@@ -245,6 +245,26 @@ function buildFallbackOutline(title: string, category: string, count: number): O
 
 }
 
+/**
+ * Complète un sommaire sans jamais écraser un chapitre déjà retouché par
+ * l'auteur : seules les entrées manquantes ou encore génériques sont remplies
+ * par le plan de secours.
+ */
+function mergeOutlineWithFallback(existing: OutlineChapter[], fallback: OutlineChapter[]): OutlineChapter[] {
+  return fallback.map((secours, index) => {
+    const current = existing[index];
+    if (current && !isGenericTitle(current.titre)) {
+      return { ...secours, ...current, numero: index + 1 };
+    }
+    return { ...secours, numero: index + 1 };
+  });
+}
+
+/** Vrai si au moins un chapitre du sommaire porte un titre écrit/choisi par l'auteur. */
+function hasEditedOutlineTitles(items: OutlineChapter[]) {
+  return items.some((item) => !isGenericTitle(item.titre));
+}
+
 function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: number) {
   if (items.length !== expectedCount) return true;
   const titles = items.map((item) => cleanText(item.titre).toLowerCase()).filter(Boolean);
