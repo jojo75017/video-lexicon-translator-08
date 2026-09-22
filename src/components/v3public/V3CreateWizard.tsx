@@ -276,6 +276,7 @@ function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: numbe
 export default function V3CreateWizard() {
   const [searchParams] = useSearchParams();
   const requestedProjectId = searchParams.get('projectId');
+  const isDirectWritingPath = searchParams.get('ecrire') === '1';
   const hub = useMemo(readHubConfig, []);
   const startingBrief = useMemo(() => readBookBrief() || {}, []);
   const startsFromExistingOutline = startingBrief.creationPath === 'existing-outline';
@@ -673,16 +674,29 @@ export default function V3CreateWizard() {
    * recherche et exclut les titres déjà proposés.
    */
   const generateTitleSerie = async (deeper: boolean) => {
-    if (aiTopic.trim().length < 4) {
-      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
+    const authorInformation = [
+      aiTopic.trim() && `Idée libre : ${aiTopic.trim()}`,
+      title.trim() && `Titre envisagé : ${title.trim()}`,
+      subtitle.trim() && `Sous-titre envisagé : ${subtitle.trim()}`,
+      description.trim() && `Informations et synopsis de l’auteur : ${description.trim()}`,
+      effectiveCategory && `Catégorie choisie : ${effectiveCategory}`,
+      cibleProfil.trim() && `Lecteur visé : ${cibleProfil.trim()}`,
+      cibleBesoins.trim() && `Besoins du lecteur : ${cibleBesoins.trim()}`,
+      cibleFrustrations.trim() && `Difficultés du lecteur : ${cibleFrustrations.trim()}`,
+      promesseCentrale.trim() && `Promesse souhaitée : ${promesseCentrale.trim()}`,
+      sourceText.trim() && `Matière fournie par l’auteur : ${sourceText.trim().slice(0, 3500)}`,
+    ].filter(Boolean).join('\n');
+    if (authorInformation.length < 10) {
+      toast.error('Remplis d’abord les informations de ton livre, même en quelques phrases.');
       return;
     }
     if (!requireAiKey()) return;
     setAiLoading(true);
     try {
       const dejaVus = allIdeas.map((idea) => `- ${idea.title}`).join('\n');
-      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose CINQ livres commerciaux différents (angles réellement distincts : méthode, promesse émotionnelle, pas-à-pas, récit, guide express…).
-Idée / niche : "${aiTopic.trim()}"
+       const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir des informations réelles données par l'auteur ci-dessous, propose CINQ livres différents et fidèles à son projet (angles réellement distincts : méthode, promesse émotionnelle, pas-à-pas, récit, guide express…).
+ Informations de l'auteur :
+ """${authorInformation}"""
 ${deeper ? `\nRecherche plus poussée : explore des angles, des promesses et des formats que l'on ne trouve pas dans les titres suivants, déjà proposés. Ne les reprends pas, ne les reformule pas :\n${dejaVus}\n` : ''}
 Règles :
 - Tout en français courant. Aucun mot latin, inventé ou étranger décoratif.
@@ -1354,6 +1368,16 @@ Règles :
       return;
     }
 
+    if (step === 0 && isDirectWritingPath && !chosenIdeaId) {
+      if (aiSeries.length === 0) {
+        toast.info('Les agents vont d’abord préparer plusieurs propositions à partir de tes informations.');
+        void runAIAssistant();
+      } else {
+        toast.info('Choisis une proposition avant de continuer vers la rédaction.');
+      }
+      return;
+    }
+
     // Les chapitres déjà retouchés par l'auteur sont toujours conservés :
     // on ne remplit que les entrées manquantes ou encore génériques.
     if (step === 1 && (outline.length !== chapters || hasRepeatedFallbackTitles(outline, chapters))) {
@@ -1994,8 +2018,12 @@ Règles :
 
 
 
-      {/* Assistant IA : titre, sous-titre, synopsis, catégories */}
-      <div className="rounded-[24px] border p-5" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}>
+       {/* Assistant IA : sur le parcours direct, il vient APRÈS la fiche afin
+           d'exploiter les informations réellement saisies par l'abonné. */}
+       <div
+         className={`${isDirectWritingPath ? 'hidden' : ''} rounded-[24px] border p-5`}
+         style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-orange-50)' }}
+       >
         <div className="flex items-center gap-2">
           <span className="v3-chip v3-chip-orange"><Wand2 className="h-3.5 w-3.5" /> Assistant IA</span>
           <span className="text-xs font-bold uppercase tracking-widest" style={{ color: 'var(--v3-muted)' }}>
@@ -2211,8 +2239,13 @@ Règles :
       {step === 0 && (
         <div className="space-y-5">
           <div>
-            <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>Fiche du livre</h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>Titre, sous-titre, catégorie KDP, auteur et synopsis : c’est la base que suivront les agents.</p>
+            {isDirectWritingPath && (
+              <span className="v3-chip v3-chip-orange mb-3"><Rocket className="h-3.5 w-3.5" /> Écrire mon livre maintenant</span>
+            )}
+            <h2 className="v3-serif text-4xl font-bold" style={{ color: 'var(--v3-ink)' }}>D’abord, parlez-nous de votre livre</h2>
+            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+              Remplissez ce que vous connaissez. Les agents utiliseront vos informations pour vous proposer plusieurs versions réalistes avant toute rédaction.
+            </p>
           </div>
           <label className="block space-y-2">
             <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Titre du livre</span>
@@ -2293,7 +2326,7 @@ Règles :
               plusieurs choix complets avant toute rédaction. */}
           <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
             <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
-              Vos informations sont notées. L’IA vous propose maintenant plusieurs choix enrichis.
+              Étape suivante : comparez plusieurs propositions créées à partir de vos informations.
             </p>
             <button
               type="button"
@@ -2302,12 +2335,56 @@ Règles :
               className="v3-btn v3-btn-primary mt-3 w-full justify-center py-4 text-base"
             >
               {aiLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
-              {aiLoading ? 'L’IA travaille…' : 'Voir les propositions de l’IA (titres, angles, synopsis)'}
+              {aiLoading ? 'Les agents analysent vos informations…' : 'Analyser mes informations et proposer 5 choix'}
             </button>
             <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
               Choisissez une proposition, ajustez-la si besoin, puis continuez : les agents rédigent ensuite votre livre.
               {outlineWasEdited && ' Votre sommaire modifié sera conservé.'}
             </p>
+
+            {isDirectWritingPath && aiSeries.length > 0 && (
+              <div className="mt-5 space-y-4 border-t pt-5" style={{ borderColor: 'var(--v3-border)' }}>
+                {aiSeries.length > 1 && (
+                  <div className="flex flex-wrap gap-2">
+                    {aiSeries.map((_, index) => (
+                      <button key={index} type="button" onClick={() => setActiveSerie(index)} className="rounded-full border px-3 py-1 text-xs font-bold" style={index === activeSerie ? { background: 'var(--v3-orange-600)', color: '#fff', borderColor: 'var(--v3-orange-600)' } : { borderColor: 'var(--v3-border)', color: 'var(--v3-muted)', background: 'var(--v3-paper)' }}>
+                        Série {index + 1}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {aiConseils[activeSerie] && (
+                  <p className="rounded-xl border p-3 text-sm" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+                    <strong>Conseil de l’agent :</strong> {aiConseils[activeSerie]}
+                  </p>
+                )}
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {(aiSeries[activeSerie] || []).map((idea) => {
+                    const retenu = chosenIdeaId === idea.id;
+                    return (
+                      <div key={idea.id} className="space-y-2 rounded-2xl border p-4 text-sm" style={{ borderColor: retenu ? 'var(--v3-orange-600)' : 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+                        <div className="flex flex-wrap gap-2">
+                          {idea.angle && <span className="rounded-full border px-2 py-0.5 text-[11px] font-bold uppercase" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{idea.angle}</span>}
+                          {retenu && <span className="rounded-full px-2 py-0.5 text-[11px] font-bold" style={{ background: 'var(--v3-orange-600)', color: '#fff' }}>Choix retenu</span>}
+                        </div>
+                        <h3 className="font-bold">{idea.title}</h3>
+                        {idea.subtitle && <p style={{ color: 'var(--v3-muted)' }}>{idea.subtitle}</p>}
+                        {idea.synopsis && <p className="text-[13px] leading-relaxed">{idea.synopsis}</p>}
+                        {idea.pourquoi && <p className="text-xs" style={{ color: 'var(--v3-muted)' }}><strong>Pourquoi :</strong> {idea.pourquoi}</p>}
+                        {idea.lisibilite && <p className="text-xs" style={{ color: 'var(--v3-muted)' }}><strong>Lisibilité :</strong> {idea.lisibilite}</p>}
+                        {idea.categories.length > 0 && <p className="text-xs" style={{ color: 'var(--v3-muted)' }}><strong>Catégories :</strong> {idea.categories.join(' · ')}</p>}
+                        <button type="button" onClick={() => applyIdea(idea)} className="v3-btn v3-btn-primary w-full justify-center">
+                          <Check className="h-4 w-4" /> Choisir cette proposition
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+                <button type="button" onClick={runMoreTitles} disabled={aiLoading} className="v3-btn v3-btn-primary w-full justify-center">
+                  {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />} Chercher 5 autres propositions
+                </button>
+              </div>
+            )}
           </div>
 
         </div>
