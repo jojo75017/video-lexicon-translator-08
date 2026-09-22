@@ -85,6 +85,71 @@ const Niches10Offer: React.FC<Props> = ({
     navigate(NICHES_10_PATH);
   };
 
+  const capturePayload = (value: string) => {
+    const utm = getStoredUtm();
+    return {
+      email: value,
+      lead_magnet: NICHES_10_LEAD_MAGNET,
+      ref_code: getStoredRefCode(),
+      utm_source: utm.utm_source || null,
+      utm_medium: utm.utm_medium || null,
+      utm_campaign: utm.utm_campaign || null,
+      landing_url:
+        utm.landing_url || (typeof window !== 'undefined' ? window.location.href : null),
+    };
+  };
+
+  // File locale de secours : aucun email capté ne doit être perdu sans trace.
+  const readFailedCaptures = (): { email: string; lead_magnet: string; ts: number }[] => {
+    try {
+      return JSON.parse(localStorage.getItem(FAILED_CAPTURES_KEY) || '[]');
+    } catch {
+      return [];
+    }
+  };
+  const stashFailedCapture = (value: string) => {
+    try {
+      const list = readFailedCaptures();
+      if (!list.some((l) => l.email === value)) {
+        list.push({ email: value, lead_magnet: NICHES_10_LEAD_MAGNET, ts: Date.now() });
+        localStorage.setItem(FAILED_CAPTURES_KEY, JSON.stringify(list.slice(-100)));
+      }
+    } catch {
+      // stockage indisponible — le console.error ci-dessous garde une trace
+    }
+  };
+
+  // Au chargement : retente discrètement les captures échouées, retire de la file
+  // celles qui réussissent.
+  React.useEffect(() => {
+    const retry = async () => {
+      const failed = readFailedCaptures();
+      if (failed.length === 0) return;
+      const remaining = [...failed];
+      for (const item of failed) {
+        try {
+          const { error } = await supabase.functions.invoke('funnel-capture-lead', {
+            body: capturePayload(item.email),
+          });
+          if (!error) {
+            const idx = remaining.findIndex((l) => l.email === item.email);
+            if (idx >= 0) remaining.splice(idx, 1);
+          }
+        } catch {
+          // reste en file pour une prochaine visite
+        }
+      }
+      try {
+        if (remaining.length === 0) localStorage.removeItem(FAILED_CAPTURES_KEY);
+        else localStorage.setItem(FAILED_CAPTURES_KEY, JSON.stringify(remaining));
+      } catch {
+        // silencieux
+      }
+    };
+    void retry();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const value = email.trim().toLowerCase();
@@ -95,24 +160,19 @@ const Niches10Offer: React.FC<Props> = ({
     setSubmitting(true);
     trackCaptureEvent(surface, 'click', { leadMagnet: NICHES_10_LEAD_MAGNET });
     try {
-      const utm = getStoredUtm();
-      await supabase.functions.invoke('funnel-capture-lead', {
-        body: {
-          email: value,
-          lead_magnet: NICHES_10_LEAD_MAGNET,
-          ref_code: getStoredRefCode(),
-          utm_source: utm.utm_source || null,
-          utm_medium: utm.utm_medium || null,
-          utm_campaign: utm.utm_campaign || null,
-          landing_url:
-            utm.landing_url || (typeof window !== 'undefined' ? window.location.href : null),
-        },
+      const { error } = await supabase.functions.invoke('funnel-capture-lead', {
+        body: capturePayload(value),
       });
+      if (error) throw error;
       trackFormSubmit(`niches10_${surface}`, value);
       trackLeadMagnetDownload(NICHES_10_LEAD_MAGNET);
       trackCaptureEvent(surface, 'submit', { leadMagnet: NICHES_10_LEAD_MAGNET });
-    } catch {
-      // La capture ne doit jamais bloquer l'accès au cadeau promis.
+    } catch (err) {
+      // Le cadeau reste accessible, mais l'échec laisse une trace et l'email
+      // est mis en file locale pour une retentative à la prochaine visite.
+      console.error('[Niches10Offer] capture échouée pour', value, err);
+      trackCaptureEvent(surface, 'error', { leadMagnet: NICHES_10_LEAD_MAGNET });
+      stashFailedCapture(value);
     } finally {
       rememberNiches10Email(value);
       setSubmitting(false);
