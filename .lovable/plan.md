@@ -1,38 +1,27 @@
-# Accueil V3 avant-première centré sur la réservation
+# Choisir son titre parmi plusieurs propositions travaillées
 
-## Résultat attendu
-Le haut de `/v3` devient une vraie page d’avant-première : promesse immédiate, ouverture datée, compte à rebours, un seul appel à l’action pour laisser son email, puis preuve auteur compacte.
+Sur la page de création (`/v3/create`), l'assistant ne propose aujourd'hui **qu'un seul** titre, avec son sous-titre et son synopsis. Si le titre ne plaît pas, il faut relancer et l'ancien est perdu.
 
-## Modifications
-1. **Simplifier l’ouverture de la page**
-   - Retirer le texte « Vous ne savez pas par où commencer ? », les encarts de démarrage et le gros lien vers les 539 questions.
-   - Ne modifier aucune autre section plus bas.
+## Ce qui change
 
-2. **Refondre le premier écran**
-   - Garder la charte ivoire, or, émeraude et serif.
-   - Afficher le badge « Ouverture le 1er octobre ».
-   - Ajouter un compte à rebours sobre jusqu’au 1er octobre 2026 à 00:00, heure de Paris, en jours/heures/minutes.
-   - Remplacer le titre, le sous-titre et le paragraphe par les textes fournis.
-   - Conserver les cinq pastilles Kindle, Livre broché, Couverture, Livre audio et Métadonnées.
-   - Remplacer le bouton de découverte par « Réserver ma place — kit + 10 niches offerts ».
+1. **5 propositions au lieu d'une.** L'assistant renvoie 5 ensembles complets : titre, sous-titre, synopsis (150–200 mots), catégories Amazon — plus, pour chaque proposition :
+   - un **angle** (ce qui la différencie : pratique, émotionnel, méthode, etc.),
+   - un **« pourquoi ce titre »** en une ou deux phrases (le conseil de l'agent),
+   - un repère de **lisibilité** (longueur du titre, mots-clés visibles en couverture).
+2. **Un conseil d'agent au-dessus des cartes** : laquelle il recommande et pourquoi, en une phrase. Aucune donnée chiffrée inventée (pas de volume de recherche ni de ventes).
+3. **Bouton « Chercher d'autres titres »** : relance une recherche plus poussée en excluant les titres déjà proposés, pour obtenir 5 nouvelles pistes réellement différentes. Les propositions précédentes restent consultables (onglet « Série 1 », « Série 2 »…).
+4. **Bouton « Choisir ce titre »** sur chaque carte : remplace d'un coup le titre, le titre final, le sous-titre et le synopsis du livre (et la catégorie si elle est encore vide), avec confirmation à l'écran de ce qui a été remplacé. La carte choisie reste marquée « Titre retenu ».
+5. **Affinage libre** : un petit champ « Ajuster ce titre » sous la carte retenue (ex. « plus court », « plus émotionnel », « garde le mot méditation ») régénère uniquement titre + sous-titre + synopsis de cette proposition.
 
-3. **Réutiliser l’inscription existante**
-   - Le bouton ouvrira une fenêtre d’inscription email légère utilisant directement le composant existant des 10 niches.
-   - L’enregistrement, le suivi et l’accès au cadeau continueront à passer par le flux existant, sans nouvelle base ni nouveau service.
-   - Une fois l’email déjà connu, le même flux permet d’accéder directement au cadeau.
-
-4. **Remonter la preuve auteur**
-   - Déplacer la section « Auteur invité — Mr Georges Boubet, 71 livres publiés » juste sous le premier écran.
-   - La rendre plus compacte tout en conservant les vraies couvertures Amazon et le lien auteur.
-   - Retirer sa copie du bas afin d’éviter le doublon.
-
-## Vérification
-- Contrôler `/v3` sur ordinateur et mobile.
-- Vérifier le compte à rebours, l’ouverture du formulaire, la validation email et la lisibilité des couvertures.
-- Confirmer que les sections suivant la preuve auteur restent dans leur ordre et leur état actuels.
+Rien d'autre du parcours de création ne change : les étapes, le sommaire, le workflow des agents et les exports restent identiques.
 
 ## Détails techniques
-- Fichiers principaux : `src/pages/v3public/V3HomePage.tsx` et `src/components/v3public/V3HeroBanner.tsx`.
-- Date cible explicite : `2026-10-01T00:00:00+02:00`.
-- Capture réutilisée : `Niches10Offer` → `funnel-capture-lead` avec le cadeau `10-niches-offertes`.
-- Aucun changement de paiement, de tarifs, de droits d’accès ou de logique des sections inférieures.
+
+- `src/components/v3public/V3CreateWizard.tsx` :
+  - `aiResult` devient `aiSeries: TitleIdea[][]` + `activeSerie` et `chosenIdeaId`, où `TitleIdea = { id, title, subtitle, synopsis, categories, angle, pourquoi, longueur }`.
+  - `runAIAssistant` : prompt mis à jour pour renvoyer `{ conseil, propositions: [5 objets] }` en JSON strict, français uniquement, sans chiffres inventés ; `callAIWriting(..., { jsonMode: true, temperature: 0.9, maxTokens: 8192 })`, parsing tolérant conservé (`JSON.parse` puis extraction `{…}`).
+  - `runMoreTitles()` : même appel avec la liste des titres déjà produits en consigne d'exclusion et une consigne de recherche plus large (angles, promesses, formats concurrents) ; ajoute une série au tableau.
+  - `applyIdea(idea)` remplace `title`, `finalTitle`, `subtitle`, `description` (synopsis) et la catégorie si vide — même logique que l'`applyAIResult` actuel, appliquée à l'idée choisie.
+  - `refineIdea(idea, consigne)` : appel IA ciblé renvoyant `{ title, subtitle, synopsis }` et mise à jour de l'idée dans la série.
+- Rendu : cartes en grille `sm:grid-cols-2` dans le bloc « Assistant IA » existant, charte V3 (ivoire/or, boutons orange texte blanc), badges d'angle, bouton « Choisir ce titre », lien « Ajuster ce titre ».
+- Aucune nouvelle table, aucune edge function, aucun changement de tarif. BYOK conservé (`getProvider` / `validateKeyFormat`) avec le même message si la clé manque.
