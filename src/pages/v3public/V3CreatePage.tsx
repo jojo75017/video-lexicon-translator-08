@@ -357,15 +357,17 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return () => clearTimeout(t);
   }, [sommaireIa]);
   // Rien ne démarre avant la validation du sommaire : si la fiche est effacée
-  // ou le sommaire dévalidé, le workflow se referme.
+  // ou le sommaire dévalidé, le workflow se referme. Exception : le parcours
+  // « Écrire mon livre maintenant », où la fiche du livre reste ouverte.
   useEffect(() => {
+    if (directWriting) return;
     const sync = () => {
       const validated = Boolean(readBookBrief()?.outlineValidated);
       if (!validated) setShowWizard(false);
     };
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
-  }, []);
+  }, [directWriting]);
 
   const launchWorkflow = () => {
     if (!readBookBrief()?.outlineValidated) {
