@@ -34,8 +34,9 @@ export default function AdminTunnelV3Page() {
   const [clics, setClics] = useState(0);
   const [reservations, setReservations] = useState(0);
   const [jours, setJours] = useState<DayRow[]>([]);
+  const [majLe, setMajLe] = useState<Date | null>(null);
 
-  const charger = useCallback(async () => {
+  const charger = useCallback(async (silencieux = false) => {
     setLoading(true);
     try {
       const [{ data: events, error: evErr }, { data: leads, error: leadErr }] = await Promise.all([
