@@ -38,11 +38,11 @@ export default function V3StartHerePage() {
               </span>
               <span className="mt-3 block text-lg font-bold text-foreground">Écrire mon livre maintenant</span>
               <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
-                Les agents écrivent tout : titre, sommaire, chapitres, relecture. Vous corrigez après si vous voulez.
+                Remplissez votre fiche, comparez 5 propositions fondées sur vos informations, puis choisissez celle à rédiger.
               </span>
             </span>
             <span className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground">
-              <Rocket className="h-4 w-4" /> Lancer l’écriture
+              <Rocket className="h-4 w-4" /> Ouvrir la fiche du livre
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </span>
           </Link>
