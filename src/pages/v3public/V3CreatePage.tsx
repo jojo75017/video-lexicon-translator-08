@@ -65,8 +65,11 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   const type = params.get('type');
   const sommaireIa = params.get('sommaire') === 'ia';
   const projectId = params.get('projectId');
+  /** « Écrire mon livre maintenant » : la fiche du livre s'ouvre tout de suite,
+   *  sans passer par le récit ni par le sommaire. */
+  const directWriting = params.get('ecrire') === '1';
 
-  const [showWizard, setShowWizard] = useState(false);
+  const [showWizard, setShowWizard] = useState(directWriting);
   const [openedBook, setOpenedBook] = useState<{ id: string; title: string; chapters: number } | null>(null);
   const [openingBook, setOpeningBook] = useState(false);
   const [briefKey, setBriefKey] = useState(0);
@@ -74,6 +77,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
   // Étape ouverte : on reprend là où l'auteur en était.
   const [desk, setDesk] = useState<DeskId>(() => {
+    if (directWriting) return 3;
     const b = readBookBrief() || {};
     if ((b.outline?.length ?? 0) > 0 && b.outlineValidated) return 3;
     if ((b.outline?.length ?? 0) > 0) return 2;
@@ -246,7 +250,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       clearBookBrief();
       writeLocalThread([]);
       writeBookBrief({ mode: wanted, creationPath: biography ? 'biography' : 'story' });
-      setDesk(1);
+      if (!directWriting) setDesk(1);
       setOpenedBook(null);
       return;
     }
@@ -353,15 +357,28 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return () => clearTimeout(t);
   }, [sommaireIa]);
   // Rien ne démarre avant la validation du sommaire : si la fiche est effacée
-  // ou le sommaire dévalidé, le workflow se referme.
+  // ou le sommaire dévalidé, le workflow se referme. Exception : le parcours
+  // « Écrire mon livre maintenant », où la fiche du livre reste ouverte.
   useEffect(() => {
+    if (directWriting) return;
     const sync = () => {
       const validated = Boolean(readBookBrief()?.outlineValidated);
       if (!validated) setShowWizard(false);
     };
     window.addEventListener(BOOK_BRIEF_EVENT, sync);
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
-  }, []);
+  }, [directWriting]);
+
+  // Arrivée depuis « Écrire mon livre maintenant » : on amène l'auteur
+  // directement sur la fiche du livre à remplir.
+  useEffect(() => {
+    if (!directWriting) return;
+    const t = setTimeout(() => {
+      wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [directWriting]);
+
 
   const launchWorkflow = () => {
     if (!readBookBrief()?.outlineValidated) {
