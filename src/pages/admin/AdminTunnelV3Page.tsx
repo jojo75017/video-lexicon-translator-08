@@ -92,6 +92,12 @@ export default function AdminTunnelV3Page() {
           .sort((a, b) => (a.jour < b.jour ? 1 : -1))
           .slice(0, 14),
       );
+      setMajLe(new Date());
+      if (!silencieux) {
+        toast.success(
+          `Chiffres à jour — ${nbVisites} visite(s), ${nbClics} clic(s), ${nbReservations} réservation(s)`,
+        );
+      }
     } catch (e) {
       console.error('Tunnel V3 — chargement impossible', e);
       toast.error('Impossible de charger les chiffres du tunnel.');
@@ -101,7 +107,7 @@ export default function AdminTunnelV3Page() {
   }, []);
 
   useEffect(() => {
-    void charger();
+    void charger(true);
   }, [charger]);
 
   const etapes = useMemo(
