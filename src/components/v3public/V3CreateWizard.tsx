@@ -1207,7 +1207,9 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
     setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
     setCharacters([makeCharacter()]); setOutline(buildFallbackOutline('', 'Roman', 12)); setFinalTitle(''); setSubtitle('');
-    setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
+    setAiTopic(''); setAiSeries([]); setAiConseils([]); setActiveSerie(0); setChosenIdeaId(null);
+    setRefineIdeaId(null); setRefineInstruction('');
+    setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
     syncProjectId(null);
     coverTriggeredRef.current = false;
     [
