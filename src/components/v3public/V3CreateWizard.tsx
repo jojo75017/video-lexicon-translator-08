@@ -337,8 +337,9 @@ export default function V3CreateWizard() {
     }
   };
 
-  // Arrivée depuis l'onglet « Écrire maintenant » du Hub : lance le workflow
-  // directement (ou guide vers la phrase d'idée si le formulaire est vide).
+  // Arrivée depuis « Lancer l'écriture » : on ouvre le formulaire du livre.
+  // Les agents ne démarrent qu'après la saisie des informations et le choix
+  // d'une des propositions enrichies par l'IA.
   const autoWriteRef = useRef(false);
   useEffect(() => {
     if (autoWriteRef.current) return;
@@ -351,9 +352,11 @@ export default function V3CreateWizard() {
     }
     if (searchParams.get('ecrire') !== '1') return;
     autoWriteRef.current = true;
-    void startWritingNow();
+    setStep(0);
+    window.scrollTo({ top: 0, behavior: 'auto' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
 
   useEffect(() => {
@@ -2286,20 +2289,27 @@ Règles :
             </div>
           )}
 
-          {/* Raccourci : écrire tout de suite, sans passer par les étapes ni le sommaire. */}
-          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+          {/* Les agents enrichissent les informations saisies et proposent
+              plusieurs choix complets avant toute rédaction. */}
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+            <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
+              Vos informations sont notées. L’IA vous propose maintenant plusieurs choix enrichis.
+            </p>
             <button
               type="button"
-              onClick={() => { void startWritingNow(); }}
-              className="v3-btn v3-btn-primary w-full justify-center py-4 text-base"
+              onClick={runAIAssistant}
+              disabled={aiLoading}
+              className="v3-btn v3-btn-primary mt-3 w-full justify-center py-4 text-base"
             >
-              <Rocket className="h-5 w-5" /> Écrire maintenant — les agents s’occupent du reste
+              {aiLoading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Sparkles className="h-5 w-5" />}
+              {aiLoading ? 'L’IA travaille…' : 'Voir les propositions de l’IA (titres, angles, synopsis)'}
             </button>
             <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
-              Vous pourrez relire et modifier le sommaire à tout moment.
-              {outlineWasEdited && ' Votre sommaire modifié sera utilisé.'}
+              Choisissez une proposition, ajustez-la si besoin, puis continuez : les agents rédigent ensuite votre livre.
+              {outlineWasEdited && ' Votre sommaire modifié sera conservé.'}
             </p>
           </div>
+
         </div>
       )}
 
