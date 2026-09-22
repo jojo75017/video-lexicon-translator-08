@@ -172,7 +172,7 @@ function ModuleCard({
 }
 
 
-type HubTab = 'parcours' | 'outils' | 'toolsV2' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'pending' | 'script' | 'assistant' | 'bookperfect' | 'export';
+type HubTab = 'ecrire' | 'parcours' | 'outils' | 'toolsV2' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'pending' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon; highlight?: boolean }[] = [
   { id: 'ecrire', label: 'Écrire maintenant', icon: Rocket, highlight: true },
