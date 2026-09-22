@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   Sparkles, BookOpen, Library, ArrowRight,
-  Wand2, Feather, Rocket, Palette, ListTree, PenLine, HelpCircle,
+  Wand2, Feather, Rocket, Palette, ListTree, PenLine,
 } from 'lucide-react';
 
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
@@ -29,7 +29,6 @@ import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
 import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
 import V3BeforeYouStartPanel from '@/components/v3public/V3BeforeYouStartPanel';
 import V3GoFurtherPanel from '@/components/v3public/V3GoFurtherPanel';
-import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 import ReadingGate from '@/components/marketing/ReadingGate';
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 
@@ -61,28 +60,58 @@ export default function V3HomePage() {
       {/* 1. LANCEMENT — bande fine */}
       <V3LaunchBanner />
 
-      {/* 2. DEUX ENCARTS DISCRETS — juste au-dessus de la promesse */}
-      <div className="v3-shell">
-        <p className="mb-3 text-center font-serif text-lg" style={{ color: 'var(--v3-ink)' }}>
-          Vous ne savez pas par où commencer ? Cliquez sur un des encarts ci-dessous et vous serez redirigé vers vos besoins ou infos.
-        </p>
-        <V3StartIdeaCTA variant="discreet" />
-        {/* Lien vers la foire aux questions — 539 réponses qui ouvrent le bon outil */}
-        <div className="mt-4 flex justify-center">
-          <Link
-            to="/v3/fonctionnalites/questions"
-            className="group inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-semibold transition-all hover:-translate-y-0.5 hover:shadow-sm"
-            style={{ borderColor: 'var(--v3-gold-600)', color: 'var(--v3-emerald)', background: 'var(--v3-gold-soft)' }}
-          >
-            <HelpCircle className="h-4 w-4" style={{ color: 'var(--v3-gold-600)' }} />
-            Une question sur la création, la couverture, le KDP ou les forfaits&nbsp;? Voir les 539 questions-réponses
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
-      </div>
-
-      {/* 3. PROMESSE PRINCIPALE */}
+      {/* 2. PROMESSE PRINCIPALE */}
       <V3HeroBanner />
+
+      {/* PREUVE AUTEUR — visible avant les offres */}
+      <section className="v3-section-dark">
+        <div className="v3-shell py-8 md:py-10">
+          <div className="grid items-center gap-6 lg:grid-cols-[minmax(220px,0.75fr)_minmax(0,1.8fr)_auto]">
+            <div>
+              <span
+                className="v3-chip"
+                style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--v3-gold)', borderColor: 'transparent' }}
+              >
+                Auteur invité
+              </span>
+              <h2 className="v3-serif mt-3 text-2xl font-semibold text-white md:text-3xl">Mr Georges Boubet</h2>
+              <p className="mt-1 text-sm text-white/70">
+                71 livres publiés sur Amazon.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-6 gap-2 sm:gap-3">
+              {AUTHOR_BOOKS.map((b) => (
+                <a
+                  key={b.asin}
+                  href={amazonBookUrl(b.asin)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group block"
+                  title={b.title}
+                >
+                  <div className="aspect-[2/3] overflow-hidden rounded-md bg-black/40 shadow-md ring-1 ring-white/10 transition-transform group-hover:-translate-y-1">
+                    <img
+                      src={coverUrl(b.asin)}
+                      alt={`Couverture ${b.title}`}
+                      loading="eager"
+                      onError={(e) => {
+                        const img = e.currentTarget;
+                        if (img.src !== fallbackCoverUrl(b.asin)) img.src = fallbackCoverUrl(b.asin);
+                      }}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-btn-gold justify-self-start lg:justify-self-end">
+              Voir sur Amazon <ArrowRight className="h-4 w-4" />
+            </a>
+          </div>
+        </div>
+      </section>
 
       {/* Trois offres — aperçu discret, détail sur /v3/forfaits */}
       <V3PricingOverview />
@@ -190,55 +219,6 @@ export default function V3HomePage() {
                       Ouvrir <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </Link>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* AUTEUR INVITÉ */}
-          <section className="v3-section-dark">
-            <div className="v3-shell py-16">
-              <div className="flex flex-wrap items-start justify-between gap-6">
-                <div>
-                  <span
-                    className="v3-chip"
-                    style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--v3-gold)', borderColor: 'transparent' }}
-                  >
-                    Auteur invité
-                  </span>
-                  <h2 className="v3-serif mt-4 text-3xl font-semibold text-white md:text-4xl">Mr Georges Boubet</h2>
-                  <p className="mt-2 max-w-xl text-sm text-white/60">
-                    71 livres publiés. Thrillers, sagas, jeunesse — le catalogue d'un auteur passionné.
-                  </p>
-                </div>
-                <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-btn-gold">
-                  Voir sur Amazon <ArrowRight className="h-4 w-4" />
-                </a>
-              </div>
-
-              <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-6">
-                {AUTHOR_BOOKS.map((b) => (
-                  <a
-                    key={b.asin}
-                    href={amazonBookUrl(b.asin)}
-                    target="_blank" rel="noopener noreferrer"
-                    className="group block"
-                    title={b.title}
-                  >
-                    <div className="aspect-[2/3] overflow-hidden rounded-lg bg-black/40 shadow-lg ring-1 ring-white/10 transition-transform group-hover:-translate-y-1 group-hover:shadow-2xl">
-                      <img
-                        src={coverUrl(b.asin)}
-                        alt={`Couverture ${b.title}`}
-                        loading="lazy"
-                        onError={(e) => {
-                          const img = e.currentTarget;
-                          if (img.src !== fallbackCoverUrl(b.asin)) img.src = fallbackCoverUrl(b.asin);
-                        }}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div className="mt-2 line-clamp-2 text-[11px] leading-tight text-white/70">{b.title}</div>
-                  </a>
                 ))}
               </div>
             </div>
