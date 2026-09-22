@@ -76,6 +76,18 @@ type HubConfig = {
   numberOfChapters?: number;
 };
 
+/** Une proposition complète de livre issue de l'assistant (titre + sous-titre + synopsis). */
+type TitleIdea = {
+  id: string;
+  title: string;
+  subtitle: string;
+  synopsis: string;
+  categories: string[];
+  angle: string;
+  pourquoi: string;
+  lisibilite: string;
+};
+
 const CONFIG_KEY = 'edition_book_config_v1';
 const TARGET_WORDS_KEY = 'edition_chapter_target_words_v1';
 // Ne jamais partager cette clé avec la fiche auteur (`BookBrief`) : l'ancien
@@ -463,10 +475,17 @@ export default function V3CreateWizard() {
   const [arbreNarratif, setArbreNarratif] = useState('');
 
 
-  // Assistant IA — trouve titre / sous-titre / synopsis / catégories à partir d'une idée ou d'une niche.
+  // Assistant IA — plusieurs propositions complètes (titre / sous-titre / synopsis / catégories)
+  // à partir d'une idée ou d'une niche. L'abonné choisit celle qui lui parle.
   const [aiTopic, setAiTopic] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiResult, setAiResult] = useState<{ title: string; subtitle: string; synopsis: string; categories: string[] } | null>(null);
+  const [aiSeries, setAiSeries] = useState<TitleIdea[][]>([]);
+  const [aiConseils, setAiConseils] = useState<string[]>([]);
+  const [activeSerie, setActiveSerie] = useState(0);
+  const [chosenIdeaId, setChosenIdeaId] = useState<string | null>(null);
+  const [refineIdeaId, setRefineIdeaId] = useState<string | null>(null);
+  const [refineInstruction, setRefineInstruction] = useState('');
+  const [refineLoading, setRefineLoading] = useState(false);
   // Proposition complète : l'abonné n'a qu'une idée à donner, les agents remplissent le reste.
   const [proposalLoading, setProposalLoading] = useState(false);
   const [proposedFields, setProposedFields] = useState<string[]>([]);
@@ -585,43 +604,88 @@ export default function V3CreateWizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [requestedProjectId]);
 
-  const runAIAssistant = async () => {
-    if (aiTopic.trim().length < 4) {
-      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
-      return;
-    }
+  /** Toutes les idées déjà proposées, toutes séries confondues. */
+  const allIdeas = aiSeries.flat();
+
+  const requireAiKey = () => {
     const provider = getProvider();
     const key = getProviderKey(provider);
     if (!key || !validateKeyFormat(provider, key)) {
       toast.error('Ajoute et valide ta clé IA en haut de la page avant de lancer l’assistant.');
+      return false;
+    }
+    return true;
+  };
+
+  const parseJsonLoose = (raw: string): any => {
+    try { return JSON.parse(raw); } catch {
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (m) { try { return JSON.parse(m[0]); } catch { /* ignoré */ } }
+    }
+    return null;
+  };
+
+  /**
+   * Génère une série de 5 propositions complètes (titre, sous-titre, synopsis,
+   * catégories) avec l'angle et le conseil de l'agent. `deeper` élargit la
+   * recherche et exclut les titres déjà proposés.
+   */
+  const generateTitleSerie = async (deeper: boolean) => {
+    if (aiTopic.trim().length < 4) {
+      toast.error('Décris ton idée, ton sujet ou ta niche (au moins quelques mots).');
       return;
     }
+    if (!requireAiKey()) return;
     setAiLoading(true);
     try {
-      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose UN livre commercial percutant.
+      const dejaVus = allIdeas.map((idea) => `- ${idea.title}`).join('\n');
+      const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir de l'idée / niche ci-dessous, propose CINQ livres commerciaux différents (angles réellement distincts : méthode, promesse émotionnelle, pas-à-pas, récit, guide express…).
 Idée / niche : "${aiTopic.trim()}"
+${deeper ? `\nRecherche plus poussée : explore des angles, des promesses et des formats que l'on ne trouve pas dans les titres suivants, déjà proposés. Ne les reprends pas, ne les reformule pas :\n${dejaVus}\n` : ''}
+Règles :
+- Tout en français courant. Aucun mot latin, inventé ou étranger décoratif.
+- N'invente AUCUNE donnée mesurée : pas de volume de recherche, pas de chiffre de ventes, pas de pourcentage.
+- Le champ "pourquoi" explique en une ou deux phrases pourquoi ce titre peut fonctionner (clarté, promesse, lecteur visé).
 
 Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce schéma :
 {
-  "title": "titre principal court et vendeur (max 70 caractères)",
-  "subtitle": "sous-titre bénéfice/promesse (max 120 caractères)",
-  "synopsis": "synopsis complet de 150 à 200 mots, style vendeur, en français, décrivant le contenu, le lecteur visé et la transformation obtenue",
-  "categories": ["3 à 5 catégories Amazon FR pertinentes, en français, séparées ici sous forme de tableau"]
+  "conseil": "en une phrase, laquelle des cinq tu recommandes et pourquoi",
+  "propositions": [
+    {
+      "title": "titre principal court et vendeur (max 70 caractères)",
+      "subtitle": "sous-titre bénéfice/promesse (max 120 caractères)",
+      "synopsis": "synopsis de 150 à 200 mots, style vendeur, contenu, lecteur visé et transformation obtenue",
+      "categories": ["3 à 5 catégories Amazon FR en français"],
+      "angle": "l'angle en 2 à 4 mots",
+      "pourquoi": "1 à 2 phrases de conseil éditorial",
+      "lisibilite": "repère de lisibilité en couverture : longueur du titre et mots-clés visibles"
+    }
+  ]
 }`;
-      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.8, maxTokens: 4096 });
-      let parsed: any = null;
-      try { parsed = JSON.parse(raw); } catch {
-        const m = raw.match(/\{[\s\S]*\}/);
-        if (m) { try { parsed = JSON.parse(m[0]); } catch {} }
-      }
-      if (!parsed?.title) throw new Error('Réponse IA invalide.');
-      setAiResult({
-        title: String(parsed.title || '').slice(0, 120),
-        subtitle: String(parsed.subtitle || '').slice(0, 160),
-        synopsis: String(parsed.synopsis || '').trim(),
-        categories: Array.isArray(parsed.categories) ? parsed.categories.map(String).slice(0, 6) : [],
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.9, maxTokens: 8192 });
+      const parsed = parseJsonLoose(raw);
+      const list = Array.isArray(parsed?.propositions) ? parsed.propositions : [];
+      const ideas: TitleIdea[] = list
+        .filter((item: any) => String(item?.title || '').trim())
+        .slice(0, 5)
+        .map((item: any) => ({
+          id: makeId(),
+          title: cleanText(String(item.title || '')).slice(0, 120),
+          subtitle: cleanText(String(item.subtitle || '')).slice(0, 160),
+          synopsis: cleanText(String(item.synopsis || '')).trim(),
+          categories: Array.isArray(item.categories) ? item.categories.map(String).slice(0, 6) : [],
+          angle: cleanText(String(item.angle || '')).slice(0, 60),
+          pourquoi: cleanText(String(item.pourquoi || '')).trim(),
+          lisibilite: cleanText(String(item.lisibilite || '')).trim(),
+        }));
+      if (!ideas.length) throw new Error('Réponse IA invalide.');
+      setAiSeries((prev) => {
+        const next = [...prev, ideas];
+        setActiveSerie(next.length - 1);
+        return next;
       });
-      toast.success('Propositions IA prêtes — clique « Appliquer » pour remplir le formulaire.');
+      setAiConseils((prev) => [...prev, cleanText(String(parsed?.conseil || '')).trim()]);
+      toast.success(`${ideas.length} propositions prêtes — choisis le titre qui te parle.`);
     } catch (e: any) {
       toast.error(e?.message || 'Impossible de générer les propositions.');
     } finally {
@@ -629,19 +693,66 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     }
   };
 
-  const applyAIResult = () => {
-    if (!aiResult) return;
-    setTitle(aiResult.title);
-    setFinalTitle(aiResult.title);
-    setSubtitle(aiResult.subtitle);
-    setDescription(aiResult.synopsis);
-    const firstCat = aiResult.categories[0];
-    if (firstCat) {
-      const match = CATEGORIES.find((c) => c.toLowerCase() === firstCat.toLowerCase());
-      if (match) setCategory(match);
-      else { setCategory('Autre'); setCustomCategory(firstCat); }
+  const runAIAssistant = () => generateTitleSerie(false);
+  const runMoreTitles = () => generateTitleSerie(true);
+
+  /** Remplace le titre, le sous-titre et le synopsis du livre par l'idée choisie. */
+  const applyIdea = (idea: TitleIdea) => {
+    setTitle(idea.title);
+    setFinalTitle(idea.title);
+    setSubtitle(idea.subtitle);
+    setDescription(idea.synopsis);
+    if (!category || category === 'Roman') {
+      const firstCat = idea.categories[0];
+      if (firstCat) {
+        const match = CATEGORIES.find((c) => c.toLowerCase() === firstCat.toLowerCase());
+        if (match) setCategory(match);
+        else { setCategory('Autre'); setCustomCategory(firstCat); }
+      }
     }
-    toast.success('Formulaire rempli — vérifie et continue vers l’étape suivante.');
+    setChosenIdeaId(idea.id);
+    setRefineIdeaId(null);
+    setRefineInstruction('');
+    toast.success('Titre retenu — titre, sous-titre et synopsis sont remplacés.');
+  };
+
+  /** Ajuste une proposition selon une consigne libre (plus court, plus émotionnel…). */
+  const refineIdea = async (idea: TitleIdea) => {
+    const consigne = refineInstruction.trim();
+    if (consigne.length < 3) {
+      toast.error('Indique ton ajustement (ex : plus court, plus émotionnel).');
+      return;
+    }
+    if (!requireAiKey()) return;
+    setRefineLoading(true);
+    try {
+      const prompt = `Tu es un éditeur senior Amazon KDP. Ajuste la proposition de livre ci-dessous selon la consigne de l'auteur.
+Consigne : "${consigne}"
+
+Titre actuel : ${idea.title}
+Sous-titre actuel : ${idea.subtitle}
+Synopsis actuel : ${idea.synopsis}
+
+Règles : tout en français courant, aucun mot latin ou inventé, aucune donnée chiffrée inventée.
+Réponds STRICTEMENT en JSON valide : {"title": "...", "subtitle": "...", "synopsis": "synopsis de 150 à 200 mots"}`;
+      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.85, maxTokens: 4096 });
+      const parsed = parseJsonLoose(raw);
+      if (!parsed?.title) throw new Error('Réponse IA invalide.');
+      const updated: TitleIdea = {
+        ...idea,
+        title: cleanText(String(parsed.title || '')).slice(0, 120),
+        subtitle: cleanText(String(parsed.subtitle || idea.subtitle)).slice(0, 160),
+        synopsis: cleanText(String(parsed.synopsis || idea.synopsis)).trim(),
+      };
+      setAiSeries((prev) => prev.map((serie) => serie.map((item) => (item.id === idea.id ? updated : item))));
+      if (chosenIdeaId === idea.id) applyIdea(updated);
+      else toast.success('Proposition ajustée — clique « Choisir ce titre » pour l’appliquer.');
+      setRefineInstruction('');
+    } catch (e: any) {
+      toast.error(e?.message || 'Impossible d’ajuster cette proposition.');
+    } finally {
+      setRefineLoading(false);
+    }
   };
 
   /**
@@ -1096,7 +1207,9 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
     setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
     setCharacters([makeCharacter()]); setOutline(buildFallbackOutline('', 'Roman', 12)); setFinalTitle(''); setSubtitle('');
-    setAiTopic(''); setAiResult(null); setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
+    setAiTopic(''); setAiSeries([]); setAiConseils([]); setActiveSerie(0); setChosenIdeaId(null);
+    setRefineIdeaId(null); setRefineInstruction('');
+    setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
     syncProjectId(null);
     coverTriggeredRef.current = false;
     [
@@ -1870,27 +1983,136 @@ Règles :
             ))}
           </div>
         )}
-        {aiResult && (
-
-          <div className="mt-4 rounded-xl border p-4 text-sm space-y-2" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
-            <div><strong>Titre :</strong> {aiResult.title}</div>
-            {aiResult.subtitle && <div><strong>Sous-titre :</strong> {aiResult.subtitle}</div>}
-            <div><strong>Synopsis :</strong> {aiResult.synopsis}</div>
-            {aiResult.categories.length > 0 && (
+        {aiSeries.length > 0 && (
+          <div className="mt-4 space-y-3">
+            {aiSeries.length > 1 && (
               <div className="flex flex-wrap items-center gap-2">
-                <strong>Catégories :</strong>
-                {aiResult.categories.map((c) => (
-                  <span key={c} className="rounded-full border px-2 py-0.5 text-xs" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{c}</span>
+                {aiSeries.map((_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    onClick={() => setActiveSerie(index)}
+                    className="rounded-full border px-3 py-1 text-xs font-bold"
+                    style={index === activeSerie
+                      ? { background: 'var(--v3-orange-600)', color: '#fff', borderColor: 'var(--v3-orange-600)' }
+                      : { borderColor: 'var(--v3-border)', color: 'var(--v3-muted)', background: 'var(--v3-paper)' }}
+                  >
+                    Série {index + 1}
+                  </button>
                 ))}
               </div>
             )}
+
+            {aiConseils[activeSerie] && (
+              <div className="rounded-xl border p-3 text-sm" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+                <strong>Conseil de l’agent :</strong> {aiConseils[activeSerie]}
+              </div>
+            )}
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              {(aiSeries[activeSerie] || []).map((idea) => {
+                const retenu = chosenIdeaId === idea.id;
+                return (
+                  <div
+                    key={idea.id}
+                    className="rounded-2xl border p-4 text-sm space-y-2"
+                    style={{
+                      borderColor: retenu ? 'var(--v3-orange-600)' : 'var(--v3-border)',
+                      background: 'var(--v3-paper)',
+                      color: 'var(--v3-ink)',
+                    }}
+                  >
+                    <div className="flex flex-wrap items-center gap-2">
+                      {idea.angle && (
+                        <span className="rounded-full border px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>
+                          {idea.angle}
+                        </span>
+                      )}
+                      {retenu && (
+                        <span className="rounded-full px-2 py-0.5 text-[11px] font-bold" style={{ background: 'var(--v3-orange-600)', color: '#fff' }}>
+                          Titre retenu
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="font-bold">{idea.title}</div>
+                    {idea.subtitle && <div style={{ color: 'var(--v3-muted)' }}>{idea.subtitle}</div>}
+                    {idea.synopsis && <p className="text-[13px] leading-relaxed">{idea.synopsis}</p>}
+                    {idea.pourquoi && (
+                      <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
+                        <strong>Pourquoi ce titre :</strong> {idea.pourquoi}
+                      </p>
+                    )}
+                    {idea.lisibilite && (
+                      <p className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
+                        <strong>Lisibilité :</strong> {idea.lisibilite} · {idea.title.length} caractères
+                      </p>
+                    )}
+                    {idea.categories.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {idea.categories.map((c) => (
+                          <span key={c} className="rounded-full border px-2 py-0.5 text-[11px]" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-muted)' }}>{c}</span>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => applyIdea(idea)}
+                        className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+                        style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+                      >
+                        <Check className="h-3.5 w-3.5" /> Choisir ce titre
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRefineIdeaId(refineIdeaId === idea.id ? null : idea.id);
+                          setRefineInstruction('');
+                        }}
+                        className="rounded-full border px-3 py-1.5 text-xs font-bold"
+                        style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }}
+                      >
+                        Ajuster ce titre
+                      </button>
+                    </div>
+
+                    {refineIdeaId === idea.id && (
+                      <div className="flex flex-col gap-2 pt-1 sm:flex-row">
+                        <input
+                          value={refineInstruction}
+                          onChange={(e) => setRefineInstruction(e.target.value.slice(0, 160))}
+                          placeholder="Ex : plus court, plus émotionnel, garde le mot méditation…"
+                          className="flex-1 rounded-xl border px-3 py-2 text-xs outline-none"
+                          style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-ivory, #fff)' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => refineIdea(idea)}
+                          disabled={refineLoading}
+                          className="inline-flex items-center justify-center gap-2 rounded-full px-3 py-2 text-xs font-bold disabled:opacity-60"
+                          style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
+                        >
+                          {refineLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+                          Régénérer
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
             <button
               type="button"
-              onClick={applyAIResult}
-              className="mt-2 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+              onClick={runMoreTitles}
+              disabled={aiLoading}
+              className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold disabled:opacity-60"
               style={{ background: 'var(--v3-orange-600)', color: '#fff' }}
             >
-              <Check className="h-3.5 w-3.5" /> Appliquer au formulaire
+              {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+              Chercher d’autres titres (recherche plus poussée)
             </button>
           </div>
         )}
