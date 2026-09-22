@@ -369,6 +369,17 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, [directWriting]);
 
+  // Arrivée depuis « Écrire mon livre maintenant » : on amène l'auteur
+  // directement sur la fiche du livre à remplir.
+  useEffect(() => {
+    if (!directWriting) return;
+    const t = setTimeout(() => {
+      wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+    return () => clearTimeout(t);
+  }, [directWriting]);
+
+
   const launchWorkflow = () => {
     if (!readBookBrief()?.outlineValidated) {
       toast.info('Validez d’abord votre sommaire : la rédaction démarre juste après.');
