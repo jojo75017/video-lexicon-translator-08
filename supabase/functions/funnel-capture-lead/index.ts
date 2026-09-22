@@ -238,17 +238,22 @@ serve(async (req) => {
         .eq("id", leadId);
     }
 
-    // Synchronisation Systeme.io : le lead est poussé avec ses tags
-    // (échec non bloquant — le lead reste en base interne quoi qu'il arrive).
-    try {
-      const tags = ["ebookstudio-lead", `lm-${magnetKey}`];
-      if (ab_variant) tags.push(`ab-${ab_variant.toLowerCase()}`);
-      const res = await pushToSystemeIo(email, first_name, tags, [
-        ...(ref_code ? [{ slug: "ref_code", value: ref_code }] : []),
-      ]);
-      if (!res.ok) console.warn("Systeme.io push skipped:", res.detail);
-    } catch (e) {
-      console.warn("Systeme.io push exception", (e as Error).message);
+    // Synchronisation Systeme.io : uniquement si la clé est configurée.
+    // Le lead reste en base interne (funnel_leads) quoi qu'il arrive.
+    if (!SYSTEMEIO_SYNC_ENABLED) {
+      console.log("Systeme.io sync désactivée (pas de clé) — lead conservé en base interne uniquement");
+    } else {
+      try {
+        const tags = ["ebookstudio-lead", `lm-${magnetKey}`];
+        if (ab_variant) tags.push(`ab-${ab_variant.toLowerCase()}`);
+        const res = await pushToSystemeIo(email, first_name, tags, [
+          ...(ref_code ? [{ slug: "ref_code", value: ref_code }] : []),
+        ]);
+        if (res.ok) console.log("Systeme.io sync ok pour", email);
+        else console.warn("Systeme.io sync échouée:", res.detail);
+      } catch (e) {
+        console.warn("Systeme.io sync exception", (e as Error).message);
+      }
     }
 
 
