@@ -10,8 +10,17 @@ export type CaptureSurface =
   | 'commander'
   | 'methode'
   | 'parrainage'
-  | 'decouverte';
-export type CaptureEventType = 'view' | 'click' | 'submit' | 'checkout_click' | 'checkout_ready' | 'error';
+  | 'decouverte'
+  | 'v3';
+export type CaptureEventType =
+  | 'view'
+  | 'click'
+  | 'submit'
+  | 'checkout_click'
+  | 'checkout_ready'
+  | 'error'
+  | 'page_view'
+  | 'reserve_open';
 
 /** Langue du navigateur, ex. « fr-FR » : permet le filtre francophone du tunnel. */
 const browserLocale = (): string | null => {
