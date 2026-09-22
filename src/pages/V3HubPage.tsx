@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, Download, Clock, Package, ExternalLink, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, Search, Sparkles, Compass, Lock, ArrowRight, Wand2, Rocket, CheckCircle2, Layers, Bot, Infinity as InfinityIcon, ShieldCheck, Save, Image as ImageIcon, BookOpen, GraduationCap, Gem, Map as MapIcon, FileText, Copy, Check, Menu, X, PanelLeftClose, PanelLeftOpen, Gauge, Download, Clock, Package, ExternalLink, type LucideIcon } from 'lucide-react';
 import {
   V3_MODULES, V3_PILLAR_META, getModuleAccess, getModuleById, type V3Pillar, type V3Module,
 } from '@/data/roadmapV3';
@@ -175,6 +175,7 @@ function ModuleCard({
 type HubTab = 'parcours' | 'outils' | 'toolsV2' | 'documentation' | 'livres' | 'guides' | 'offres' | 'roadmap' | 'pending' | 'script' | 'assistant' | 'bookperfect' | 'export';
 
 const HUB_TABS: { id: HubTab; label: string; icon: LucideIcon; highlight?: boolean }[] = [
+  { id: 'ecrire', label: 'Écrire maintenant', icon: Rocket, highlight: true },
   { id: 'parcours', label: 'Parcours', icon: Compass },
   { id: 'pending', label: '⏳ En attente · Octobre', icon: Clock, highlight: true },
   { id: 'roadmap', label: 'Roadmap', icon: MapIcon },
@@ -617,6 +618,29 @@ const V3HubPage: React.FC = () => {
       </nav>
 
       <main className={`mx-auto px-4 md:px-8 py-8 ${activeTab === 'outils' || activeTab === 'guides' ? 'max-w-none' : 'max-w-7xl'}`}>
+        {/* ===================== ONGLET ÉCRIRE MAINTENANT ===================== */}
+        {activeTab === 'ecrire' && (
+          <div className="mx-auto max-w-3xl rounded-3xl border p-8 text-center shadow-lg" style={{ background: '#fffdf8', borderColor: `${AMBER}55` }}>
+            <span className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl" style={{ background: AMBER_SOFT, border: `1px solid ${AMBER}44` }}>
+              <Rocket className="h-8 w-8" style={{ color: AMBER_DEEP }} />
+            </span>
+            <h2 className="text-3xl font-semibold" style={{ fontFamily: SERIF, color: INK }}>Écrire votre livre maintenant</h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed" style={{ color: '#8a7860' }}>
+              Décrivez votre idée en une phrase : les agents s'occupent du reste — titre, sommaire, chapitres, relecture. Aucune étape obligatoire, vous pourrez relire et modifier le sommaire à tout moment.
+            </p>
+            <button
+              onClick={() => navigate('/v3/create?ecrire=1')}
+              className="mt-6 inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold text-white transition-all hover:-translate-y-0.5"
+              style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
+            >
+              <Rocket className="h-5 w-5" /> Lancer l'écriture — les agents s'occupent du reste
+            </button>
+            <p className="mt-3 text-xs" style={{ color: '#b29a72' }}>
+              Vous préférez avancer pas à pas ? Ouvrez l'onglet <span className="font-semibold">Parcours</span>.
+            </p>
+          </div>
+        )}
+
         {/* ===================== ONGLET PARCOURS ===================== */}
         {activeTab === 'parcours' && (
           <>
