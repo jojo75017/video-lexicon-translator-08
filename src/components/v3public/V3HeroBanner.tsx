@@ -117,6 +117,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           <Button
             type="button"
             size="lg"
+            data-contemplation-allow="true"
             onClick={() => setCaptureOpen(true)}
             className="mt-7 h-auto min-h-12 max-w-full whitespace-normal px-6 py-3 text-center text-[14px] font-bold sm:text-[15px]"
           >
