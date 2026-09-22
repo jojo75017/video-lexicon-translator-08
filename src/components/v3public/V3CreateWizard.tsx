@@ -245,6 +245,26 @@ function buildFallbackOutline(title: string, category: string, count: number): O
 
 }
 
+/**
+ * Complète un sommaire sans jamais écraser un chapitre déjà retouché par
+ * l'auteur : seules les entrées manquantes ou encore génériques sont remplies
+ * par le plan de secours.
+ */
+function mergeOutlineWithFallback(existing: OutlineChapter[], fallback: OutlineChapter[]): OutlineChapter[] {
+  return fallback.map((secours, index) => {
+    const current = existing[index];
+    if (current && !isGenericTitle(current.titre)) {
+      return { ...secours, ...current, numero: index + 1 };
+    }
+    return { ...secours, numero: index + 1 };
+  });
+}
+
+/** Vrai si au moins un chapitre du sommaire porte un titre écrit/choisi par l'auteur. */
+function hasEditedOutlineTitles(items: OutlineChapter[]) {
+  return items.some((item) => !isGenericTitle(item.titre));
+}
+
 function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: number) {
   if (items.length !== expectedCount) return true;
   const titles = items.map((item) => cleanText(item.titre).toLowerCase()).filter(Boolean);
@@ -1038,11 +1058,19 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  /** Sommaire complet, en gardant intacts les chapitres déjà retouchés. */
+  const completedOutline = () =>
+    mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+
+  /** Vrai si l'auteur a déjà modifié au moins un titre de chapitre. */
+  const outlineWasEdited = hasEditedOutlineTitles(outline);
+
   useEffect(() => {
     if (startsFromExistingOutline) return;
-    if (hasRepeatedFallbackTitles(outline, chapters)) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
-    }
+    if (!hasRepeatedFallbackTitles(outline, chapters)) return;
+    const merged = mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    // Comparaison pour éviter une boucle si le sommaire de l'auteur est déjà stable.
+    if (JSON.stringify(merged) !== JSON.stringify(outline)) setOutline(merged);
   }, [chapters, effectiveCategory, finalTitle, title, outline, startsFromExistingOutline]);
 
   const targetPromiseBlock = () => {
@@ -1304,16 +1332,14 @@ Règles :
       return;
     }
 
-    if (step === 1 && outline.length !== chapters) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
-    }
-    if (step === 1 && hasRepeatedFallbackTitles(outline, chapters)) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
-      toast.warning('Ancien sommaire répétitif remplacé par un plan complet.');
+    // Les chapitres déjà retouchés par l'auteur sont toujours conservés :
+    // on ne remplit que les entrées manquantes ou encore génériques.
+    if (step === 1 && (outline.length !== chapters || hasRepeatedFallbackTitles(outline, chapters))) {
+      setOutline(completedOutline());
     }
     if (step === 2 && !canStepOutline) {
       // Non bloquant : on complète le plan et on avance.
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      setOutline(completedOutline());
       toast.info('Sommaire complété automatiquement — tu peux le modifier à tout moment.');
     }
     if (step === 3 && !finalTitle.trim()) setFinalTitle(title);
@@ -1491,7 +1517,7 @@ Règles :
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [launched, completedBook]);
 
-  const launchWorkflow = async () => {
+  const launchWorkflow = async (outlineOverride?: OutlineChapter[]) => {
     if (seedLength < 10) {
       toast.error('Décris au moins ton idée de livre en une phrase avant de lancer les agents.');
       setStep(0);
@@ -1501,12 +1527,13 @@ Règles :
     // Rien n'est obligatoire sauf l'idée : on complète les champs laissés vides.
     const safeTitle = (finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre');
     const safeAuthor = authorName.trim() || 'Auteur Ebookstudio';
-    const safeOutline = normalizedOutline.length >= 3
-      ? normalizedOutline
+    const baseOutline = outlineOverride && outlineOverride.length >= 3 ? outlineOverride : normalizedOutline;
+    const safeOutline = baseOutline.length >= 3
+      ? baseOutline
       : buildFallbackOutline(safeTitle, effectiveCategory, chapters);
     if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
     if (authorName.trim() !== safeAuthor) setAuthorName(safeAuthor);
-    if (normalizedOutline.length < 3) {
+    if (baseOutline.length < 3) {
       setOutline(safeOutline);
       toast.info('Sommaire complété automatiquement — l’agent P3 « L’Architecte » l’affinera.');
     }
@@ -1567,6 +1594,23 @@ Règles :
     }
     setLaunched(true);
 
+  };
+
+  /**
+   * « Écrire maintenant » : on part de la simple idée du livre, les réglages
+   * laissés vides gardent leurs valeurs par défaut et le sommaire est complété
+   * en coulisse sans écraser les chapitres déjà retouchés par l'auteur.
+   */
+  const startWritingNow = async () => {
+    if (!canStepOne) {
+      toast.error('Décris ton idée de livre en une phrase — les agents remplissent le reste.');
+      return;
+    }
+    const safeTitle = finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre';
+    if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
+    const merged = completedOutline();
+    if (JSON.stringify(merged) !== JSON.stringify(outline)) setOutline(merged);
+    await launchWorkflow(merged);
   };
 
   if (launched) {
@@ -2222,6 +2266,21 @@ Règles :
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-ink)' }}>✨ {promesseCentrale}</p>
             </div>
           )}
+
+          {/* Raccourci : écrire tout de suite, sans passer par les étapes ni le sommaire. */}
+          <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
+            <button
+              type="button"
+              onClick={() => { void startWritingNow(); }}
+              className="v3-btn v3-btn-primary w-full justify-center py-4 text-base"
+            >
+              <Rocket className="h-5 w-5" /> Écrire maintenant — les agents s’occupent du reste
+            </button>
+            <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+              Vous pourrez relire et modifier le sommaire à tout moment.
+              {outlineWasEdited && ' Votre sommaire modifié sera utilisé.'}
+            </p>
+          </div>
         </div>
       )}
 
@@ -2613,7 +2672,7 @@ Règles :
             </div>
           )}
 
-          <button type="button" onClick={launchWorkflow} className="v3-btn v3-btn-primary w-full justify-center py-5 text-base">
+          <button type="button" onClick={() => { void launchWorkflow(); }} className="v3-btn v3-btn-primary w-full justify-center py-5 text-base">
             <Rocket className="h-5 w-5" /> Générer mon livre avec le workflow complet
           </button>
         </div>
