@@ -1517,7 +1517,7 @@ Règles :
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [launched, completedBook]);
 
-  const launchWorkflow = async () => {
+  const launchWorkflow = async (outlineOverride?: OutlineChapter[]) => {
     if (seedLength < 10) {
       toast.error('Décris au moins ton idée de livre en une phrase avant de lancer les agents.');
       setStep(0);
@@ -1527,12 +1527,13 @@ Règles :
     // Rien n'est obligatoire sauf l'idée : on complète les champs laissés vides.
     const safeTitle = (finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre');
     const safeAuthor = authorName.trim() || 'Auteur Ebookstudio';
-    const safeOutline = normalizedOutline.length >= 3
-      ? normalizedOutline
+    const baseOutline = outlineOverride && outlineOverride.length >= 3 ? outlineOverride : normalizedOutline;
+    const safeOutline = baseOutline.length >= 3
+      ? baseOutline
       : buildFallbackOutline(safeTitle, effectiveCategory, chapters);
     if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
     if (authorName.trim() !== safeAuthor) setAuthorName(safeAuthor);
-    if (normalizedOutline.length < 3) {
+    if (baseOutline.length < 3) {
       setOutline(safeOutline);
       toast.info('Sommaire complété automatiquement — l’agent P3 « L’Architecte » l’affinera.');
     }
