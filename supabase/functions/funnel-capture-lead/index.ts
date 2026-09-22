@@ -146,6 +146,52 @@ async function sendLeadMagnetEmail(email: string, firstName: string, magnetKey: 
   return true;
 }
 
+// Email dédié aux réservations d'avant-première V3 (source "v3-reservation").
+// Même gabarit visuel et mêmes garde-fous que sendLeadMagnetEmail.
+async function sendV3ReservationEmail(email: string, firstName: string) {
+  if (!EMAIL_SENDING_ENABLED) return false;
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) {
+    console.warn("RESEND_API_KEY missing — skipping email");
+    return false;
+  }
+  const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  const html = `
+  <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
+    <h1 style="color:#008296;margin:0 0 12px">Votre place est réservée.</h1>
+    <p>${greeting}</p>
+    <p>C'est noté : votre place pour l'ouverture d'EbookStudio V3 est réservée. Le 1er octobre, je vous préviens dès que les portes ouvrent.</p>
+    <p>En attendant, votre cadeau vous attend déjà — le kit de démarrage et vos 10 niches Amazon rentables, prêtes à l'emploi.</p>
+    <p style="text-align:center;margin:24px 0">
+      <a href="https://ebookstudio.fr/10-niches-offertes" style="background:#FF9E2D;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
+        🎁 Ouvrir mon kit + mes 10 niches
+      </a>
+    </p>
+    <p>À très vite,<br/>Georges</p>
+    <hr style="border:none;border-top:1px solid #e5e7eb;margin:24px 0"/>
+    <p style="font-size:12px;color:#6b7280">Vous recevez cet email car vous avez réservé votre place sur ebookstudio.fr.</p>
+  </div>`;
+
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "EbookStudio <noreply@ebookstudio.fr>",
+      to: [email],
+      subject: "✅ Votre place est réservée — ouverture le 1er octobre",
+      html,
+    }),
+  });
+  if (!res.ok) {
+    console.error("Resend error", res.status, await res.text());
+    return false;
+  }
+  return true;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -157,6 +203,7 @@ serve(async (req) => {
     const magnetKey = String(body.lead_magnet || "").trim() || DEFAULT_MAGNET;
     const abVariantRaw = String(body.ab_variant || "").trim().toUpperCase();
     const ab_variant = abVariantRaw === "A" || abVariantRaw === "B" ? abVariantRaw : null;
+    const source = String(body.source || "").trim().slice(0, 64);
     const honeypot = String(body.website || "").trim();
 
     if (honeypot) {
@@ -229,8 +276,12 @@ serve(async (req) => {
       leadId = inserted.id;
     }
 
-    // Send lead magnet email (non-blocking failure)
-    const sent = await sendLeadMagnetEmail(email, first_name, magnetKey);
+    // Send lead magnet email (non-blocking failure).
+    // Réservation avant-première V3 : email de confirmation dédié à la place du magnet générique.
+    const sent =
+      source === "v3-reservation"
+        ? await sendV3ReservationEmail(email, first_name)
+        : await sendLeadMagnetEmail(email, first_name, magnetKey);
     if (sent) {
       await supabase
         .from("funnel_leads")
