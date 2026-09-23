@@ -66,11 +66,14 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
   const fromEbooks: MyBookOption[] = (ebooks.data ?? []).map((row) => {
     const draft = ((row as Record<string, unknown>).draft_state ?? {}) as Record<string, unknown>;
     const brief = (draft.brief ?? {}) as Record<string, unknown>;
+    const rawTitle = clean(row.title) || firstOf(brief, ['title']);
+    const split = splitTitleAndSubtitle(rawTitle);
     return {
       id: String(row.id),
       kind: 'ebook' as const,
-      title: clean(row.title) || firstOf(brief, ['title']) || 'Sans titre',
-      subtitle: firstOf(brief, ['subtitle', 'sousTitre', 'sous_titre', 'tagline', 'accroche', 'format']),
+      title: split.title || 'Sans titre',
+      subtitle:
+        firstOf(brief, ['subtitle', 'sousTitre', 'sous_titre', 'tagline', 'accroche']) || split.subtitle,
       author: clean(row.author_name) || firstOf(brief, ['author', 'authorName']),
       synopsis:
         clean(row.book_summary) ||
