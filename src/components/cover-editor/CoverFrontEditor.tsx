@@ -832,8 +832,9 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                       composition={composition}
                       projectImage={bgImage}
                     />
-                    <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
-                    <p className="text-xs text-muted-foreground">{tpl.description}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      Modèle {templateIndex + 1}
+                    </p>
                   </button>
 
                   {/* variantes de couleurs */}
