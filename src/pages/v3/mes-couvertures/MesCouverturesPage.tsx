@@ -118,13 +118,15 @@ export default function MesCouverturesPage() {
   const resetCreateForm = () => {
     setNewName('');
     setNewTitle('');
+    setNewSubtitle('');
     setNewType('ebook');
     setNewPages('');
   };
 
-  /** Reprend un livre enregistré : nom du projet et titre préremplis. */
+  /** Reprend un livre enregistré : nom du projet, titre et sous-titre préremplis. */
   const applyMyBook = (book: MyBookOption) => {
     setNewTitle(book.title);
+    setNewSubtitle(book.subtitle ?? '');
     if (!newName.trim()) setNewName(`Couverture — ${book.title}`);
     toast.success(`Livre chargé : ${book.title}`);
   };
