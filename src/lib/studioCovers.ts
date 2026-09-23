@@ -39,15 +39,20 @@ export async function loadStudioCovers(): Promise<StudioCover[]> {
   }
 
   return await Promise.all(
-    rows.map(async (p) => ({
-      id: p.id,
-      projectName: p.project_name,
-      bookTitle: p.book_title,
-      coverType: p.cover_type,
-      thumbPath: p.thumbnail_path,
-      thumbUrl: p.thumbnail_path ? await getSignedCoverUrl(p.thumbnail_path) : null,
-      updatedAt: p.updated_at,
-    })),
+    rows.map(async (p) => {
+      // Repli sur l'illustration quand la miniature n'a pas encore été enregistrée :
+      // une couverture visible ne doit jamais disparaître de la bibliothèque.
+      const path = p.thumbnail_path || p.illustration_path;
+      return {
+        id: p.id,
+        projectName: p.project_name,
+        bookTitle: p.book_title,
+        coverType: p.cover_type,
+        thumbPath: path,
+        thumbUrl: path ? await getSignedCoverUrl(path) : null,
+        updatedAt: p.updated_at,
+      };
+    }),
   );
 }
 
