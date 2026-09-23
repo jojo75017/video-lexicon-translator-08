@@ -809,7 +809,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {visibleTemplates.map((tpl) => {
+            {visibleTemplates.map((tpl, templateIndex) => {
               const active = composition.templateId === tpl.id;
               const variantIndex = active ? templateVariant : 0;
               return (
@@ -832,8 +832,9 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                       composition={composition}
                       projectImage={bgImage}
                     />
-                    <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
-                    <p className="text-xs text-muted-foreground">{tpl.description}</p>
+                    <p className="text-sm font-semibold text-foreground">
+                      Modèle {templateIndex + 1}
+                    </p>
                   </button>
 
                   {/* variantes de couleurs */}
