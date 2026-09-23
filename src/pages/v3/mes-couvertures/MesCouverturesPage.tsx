@@ -420,6 +420,15 @@ export default function MesCouverturesPage() {
               />
             </div>
             <div className="space-y-2">
+              <Label htmlFor="cover-subtitle">Sous-titre (facultatif)</Label>
+              <Input
+                id="cover-subtitle"
+                value={newSubtitle}
+                onChange={(e) => setNewSubtitle(e.target.value)}
+                placeholder="Sous-titre tel qu'il apparaîtra sous le titre"
+              />
+            </div>
+            <div className="space-y-2">
               <Label>Type de couverture</Label>
               <div className="grid grid-cols-3 gap-2">
                 {(Object.keys(TYPE_META) as CoverType[]).map((type) => (
