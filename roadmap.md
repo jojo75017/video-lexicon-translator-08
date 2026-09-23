@@ -6,6 +6,11 @@
 - [x] Aligner quotas, verrous et paiements
 - [x] Vérifier TypeScript, tests et parcours visuels
 
+## Partenaires — septembre 2026
+
+- [x] Alexandre (partenariats@alexandrechaimbault.com) : accès test 14 jours provisionné + email de connexion renvoyé à la bonne adresse
+- [ ] Stan (stanjuliann@gmail.com) : accès en attente de son accord sur la règle 20 % premier paiement
+
 ## Acquisition — septembre 2026
 
 - [x] Corriger le tarif annoncé dans l'email de relance des paniers abandonnés
