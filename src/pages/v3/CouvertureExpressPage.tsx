@@ -67,6 +67,7 @@ import {
 import { downloadBlob, renderKindleCoverJpeg } from '@/lib/cover-editor/kindleExport';
 import SuggestInput from '@/components/cover-editor/SuggestInput';
 import { coverDetailSuggestions } from '@/data/coverDetailSuggestions';
+import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
 import { cn } from '@/lib/utils';
 
 type Step = 1 | 2 | 3;
@@ -95,6 +96,10 @@ export default function CouvertureExpressPage() {
   const { credits, key, refresh } = useCoverProAccess();
 
   const [step, setStep] = useState<Step>(1);
+  /* Bibliothèque de l'abonné : livres déjà enregistrés, pour éviter toute resaisie. */
+  const [myBooks, setMyBooks] = useState<MyBookOption[]>([]);
+  const [booksLoading, setBooksLoading] = useState(true);
+  const [selectedBookId, setSelectedBookId] = useState('');
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
