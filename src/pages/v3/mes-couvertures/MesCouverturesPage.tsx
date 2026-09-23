@@ -155,7 +155,7 @@ export default function MesCouverturesPage() {
               title: label,
               createdAt: f.created_at || new Date(Number(f.name.split('-')[0]) || Date.now()).toISOString(),
               fingerprint: typeof f.metadata?.eTag === 'string'
-                ? f.metadata.eTag.replaceAll('"', '')
+                ? f.metadata.eTag.replace(/"/g, '')
                 : undefined,
             });
           }

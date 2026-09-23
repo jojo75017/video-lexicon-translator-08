@@ -166,7 +166,7 @@ const listCoversInRoot = async (storageRoot: string): Promise<SavedCover[]> => {
           title: (rest.join('__') || '').replace(/-/g, ' '),
           createdAt: file.created_at || new Date(Number(stamp) || Date.now()).toISOString(),
           fingerprint: typeof file.metadata?.eTag === 'string'
-            ? file.metadata.eTag.replaceAll('"', '')
+            ? file.metadata.eTag.replace(/"/g, '')
             : undefined,
         };
       });
