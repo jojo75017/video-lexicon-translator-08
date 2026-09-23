@@ -399,7 +399,7 @@ export default function MesCouverturesPage() {
           <div className="space-y-4">
             <MyBookPicker
               onSelect={applyMyBook}
-              hint="Le nom du projet et le titre se remplissent depuis votre livre."
+              hint="Le nom du projet, le titre et le sous-titre se remplissent depuis votre livre."
             />
             <div className="space-y-2">
               <Label htmlFor="cover-name">Nom du projet *</Label>
