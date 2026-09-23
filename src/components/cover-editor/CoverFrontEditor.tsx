@@ -765,17 +765,11 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Chaque aperçu est une vraie couverture rendue avec votre illustration, votre titre et
-                votre nom : le modèle ne change que la mise en page, les polices et les styles. Tous
-                les réglages restent modifiables ensuite.
+                Chaque vignette est un exemple de démonstration, avec son propre titre et sa propre
+                image, pour vous montrer le style réel du modèle. Cliquez sur celui qui vous plaît :
+                il s'applique alors à votre livre, votre illustration et vos textes, qui restent
+                entièrement modifiables.
               </p>
-              {!bgImage && (
-                <p className="mt-1 text-xs font-medium text-[#c1600f]">
-                  Aucune illustration pour le moment : les aperçus utilisent une image de
-                  démonstration. Générez votre illustration en haut de page pour voir votre vraie
-                  couverture.
-                </p>
-              )}
             </div>
             {templateBackup && (
               <Button variant="outline" size="sm" onClick={cancelTemplate} className="gap-1">
@@ -836,8 +830,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     <CoverTemplateThumb
                       template={tpl}
                       variantIndex={variantIndex}
-                      composition={composition}
-                      projectImage={bgImage}
+                      canvas={composition.canvas}
                     />
                     <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
                     <p className="text-xs text-muted-foreground">{tpl.description}</p>
