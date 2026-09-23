@@ -27,3 +27,7 @@
 - [x] Recentrer le haut de `/v3` sur la réservation email
 - [x] Remonter la preuve auteur sous le hero
 - [x] Vérifier le parcours sur ordinateur et mobile
+
+## Studio de couverture 67 €
+
+- [x] Générer la consigne visuelle depuis le synopsis réel du livre (scène, décor, couleurs) avant l'image

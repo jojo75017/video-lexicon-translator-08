@@ -44,12 +44,70 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
   const [avoid, setAvoid] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ url: string; width: number; height: number; funding: string } | null>(null);
+  /** Titre du livre : sert uniquement de contexte, jamais écrit dans l'image. */
+  const [bookTitle, setBookTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  /** Consigne visuelle sur-mesure déduite du synopsis, modifiable avant génération. */
+  const [visualPrompt, setVisualPrompt] = useState('');
+  const [visualBusy, setVisualBusy] = useState(false);
+
+  /**
+   * Demande à l'IA la consigne visuelle correspondant réellement au livre
+   * (scène clé, décor, époque, couleurs). Analyse de texte : aucune image,
+   * aucune génération consommée à cette étape.
+   */
+  const proposeVisualPrompt = async (source?: {
+    summary?: string;
+    genre?: string;
+    bookTitle?: string;
+    subtitle?: string;
+  }) => {
+    const text = (source?.summary ?? summary).trim();
+    if (text.length < 20) {
+      toast.error('Ajoutez d’abord le synopsis de votre livre (quelques phrases suffisent).');
+      return;
+    }
+    setVisualBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('cover-visual-prompt', {
+        body: {
+          summary: text,
+          genre: source?.genre ?? genre,
+          mood,
+          palette,
+          avoid,
+          bookTitle: source?.bookTitle ?? bookTitle,
+          subtitle: source?.subtitle ?? subtitle,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const proposed = data?.visualPrompt as string | undefined;
+      if (!proposed) throw new Error('Consigne visuelle indisponible.');
+      setVisualPrompt(proposed);
+      toast.success('Consigne visuelle créée depuis votre livre : relisez-la, puis générez.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Consigne visuelle indisponible.');
+    } finally {
+      setVisualBusy(false);
+    }
+  };
 
   /** Reprend un livre enregistré : genre et synopsis, sans rien inventer. */
   const applyMyBook = (book: MyBookOption) => {
     if (book.genre) setGenre(book.genre);
     if (book.synopsis) setSummary(book.synopsis);
+    setBookTitle(book.title);
+    setSubtitle(book.subtitle);
     toast.success(`Livre chargé : ${book.title}`);
+    if (book.synopsis && book.synopsis.trim().length >= 20) {
+      void proposeVisualPrompt({
+        summary: book.synopsis,
+        genre: book.genre,
+        bookTitle: book.title,
+        subtitle: book.subtitle,
+      });
+    }
   };
 
   useEffect(() => {
@@ -67,11 +125,25 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
       toast.error('Choisissez d\u2019abord un projet de couverture.');
       return;
     }
+    if (!visualPrompt.trim()) {
+      toast.error('Créez d’abord la consigne visuelle depuis votre synopsis.');
+      return;
+    }
     setBusy(true);
     setPreview(null);
     try {
       const { data, error } = await supabase.functions.invoke('cover-pro-generate', {
-        body: { projectId, genre, summary, mood, palette, avoid, lighting: 'bright' },
+        body: {
+          projectId,
+          genre,
+          summary,
+          mood,
+          palette,
+          avoid,
+          lighting: 'bright',
+          bookTitle,
+          visualPrompt: visualPrompt.trim(),
+        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -186,6 +258,36 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           </p>
         </div>
 
+        {/* Consigne visuelle sur-mesure : la scène réelle du livre, ses couleurs
+            et son ambiance, relue et modifiable avant toute génération. */}
+        <div className="space-y-2 rounded-lg border border-[#FF9E2D]/40 bg-[#FF9E2D]/5 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Label htmlFor="cp-visual">Consigne visuelle sur-mesure (créée depuis votre livre)</Label>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              disabled={visualBusy || busy || summary.trim().length < 20}
+              onClick={() => void proposeVisualPrompt()}
+            >
+              {visualBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              {visualPrompt ? 'Refaire la consigne' : 'Créer la consigne depuis mon synopsis'}
+            </Button>
+          </div>
+          <Textarea
+            id="cp-visual"
+            rows={6}
+            value={visualPrompt}
+            onChange={(e) => setVisualPrompt(e.target.value)}
+            placeholder="La scène de votre livre, son décor, son époque, sa lumière et ses couleurs apparaîtront ici."
+          />
+          <p className="text-xs text-muted-foreground">
+            Cette consigne décrit la scène réelle de votre histoire, ses couleurs et son ambiance :
+            c&rsquo;est elle qui donne une vraie couverture, et non une image passe-partout. Relisez-la,
+            corrigez un détail si vous le souhaitez, puis générez. Votre titre, votre sous-titre et
+            votre nom d&rsquo;auteur seront ensuite ajoutés sur l&rsquo;image dans l&rsquo;éditeur.
+          </p>
+        </div>
 
         <Button onClick={generate} disabled={busy || blocked || !projectId} className="w-full">
           {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
