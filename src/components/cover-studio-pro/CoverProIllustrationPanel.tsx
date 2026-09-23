@@ -125,11 +125,25 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
       toast.error('Choisissez d\u2019abord un projet de couverture.');
       return;
     }
+    if (!visualPrompt.trim()) {
+      toast.error('Créez d’abord la consigne visuelle depuis votre synopsis.');
+      return;
+    }
     setBusy(true);
     setPreview(null);
     try {
       const { data, error } = await supabase.functions.invoke('cover-pro-generate', {
-        body: { projectId, genre, summary, mood, palette, avoid, lighting: 'bright' },
+        body: {
+          projectId,
+          genre,
+          summary,
+          mood,
+          palette,
+          avoid,
+          lighting: 'bright',
+          bookTitle,
+          visualPrompt: visualPrompt.trim(),
+        },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
