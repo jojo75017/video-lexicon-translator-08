@@ -271,6 +271,49 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
             <Label htmlFor="cp-avoid">À éviter</Label>
             <Input id="cp-avoid" value={avoid} onChange={(e) => setAvoid(e.target.value)} placeholder="Visages, animaux…" />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-focal">Sujet au premier plan</Label>
+            <Input
+              id="cp-focal"
+              value={focalSubject}
+              onChange={(e) => setFocalSubject(e.target.value)}
+              placeholder="Une femme de dos près d’une fenêtre…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-era">Époque</Label>
+            <Input
+              id="cp-era"
+              value={era}
+              onChange={(e) => setEra(e.target.value)}
+              placeholder="Années 1950, aujourd’hui…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-location">Lieu</Label>
+            <Input
+              id="cp-location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Village de bord de mer, appartement parisien…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-lighting">Lumière</Label>
+            <select
+              id="cp-lighting"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              value={lighting}
+              onChange={(e) => setLighting(e.target.value)}
+            >
+              <option value="">Laisser l’IA choisir</option>
+              <option value="lumière naturelle douce du matin">Matin doux</option>
+              <option value="lumière chaude de fin de journée, contre-jour doré">Fin de journée dorée</option>
+              <option value="clair-obscur contrasté, ombres marquées">Clair-obscur contrasté</option>
+              <option value="nuit bleutée, éclairage de lune ou de lampadaire">Nuit bleutée</option>
+              <option value="lumière crue et vive, contraste maximal">Lumière vive</option>
+            </select>
+          </div>
         </div>
 
         <div className="space-y-2">
