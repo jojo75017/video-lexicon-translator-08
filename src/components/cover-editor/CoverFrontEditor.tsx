@@ -908,6 +908,12 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           <CardContent className="space-y-4 p-4">
             <p className="text-sm font-semibold text-foreground">Première de couverture</p>
 
+            {/* Charge en un clic le titre, le sous-titre et l'auteur d'un livre. */}
+            <MyBookPicker
+              onSelect={applyMyBook}
+              hint="Le titre, le sous-titre et le nom d’auteur se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
+            />
+
             {ROLES.map((role) => {
               const layer = composition.layers.find((l) => l.role === role);
               return (
