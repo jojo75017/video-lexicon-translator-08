@@ -191,6 +191,7 @@ export default function MesCouverturesPage() {
       const copy = await createCoverProject({
         project_name: `${project.project_name} (copie)`,
         book_title: project.book_title,
+        book_subtitle: project.book_subtitle,
         cover_type: project.cover_type,
         format_id: project.format_id,
         page_count: project.page_count,
