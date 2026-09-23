@@ -114,7 +114,10 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
       const text: string = payload?.choices?.[0]?.message?.content ?? "";
       const result = text.replace(/```/g, "").replace(/\s+/g, " ").trim();
       const wordCount = result.split(/\s+/).filter(Boolean).length;
-      if (wordCount >= 150 && /[.!?]$/.test(result)) return result.slice(0, 3000);
+      // Premier passage exigeant, second passage plus tolérant pour ne jamais
+      // renvoyer un texte générique à l'abonné.
+      const minWords = attempt === 0 ? 150 : 110;
+      if (wordCount >= minWords && /[.!?]$/.test(result)) return result.slice(0, 3000);
     }
     return buildFaithfulFallback(input);
   } catch {
