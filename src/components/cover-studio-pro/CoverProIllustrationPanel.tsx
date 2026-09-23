@@ -205,8 +205,30 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
         {/* Reprendre un livre déjà enregistré : genre et synopsis préremplis. */}
         <MyBookPicker
           onSelect={applyMyBook}
-          hint="Le genre et le synopsis se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
+          hint="Le titre, le sous-titre, le genre et le synopsis se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
         />
+
+        {/* Titre et sous-titre visibles : préremplis depuis le livre, modifiables. */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="cp-title">Titre du livre</Label>
+            <Input
+              id="cp-title"
+              value={bookTitle}
+              onChange={(e) => setBookTitle(e.target.value)}
+              placeholder="Titre tel qu’il apparaîtra sur la couverture"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-subtitle">Sous-titre (facultatif)</Label>
+            <Input
+              id="cp-subtitle"
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Sous-titre tel qu’il apparaîtra sous le titre"
+            />
+          </div>
+        </div>
 
         <div className="space-y-2">
           <Label htmlFor="cp-project">Projet de couverture</Label>
