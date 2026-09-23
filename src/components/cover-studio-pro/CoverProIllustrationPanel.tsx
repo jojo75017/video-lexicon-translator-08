@@ -42,6 +42,11 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
   const [mood, setMood] = useState('');
   const [palette, setPalette] = useState('');
   const [avoid, setAvoid] = useState('');
+  /** Cadrage complémentaire : rien n'est inventé, tout reste facultatif. */
+  const [focalSubject, setFocalSubject] = useState('');
+  const [era, setEra] = useState('');
+  const [location, setLocation] = useState('');
+  const [lighting, setLighting] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ url: string; width: number; height: number; funding: string } | null>(null);
   /** Titre du livre : sert uniquement de contexte, jamais écrit dans l'image. */
@@ -76,6 +81,10 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           mood,
           palette,
           avoid,
+          focalSubject,
+          era,
+          location,
+          include: lighting,
           bookTitle: source?.bookTitle ?? bookTitle,
           subtitle: source?.subtitle ?? subtitle,
         },
@@ -140,7 +149,7 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           mood,
           palette,
           avoid,
-          lighting: 'bright',
+          lighting: lighting || 'bright',
           bookTitle,
           visualPrompt: visualPrompt.trim(),
         },
@@ -197,8 +206,30 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
         {/* Reprendre un livre déjà enregistré : genre et synopsis préremplis. */}
         <MyBookPicker
           onSelect={applyMyBook}
-          hint="Le genre et le synopsis se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
+          hint="Le titre, le sous-titre, le genre et le synopsis se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
         />
+
+        {/* Titre et sous-titre visibles : préremplis depuis le livre, modifiables. */}
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="cp-title">Titre du livre</Label>
+            <Input
+              id="cp-title"
+              value={bookTitle}
+              onChange={(e) => setBookTitle(e.target.value)}
+              placeholder="Titre tel qu’il apparaîtra sur la couverture"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-subtitle">Sous-titre (facultatif)</Label>
+            <Input
+              id="cp-subtitle"
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Sous-titre tel qu’il apparaîtra sous le titre"
+            />
+          </div>
+        </div>
 
         <div className="space-y-2">
           <Label htmlFor="cp-project">Projet de couverture</Label>
@@ -240,6 +271,49 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           <div className="space-y-2">
             <Label htmlFor="cp-avoid">À éviter</Label>
             <Input id="cp-avoid" value={avoid} onChange={(e) => setAvoid(e.target.value)} placeholder="Visages, animaux…" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-focal">Sujet au premier plan</Label>
+            <Input
+              id="cp-focal"
+              value={focalSubject}
+              onChange={(e) => setFocalSubject(e.target.value)}
+              placeholder="Une femme de dos près d’une fenêtre…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-era">Époque</Label>
+            <Input
+              id="cp-era"
+              value={era}
+              onChange={(e) => setEra(e.target.value)}
+              placeholder="Années 1950, aujourd’hui…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-location">Lieu</Label>
+            <Input
+              id="cp-location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Village de bord de mer, appartement parisien…"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="cp-lighting">Lumière</Label>
+            <select
+              id="cp-lighting"
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm"
+              value={lighting}
+              onChange={(e) => setLighting(e.target.value)}
+            >
+              <option value="">Laisser l’IA choisir</option>
+              <option value="lumière naturelle douce du matin">Matin doux</option>
+              <option value="lumière chaude de fin de journée, contre-jour doré">Fin de journée dorée</option>
+              <option value="clair-obscur contrasté, ombres marquées">Clair-obscur contrasté</option>
+              <option value="nuit bleutée, éclairage de lune ou de lampadaire">Nuit bleutée</option>
+              <option value="lumière crue et vive, contraste maximal">Lumière vive</option>
+            </select>
           </div>
         </div>
 

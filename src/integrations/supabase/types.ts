@@ -983,6 +983,7 @@ export type Database = {
       cover_projects: {
         Row: {
           ai_generated: boolean
+          book_subtitle: string | null
           book_title: string | null
           brief: Json | null
           cover_type: string
@@ -1011,6 +1012,7 @@ export type Database = {
         }
         Insert: {
           ai_generated?: boolean
+          book_subtitle?: string | null
           book_title?: string | null
           brief?: Json | null
           cover_type?: string
@@ -1039,6 +1041,7 @@ export type Database = {
         }
         Update: {
           ai_generated?: boolean
+          book_subtitle?: string | null
           book_title?: string | null
           brief?: Json | null
           cover_type?: string

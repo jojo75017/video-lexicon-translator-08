@@ -77,20 +77,25 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 700,
+        max_tokens: 1600,
         messages: [
           {
             role: "system",
             content:
               "Tu es directeur artistique dans une maison d'édition française. À partir des " +
-              "informations d'un livre, tu écris UNE SEULE consigne visuelle en français, de 60 à " +
-              "120 mots, décrivant précisément l'illustration de couverture à produire : sujet " +
-              "principal, décor, époque, action ou instant choisi, cadrage, angle, lumière, " +
-              "matières, palette et point focal. Reste strictement fidèle à la description de l'auteur : " +
-              "n'invente aucun personnage, lieu, époque, objet ou événement absent. Respecte mot pour mot " +
-              "les éléments obligatoires et interdits. Interdits dans ta réponse : listes, " +
-              "titres, guillemets, mentions de texte, de titre, de logo ou de typographie, mots " +
-              "latins ou inventés. Réponds uniquement par la consigne visuelle.",
+              "informations d'un livre, tu rédiges UN SEUL brief visuel en français, de 200 à 300 " +
+              "mots, en texte continu, décrivant précisément l'illustration de couverture à " +
+              "produire. Développe successivement, sans écrire aucun intitulé de rubrique : la " +
+              "scène clé et le sujet focal (personnages, posture, action, regard, vêtements) ; le " +
+              "décor, l'époque et l'arrière-plan avec leurs détails d'architecture ou de nature ; " +
+              "l'éclairage et l'ambiance (source de lumière, contrastes, ombres portées) ; la " +
+              "palette chromatique et les matières (textures, reflets, harmonies) ; enfin le " +
+              "cadrage vertical, l'angle et la profondeur de champ. Reste strictement fidèle à la " +
+              "description de l'auteur : n'invente aucun personnage, lieu, époque, objet ou " +
+              "événement absent. Respecte mot pour mot les éléments obligatoires et interdits. " +
+              "Interdits dans ta réponse : listes, puces, titres, guillemets, mentions de texte, " +
+              "de titre, de logo ou de typographie, mots latins ou inventés. Réponds uniquement " +
+              "par le brief visuel.",
           },
           {
             role: "user",
@@ -98,7 +103,7 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
               context +
               (attempt === 0
                 ? ""
-                : "\n\nLa réponse précédente était incomplète. Écris cette fois une phrase complète de 60 à 120 mots terminée par un point."),
+                : "\n\nLa réponse précédente était trop courte. Écris cette fois un brief complet de 200 à 300 mots, terminé par un point."),
           },
         ],
       }),
@@ -109,7 +114,10 @@ export async function buildVisualPrompt(input: VisualPromptInput): Promise<strin
       const text: string = payload?.choices?.[0]?.message?.content ?? "";
       const result = text.replace(/```/g, "").replace(/\s+/g, " ").trim();
       const wordCount = result.split(/\s+/).filter(Boolean).length;
-      if (wordCount >= 45 && /[.!?]$/.test(result)) return result.slice(0, 1200);
+      // Premier passage exigeant, second passage plus tolérant pour ne jamais
+      // renvoyer un texte générique à l'abonné.
+      const minWords = attempt === 0 ? 150 : 110;
+      if (wordCount >= minWords && /[.!?]$/.test(result)) return result.slice(0, 3000);
     }
     return buildFaithfulFallback(input);
   } catch {

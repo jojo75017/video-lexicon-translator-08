@@ -271,6 +271,7 @@ export function createComposition(params: {
   formatId: string;
   illustrationPath: string | null;
   bookTitle?: string | null;
+  bookSubtitle?: string | null;
 }): FrontComposition {
   const size = getFrontCanvasSize(params.formatId);
   return {
@@ -288,8 +289,8 @@ export function createComposition(params: {
     imageFlipX: false,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
-      // Aucun sous-titre inventé : le calque reste vide tant que l'auteur n'en saisit pas.
-      defaultLayer('subtitle', size, ''),
+      // Aucun sous-titre inventé : on reprend celui du livre s'il existe, sinon vide.
+      defaultLayer('subtitle', size, params.bookSubtitle?.trim() || ''),
       defaultLayer('author', size, 'Nom de l’auteur'),
     ],
   };
@@ -331,7 +332,12 @@ const looksLikeUrl = (value: string) => /https?:\/\//i.test(value) || /token=/i.
  */
 export function parseComposition(
   raw: unknown,
-  fallback: { formatId: string; illustrationPath: string | null; bookTitle?: string | null },
+  fallback: {
+    formatId: string;
+    illustrationPath: string | null;
+    bookTitle?: string | null;
+    bookSubtitle?: string | null;
+  },
 ): FrontComposition {
   const size = getFrontCanvasSize(fallback.formatId);
   if (!raw || typeof raw !== 'object') return createComposition(fallback);

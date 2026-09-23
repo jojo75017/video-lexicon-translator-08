@@ -32,6 +32,9 @@ import {
 
 import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
 import CoverProAccessBar from '@/components/cover-editor/CoverProAccessBar';
+import MyBookPicker from '@/components/cover-editor/MyBookPicker';
+import type { MyBookOption } from '@/lib/cover-editor/myBooks';
+import { toast } from 'sonner';
 
 
 import { Button } from '@/components/ui/button';
@@ -149,11 +152,13 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           formatId: project.format_id,
           illustrationPath: project.illustration_path,
           bookTitle: project.book_title,
+          bookSubtitle: project.book_subtitle,
         })
       : createComposition({
           formatId: project.format_id,
           illustrationPath: project.illustration_path,
           bookTitle: project.book_title,
+          bookSubtitle: project.book_subtitle,
         }),
   );
 
@@ -517,6 +522,37 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
       layers: [...prev.layers, defaultLayer(role, prev.canvas)],
     }));
 
+  /**
+   * Reprend un livre enregistré : titre, sous-titre et auteur sont recopiés tels
+   * quels sur la couverture. Aucun texte inventé, aucune valeur par défaut.
+   */
+  const applyMyBook = (book: MyBookOption) => {
+    const values: Partial<Record<TextRole, string>> = {
+      title: (book.title ?? '').trim(),
+      subtitle: (book.subtitle ?? '').trim(),
+      author: (book.author ?? '').trim(),
+    };
+    commit((prev) => {
+      let layers = [...prev.layers];
+      (['title', 'subtitle', 'author'] as TextRole[]).forEach((role) => {
+        const text = values[role] ?? '';
+        if (!text) return;
+        const index = layers.findIndex((l) => l.role === role);
+        if (index >= 0) {
+          layers[index] = { ...layers[index], text };
+        } else {
+          layers = [...layers, { ...defaultLayer(role, prev.canvas), text }];
+        }
+      });
+      return { ...prev, layers };
+    });
+    toast.success(
+      values.subtitle
+        ? `Livre chargé : ${values.title} — sous-titre repris.`
+        : `Livre chargé : ${values.title}.`,
+    );
+  };
+
   const removeLayer = (id: string) => {
     commit((prev) => ({ ...prev, layers: prev.layers.filter((l) => l.id !== id) }));
     setSelectedId(null);
@@ -871,6 +907,12 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
         <Card className="h-fit">
           <CardContent className="space-y-4 p-4">
             <p className="text-sm font-semibold text-foreground">Première de couverture</p>
+
+            {/* Charge en un clic le titre, le sous-titre et l'auteur d'un livre. */}
+            <MyBookPicker
+              onSelect={applyMyBook}
+              hint="Le titre, le sous-titre et le nom d’auteur se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
+            />
 
             {ROLES.map((role) => {
               const layer = composition.layers.find((l) => l.role === role);

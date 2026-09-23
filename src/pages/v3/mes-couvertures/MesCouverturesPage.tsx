@@ -73,6 +73,7 @@ export default function MesCouverturesPage() {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newTitle, setNewTitle] = useState('');
+  const [newSubtitle, setNewSubtitle] = useState('');
   const [newType, setNewType] = useState<CoverType>('ebook');
   const [newPages, setNewPages] = useState('');
 
@@ -117,13 +118,15 @@ export default function MesCouverturesPage() {
   const resetCreateForm = () => {
     setNewName('');
     setNewTitle('');
+    setNewSubtitle('');
     setNewType('ebook');
     setNewPages('');
   };
 
-  /** Reprend un livre enregistré : nom du projet et titre préremplis. */
+  /** Reprend un livre enregistré : nom du projet, titre et sous-titre préremplis. */
   const applyMyBook = (book: MyBookOption) => {
     setNewTitle(book.title);
+    setNewSubtitle(book.subtitle ?? '');
     if (!newName.trim()) setNewName(`Couverture — ${book.title}`);
     toast.success(`Livre chargé : ${book.title}`);
   };
@@ -140,6 +143,7 @@ export default function MesCouverturesPage() {
       const created = await createCoverProject({
         project_name: name,
         book_title: newTitle.trim() || null,
+        book_subtitle: newSubtitle.trim() || null,
         cover_type: newType,
         format_id: TYPE_META[newType].formatId,
         page_count: Number.isFinite(pages as number) ? (pages as number) : null,
@@ -187,6 +191,7 @@ export default function MesCouverturesPage() {
       const copy = await createCoverProject({
         project_name: `${project.project_name} (copie)`,
         book_title: project.book_title,
+        book_subtitle: project.book_subtitle,
         cover_type: project.cover_type,
         format_id: project.format_id,
         page_count: project.page_count,
@@ -395,7 +400,7 @@ export default function MesCouverturesPage() {
           <div className="space-y-4">
             <MyBookPicker
               onSelect={applyMyBook}
-              hint="Le nom du projet et le titre se remplissent depuis votre livre."
+              hint="Le nom du projet, le titre et le sous-titre se remplissent depuis votre livre."
             />
             <div className="space-y-2">
               <Label htmlFor="cover-name">Nom du projet *</Label>
@@ -413,6 +418,15 @@ export default function MesCouverturesPage() {
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 placeholder="Titre tel qu'il apparaîtra sur la couverture"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cover-subtitle">Sous-titre (facultatif)</Label>
+              <Input
+                id="cover-subtitle"
+                value={newSubtitle}
+                onChange={(e) => setNewSubtitle(e.target.value)}
+                placeholder="Sous-titre tel qu'il apparaîtra sous le titre"
               />
             </div>
             <div className="space-y-2">
