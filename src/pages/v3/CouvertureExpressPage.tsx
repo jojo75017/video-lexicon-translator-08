@@ -67,7 +67,8 @@ import {
 import { downloadBlob, renderKindleCoverJpeg } from '@/lib/cover-editor/kindleExport';
 import SuggestInput from '@/components/cover-editor/SuggestInput';
 import { coverDetailSuggestions } from '@/data/coverDetailSuggestions';
-import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
+import MyBookPicker from '@/components/cover-editor/MyBookPicker';
+import type { MyBookOption } from '@/lib/cover-editor/myBooks';
 import { cn } from '@/lib/utils';
 
 type Step = 1 | 2 | 3;
