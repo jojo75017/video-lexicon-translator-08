@@ -103,23 +103,60 @@ export default function MesCouverturesPage() {
         const bucket = supabase.storage.from('ebook-images');
         const root = auth.user.id;
         const isCover = (n: string) => /couverture|cover/i.test(n) && /\.(png|jpe?g|webp)$/i.test(n);
+        const byPath = new Map<string, SavedCover>();
+        const addCover = (cover: SavedCover) => {
+          const normalizedPath = decodeURIComponent(cover.path).replace(/^.*\/ebook-images\//, '');
+          byPath.set(normalizedPath, { ...cover, path: normalizedPath });
+        };
+
+        // Source prioritaire : les couvertures réellement rattachées aux livres V2/V3.
+        const { data: books } = await supabase
+          .from('ebook_projects')
+          .select('title, cover_concepts, ebook_images, updated_at')
+          .order('updated_at', { ascending: false });
+        for (const book of books ?? []) {
+          const images = Array.isArray(book.ebook_images) ? book.ebook_images : [];
+          const front = images.find((image) => {
+            if (!image || typeof image !== 'object' || Array.isArray(image)) return false;
+            return (image as { type?: unknown }).type === 'front_cover';
+          });
+          const frontUrl = front && typeof front === 'object' && !Array.isArray(front)
+            ? (front as { url?: unknown }).url
+            : null;
+          const candidates = [frontUrl, book.cover_concepts];
+          for (const candidate of candidates) {
+            if (typeof candidate !== 'string' || !candidate.trim()) continue;
+            const path = decodeURIComponent(candidate).replace(/^.*\/object\/public\/ebook-images\//, '');
+            addCover({
+              url: candidate,
+              path,
+              format: 'kindle',
+              title: book.title || 'Couverture',
+              createdAt: book.updated_at,
+              fingerprint: candidate.startsWith('data:image/') ? candidate.slice(-160) : undefined,
+            });
+          }
+        }
+
         const { data: folders } = await bucket.list(root, { limit: 200 });
-        const out: SavedCover[] = [];
         const scan = async (folder: string, label: string) => {
           const { data: files } = await bucket.list(folder, { limit: 200 });
           for (const f of files ?? []) {
             if (!f.id) {
-              if (/cover/i.test(f.name)) await scan(`${folder}/${f.name}`, label);
+              await scan(`${folder}/${f.name}`, label);
               continue;
             }
             if (!isCover(f.name)) continue;
             const path = `${folder}/${f.name}`;
-            out.push({
+            addCover({
               url: bucket.getPublicUrl(path).data.publicUrl,
               path,
               format: 'kindle',
               title: label,
               createdAt: f.created_at || new Date(Number(f.name.split('-')[0]) || Date.now()).toISOString(),
+              fingerprint: typeof f.metadata?.eTag === 'string'
+                ? f.metadata.eTag.replaceAll('"', '')
+                : undefined,
             });
           }
         };
@@ -128,6 +165,7 @@ export default function MesCouverturesPage() {
             .filter((f) => !f.id && f.name !== 'Couvertures')
             .map((f) => scan(`${root}/${f.name}`, f.name === 'kids-books' ? 'Livre enfant' : f.name.replace(/-/g, ' '))),
         );
+        const out = [...byPath.values()];
         out.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         setBookCovers(out);
       })().catch(() => setBookCovers([]));
@@ -275,8 +313,10 @@ export default function MesCouverturesPage() {
   const allClassic = useMemo(() => {
     const seen = new Set<string>();
     return [...bookCovers, ...savedCovers].filter((c) => {
-      if (seen.has(c.url)) return false;
-      seen.add(c.url);
+      const normalizedPath = decodeURIComponent(c.path || c.url).replace(/^.*\/object\/public\/ebook-images\//, '');
+      const key = c.fingerprint || normalizedPath || c.url;
+      if (seen.has(key)) return false;
+      seen.add(key);
       return true;
     });
   }, [bookCovers, savedCovers]);
