@@ -97,10 +97,6 @@ export default function CouvertureExpressPage() {
   const { credits, key, refresh } = useCoverProAccess();
 
   const [step, setStep] = useState<Step>(1);
-  /* Bibliothèque de l'abonné : livres déjà enregistrés, pour éviter toute resaisie. */
-  const [myBooks, setMyBooks] = useState<MyBookOption[]>([]);
-  const [booksLoading, setBooksLoading] = useState(true);
-  const [selectedBookId, setSelectedBookId] = useState('');
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -164,22 +160,8 @@ export default function CouvertureExpressPage() {
     }
   }, [searchParams]);
 
-  /* Chargement de la bibliothèque : uniquement les livres réellement enregistrés. */
-  useEffect(() => {
-    let active = true;
-    void listMyBooks()
-      .then((books) => { if (active) setMyBooks(books); })
-      .catch(() => { if (active) setMyBooks([]); })
-      .finally(() => { if (active) setBooksLoading(false); });
-    return () => { active = false; };
-  }, []);
-
   /** Reprend un livre de la bibliothèque : remplit la fiche sans rien inventer. */
-  const applyMyBook = (value: string) => {
-    setSelectedBookId(value);
-    const [kind, id] = value.split(':');
-    const book = myBooks.find((b) => b.kind === kind && b.id === id);
-    if (!book) return;
+  const applyMyBook = (book: MyBookOption) => {
     setTitle(book.title);
     if (book.subtitle) setSubtitle(book.subtitle);
     if (book.author) setAuthor(book.author);
