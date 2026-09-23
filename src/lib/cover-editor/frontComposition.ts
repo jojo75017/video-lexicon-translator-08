@@ -332,7 +332,12 @@ const looksLikeUrl = (value: string) => /https?:\/\//i.test(value) || /token=/i.
  */
 export function parseComposition(
   raw: unknown,
-  fallback: { formatId: string; illustrationPath: string | null; bookTitle?: string | null },
+  fallback: {
+    formatId: string;
+    illustrationPath: string | null;
+    bookTitle?: string | null;
+    bookSubtitle?: string | null;
+  },
 ): FrontComposition {
   const size = getFrontCanvasSize(fallback.formatId);
   if (!raw || typeof raw !== 'object') return createComposition(fallback);
