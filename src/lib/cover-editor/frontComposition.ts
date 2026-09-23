@@ -288,7 +288,8 @@ export function createComposition(params: {
     imageFlipX: false,
     layers: [
       defaultLayer('title', size, params.bookTitle?.trim() || 'Titre du livre'),
-      defaultLayer('subtitle', size, 'Sous-titre'),
+      // Aucun sous-titre inventé : le calque reste vide tant que l'auteur n'en saisit pas.
+      defaultLayer('subtitle', size, ''),
       defaultLayer('author', size, 'Nom de l’auteur'),
     ],
   };
