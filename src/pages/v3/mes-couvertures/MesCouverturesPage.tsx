@@ -33,14 +33,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
+import MyBookPicker from '@/components/cover-editor/MyBookPicker';
+import type { MyBookOption } from '@/lib/cover-editor/myBooks';
 import {
   createCoverProject,
   deleteCoverProject,
