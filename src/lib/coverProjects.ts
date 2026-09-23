@@ -111,6 +111,7 @@ export async function createCoverProject(input: CoverProjectInput): Promise<Cove
       user_id: userId,
       project_name: input.project_name,
       book_title: input.book_title ?? null,
+      book_subtitle: input.book_subtitle ?? null,
       cover_type: input.cover_type,
       format_id: input.format_id,
       page_count: input.page_count ?? null,
