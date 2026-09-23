@@ -830,7 +830,8 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                     <CoverTemplateThumb
                       template={tpl}
                       variantIndex={variantIndex}
-                      canvas={composition.canvas}
+                      composition={composition}
+                      projectImage={bgImage}
                     />
                     <p className="text-sm font-semibold text-foreground">{tpl.label}</p>
                     <p className="text-xs text-muted-foreground">{tpl.description}</p>
