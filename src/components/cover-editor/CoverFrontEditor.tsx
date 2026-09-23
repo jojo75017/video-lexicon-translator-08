@@ -32,6 +32,9 @@ import {
 
 import IllustrationGeneratorPanel from '@/components/cover-editor/IllustrationGeneratorPanel';
 import CoverProAccessBar from '@/components/cover-editor/CoverProAccessBar';
+import MyBookPicker from '@/components/cover-editor/MyBookPicker';
+import type { MyBookOption } from '@/lib/cover-editor/myBooks';
+import { toast } from 'sonner';
 
 
 import { Button } from '@/components/ui/button';
