@@ -84,16 +84,19 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
     };
   });
 
-  const fromProjects: MyBookOption[] = (projects.data ?? []).map((row) => ({
-    id: String(row.id),
-    kind: 'book' as const,
-    title: clean(row.title) || 'Sans titre',
-    subtitle: clean(row.subtitle),
-    author: '',
-    synopsis: clean(row.source_notes) || clean(row.target_audience),
-    genre: clean(row.genre),
-    updatedAt: clean(row.updated_at) || null,
-  }));
+  const fromProjects: MyBookOption[] = (projects.data ?? []).map((row) => {
+    const split = splitTitleAndSubtitle(clean(row.title));
+    return {
+      id: String(row.id),
+      kind: 'book' as const,
+      title: split.title || 'Sans titre',
+      subtitle: clean(row.subtitle) || split.subtitle,
+      author: '',
+      synopsis: clean(row.source_notes) || clean(row.target_audience),
+      genre: clean(row.genre),
+      updatedAt: clean(row.updated_at) || null,
+    };
+  });
 
   return [...fromEbooks, ...fromProjects].sort((a, b) =>
     (b.updatedAt || '').localeCompare(a.updatedAt || ''),
