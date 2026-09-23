@@ -23,6 +23,7 @@ type Row = {
   updated_at: string;
   chapters?: any[] | null;
   ebook_images?: any[] | null;
+  cover_concepts?: any | null;
   project_type?: string | null;
 };
 
