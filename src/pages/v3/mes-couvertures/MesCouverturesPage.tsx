@@ -228,6 +228,15 @@ export default function MesCouverturesPage() {
   };
 
   const showPageCount = useMemo(() => newType !== 'ebook', [newType]);
+  const paidProjects = useMemo(
+    () => projects.filter((project) => project.illustration_path?.includes('/studio-pro/')),
+    [projects],
+  );
+  const classicProjects = useMemo(
+    () => projects.filter((project) => !project.illustration_path?.includes('/studio-pro/')),
+    [projects],
+  );
+  const classicCoverCount = classicProjects.length + savedCovers.length;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 space-y-6">
@@ -281,7 +290,7 @@ export default function MesCouverturesPage() {
         </Card>
       )}
 
-      {!loading && !error && projects.length === 0 && (
+      {!loading && !error && projects.length === 0 && savedCovers.length === 0 && (
         <Card>
           <CardContent className="space-y-3 p-10 text-center">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
@@ -298,9 +307,13 @@ export default function MesCouverturesPage() {
         </Card>
       )}
 
-      {!loading && !error && projects.length > 0 && (
-        <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {projects.map((project) => {
+      {!loading && !error && paidProjects.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-xl font-bold text-foreground">
+            Couvertures de l’offre à 67 € ({paidProjects.length})
+          </h2>
+          <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {paidProjects.map((project) => {
             const meta = TYPE_META[project.cover_type] ?? TYPE_META.ebook;
             const Icon = meta.icon;
             const thumb = thumbs[project.id];
@@ -388,21 +401,68 @@ export default function MesCouverturesPage() {
               </Card>
             );
           })}
-        </div>
+          </div>
+        </section>
       )}
 
       {!loading && (
         <section className="space-y-3 border-t pt-6">
           <h2 className="text-xl font-bold text-foreground">
-            Mes couvertures du studio classique ({savedCovers.length})
+            Mes couvertures du studio classique ({classicCoverCount})
           </h2>
           <p className="text-sm text-muted-foreground">
             Les couvertures que vous avez créées vous-même dans le studio de couverture inclus, en dehors de l’offre à 67 €.
           </p>
-          {savedCovers.length === 0 ? (
+          {classicCoverCount === 0 ? (
             <p className="text-sm text-muted-foreground">Aucune couverture enregistrée dans le studio classique.</p>
           ) : (
             <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {classicProjects.map((project) => {
+                const meta = TYPE_META[project.cover_type] ?? TYPE_META.ebook;
+                const Icon = meta.icon;
+                const thumb = thumbs[project.id];
+                return (
+                  <Card key={project.id} className="flex w-full max-w-[240px] flex-col overflow-hidden">
+                    <Link
+                      to={`/v3/mes-couvertures/${project.id}`}
+                      aria-label={`Ouvrir l’éditeur de ${project.project_name}`}
+                      className="block w-full bg-muted transition-opacity hover:opacity-90"
+                      style={{ height: 330 }}
+                    >
+                      {thumb ? (
+                        <img
+                          src={thumb}
+                          alt={`Miniature de ${project.project_name}`}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full flex-col items-center justify-center gap-2 text-muted-foreground">
+                          <Icon className="h-7 w-7" />
+                          <span className="text-xs">Projet à finaliser</span>
+                        </div>
+                      )}
+                    </Link>
+                    <div className="space-y-1 px-3 pt-3">
+                      <p className="truncate text-sm font-semibold text-foreground">{project.project_name}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {project.book_title || 'Titre du livre non renseigné'}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+                        <Badge variant="outline" className="text-[10px]">{meta.label}</Badge>
+                        <span className="text-[10px] text-muted-foreground">{formatDate(project.updated_at)}</span>
+                      </div>
+                    </div>
+                    <CardFooter className="mt-auto p-3">
+                      <Button asChild size="sm" className="w-full gap-1 bg-orange-500 text-primary-foreground hover:bg-orange-600">
+                        <Link to={`/v3/mes-couvertures/${project.id}`}>
+                          <Pencil className="h-3.5 w-3.5" /> Modifier cette couverture
+                        </Link>
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                );
+              })}
               {savedCovers.map((c) => (
                 <Card key={c.path} className="flex w-full max-w-[240px] flex-col overflow-hidden">
                   <a href={c.url} target="_blank" rel="noreferrer" className="block w-full bg-muted" style={{ height: 330 }}>
