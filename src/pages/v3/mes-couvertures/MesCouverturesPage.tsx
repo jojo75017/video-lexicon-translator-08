@@ -81,6 +81,10 @@ export default function MesCouverturesPage() {
   const [newTitle, setNewTitle] = useState('');
   const [newType, setNewType] = useState<CoverType>('ebook');
   const [newPages, setNewPages] = useState('');
+  /* Bibliothèque : livres déjà enregistrés par l'abonné. */
+  const [myBooks, setMyBooks] = useState<MyBookOption[]>([]);
+  const [booksLoading, setBooksLoading] = useState(true);
+  const [selectedBookId, setSelectedBookId] = useState('');
 
   // Renommage
   const [renameTarget, setRenameTarget] = useState<CoverProject | null>(null);
@@ -120,11 +124,32 @@ export default function MesCouverturesPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    let active = true;
+    void listMyBooks()
+      .then((books) => { if (active) setMyBooks(books); })
+      .catch(() => { if (active) setMyBooks([]); })
+      .finally(() => { if (active) setBooksLoading(false); });
+    return () => { active = false; };
+  }, []);
+
   const resetCreateForm = () => {
     setNewName('');
     setNewTitle('');
     setNewType('ebook');
     setNewPages('');
+    setSelectedBookId('');
+  };
+
+  /** Reprend un livre enregistré : nom du projet et titre préremplis. */
+  const applyMyBook = (value: string) => {
+    setSelectedBookId(value);
+    const [kind, id] = value.split(':');
+    const book = myBooks.find((b) => b.kind === kind && b.id === id);
+    if (!book) return;
+    setNewTitle(book.title);
+    if (!newName.trim()) setNewName(`Couverture — ${book.title}`);
+    toast.success(`Livre chargé : ${book.title}`);
   };
 
   const handleCreate = async () => {
