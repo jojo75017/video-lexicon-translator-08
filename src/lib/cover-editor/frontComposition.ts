@@ -354,7 +354,13 @@ export function parseComposition(
         : 'title';
 
       const base = defaultLayer(role, canvas);
-      const text = str(l.text, base.text);
+      // Un texte vide reste vide : on ne réinjecte jamais le libellé « Sous-titre »
+      // comme contenu réel de la couverture.
+      const rawText = typeof l.text === 'string' ? l.text : base.text;
+      const text =
+        (role === 'subtitle' || role === 'custom') && rawText.trim() === ROLE_LABEL[role]
+          ? ''
+          : rawText;
       const shadowRaw = (l.shadow ?? null) as Record<string, unknown> | null;
       const outlineRaw = (l.outline ?? null) as Record<string, unknown> | null;
       const bandRaw = (l.band ?? null) as Record<string, unknown> | null;
