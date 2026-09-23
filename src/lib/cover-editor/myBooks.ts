@@ -19,6 +19,23 @@ export interface MyBookOption {
 
 const clean = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
+/**
+ * Beaucoup de livres sont enregistrés avec la formule « Titre : Sous-titre » dans un seul champ.
+ * On sépare alors les deux parties, sans rien inventer : seul le texte existant est découpé.
+ */
+export const splitTitleAndSubtitle = (raw: string): { title: string; subtitle: string } => {
+  const value = clean(raw);
+  for (const sep of [' : ', ' — ', ' – ', ' - ', ': ']) {
+    const at = value.indexOf(sep);
+    if (at > 2) {
+      const title = value.slice(0, at).trim();
+      const subtitle = value.slice(at + sep.length).trim();
+      if (title && subtitle) return { title, subtitle };
+    }
+  }
+  return { title: value, subtitle: '' };
+};
+
 /** Première valeur non vide parmi plusieurs champs possibles du brouillon. */
 const firstOf = (source: Record<string, unknown>, keys: string[]): string => {
   for (const key of keys) {
