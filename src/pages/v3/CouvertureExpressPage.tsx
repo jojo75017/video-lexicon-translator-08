@@ -548,6 +548,40 @@ export default function CouvertureExpressPage() {
         {step === 1 && (
           <Card className="mx-auto max-w-xl">
             <CardContent className="space-y-4 p-5">
+              {/* Reprendre un livre déjà enregistré dans la bibliothèque de l'abonné. */}
+              <div className="space-y-1.5 rounded-lg border border-[#008296]/30 bg-[#008296]/5 p-3">
+                <Label>Partir d’un de mes livres</Label>
+                <Select value={selectedBookId} onValueChange={applyMyBook}>
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={
+                        booksLoading
+                          ? 'Chargement de vos livres…'
+                          : myBooks.length
+                            ? 'Choisir un livre enregistré'
+                            : 'Aucun livre enregistré pour l’instant'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {myBooks.map((book) => (
+                      <SelectItem key={`${book.kind}-${book.id}`} value={`${book.kind}:${book.id}`}>
+                        {book.title}
+                      </SelectItem>
+                    ))}
+                    {!booksLoading && myBooks.length === 0 && (
+                      <SelectItem value="none" disabled>
+                        Aucun livre trouvé
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Le titre, le sous-titre, l’auteur et le synopsis se remplissent depuis votre livre.
+                  Vous pouvez tout corriger ensuite.
+                </p>
+              </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="ex-title">Titre de votre livre</Label>
                 <Input
