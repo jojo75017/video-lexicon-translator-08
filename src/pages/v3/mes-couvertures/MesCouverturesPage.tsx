@@ -36,6 +36,8 @@ import {
 import MyBookPicker from '@/components/cover-editor/MyBookPicker';
 import type { MyBookOption } from '@/lib/cover-editor/myBooks';
 import { listSavedCovers, type SavedCover } from '@/lib/coverLibrary';
+import { supabase } from '@/integrations/supabase/client';
+import useCoverProAccess from '@/hooks/useCoverProAccess';
 import {
   createCoverProject,
   deleteCoverProject,
@@ -66,6 +68,8 @@ export default function MesCouverturesPage() {
   const [projects, setProjects] = useState<CoverProject[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
   const [savedCovers, setSavedCovers] = useState<SavedCover[]>([]);
+  const [bookCovers, setBookCovers] = useState<SavedCover[]>([]);
+  const coverPro = useCoverProAccess();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -91,6 +95,28 @@ export default function MesCouverturesPage() {
     setError(null);
     try {
       void listSavedCovers().then(setSavedCovers).catch(() => setSavedCovers([]));
+      void (async () => {
+        const { data: auth } = await supabase.auth.getUser();
+        if (!auth.user) return;
+        const { data } = await supabase
+          .from('ebook_projects')
+          .select('id,title,updated_at,ebook_images,cover_concepts')
+          .eq('user_id', auth.user.id)
+          .order('updated_at', { ascending: false });
+        const out: SavedCover[] = [];
+        for (const b of (data ?? []) as any[]) {
+          const imgs = Array.isArray(b.ebook_images) ? b.ebook_images : [];
+          const concepts = Array.isArray(b.cover_concepts) ? b.cover_concepts : b.cover_concepts ? [b.cover_concepts] : [];
+          const urls = [
+            ...imgs.map((i: any) => i?.url),
+            ...concepts.map((c: any) => (typeof c === 'string' ? c : c?.url || c?.imageUrl)),
+          ].filter((u: any) => typeof u === 'string' && u && !u.startsWith('data:image/svg'));
+          urls.forEach((url: string, i: number) =>
+            out.push({ url, path: `${b.id}-${i}`, format: 'kindle', title: b.title || '', createdAt: b.updated_at }),
+          );
+        }
+        setBookCovers(out);
+      })().catch(() => setBookCovers([]));
       const rows = await listCoverProjects();
       setProjects(rows);
 
@@ -228,15 +254,19 @@ export default function MesCouverturesPage() {
   };
 
   const showPageCount = useMemo(() => newType !== 'ebook', [newType]);
-  const paidProjects = useMemo(
-    () => projects.filter((project) => project.illustration_path?.includes('/studio-pro/')),
-    [projects],
-  );
-  const classicProjects = useMemo(
-    () => projects.filter((project) => !project.illustration_path?.includes('/studio-pro/')),
-    [projects],
-  );
-  const classicCoverCount = classicProjects.length + savedCovers.length;
+  // Tous les projets du studio éditable relèvent de l'offre à 67 € :
+  // visibles uniquement pour un acheteur ou l'admin.
+  const paidProjects = useMemo(() => (coverPro.hasAccess ? projects : []), [projects, coverPro.hasAccess]);
+  const classicProjects: CoverProject[] = [];
+  const allClassic = useMemo(() => {
+    const seen = new Set<string>();
+    return [...bookCovers, ...savedCovers].filter((c) => {
+      if (seen.has(c.url)) return false;
+      seen.add(c.url);
+      return true;
+    });
+  }, [bookCovers, savedCovers]);
+  const classicCoverCount = allClassic.length;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8 space-y-6">
@@ -463,7 +493,7 @@ export default function MesCouverturesPage() {
                   </Card>
                 );
               })}
-              {savedCovers.map((c) => (
+              {allClassic.map((c) => (
                 <Card key={c.path} className="flex w-full max-w-[240px] flex-col overflow-hidden">
                   <a href={c.url} target="_blank" rel="noreferrer" className="block w-full bg-muted" style={{ height: 330 }}>
                     <img src={c.url} alt={c.title || 'Couverture'} className="h-full w-full object-cover" loading="lazy" />
