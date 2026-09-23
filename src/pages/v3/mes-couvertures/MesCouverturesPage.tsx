@@ -73,6 +73,7 @@ export default function MesCouverturesPage() {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newTitle, setNewTitle] = useState('');
+  const [newSubtitle, setNewSubtitle] = useState('');
   const [newType, setNewType] = useState<CoverType>('ebook');
   const [newPages, setNewPages] = useState('');
 
