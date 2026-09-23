@@ -519,6 +519,37 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
       layers: [...prev.layers, defaultLayer(role, prev.canvas)],
     }));
 
+  /**
+   * Reprend un livre enregistré : titre, sous-titre et auteur sont recopiés tels
+   * quels sur la couverture. Aucun texte inventé, aucune valeur par défaut.
+   */
+  const applyMyBook = (book: MyBookOption) => {
+    const values: Partial<Record<TextRole, string>> = {
+      title: (book.title ?? '').trim(),
+      subtitle: (book.subtitle ?? '').trim(),
+      author: (book.author ?? '').trim(),
+    };
+    commit((prev) => {
+      let layers = [...prev.layers];
+      (['title', 'subtitle', 'author'] as TextRole[]).forEach((role) => {
+        const text = values[role] ?? '';
+        if (!text) return;
+        const index = layers.findIndex((l) => l.role === role);
+        if (index >= 0) {
+          layers[index] = { ...layers[index], text };
+        } else {
+          layers = [...layers, { ...defaultLayer(role, prev.canvas), text }];
+        }
+      });
+      return { ...prev, layers };
+    });
+    toast.success(
+      values.subtitle
+        ? `Livre chargé : ${values.title} — sous-titre repris.`
+        : `Livre chargé : ${values.title}.`,
+    );
+  };
+
   const removeLayer = (id: string) => {
     commit((prev) => ({ ...prev, layers: prev.layers.filter((l) => l.id !== id) }));
     setSelectedId(null);
