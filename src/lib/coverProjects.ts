@@ -45,6 +45,7 @@ export interface CoverProject {
 export interface CoverProjectInput {
   project_name: string;
   book_title?: string | null;
+  book_subtitle?: string | null;
   cover_type: CoverType;
   format_id: string;
   page_count?: number | null;
