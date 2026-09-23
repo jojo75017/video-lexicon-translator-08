@@ -95,26 +95,40 @@ export default function MesCouverturesPage() {
     setError(null);
     try {
       void listSavedCovers().then(setSavedCovers).catch(() => setSavedCovers([]));
+      // Couvertures IA V2/V3 rangées par livre dans la bibliothèque d'images :
+      // <racine>/<Livre>/…Couverture-IA.* et <racine>/kids-books/draft-cover/…
       void (async () => {
         const { data: auth } = await supabase.auth.getUser();
         if (!auth.user) return;
-        const { data } = await supabase
-          .from('ebook_projects')
-          .select('id,title,updated_at,ebook_images,cover_concepts')
-          .eq('user_id', auth.user.id)
-          .order('updated_at', { ascending: false });
+        const bucket = supabase.storage.from('ebook-images');
+        const root = auth.user.id;
+        const isCover = (n: string) => /couverture|cover/i.test(n) && /\.(png|jpe?g|webp)$/i.test(n);
+        const { data: folders } = await bucket.list(root, { limit: 200 });
         const out: SavedCover[] = [];
-        for (const b of (data ?? []) as any[]) {
-          const imgs = Array.isArray(b.ebook_images) ? b.ebook_images : [];
-          const concepts = Array.isArray(b.cover_concepts) ? b.cover_concepts : b.cover_concepts ? [b.cover_concepts] : [];
-          const urls = [
-            ...imgs.map((i: any) => i?.url),
-            ...concepts.map((c: any) => (typeof c === 'string' ? c : c?.url || c?.imageUrl)),
-          ].filter((u: any) => typeof u === 'string' && u && !u.startsWith('data:image/svg'));
-          urls.forEach((url: string, i: number) =>
-            out.push({ url, path: `${b.id}-${i}`, format: 'kindle', title: b.title || '', createdAt: b.updated_at }),
-          );
-        }
+        const scan = async (folder: string, label: string) => {
+          const { data: files } = await bucket.list(folder, { limit: 200 });
+          for (const f of files ?? []) {
+            if (!f.id) {
+              if (/cover/i.test(f.name)) await scan(`${folder}/${f.name}`, label);
+              continue;
+            }
+            if (!isCover(f.name)) continue;
+            const path = `${folder}/${f.name}`;
+            out.push({
+              url: bucket.getPublicUrl(path).data.publicUrl,
+              path,
+              format: 'kindle',
+              title: label,
+              createdAt: f.created_at || new Date(Number(f.name.split('-')[0]) || Date.now()).toISOString(),
+            });
+          }
+        };
+        await Promise.all(
+          (folders ?? [])
+            .filter((f) => !f.id && f.name !== 'Couvertures')
+            .map((f) => scan(`${root}/${f.name}`, f.name === 'kids-books' ? 'Livre enfant' : f.name.replace(/-/g, ' '))),
+        );
+        out.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         setBookCovers(out);
       })().catch(() => setBookCovers([]));
       const rows = await listCoverProjects();
