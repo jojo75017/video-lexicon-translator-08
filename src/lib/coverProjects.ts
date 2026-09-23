@@ -25,6 +25,8 @@ export interface CoverProject {
   user_id: string;
   project_name: string;
   book_title: string | null;
+  /** Sous-titre du livre : jamais inventé, uniquement saisi ou repris d'un livre. */
+  book_subtitle: string | null;
   cover_type: CoverType;
   format_id: string;
   page_count: number | null;
