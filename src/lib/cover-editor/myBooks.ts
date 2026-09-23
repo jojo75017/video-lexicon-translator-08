@@ -19,6 +19,15 @@ export interface MyBookOption {
 
 const clean = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
+/** Première valeur non vide parmi plusieurs champs possibles du brouillon. */
+const firstOf = (source: Record<string, unknown>, keys: string[]): string => {
+  for (const key of keys) {
+    const value = clean(source[key]);
+    if (value) return value;
+  }
+  return '';
+};
+
 /** Livres enregistrés côté ebook_projects + book_projects, les plus récents d'abord. */
 export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
   const { data: auth } = await supabase.auth.getUser();
@@ -38,15 +47,19 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
   ]);
 
   const fromEbooks: MyBookOption[] = (ebooks.data ?? []).map((row) => {
-    const brief = ((row as Record<string, unknown>).draft_state as { brief?: Record<string, unknown> } | null)?.brief ?? {};
+    const draft = ((row as Record<string, unknown>).draft_state ?? {}) as Record<string, unknown>;
+    const brief = (draft.brief ?? {}) as Record<string, unknown>;
     return {
       id: String(row.id),
       kind: 'ebook' as const,
-      title: clean(row.title) || 'Sans titre',
-      subtitle: clean(brief.subtitle),
-      author: clean(row.author_name) || clean(brief.author),
-      synopsis: clean(row.book_summary) || clean(row.kdp_description) || clean(brief.description),
-      genre: clean(row.kdp_categories) || clean(brief.category),
+      title: clean(row.title) || firstOf(brief, ['title']) || 'Sans titre',
+      subtitle: firstOf(brief, ['subtitle', 'sousTitre', 'sous_titre', 'tagline', 'accroche', 'format']),
+      author: clean(row.author_name) || firstOf(brief, ['author', 'authorName']),
+      synopsis:
+        clean(row.book_summary) ||
+        clean(row.kdp_description) ||
+        firstOf(brief, ['synopsis', 'hook', 'description', 'pitch', 'resume', 'summary']),
+      genre: clean(row.kdp_categories) || firstOf(brief, ['genre', 'category', 'categorie']),
       updatedAt: clean(row.updated_at) || null,
     };
   });
@@ -57,7 +70,7 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
     title: clean(row.title) || 'Sans titre',
     subtitle: clean(row.subtitle),
     author: '',
-    synopsis: clean(row.source_notes),
+    synopsis: clean(row.source_notes) || clean(row.target_audience),
     genre: clean(row.genre),
     updatedAt: clean(row.updated_at) || null,
   }));
