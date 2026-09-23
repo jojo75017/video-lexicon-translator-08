@@ -271,6 +271,7 @@ export function createComposition(params: {
   formatId: string;
   illustrationPath: string | null;
   bookTitle?: string | null;
+  bookSubtitle?: string | null;
 }): FrontComposition {
   const size = getFrontCanvasSize(params.formatId);
   return {
