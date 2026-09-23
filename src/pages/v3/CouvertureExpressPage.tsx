@@ -67,6 +67,7 @@ import {
 import { downloadBlob, renderKindleCoverJpeg } from '@/lib/cover-editor/kindleExport';
 import SuggestInput from '@/components/cover-editor/SuggestInput';
 import { coverDetailSuggestions } from '@/data/coverDetailSuggestions';
+import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
 import { cn } from '@/lib/utils';
 
 type Step = 1 | 2 | 3;
@@ -95,6 +96,10 @@ export default function CouvertureExpressPage() {
   const { credits, key, refresh } = useCoverProAccess();
 
   const [step, setStep] = useState<Step>(1);
+  /* Bibliothèque de l'abonné : livres déjà enregistrés, pour éviter toute resaisie. */
+  const [myBooks, setMyBooks] = useState<MyBookOption[]>([]);
+  const [booksLoading, setBooksLoading] = useState(true);
+  const [selectedBookId, setSelectedBookId] = useState('');
   const [title, setTitle] = useState('');
   const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
@@ -157,6 +162,38 @@ export default function CouvertureExpressPage() {
       if (match) setGenreId(match.id);
     }
   }, [searchParams]);
+
+  /* Chargement de la bibliothèque : uniquement les livres réellement enregistrés. */
+  useEffect(() => {
+    let active = true;
+    void listMyBooks()
+      .then((books) => { if (active) setMyBooks(books); })
+      .catch(() => { if (active) setMyBooks([]); })
+      .finally(() => { if (active) setBooksLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  /** Reprend un livre de la bibliothèque : remplit la fiche sans rien inventer. */
+  const applyMyBook = (value: string) => {
+    setSelectedBookId(value);
+    const [kind, id] = value.split(':');
+    const book = myBooks.find((b) => b.kind === kind && b.id === id);
+    if (!book) return;
+    setTitle(book.title);
+    if (book.subtitle) setSubtitle(book.subtitle);
+    if (book.author) setAuthor(book.author);
+    if (book.synopsis) setSynopsis(book.synopsis);
+    const genre = book.genre.toLocaleLowerCase('fr');
+    if (genre) {
+      const match = EXPRESS_GENRES.find((item) =>
+        item.id === genre ||
+        item.label.toLocaleLowerCase('fr').includes(genre) ||
+        genre.includes(item.id),
+      );
+      if (match) setGenreId(match.id);
+    }
+    toast.success(`Livre chargé : ${book.title}`);
+  };
 
   /** Trois propositions : le modèle conseillé pour le genre, puis les autres. */
   const proposals = useMemo(() => {
@@ -548,6 +585,40 @@ export default function CouvertureExpressPage() {
         {step === 1 && (
           <Card className="mx-auto max-w-xl">
             <CardContent className="space-y-4 p-5">
+              {/* Reprendre un livre déjà enregistré dans la bibliothèque de l'abonné. */}
+              <div className="space-y-1.5 rounded-lg border border-[#008296]/30 bg-[#008296]/5 p-3">
+                <Label>Partir d’un de mes livres</Label>
+                <Select value={selectedBookId} onValueChange={applyMyBook}>
+                  <SelectTrigger>
+                    <SelectValue
+                      placeholder={
+                        booksLoading
+                          ? 'Chargement de vos livres…'
+                          : myBooks.length
+                            ? 'Choisir un livre enregistré'
+                            : 'Aucun livre enregistré pour l’instant'
+                      }
+                    />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {myBooks.map((book) => (
+                      <SelectItem key={`${book.kind}-${book.id}`} value={`${book.kind}:${book.id}`}>
+                        {book.title}
+                      </SelectItem>
+                    ))}
+                    {!booksLoading && myBooks.length === 0 && (
+                      <SelectItem value="none" disabled>
+                        Aucun livre trouvé
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-muted-foreground">
+                  Le titre, le sous-titre, l’auteur et le synopsis se remplissent depuis votre livre.
+                  Vous pouvez tout corriger ensuite.
+                </p>
+              </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="ex-title">Titre de votre livre</Label>
                 <Input

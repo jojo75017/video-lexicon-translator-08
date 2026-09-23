@@ -1,6 +1,7 @@
 import { ArrowRight, ListOrdered, Rocket, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import V3AgentsStartGrid from '@/components/v3public/V3AgentsStartGrid';
+import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 import V3WelcomeVideo from '@/components/v3public/V3WelcomeVideo';
 
 /** Page « Commence ici » — point d'entrée unique vers tous les agents V3. */
@@ -66,6 +67,12 @@ export default function V3StartHerePage() {
             </span>
           </Link>
         </div>
+      </section>
+
+      {/* Les quatre encarts d'aide au démarrage : Ecoboost, sommaire, niches, discussion libre. */}
+      <section className="space-y-3">
+        <h2 className="text-lg font-bold text-foreground">Si vous ne savez pas par où commencer</h2>
+        <V3StartIdeaCTA variant="discreet" />
       </section>
 
       <V3WelcomeVideo />

@@ -34,6 +34,14 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
+import {
   createCoverProject,
   deleteCoverProject,
   getSignedCoverUrl,
@@ -73,6 +81,10 @@ export default function MesCouverturesPage() {
   const [newTitle, setNewTitle] = useState('');
   const [newType, setNewType] = useState<CoverType>('ebook');
   const [newPages, setNewPages] = useState('');
+  /* Bibliothèque : livres déjà enregistrés par l'abonné. */
+  const [myBooks, setMyBooks] = useState<MyBookOption[]>([]);
+  const [booksLoading, setBooksLoading] = useState(true);
+  const [selectedBookId, setSelectedBookId] = useState('');
 
   // Renommage
   const [renameTarget, setRenameTarget] = useState<CoverProject | null>(null);
@@ -112,11 +124,32 @@ export default function MesCouverturesPage() {
     void load();
   }, [load]);
 
+  useEffect(() => {
+    let active = true;
+    void listMyBooks()
+      .then((books) => { if (active) setMyBooks(books); })
+      .catch(() => { if (active) setMyBooks([]); })
+      .finally(() => { if (active) setBooksLoading(false); });
+    return () => { active = false; };
+  }, []);
+
   const resetCreateForm = () => {
     setNewName('');
     setNewTitle('');
     setNewType('ebook');
     setNewPages('');
+    setSelectedBookId('');
+  };
+
+  /** Reprend un livre enregistré : nom du projet et titre préremplis. */
+  const applyMyBook = (value: string) => {
+    setSelectedBookId(value);
+    const [kind, id] = value.split(':');
+    const book = myBooks.find((b) => b.kind === kind && b.id === id);
+    if (!book) return;
+    setNewTitle(book.title);
+    if (!newName.trim()) setNewName(`Couverture — ${book.title}`);
+    toast.success(`Livre chargé : ${book.title}`);
   };
 
   const handleCreate = async () => {
@@ -384,6 +417,37 @@ export default function MesCouverturesPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="space-y-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <Label>Partir d’un de mes livres</Label>
+              <Select value={selectedBookId} onValueChange={applyMyBook}>
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      booksLoading
+                        ? 'Chargement de vos livres…'
+                        : myBooks.length
+                          ? 'Choisir un livre enregistré'
+                          : 'Aucun livre enregistré pour l’instant'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {myBooks.map((book) => (
+                    <SelectItem key={`${book.kind}-${book.id}`} value={`${book.kind}:${book.id}`}>
+                      {book.title}
+                    </SelectItem>
+                  ))}
+                  {!booksLoading && myBooks.length === 0 && (
+                    <SelectItem value="none" disabled>
+                      Aucun livre trouvé
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Le nom du projet et le titre se remplissent depuis votre livre.
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="cover-name">Nom du projet *</Label>
               <Input
