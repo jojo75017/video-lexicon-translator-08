@@ -42,6 +42,11 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
   const [mood, setMood] = useState('');
   const [palette, setPalette] = useState('');
   const [avoid, setAvoid] = useState('');
+  /** Cadrage complémentaire : rien n'est inventé, tout reste facultatif. */
+  const [focalSubject, setFocalSubject] = useState('');
+  const [era, setEra] = useState('');
+  const [location, setLocation] = useState('');
+  const [lighting, setLighting] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ url: string; width: number; height: number; funding: string } | null>(null);
   /** Titre du livre : sert uniquement de contexte, jamais écrit dans l'image. */
