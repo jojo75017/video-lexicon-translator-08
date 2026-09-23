@@ -149,11 +149,13 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           formatId: project.format_id,
           illustrationPath: project.illustration_path,
           bookTitle: project.book_title,
+          bookSubtitle: project.book_subtitle,
         })
       : createComposition({
           formatId: project.format_id,
           illustrationPath: project.illustration_path,
           bookTitle: project.book_title,
+          bookSubtitle: project.book_subtitle,
         }),
   );
 
