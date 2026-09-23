@@ -163,7 +163,7 @@ export default function CouvertureExpressPage() {
   /** Reprend un livre de la bibliothèque : remplit la fiche sans rien inventer. */
   const applyMyBook = (book: MyBookOption) => {
     setTitle(book.title);
-    if (book.subtitle) setSubtitle(book.subtitle);
+    setSubtitle(book.subtitle);
     if (book.author) setAuthor(book.author);
     if (book.synopsis) setSynopsis(book.synopsis);
     const genre = book.genre.toLocaleLowerCase('fr');

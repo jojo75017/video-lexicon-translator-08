@@ -19,6 +19,23 @@ export interface MyBookOption {
 
 const clean = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
+/**
+ * Beaucoup de livres sont enregistrés avec la formule « Titre : Sous-titre » dans un seul champ.
+ * On sépare alors les deux parties, sans rien inventer : seul le texte existant est découpé.
+ */
+export const splitTitleAndSubtitle = (raw: string): { title: string; subtitle: string } => {
+  const value = clean(raw);
+  for (const sep of [' : ', ' — ', ' – ', ' - ', ': ']) {
+    const at = value.indexOf(sep);
+    if (at > 2) {
+      const title = value.slice(0, at).trim();
+      const subtitle = value.slice(at + sep.length).trim();
+      if (title && subtitle) return { title, subtitle };
+    }
+  }
+  return { title: value, subtitle: '' };
+};
+
 /** Première valeur non vide parmi plusieurs champs possibles du brouillon. */
 const firstOf = (source: Record<string, unknown>, keys: string[]): string => {
   for (const key of keys) {
@@ -49,11 +66,14 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
   const fromEbooks: MyBookOption[] = (ebooks.data ?? []).map((row) => {
     const draft = ((row as Record<string, unknown>).draft_state ?? {}) as Record<string, unknown>;
     const brief = (draft.brief ?? {}) as Record<string, unknown>;
+    const rawTitle = clean(row.title) || firstOf(brief, ['title']);
+    const split = splitTitleAndSubtitle(rawTitle);
     return {
       id: String(row.id),
       kind: 'ebook' as const,
-      title: clean(row.title) || firstOf(brief, ['title']) || 'Sans titre',
-      subtitle: firstOf(brief, ['subtitle', 'sousTitre', 'sous_titre', 'tagline', 'accroche', 'format']),
+      title: split.title || 'Sans titre',
+      subtitle:
+        firstOf(brief, ['subtitle', 'sousTitre', 'sous_titre', 'tagline', 'accroche']) || split.subtitle,
       author: clean(row.author_name) || firstOf(brief, ['author', 'authorName']),
       synopsis:
         clean(row.book_summary) ||
@@ -64,16 +84,19 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
     };
   });
 
-  const fromProjects: MyBookOption[] = (projects.data ?? []).map((row) => ({
-    id: String(row.id),
-    kind: 'book' as const,
-    title: clean(row.title) || 'Sans titre',
-    subtitle: clean(row.subtitle),
-    author: '',
-    synopsis: clean(row.source_notes) || clean(row.target_audience),
-    genre: clean(row.genre),
-    updatedAt: clean(row.updated_at) || null,
-  }));
+  const fromProjects: MyBookOption[] = (projects.data ?? []).map((row) => {
+    const split = splitTitleAndSubtitle(clean(row.title));
+    return {
+      id: String(row.id),
+      kind: 'book' as const,
+      title: split.title || 'Sans titre',
+      subtitle: clean(row.subtitle) || split.subtitle,
+      author: '',
+      synopsis: clean(row.source_notes) || clean(row.target_audience),
+      genre: clean(row.genre),
+      updatedAt: clean(row.updated_at) || null,
+    };
+  });
 
   return [...fromEbooks, ...fromProjects].sort((a, b) =>
     (b.updatedAt || '').localeCompare(a.updatedAt || ''),

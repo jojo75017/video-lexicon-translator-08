@@ -23,6 +23,7 @@ type Row = {
   updated_at: string;
   chapters?: any[] | null;
   ebook_images?: any[] | null;
+  cover_concepts?: any | null;
   project_type?: string | null;
 };
 
@@ -63,7 +64,7 @@ export default function V3LibraryPage() {
       setEmail(auth.user.email || null);
       const { data, error } = await supabase
         .from('ebook_projects')
-        .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images,project_type')
+        .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images,cover_concepts,project_type')
         .eq('user_id', auth.user.id)
         .order('updated_at', { ascending: false });
       if (cancelled) return;
@@ -290,7 +291,9 @@ export default function V3LibraryPage() {
 }
 
 function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; studioCover?: StudioCover; hasStudioCovers?: boolean; onPickCover: () => void; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
-  const ownImage = (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || undefined;
+  // Couverture déjà enregistrée sur le livre : image rattachée, sinon visuel généré (cover_concepts).
+  const concept = typeof r.cover_concepts === 'string' && r.cover_concepts.length > 20 ? r.cover_concepts : undefined;
+  const ownImage = (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || concept || undefined;
   const [cover, setCover] = useState<string | undefined>(ownImage || studioCover?.thumbUrl || undefined);
 
   // La couverture du studio arrive après le premier rendu : on l'applique si le livre n'a rien.
