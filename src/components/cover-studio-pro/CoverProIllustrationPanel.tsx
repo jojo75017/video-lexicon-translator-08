@@ -10,6 +10,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignedCoverUrl, listCoverProjects, type CoverProject } from '@/lib/coverProjects';
+import MyBookPicker from '@/components/cover-editor/MyBookPicker';
+import type { MyBookOption } from '@/lib/cover-editor/myBooks';
 
 /** Bouton orange toujours visible pour ouvrir l'éditeur du projet sélectionné. */
 function ContinueInEditorButton({ projectId }: { projectId: string }) {
@@ -112,6 +114,12 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
             </span>
           )}
         </div>
+
+        {/* Reprendre un livre déjà enregistré : genre et synopsis préremplis. */}
+        <MyBookPicker
+          onSelect={applyMyBook}
+          hint="Le genre et le synopsis se remplissent depuis votre livre. Vous pouvez tout corriger ensuite."
+        />
 
         <div className="space-y-2">
           <Label htmlFor="cp-project">Projet de couverture</Label>
