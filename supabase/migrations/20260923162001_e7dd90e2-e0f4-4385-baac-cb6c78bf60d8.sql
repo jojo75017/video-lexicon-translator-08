@@ -1,0 +1,1 @@
+ALTER TABLE public.cover_projects ADD COLUMN IF NOT EXISTS book_subtitle text;
