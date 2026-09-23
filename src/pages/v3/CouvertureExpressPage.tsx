@@ -163,6 +163,38 @@ export default function CouvertureExpressPage() {
     }
   }, [searchParams]);
 
+  /* Chargement de la bibliothèque : uniquement les livres réellement enregistrés. */
+  useEffect(() => {
+    let active = true;
+    void listMyBooks()
+      .then((books) => { if (active) setMyBooks(books); })
+      .catch(() => { if (active) setMyBooks([]); })
+      .finally(() => { if (active) setBooksLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  /** Reprend un livre de la bibliothèque : remplit la fiche sans rien inventer. */
+  const applyMyBook = (value: string) => {
+    setSelectedBookId(value);
+    const [kind, id] = value.split(':');
+    const book = myBooks.find((b) => b.kind === kind && b.id === id);
+    if (!book) return;
+    setTitle(book.title);
+    if (book.subtitle) setSubtitle(book.subtitle);
+    if (book.author) setAuthor(book.author);
+    if (book.synopsis) setSynopsis(book.synopsis);
+    const genre = book.genre.toLocaleLowerCase('fr');
+    if (genre) {
+      const match = EXPRESS_GENRES.find((item) =>
+        item.id === genre ||
+        item.label.toLocaleLowerCase('fr').includes(genre) ||
+        genre.includes(item.id),
+      );
+      if (match) setGenreId(match.id);
+    }
+    toast.success(`Livre chargé : ${book.title}`);
+  };
+
   /** Trois propositions : le modèle conseillé pour le genre, puis les autres. */
   const proposals = useMemo(() => {
     const order = proposalOrder(genreId);
