@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/dialog';
 import MyBookPicker from '@/components/cover-editor/MyBookPicker';
 import type { MyBookOption } from '@/lib/cover-editor/myBooks';
+import { listSavedCovers, type SavedCover } from '@/lib/coverLibrary';
 import {
   createCoverProject,
   deleteCoverProject,
@@ -64,6 +65,7 @@ export default function MesCouverturesPage() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState<CoverProject[]>([]);
   const [thumbs, setThumbs] = useState<Record<string, string>>({});
+  const [savedCovers, setSavedCovers] = useState<SavedCover[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -88,14 +90,16 @@ export default function MesCouverturesPage() {
     setLoading(true);
     setError(null);
     try {
+      void listSavedCovers().then(setSavedCovers).catch(() => setSavedCovers([]));
       const rows = await listCoverProjects();
       setProjects(rows);
 
       // Miniatures : URL signées temporaires uniquement, jamais d'URL publique.
       const entries = await Promise.all(
         rows.map(async (p) => {
-          if (!p.thumbnail_path) return null;
-          const url = await getSignedCoverUrl(p.thumbnail_path);
+          const path = p.thumbnail_path || p.illustration_path;
+          if (!path) return null;
+          const url = await getSignedCoverUrl(path);
           return url ? ([p.id, url] as const) : null;
         }),
       );
@@ -386,6 +390,41 @@ export default function MesCouverturesPage() {
           })}
         </div>
       )}
+
+      {!loading && (
+        <section className="space-y-3 border-t pt-6">
+          <h2 className="text-xl font-bold text-foreground">
+            Mes couvertures du studio classique ({savedCovers.length})
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Les couvertures que vous avez créées vous-même dans le studio de couverture inclus, en dehors de l’offre à 67 €.
+          </p>
+          {savedCovers.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucune couverture enregistrée dans le studio classique.</p>
+          ) : (
+            <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {savedCovers.map((c) => (
+                <Card key={c.path} className="flex w-full max-w-[240px] flex-col overflow-hidden">
+                  <a href={c.url} target="_blank" rel="noreferrer" className="block w-full bg-muted" style={{ height: 330 }}>
+                    <img src={c.url} alt={c.title || 'Couverture'} className="h-full w-full object-cover" loading="lazy" />
+                  </a>
+                  <div className="space-y-1 p-3">
+                    <p className="truncate text-sm font-semibold text-foreground">{c.title || 'Couverture sans titre'}</p>
+                    <div className="flex items-center gap-1.5">
+                      <Badge variant="outline" className="text-[10px]">{c.format === 'paperback' ? 'Broché' : 'eBook Kindle'}</Badge>
+                      <span className="text-[10px] text-muted-foreground">{formatDate(c.createdAt)}</span>
+                    </div>
+                    <Button asChild size="sm" variant="outline" className="mt-2 w-full">
+                      <a href={c.url} download target="_blank" rel="noreferrer">Télécharger</a>
+                    </Button>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
 
 
       {/* Création */}
