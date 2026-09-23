@@ -75,10 +75,6 @@ export default function MesCouverturesPage() {
   const [newTitle, setNewTitle] = useState('');
   const [newType, setNewType] = useState<CoverType>('ebook');
   const [newPages, setNewPages] = useState('');
-  /* Bibliothèque : livres déjà enregistrés par l'abonné. */
-  const [myBooks, setMyBooks] = useState<MyBookOption[]>([]);
-  const [booksLoading, setBooksLoading] = useState(true);
-  const [selectedBookId, setSelectedBookId] = useState('');
 
   // Renommage
   const [renameTarget, setRenameTarget] = useState<CoverProject | null>(null);
