@@ -809,7 +809,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
-            {visibleTemplates.map((tpl) => {
+            {visibleTemplates.map((tpl, templateIndex) => {
               const active = composition.templateId === tpl.id;
               const variantIndex = active ? templateVariant : 0;
               return (
