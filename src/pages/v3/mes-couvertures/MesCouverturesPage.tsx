@@ -143,6 +143,7 @@ export default function MesCouverturesPage() {
       const created = await createCoverProject({
         project_name: name,
         book_title: newTitle.trim() || null,
+        book_subtitle: newSubtitle.trim() || null,
         cover_type: newType,
         format_id: TYPE_META[newType].formatId,
         page_count: Number.isFinite(pages as number) ? (pages as number) : null,
