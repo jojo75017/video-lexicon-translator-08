@@ -417,6 +417,37 @@ export default function MesCouverturesPage() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
+            <div className="space-y-2 rounded-lg border border-primary/30 bg-primary/5 p-3">
+              <Label>Partir d’un de mes livres</Label>
+              <Select value={selectedBookId} onValueChange={applyMyBook}>
+                <SelectTrigger>
+                  <SelectValue
+                    placeholder={
+                      booksLoading
+                        ? 'Chargement de vos livres…'
+                        : myBooks.length
+                          ? 'Choisir un livre enregistré'
+                          : 'Aucun livre enregistré pour l’instant'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {myBooks.map((book) => (
+                    <SelectItem key={`${book.kind}-${book.id}`} value={`${book.kind}:${book.id}`}>
+                      {book.title}
+                    </SelectItem>
+                  ))}
+                  {!booksLoading && myBooks.length === 0 && (
+                    <SelectItem value="none" disabled>
+                      Aucun livre trouvé
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Le nom du projet et le titre se remplissent depuis votre livre.
+              </p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="cover-name">Nom du projet *</Label>
               <Input
