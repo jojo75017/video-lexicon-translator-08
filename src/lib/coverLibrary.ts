@@ -11,6 +11,8 @@ export interface SavedCover {
   format: SavedCoverFormat;
   title: string;
   createdAt: string;
+  /** Empreinte du fichier fournie par le stockage, utilisée pour masquer les copies identiques. */
+  fingerprint?: string;
 }
 
 const sanitize = (value?: string, fallback = 'livre'): string => {
@@ -163,6 +165,9 @@ const listCoversInRoot = async (storageRoot: string): Promise<SavedCover[]> => {
           format,
           title: (rest.join('__') || '').replace(/-/g, ' '),
           createdAt: file.created_at || new Date(Number(stamp) || Date.now()).toISOString(),
+          fingerprint: typeof file.metadata?.eTag === 'string'
+            ? file.metadata.eTag.replace(/"/g, '')
+            : undefined,
         };
       });
   } catch {
