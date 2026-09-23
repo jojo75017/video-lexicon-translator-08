@@ -1,6 +1,7 @@
 import { ArrowRight, ListOrdered, Rocket, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import V3AgentsStartGrid from '@/components/v3public/V3AgentsStartGrid';
+import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 import V3WelcomeVideo from '@/components/v3public/V3WelcomeVideo';
 
 /** Page « Commence ici » — point d'entrée unique vers tous les agents V3. */
