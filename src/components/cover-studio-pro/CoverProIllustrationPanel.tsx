@@ -258,6 +258,36 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
           </p>
         </div>
 
+        {/* Consigne visuelle sur-mesure : la scène réelle du livre, ses couleurs
+            et son ambiance, relue et modifiable avant toute génération. */}
+        <div className="space-y-2 rounded-lg border border-[#FF9E2D]/40 bg-[#FF9E2D]/5 p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <Label htmlFor="cp-visual">Consigne visuelle sur-mesure (créée depuis votre livre)</Label>
+            <Button
+              type="button"
+              variant="outline"
+              className="gap-2"
+              disabled={visualBusy || busy || summary.trim().length < 20}
+              onClick={() => void proposeVisualPrompt()}
+            >
+              {visualBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              {visualPrompt ? 'Refaire la consigne' : 'Créer la consigne depuis mon synopsis'}
+            </Button>
+          </div>
+          <Textarea
+            id="cp-visual"
+            rows={6}
+            value={visualPrompt}
+            onChange={(e) => setVisualPrompt(e.target.value)}
+            placeholder="La scène de votre livre, son décor, son époque, sa lumière et ses couleurs apparaîtront ici."
+          />
+          <p className="text-xs text-muted-foreground">
+            Cette consigne décrit la scène réelle de votre histoire, ses couleurs et son ambiance :
+            c&rsquo;est elle qui donne une vraie couverture, et non une image passe-partout. Relisez-la,
+            corrigez un détail si vous le souhaitez, puis générez. Votre titre, votre sous-titre et
+            votre nom d&rsquo;auteur seront ensuite ajoutés sur l&rsquo;image dans l&rsquo;éditeur.
+          </p>
+        </div>
 
         <Button onClick={generate} disabled={busy || blocked || !projectId} className="w-full">
           {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}
