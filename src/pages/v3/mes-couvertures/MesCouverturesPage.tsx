@@ -102,7 +102,17 @@ export default function MesCouverturesPage() {
         if (!auth.user) return;
         const bucket = supabase.storage.from('ebook-images');
         const root = auth.user.id;
-        const isCover = (n: string) => /couverture|cover/i.test(n) && /\.(png|jpe?g|webp)$/i.test(n);
+        const normalizeName = (value: string) => value
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9]/gi, '')
+          .toLowerCase();
+        const isCover = (name: string, bookLabel: string) => {
+          if (!/\.(png|jpe?g|webp)$/i.test(name)) return false;
+          if (/couverture|cover/i.test(name)) return true;
+          const withoutTimestamp = name.replace(/^\d+[-_]?/, '').replace(/\.[^.]+$/, '');
+          return normalizeName(withoutTimestamp) === normalizeName(bookLabel);
+        };
         const byPath = new Map<string, SavedCover>();
         const addCover = (cover: SavedCover) => {
           const normalizedPath = decodeURIComponent(cover.path).replace(/^.*\/ebook-images\//, '');
@@ -112,7 +122,7 @@ export default function MesCouverturesPage() {
         // Source prioritaire : les couvertures réellement rattachées aux livres V2/V3.
         const { data: books } = await supabase
           .from('ebook_projects')
-          .select('title, cover_concepts, ebook_images, updated_at')
+          .select('title, cover_url, cover_concepts, ebook_images, updated_at')
           .order('updated_at', { ascending: false });
         for (const book of books ?? []) {
           const images = Array.isArray(book.ebook_images) ? book.ebook_images : [];
@@ -123,7 +133,7 @@ export default function MesCouverturesPage() {
           const frontUrl = front && typeof front === 'object' && !Array.isArray(front)
             ? (front as { url?: unknown }).url
             : null;
-          const candidates = [frontUrl, book.cover_concepts];
+          const candidates = [book.cover_url, frontUrl, book.cover_concepts];
           for (const candidate of candidates) {
             if (typeof candidate !== 'string' || !candidate.trim()) continue;
             const path = decodeURIComponent(candidate).replace(/^.*\/object\/public\/ebook-images\//, '');
@@ -146,7 +156,7 @@ export default function MesCouverturesPage() {
               await scan(`${folder}/${f.name}`, label);
               continue;
             }
-            if (!isCover(f.name)) continue;
+            if (!isCover(f.name, label)) continue;
             const path = `${folder}/${f.name}`;
             addCover({
               url: bucket.getPublicUrl(path).data.publicUrl,
