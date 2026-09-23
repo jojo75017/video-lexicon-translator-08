@@ -45,6 +45,13 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ url: string; width: number; height: number; funding: string } | null>(null);
 
+  /** Reprend un livre enregistré : genre et synopsis, sans rien inventer. */
+  const applyMyBook = (book: MyBookOption) => {
+    if (book.genre) setGenre(book.genre);
+    if (book.synopsis) setSummary(book.synopsis);
+    toast.success(`Livre chargé : ${book.title}`);
+  };
+
   useEffect(() => {
     listCoverProjects()
       .then((list) => {
