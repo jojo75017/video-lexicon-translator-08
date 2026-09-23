@@ -44,12 +44,70 @@ export default function CoverProIllustrationPanel({ remaining, hasKey, onGenerat
   const [avoid, setAvoid] = useState('');
   const [busy, setBusy] = useState(false);
   const [preview, setPreview] = useState<{ url: string; width: number; height: number; funding: string } | null>(null);
+  /** Titre du livre : sert uniquement de contexte, jamais écrit dans l'image. */
+  const [bookTitle, setBookTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
+  /** Consigne visuelle sur-mesure déduite du synopsis, modifiable avant génération. */
+  const [visualPrompt, setVisualPrompt] = useState('');
+  const [visualBusy, setVisualBusy] = useState(false);
+
+  /**
+   * Demande à l'IA la consigne visuelle correspondant réellement au livre
+   * (scène clé, décor, époque, couleurs). Analyse de texte : aucune image,
+   * aucune génération consommée à cette étape.
+   */
+  const proposeVisualPrompt = async (source?: {
+    summary?: string;
+    genre?: string;
+    bookTitle?: string;
+    subtitle?: string;
+  }) => {
+    const text = (source?.summary ?? summary).trim();
+    if (text.length < 20) {
+      toast.error('Ajoutez d’abord le synopsis de votre livre (quelques phrases suffisent).');
+      return;
+    }
+    setVisualBusy(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('cover-visual-prompt', {
+        body: {
+          summary: text,
+          genre: source?.genre ?? genre,
+          mood,
+          palette,
+          avoid,
+          bookTitle: source?.bookTitle ?? bookTitle,
+          subtitle: source?.subtitle ?? subtitle,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      const proposed = data?.visualPrompt as string | undefined;
+      if (!proposed) throw new Error('Consigne visuelle indisponible.');
+      setVisualPrompt(proposed);
+      toast.success('Consigne visuelle créée depuis votre livre : relisez-la, puis générez.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Consigne visuelle indisponible.');
+    } finally {
+      setVisualBusy(false);
+    }
+  };
 
   /** Reprend un livre enregistré : genre et synopsis, sans rien inventer. */
   const applyMyBook = (book: MyBookOption) => {
     if (book.genre) setGenre(book.genre);
     if (book.synopsis) setSummary(book.synopsis);
+    setBookTitle(book.title);
+    setSubtitle(book.subtitle);
     toast.success(`Livre chargé : ${book.title}`);
+    if (book.synopsis && book.synopsis.trim().length >= 20) {
+      void proposeVisualPrompt({
+        summary: book.synopsis,
+        genre: book.genre,
+        bookTitle: book.title,
+        subtitle: book.subtitle,
+      });
+    }
   };
 
   useEffect(() => {
