@@ -765,10 +765,9 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Chaque vignette est un exemple de démonstration, avec son propre titre et sa propre
-                image, pour vous montrer le style réel du modèle. Cliquez sur celui qui vous plaît :
-                il s'applique alors à votre livre, votre illustration et vos textes, qui restent
-                entièrement modifiables.
+                Chaque vignette montre VOTRE couverture (même image, même titre) avec une mise en
+                page et une typographie différentes. Comparez, cliquez sur celle que vous préférez :
+                elle s'applique aussitôt et tout reste modifiable.
               </p>
             </div>
             {templateBackup && (
