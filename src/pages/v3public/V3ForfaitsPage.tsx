@@ -34,9 +34,9 @@ const COMPARISON = [
     edition: "Inclus",
     maison: "Inclus",
   },
-  { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités", maison: "Inclus" },
-  { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60", maison: "Inclus" },
-  { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000", maison: "Inclus" },
+  { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités", maison: "Illimités" },
+  { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60", maison: "60" },
+  { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000", maison: "8 000" },
   { label: "Génie et sommaire", legacy: "Inclus", plume: "Guidé", edition: "Avancé + séries", maison: "Inclus" },
   { label: "Correction et exports", legacy: "Inclus", plume: "Complets", edition: "Professionnels", maison: "Inclus" },
   { label: "Recherche avancée", legacy: "Incluse", plume: "Incluse", edition: "Incluse + Amazon Spy", maison: "Inclus" },
@@ -45,6 +45,7 @@ const COMPARISON = [
   { label: "Traductions 10 langues", legacy: "—", plume: "À la carte", edition: "Incluses", maison: "Inclus" },
   { label: "Sélection maisons d'édition", legacy: "—", plume: "À la carte", edition: "Incluse", maison: "Inclus" },
   { label: "BD Studio Pro et Studio Jeunesse", legacy: "—", plume: "—", edition: "Inclus", maison: "Inclus" },
+  { label: "Tous les compléments payants", legacy: "—", plume: "À la carte", edition: "À la carte", maison: "Tous inclus" },
 ] as const;
 
 export default function V3ForfaitsPage() {
@@ -166,7 +167,7 @@ export default function V3ForfaitsPage() {
           <div className="p-6"><h2 className="v3-serif text-2xl font-semibold">Comparer l’essentiel</h2><p className="mt-1 text-sm" style={{ color: "var(--v3-muted)" }}>Les gros compléments premium restent à la carte dans les trois offres.</p></div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-sm">
-              <thead style={{ background: "var(--v3-cream)" }}><tr><th className="px-5 py-3 text-left">Fonction</th><th className="px-5 py-3 text-left">Déjà abonné</th><th className="px-5 py-3 text-left">Plume</th><th className="px-5 py-3 text-left">Édition</th></tr></thead>
+              <thead style={{ background: "var(--v3-cream)" }}><tr><th className="px-5 py-3 text-left">Fonction</th><th className="px-5 py-3 text-left">Déjà abonné</th><th className="px-5 py-3 text-left">Plume</th><th className="px-5 py-3 text-left">Édition</th><th className="px-5 py-3 text-left">Maison d'Édition</th></tr></thead>
               <tbody>{COMPARISON.map((row) => <tr key={row.label} style={{ borderTop: "1px solid var(--v3-line)" }}><th className="px-5 py-3 text-left font-medium">{row.label}</th>{([row.legacy, row.plume, row.edition, row.maison] as const).map((value, index) => <td key={index} className="px-5 py-3" style={{ color: value === "—" ? "var(--v3-muted)" : "var(--v3-ink)" }}>{value === "—" ? <Minus className="h-4 w-4" /> : value}</td>)}</tr>)}</tbody>
             </table>
           </div>
