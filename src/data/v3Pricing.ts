@@ -1,4 +1,4 @@
-export type V3PlanId = "plume" | "edition";
+export type V3PlanId = "plume" | "edition" | "maison";
 export type V3BillingInterval = "month" | "year";
 
 export interface V3Plan {
@@ -119,6 +119,35 @@ export const V3_PLANS: V3Plan[] = [
       "Support prioritaire",
     ],
   },
+  {
+    id: "maison",
+    name: "Maison d'Édition",
+    tagline: "Tout compris : Édition + tous les compléments, plus jamais rien à acheter",
+    monthlyPrice: 97,
+    yearlyPrice: 897,
+    booksPerMonth: null,
+    chaptersMax: 60,
+    wordsPerChapter: 8000,
+    charactersMax: Infinity,
+    agentsCount: 30,
+    proModulesIncluded: true,
+    aiSummary: "Sommaire IA avancé + architecture de série multi-tomes",
+    allAddonsIncluded: true,
+    idealFor: "Les auteurs-éditeurs qui veulent tous les studios et tous les compléments, sans jamais payer de supplément.",
+    features: [
+      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
+      "Tout ce que contient Édition",
+      "Tous les compléments payants inclus, sans achat séparé",
+      "Version Longue, BD & Comics, Histoires illustrées",
+      "Jeux & Énigmes, Cherche & Trouve, Histoires courtes",
+      "Pack Boost de Lancement et Promotion Éditeur",
+      "Transcription audio/vidéo et Documentation Studio",
+      "Revenus & Scaling, Distribution Large, Trafic Social",
+      "Qualité Éditoriale et Étude de Marché",
+      "Toutes les futures nouveautés V3 incluses",
+      "Support prioritaire",
+    ],
+  },
 ];
 
 export function getV3Plan(id: V3PlanId): V3Plan | undefined {
@@ -135,6 +164,7 @@ export function getV3PriceId(
   const map: Record<V3PlanId, { monthly: string; annual: string }> = {
     plume: { monthly: "v3_plume_monthly", annual: "v3_plume_annual" },
     edition: { monthly: "v3_edition_monthly", annual: "v3_edition_annual" },
+    maison: { monthly: "v3_maison_monthly", annual: "v3_maison_annual" },
     
   };
   const base = map[planId][suffix];

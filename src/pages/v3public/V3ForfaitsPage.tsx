@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 const PLAN_ICONS = {
   plume: Feather,
   edition: Crown,
+  maison: Building2,
 } as const;
 
 const COMPARISON = [
@@ -74,7 +75,7 @@ export default function V3ForfaitsPage() {
           </div>
         </header>
 
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <article className="flex flex-col rounded-lg bg-background p-7" style={{ border: "1px solid var(--v3-line)" }}>
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-md" style={{ background: "var(--v3-gold-soft)", color: "var(--v3-gold-600)" }}><Gift size={19} /></span>
@@ -142,7 +143,7 @@ export default function V3ForfaitsPage() {
 
                 <div className="mb-4 rounded-md p-3 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}><strong style={{ color: "var(--v3-ink)" }}>Idéal pour :</strong> {plan.idealFor}</div>
                 <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: plan.name })}>Choisir {plan.name} · {formatPrice(publicPrice)}</Button>
-                <div className="mt-2">
+                {plan.id !== "maison" && <div className="mt-2">
                   <PayPalSubscribeButton
                     planId={plan.id}
                     interval={interval}
@@ -151,7 +152,7 @@ export default function V3ForfaitsPage() {
                     accent="var(--v3-emerald)"
                     legacyV2={hasV2}
                   />
-                </div>
+                </div>}
                 <p className="mt-2 text-center text-[11px]" style={{ color: "var(--v3-muted)" }}>
                   Prélèvement automatique {interval === "month" ? "mensuel" : "annuel"} · Annulable à tout moment
                 </p>

@@ -16,11 +16,15 @@ const ALLOWED_PRICES = new Set([
   "v3_plume_annual",
   "v3_edition_monthly",
   "v3_edition_annual",
+  "v3_maison_monthly",
+  "v3_maison_annual",
   // Tarifs « ancien client V2 » (-20 % à vie) — droit revérifié en base
   "v3_plume_monthly_legacy",
   "v3_plume_annual_legacy",
   "v3_edition_monthly_legacy",
   "v3_edition_annual_legacy",
+  "v3_maison_monthly_legacy",
+  "v3_maison_annual_legacy",
   // Version audio d'un livre (paiement unique)
   "v3_audio_single",
   // Compléments (paiement unique)
@@ -164,7 +168,7 @@ Deno.serve(async (req) => {
     if (userId) sessionMeta.userId = userId;
     if (cleanRefCode) sessionMeta.ref_code = cleanRefCode;
 
-    const isV3Plan = priceId.startsWith("v3_plume_") || priceId.startsWith("v3_edition_");
+    const isV3Plan = priceId.startsWith("v3_plume_") || priceId.startsWith("v3_edition_") || priceId.startsWith("v3_maison_");
     let orderId: string | null = null;
     if (isV3Plan) {
       const supabase = createClient(
