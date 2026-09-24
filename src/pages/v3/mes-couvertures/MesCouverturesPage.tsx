@@ -122,7 +122,7 @@ export default function MesCouverturesPage() {
         // Source prioritaire : les couvertures réellement rattachées aux livres V2/V3.
         const { data: books } = await supabase
           .from('ebook_projects')
-          .select('title, cover_url, cover_concepts, ebook_images, updated_at')
+          .select('title, cover_concepts, ebook_images, updated_at')
           .order('updated_at', { ascending: false });
         for (const book of books ?? []) {
           const images = Array.isArray(book.ebook_images) ? book.ebook_images : [];
@@ -133,7 +133,7 @@ export default function MesCouverturesPage() {
           const frontUrl = front && typeof front === 'object' && !Array.isArray(front)
             ? (front as { url?: unknown }).url
             : null;
-          const candidates = [book.cover_url, frontUrl, book.cover_concepts];
+          const candidates = [frontUrl, book.cover_concepts];
           for (const candidate of candidates) {
             if (typeof candidate !== 'string' || !candidate.trim()) continue;
             const path = decodeURIComponent(candidate).replace(/^.*\/object\/public\/ebook-images\//, '');
