@@ -25,7 +25,7 @@ export interface KdpPilotTierConfig {
   features: KdpPilotFeatureFlag[];
 }
 
-export const KDP_PILOT_TIERS: Record<V3PlanId, KdpPilotTierConfig> = {
+const BASE_TIERS: Record<"plume" | "edition", KdpPilotTierConfig> = {
   plume: {
     planId: "plume",
     label: "KDP Pilot — Audit complet",
@@ -73,6 +73,11 @@ export const KDP_PILOT_TIERS: Record<V3PlanId, KdpPilotTierConfig> = {
       { key: "unlimited", label: "Audits illimités", description: "Aucun quota mensuel.", included: true },
     ],
   },
+};
+
+export const KDP_PILOT_TIERS: Record<V3PlanId, KdpPilotTierConfig> = {
+  ...BASE_TIERS,
+  maison: { ...BASE_TIERS.edition, planId: "maison" },
 };
 
 export function getKdpPilotTier(planId: V3PlanId): KdpPilotTierConfig {

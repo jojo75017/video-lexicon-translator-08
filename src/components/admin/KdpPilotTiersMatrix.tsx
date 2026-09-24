@@ -9,6 +9,7 @@ const ORDER: V3PlanId[] = ["plume", "edition"];
 const TIER_COLOR: Record<V3PlanId, string> = {
   plume: "border-l-emerald-500",
   edition: "border-l-purple-600",
+  maison: "border-l-amber-500",
 };
 
 const BSR_LABEL: Record<string, string> = {
