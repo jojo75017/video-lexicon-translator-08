@@ -279,7 +279,7 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string, accessC
 async function handleV3SubscriptionReferral(session: any) {
   const refCode = String(session.metadata?.ref_code || "");
   const plan = String(session.metadata?.plan || "");
-  if (!refCode || !plan.startsWith("v3_plume_") && !plan.startsWith("v3_edition_")) return;
+  if (!refCode || !plan.startsWith("v3_plume_") && !plan.startsWith("v3_edition_") && !plan.startsWith("v3_maison_")) return;
   if (!/^[A-Za-z0-9_-]{1,40}$/.test(refCode)) return;
 
   const supabase = getSupabase();
@@ -395,7 +395,7 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
 
   // Les abonnements Plume/Édition sont récurrents sans nombre d'échéances :
   // chaque facture payée maintient simplement l'accès actif.
-  if (String(order.plan ?? "").startsWith("v3_plume_") || String(order.plan ?? "").startsWith("v3_edition_")) {
+  if (String(order.plan ?? "").startsWith("v3_plume_") || String(order.plan ?? "").startsWith("v3_edition_") || String(order.plan ?? "").startsWith("v3_maison_")) {
     await supabase.from("v3_installment_orders").update({
       status: "active",
       installments_paid: 1,
@@ -503,7 +503,7 @@ Deno.serve(async (req) => {
           break;
         }
         // Commission d'affiliation 20 % sur les abonnements V3 (Plume/Édition).
-        if (typeof plan === "string" && (plan.startsWith("v3_plume_") || plan.startsWith("v3_edition_"))) {
+        if (typeof plan === "string" && (plan.startsWith("v3_plume_") || plan.startsWith("v3_edition_") || plan.startsWith("v3_maison_"))) {
           await handleV3SubscriptionReferral(session);
         }
         if (session.metadata?.kind === "v3_subscription") {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Check, Crown, Feather, Gift, Minus } from "lucide-react";
+import { Building2, Check, Crown, Feather, Gift, Minus } from "lucide-react";
 import {
   V3_PLANS,
   formatPrice,
@@ -23,6 +23,7 @@ import { Button } from "@/components/ui/button";
 const PLAN_ICONS = {
   plume: Feather,
   edition: Crown,
+  maison: Building2,
 } as const;
 
 const COMPARISON = [
@@ -31,18 +32,20 @@ const COMPARISON = [
     legacy: "Inclus",
     plume: "Inclus",
     edition: "Inclus",
+    maison: "Inclus",
   },
-  { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités" },
-  { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60" },
-  { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000" },
-  { label: "Génie et sommaire", legacy: "Inclus", plume: "Guidé", edition: "Avancé + séries" },
-  { label: "Correction et exports", legacy: "Inclus", plume: "Complets", edition: "Professionnels" },
-  { label: "Recherche avancée", legacy: "Incluse", plume: "Incluse", edition: "Incluse + Amazon Spy" },
-  { label: "Couvertures", legacy: "Simple (comme la V2)", plume: "Kindle + broché", edition: "Cover Studio Pro + relié" },
-  { label: "Audiolivre", legacy: "—", plume: "Standard", edition: "Premium inclus" },
-  { label: "Traductions 10 langues", legacy: "—", plume: "À la carte", edition: "Incluses" },
-  { label: "Sélection maisons d'édition", legacy: "—", plume: "À la carte", edition: "Incluse" },
-  { label: "BD Studio Pro et Studio Jeunesse", legacy: "—", plume: "—", edition: "Inclus" },
+  { label: "Livres par mois", legacy: "2", plume: "50", edition: "Illimités", maison: "Illimités" },
+  { label: "Chapitres par livre", legacy: "40", plume: "40", edition: "60", maison: "60" },
+  { label: "Mots par chapitre", legacy: "5 000", plume: "5 000", edition: "8 000", maison: "8 000" },
+  { label: "Génie et sommaire", legacy: "Inclus", plume: "Guidé", edition: "Avancé + séries", maison: "Inclus" },
+  { label: "Correction et exports", legacy: "Inclus", plume: "Complets", edition: "Professionnels", maison: "Inclus" },
+  { label: "Recherche avancée", legacy: "Incluse", plume: "Incluse", edition: "Incluse + Amazon Spy", maison: "Inclus" },
+  { label: "Couvertures", legacy: "Simple (comme la V2)", plume: "Kindle + broché", edition: "Cover Studio Pro + relié", maison: "Inclus" },
+  { label: "Audiolivre", legacy: "—", plume: "Standard", edition: "Premium inclus", maison: "Inclus" },
+  { label: "Traductions 10 langues", legacy: "—", plume: "À la carte", edition: "Incluses", maison: "Inclus" },
+  { label: "Sélection maisons d'édition", legacy: "—", plume: "À la carte", edition: "Incluse", maison: "Inclus" },
+  { label: "BD Studio Pro et Studio Jeunesse", legacy: "—", plume: "—", edition: "Inclus", maison: "Inclus" },
+  { label: "Tous les compléments payants", legacy: "—", plume: "À la carte", edition: "À la carte", maison: "Tous inclus" },
 ] as const;
 
 export default function V3ForfaitsPage() {
@@ -74,7 +77,7 @@ export default function V3ForfaitsPage() {
           </div>
         </header>
 
-        <div className="grid gap-5 lg:grid-cols-3">
+        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <article className="flex flex-col rounded-lg bg-background p-7" style={{ border: "1px solid var(--v3-line)" }}>
             <div className="flex items-center gap-3">
               <span className="grid h-10 w-10 place-items-center rounded-md" style={{ background: "var(--v3-gold-soft)", color: "var(--v3-gold-600)" }}><Gift size={19} /></span>
@@ -142,7 +145,7 @@ export default function V3ForfaitsPage() {
 
                 <div className="mb-4 rounded-md p-3 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}><strong style={{ color: "var(--v3-ink)" }}>Idéal pour :</strong> {plan.idealFor}</div>
                 <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: plan.name })}>Choisir {plan.name} · {formatPrice(publicPrice)}</Button>
-                <div className="mt-2">
+                {plan.id !== "maison" && <div className="mt-2">
                   <PayPalSubscribeButton
                     planId={plan.id}
                     interval={interval}
@@ -151,7 +154,7 @@ export default function V3ForfaitsPage() {
                     accent="var(--v3-emerald)"
                     legacyV2={hasV2}
                   />
-                </div>
+                </div>}
                 <p className="mt-2 text-center text-[11px]" style={{ color: "var(--v3-muted)" }}>
                   Prélèvement automatique {interval === "month" ? "mensuel" : "annuel"} · Annulable à tout moment
                 </p>
@@ -164,8 +167,8 @@ export default function V3ForfaitsPage() {
           <div className="p-6"><h2 className="v3-serif text-2xl font-semibold">Comparer l’essentiel</h2><p className="mt-1 text-sm" style={{ color: "var(--v3-muted)" }}>Les gros compléments premium restent à la carte dans les trois offres.</p></div>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[760px] text-sm">
-              <thead style={{ background: "var(--v3-cream)" }}><tr><th className="px-5 py-3 text-left">Fonction</th><th className="px-5 py-3 text-left">Déjà abonné</th><th className="px-5 py-3 text-left">Plume</th><th className="px-5 py-3 text-left">Édition</th></tr></thead>
-              <tbody>{COMPARISON.map((row) => <tr key={row.label} style={{ borderTop: "1px solid var(--v3-line)" }}><th className="px-5 py-3 text-left font-medium">{row.label}</th>{([row.legacy, row.plume, row.edition] as const).map((value, index) => <td key={index} className="px-5 py-3" style={{ color: value === "—" ? "var(--v3-muted)" : "var(--v3-ink)" }}>{value === "—" ? <Minus className="h-4 w-4" /> : value}</td>)}</tr>)}</tbody>
+              <thead style={{ background: "var(--v3-cream)" }}><tr><th className="px-5 py-3 text-left">Fonction</th><th className="px-5 py-3 text-left">Déjà abonné</th><th className="px-5 py-3 text-left">Plume</th><th className="px-5 py-3 text-left">Édition</th><th className="px-5 py-3 text-left">Maison d'Édition</th></tr></thead>
+              <tbody>{COMPARISON.map((row) => <tr key={row.label} style={{ borderTop: "1px solid var(--v3-line)" }}><th className="px-5 py-3 text-left font-medium">{row.label}</th>{([row.legacy, row.plume, row.edition, row.maison] as const).map((value, index) => <td key={index} className="px-5 py-3" style={{ color: value === "—" ? "var(--v3-muted)" : "var(--v3-ink)" }}>{value === "—" ? <Minus className="h-4 w-4" /> : value}</td>)}</tr>)}</tbody>
             </table>
           </div>
         </section>

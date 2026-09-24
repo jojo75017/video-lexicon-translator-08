@@ -61,7 +61,7 @@ export function useV3Entitlement() {
         const paid = rows.filter((r: any) => PAID_STATUSES.has((r.status ?? '').toLowerCase()));
         const full = paid.some((r: any) => {
           const plan = String(r.plan ?? '');
-          return plan.startsWith('full') || plan.startsWith('v3_edition_');
+          return plan.startsWith('full') || plan.startsWith('v3_edition_') || plan.startsWith('v3_maison_');
         });
         setHasFull(full);
         let base = full || paid.some((r: any) => {
