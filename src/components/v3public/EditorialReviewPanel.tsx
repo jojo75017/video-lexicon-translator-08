@@ -31,8 +31,8 @@ const toChapters = (raw: unknown): LoadedChapter[] =>
     content: String(c?.content || c?.contenu || ''),
   })).filter((c) => c.content.trim().length > 0);
 
-export default function EditorialReviewPanel({ books }: { books: ReviewBook[] }) {
-  const [bookId, setBookId] = useState(books[0]?.id || '');
+export default function EditorialReviewPanel({ books, initialBookId, autoLoad }: { books: ReviewBook[]; initialBookId?: string; autoLoad?: boolean }) {
+  const [bookId, setBookId] = useState(initialBookId || books[0]?.id || '');
   const [subject, setSubject] = useState('');
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(false);
@@ -42,8 +42,10 @@ export default function EditorialReviewPanel({ books }: { books: ReviewBook[] })
 
   // Changer de livre remet le texte chargé et le rapport à zéro.
   useEffect(() => { setChapters([]); setReport(null); }, [bookId]);
+  useEffect(() => { if (initialBookId) setBookId(initialBookId); }, [initialBookId]);
 
   const book = books.find((b) => b.id === bookId);
+
 
   /** Récupère le texte du livre : d'abord le projet, sinon la dernière sauvegarde complète. */
   const fetchBook = async () => {
