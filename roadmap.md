@@ -32,4 +32,4 @@
 
 - [x] Générer la consigne visuelle depuis le synopsis réel du livre (scène, décor, couleurs) avant l'image
 
-- [ ] Livres corrigés : onglet « Correction éditoriale » (sujet hors-thème, continuité personnages, chronologie, lieux, événements, incohérences internes, répétitions, grammaire, ponctuation, typo FR, fluidité)
+- [x] Livres corrigés : onglet « Correction éditoriale » (sujet hors-thème, continuité personnages, chronologie, lieux, événements, incohérences internes, répétitions, grammaire, ponctuation, typo FR, fluidité)
