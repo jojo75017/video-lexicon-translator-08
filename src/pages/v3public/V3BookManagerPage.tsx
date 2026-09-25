@@ -50,6 +50,8 @@ export default function V3BookManagerPage() {
   const location = useLocation();
   const correctedOnly = location.pathname.endsWith('/livres-corriges');
   const [rows, setRows] = useState<Book[]>([]);
+  /** Tous les livres du compte (tous types) : la correction éditoriale doit pouvoir en prendre n'importe lequel. */
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Book | null>(null);
   const [exporting, setExporting] = useState<Book | null>(null);
@@ -60,13 +62,14 @@ export default function V3BookManagerPage() {
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
-    let query = supabase.from('ebook_projects')
+    const { data, error } = await supabase.from('ebook_projects')
       .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at,draft_state')
-      .eq('user_id', auth.user.id);
-    if (correctedOnly) query = query.eq('project_type', 'corrected');
-    const { data, error } = await query.order('updated_at', { ascending: false });
+      .eq('user_id', auth.user.id)
+      .order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
-    setRows((data as Book[]) || []);
+    const list = (data as (Book & { project_type?: string | null })[]) || [];
+    setAllBooks(list);
+    setRows(correctedOnly ? list.filter((b) => b.project_type === 'corrected') : list);
     setLoading(false);
   };
   useEffect(() => { load(); }, []); // eslint-disable-line
@@ -185,18 +188,16 @@ export default function V3BookManagerPage() {
 
 
 
-      {correctedOnly && (
-        <div className="mt-6 flex gap-2 border-b border-black/10">
-          {([['books', 'Mes livres corrigés'], ['editorial', 'Correction éditoriale']] as const).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 ${tab === k ? 'border-[var(--v3-orange)] text-[var(--v3-ink)]' : 'border-transparent text-[var(--v3-muted)]'}`}>{l}</button>
-          ))}
-        </div>
-      )}
+      <div className="mt-6 flex gap-2 border-b border-black/10">
+        {([['books', correctedOnly ? 'Mes livres corrigés' : 'Mes livres'], ['editorial', 'Correction éditoriale']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => setTab(k)} className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 ${tab === k ? 'border-[var(--v3-orange)] text-[var(--v3-ink)]' : 'border-transparent text-[var(--v3-muted)]'}`}>{l}</button>
+        ))}
+      </div>
 
-      {correctedOnly && tab === 'editorial' ? (
+      {tab === 'editorial' ? (
         loading ? <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
-        : rows.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre corrigé à analyser pour l’instant.</p>
-        : <EditorialReviewPanel books={rows} />
+        : allBooks.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre enregistré à analyser pour l’instant.</p>
+        : <EditorialReviewPanel books={allBooks} />
       ) : loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
       ) : rows.length === 0 ? (
