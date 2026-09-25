@@ -44,6 +44,17 @@ const ALLOWED_PRICES = new Set([
   "bookperfect_launch_once",
 ]);
 
+// Tarifs officiels V3 (27/270, 47/470, 97/897 €) : les anciens identifiants
+// pointaient sur des montants obsolètes chez Stripe.
+const PRICE_ALIASES: Record<string, string> = {
+  v3_plume_monthly: "v3_plume_monthly_oct",
+  v3_plume_annual: "v3_plume_annual_oct",
+  v3_edition_monthly: "v3_edition_monthly_oct",
+  v3_edition_annual: "v3_edition_annual_oct",
+  v3_maison_monthly: "v3_maison_monthly_oct",
+  v3_maison_annual: "v3_maison_annual_oct",
+};
+
 /** Vérifie qu'un email/userId a bien réglé la V2 (plans `v2_*` payés). */
 async function isLegacyV2Buyer(email?: string, userId?: string): Promise<boolean> {
   const supabase = createClient(
@@ -141,7 +152,7 @@ Deno.serve(async (req) => {
 
     // Resolve human-readable priceId → real Stripe price via lookup_key
     const prices = await stripeRequest<any>(env, "GET", "/prices/search", {
-      query: `lookup_key:'${priceId}'`,
+      query: `lookup_key:'${PRICE_ALIASES[priceId] ?? priceId}'`,
       limit: 1,
     });
     if (!prices?.data?.length) throw new Error("Prix Stripe introuvable");
