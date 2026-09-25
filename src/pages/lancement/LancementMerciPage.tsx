@@ -1,7 +1,7 @@
 // Page de remerciement du tunnel de lancement — /lancement/merci
 // Confirme le paiement côté serveur puis affiche l'accès et le code.
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock, Copy, Loader2, Mail } from 'lucide-react';
 import { toast } from 'sonner';
@@ -26,6 +26,8 @@ export default function LancementMerciPage() {
   const [loading, setLoading] = useState(Boolean(sessionId));
   const [failed, setFailed] = useState(false);
   const attempts = useRef(0);
+
+  usePageMeta({ title: 'Merci — votre accès EbookStudio', noindex: true });
 
   const confirm = useCallback(async () => {
     if (!sessionId) return;
@@ -69,10 +71,6 @@ export default function LancementMerciPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Helmet>
-        <title>Merci — votre accès EbookStudio</title>
-        <meta name="robots" content="noindex" />
-      </Helmet>
 
       <div className="mx-auto max-w-2xl px-4 py-16">
         {loading && (

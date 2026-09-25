@@ -1,6 +1,6 @@
 // Page de vente du tunnel de lancement — /lancement/offres
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { useSearchParams } from 'react-router-dom';
 import { Check, X, ShieldCheck, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -23,6 +23,12 @@ export default function LancementOffresPage() {
   const [interval, setInterval] = useState<V3BillingInterval>('month');
   const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
 
+  usePageMeta({
+    title: "Les offres du lancement EbookStudio — Plume, Édition, Maison d'Édition",
+    description: `Trois formules ouvertes le ${LANCEMENT_DATE_LABEL} : Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois. Sans engagement.`,
+    canonical: 'https://ebookstudio.fr/lancement/offres',
+  });
+
   useEffect(() => {
     void trackCaptureEvent('lancement', 'offer_view');
   }, []);
@@ -39,14 +45,6 @@ export default function LancementOffresPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Helmet>
-        <title>Les offres du lancement EbookStudio — Plume, Édition, Maison d'Édition</title>
-        <meta
-          name="description"
-          content={`Trois formules ouvertes le ${LANCEMENT_DATE_LABEL} : Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois. Sans engagement.`}
-        />
-        <link rel="canonical" href="https://ebookstudio.fr/lancement/offres" />
-      </Helmet>
       <PaymentTestModeBanner />
 
       <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">

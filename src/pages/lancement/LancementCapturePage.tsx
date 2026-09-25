@@ -1,7 +1,7 @@
 // Page de capture publique du tunnel de lancement — /lancement
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { usePageMeta } from '@/hooks/usePageMeta';
 import { toast } from 'sonner';
 import { Check, Loader2, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,6 +22,12 @@ export default function LancementCapturePage() {
   const [firstName, setFirstName] = useState('');
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+
+  usePageMeta({
+    title: 'Lancement EbookStudio — écrivez et publiez votre livre sur Amazon',
+    description: `Ouverture le ${LANCEMENT_DATE_LABEL} : l'atelier complet pour écrire, corriger, habiller et publier votre livre sur Amazon KDP.`,
+    canonical: 'https://ebookstudio.fr/lancement',
+  });
 
   useEffect(() => {
     void trackCaptureEvent('lancement', 'page_view');
@@ -67,16 +73,6 @@ export default function LancementCapturePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Helmet>
-        <title>Lancement EbookStudio — écrivez et publiez votre livre sur Amazon</title>
-        <meta
-          name="description"
-          content={`Ouverture le ${LANCEMENT_DATE_LABEL} : l'atelier complet pour écrire, corriger, habiller et publier votre livre sur Amazon KDP.`}
-        />
-        <meta property="og:title" content="Lancement EbookStudio" />
-        <meta property="og:url" content="https://ebookstudio.fr/lancement" />
-        <link rel="canonical" href="https://ebookstudio.fr/lancement" />
-      </Helmet>
 
       <div className="mx-auto max-w-6xl px-4 py-12 md:py-20">
         <div className="grid gap-10 md:grid-cols-2 md:items-start">
