@@ -19,6 +19,8 @@ export type CaptureEventType =
   | 'submit'
   | 'checkout_click'
   | 'checkout_ready'
+  | 'email_captured'
+
   | 'error'
   | 'page_view'
   | 'reserve_open'
