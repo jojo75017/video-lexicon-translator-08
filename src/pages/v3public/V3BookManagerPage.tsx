@@ -50,6 +50,8 @@ export default function V3BookManagerPage() {
   const location = useLocation();
   const correctedOnly = location.pathname.endsWith('/livres-corriges');
   const [rows, setRows] = useState<Book[]>([]);
+  /** Tous les livres du compte (tous types) : la correction éditoriale doit pouvoir en prendre n'importe lequel. */
+  const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Book | null>(null);
   const [exporting, setExporting] = useState<Book | null>(null);
