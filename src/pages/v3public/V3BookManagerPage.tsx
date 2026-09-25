@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
+import EditorialReviewPanel from '@/components/v3public/EditorialReviewPanel';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 import type { Chapter } from '@/hooks/useSubscriptionGeneration';
 
@@ -54,6 +55,7 @@ export default function V3BookManagerPage() {
   const [exporting, setExporting] = useState<Book | null>(null);
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
+  const [tab, setTab] = useState<'books' | 'editorial'>('books');
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
@@ -183,7 +185,19 @@ export default function V3BookManagerPage() {
 
 
 
-      {loading ? (
+      {correctedOnly && (
+        <div className="mt-6 flex gap-2 border-b border-black/10">
+          {([['books', 'Mes livres corrigés'], ['editorial', 'Correction éditoriale']] as const).map(([k, l]) => (
+            <button key={k} onClick={() => setTab(k)} className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 ${tab === k ? 'border-[var(--v3-orange)] text-[var(--v3-ink)]' : 'border-transparent text-[var(--v3-muted)]'}`}>{l}</button>
+          ))}
+        </div>
+      )}
+
+      {correctedOnly && tab === 'editorial' ? (
+        loading ? <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
+        : rows.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre corrigé à analyser pour l’instant.</p>
+        : <EditorialReviewPanel books={rows} />
+      ) : loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
       ) : rows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-14">
