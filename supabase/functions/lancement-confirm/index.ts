@@ -24,12 +24,102 @@ function admin() {
   );
 }
 
+const PAYPAL_BASE = "https://api-m.paypal.com";
+
+/** Interroge PayPal pour connaître l'état réel de l'abonnement. */
+async function fetchPaypalStatus(subscriptionId: string): Promise<string | null> {
+  const id = Deno.env.get("PAYPAL_CLIENT_ID");
+  const secret = Deno.env.get("PAYPAL_CLIENT_SECRET");
+  if (!id || !secret) return null;
+  try {
+    const auth = await fetch(`${PAYPAL_BASE}/v1/oauth2/token`, {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${btoa(`${id}:${secret}`)}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: "grant_type=client_credentials",
+    });
+    if (!auth.ok) {
+      console.error("PayPal OAuth indisponible:", auth.status);
+      return null;
+    }
+    const { access_token } = await auth.json();
+    const res = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions/${subscriptionId}`, {
+      headers: { Authorization: `Bearer ${access_token}` },
+    });
+    if (!res.ok) return null;
+    const sub = await res.json();
+    return String(sub?.status ?? "") || null;
+  } catch (e) {
+    console.error("PayPal statut abonnement:", (e as Error).message);
+    return null;
+  }
+}
+
+/** Confirmation d'un abonnement réglé via PayPal (tunnel de lancement). */
+async function confirmPaypal(subscriptionId: string): Promise<Response> {
+  const supabase = admin();
+  const { data: row } = await supabase
+    .from("paypal_subscriptions")
+    .select("email, plan_id, interval, status")
+    .eq("paypal_subscription_id", subscriptionId)
+    .maybeSingle();
+
+  if (!row) return json({ status: "pending", email: null });
+
+  const record = row as { email: string; plan_id: string; interval: string; status: string };
+  const email = String(record.email ?? "").trim().toLowerCase();
+  const wasActive = String(record.status ?? "").toLowerCase() === "active";
+  let active = wasActive;
+
+  // Le webhook n'est pas toujours arrivé : on demande l'état à PayPal.
+  if (!active) {
+    const remote = await fetchPaypalStatus(subscriptionId);
+    if (remote === "ACTIVE" || remote === "APPROVED") {
+      active = true;
+      await supabase
+        .from("paypal_subscriptions")
+        .update({ status: "active", last_payment_at: new Date().toISOString() })
+        .eq("paypal_subscription_id", subscriptionId);
+    }
+  }
+
+  if (!active || !email) return json({ status: "pending", email: email || null });
+
+  const priceId = `v3_${record.plan_id}_${record.interval === "year" ? "annual" : "monthly"}`;
+  const { code, info } = await grantV3SubscriptionAccess(email, priceId);
+  const planLabel = info?.label || "Abonnement EbookStudio V3";
+
+  // On n'envoie jamais deux fois l'email d'accès.
+  const emailSent = wasActive ? false : await sendV3AccessEmail(email, planLabel, code);
+
+  return json({
+    status: "paid",
+    email,
+    plan: info?.plan ?? null,
+    planLabel,
+    accessCode: code,
+    emailSent,
+    alreadyActive: wasActive,
+  });
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") return json({ error: "Méthode non autorisée" }, 405);
 
   try {
-    const { sessionId } = await req.json();
+    const { sessionId, subscriptionId } = await req.json();
+
+    // Retour PayPal : on réconcilie l'abonnement au lieu d'une session Stripe.
+    if (typeof subscriptionId === "string" && subscriptionId.length > 0) {
+      if (!/^[A-Za-z0-9-]{5,64}$/.test(subscriptionId)) {
+        return json({ error: "Abonnement PayPal invalide" }, 400);
+      }
+      return await confirmPaypal(subscriptionId);
+    }
+
     if (typeof sessionId !== "string" || !/^cs_(test|live)_[A-Za-z0-9_]+$/.test(sessionId)) {
       return json({ error: "Session de paiement invalide" }, 400);
     }

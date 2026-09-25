@@ -254,3 +254,4 @@ verify_jwt = true
 
 [functions.lancement-confirm]
 verify_jwt = false
+
