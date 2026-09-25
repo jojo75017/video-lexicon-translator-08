@@ -199,6 +199,12 @@ export default function LancementOffresPage() {
                       planName={plan.name}
                       amount={amount}
                       accent="hsl(var(--primary))"
+                      returnUrl={`${window.location.origin}/lancement/merci?paypal=1${
+                        source ? `&source=${encodeURIComponent(source)}` : ''
+                      }`}
+                      cancelUrl={`${window.location.origin}/lancement/offres?paypal=annule${
+                        source ? `&source=${encodeURIComponent(source)}` : ''
+                      }`}
                     />
                   </div>
                 </div>

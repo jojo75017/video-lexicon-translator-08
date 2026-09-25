@@ -14,9 +14,22 @@ interface Props {
   accent: string;
   /** Tarif ancien client V2 (-20 % à vie). */
   legacyV2?: boolean;
+  /** Page de retour après approbation PayPal (défaut : page de reçu V3). */
+  returnUrl?: string;
+  /** Page de retour si l'acheteur annule sur PayPal. */
+  cancelUrl?: string;
 }
 
-export function PayPalSubscribeButton({ planId, interval, planName, amount, accent, legacyV2 = false }: Props) {
+export function PayPalSubscribeButton({
+  planId,
+  interval,
+  planName,
+  amount,
+  accent,
+  legacyV2 = false,
+  returnUrl,
+  cancelUrl,
+}: Props) {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,8 +47,10 @@ export function PayPalSubscribeButton({ planId, interval, planName, amount, acce
           interval,
           legacyV2,
           email: email.trim(),
-          returnUrl: `${window.location.origin}/v3/paypal-retour?plan=${planId}&interval=${interval}`,
-          cancelUrl: `${window.location.origin}/v3/forfaits?paypal=cancelled`,
+          returnUrl:
+            returnUrl ??
+            `${window.location.origin}/v3/paypal-retour?plan=${planId}&interval=${interval}`,
+          cancelUrl: cancelUrl ?? `${window.location.origin}/v3/forfaits?paypal=cancelled`,
         },
       });
       if (error || !data?.approvalUrl) {

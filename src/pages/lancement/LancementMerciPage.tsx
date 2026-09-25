@@ -22,18 +22,24 @@ export default function LancementMerciPage() {
   const [params] = useSearchParams();
   const sessionId = params.get('session_id');
   const isPaypal = params.get('paypal') === '1';
+  // PayPal renvoie l'identifiant d'abonnement ; on garde aussi celui mémorisé
+  // au moment du clic pour ne jamais perdre la commande.
+  const paypalSubId =
+    params.get('subscription_id') ||
+    (isPaypal ? localStorage.getItem('paypal_sub_id') : null);
+  const canConfirm = Boolean(sessionId || paypalSubId);
   const [result, setResult] = useState<ConfirmResult | null>(null);
-  const [loading, setLoading] = useState(Boolean(sessionId));
+  const [loading, setLoading] = useState(canConfirm);
   const [failed, setFailed] = useState(false);
   const attempts = useRef(0);
 
   usePageMeta({ title: 'Merci — votre accès EbookStudio', noindex: true });
 
   const confirm = useCallback(async () => {
-    if (!sessionId) return;
+    if (!sessionId && !paypalSubId) return;
     try {
       const { data, error } = await supabase.functions.invoke('lancement-confirm', {
-        body: { sessionId },
+        body: sessionId ? { sessionId } : { subscriptionId: paypalSubId },
       });
       if (error) throw new Error(error.message);
       const res = data as ConfirmResult;
@@ -55,7 +61,7 @@ export default function LancementMerciPage() {
       setFailed(true);
       setLoading(false);
     }
-  }, [sessionId]);
+  }, [sessionId, paypalSubId]);
 
   useEffect(() => {
     void confirm();
@@ -141,7 +147,7 @@ export default function LancementMerciPage() {
               par email.
             </p>
             <div className="mt-8 space-y-3">
-              <Button size="lg" className="w-full" onClick={() => { attempts.current = 0; setFailed(false); setLoading(true); void confirm(); }} disabled={!sessionId}>
+              <Button size="lg" className="w-full" onClick={() => { attempts.current = 0; setFailed(false); setLoading(true); void confirm(); }} disabled={!canConfirm}>
                 Vérifier à nouveau
               </Button>
               <Button size="lg" variant="outline" className="w-full" asChild>
