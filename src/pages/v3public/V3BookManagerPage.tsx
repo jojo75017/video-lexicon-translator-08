@@ -58,6 +58,8 @@ export default function V3BookManagerPage() {
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [tab, setTab] = useState<'books' | 'editorial'>('books');
+  const [selectedBookId, setSelectedBookId] = useState<string>('');
+
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
