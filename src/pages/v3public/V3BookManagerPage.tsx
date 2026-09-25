@@ -199,10 +199,10 @@ export default function V3BookManagerPage() {
       {tab === 'editorial' ? (
         loading ? <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
         : allBooks.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre enregistré à analyser pour l’instant.</p>
-        : <EditorialReviewPanel books={allBooks} />
+        : <EditorialReviewPanel books={allBooks} initialBookId={selectedBookId || undefined} autoLoad={Boolean(selectedBookId)} />
       ) : loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
-      ) : rows.length === 0 ? (
+      ) : displayRows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-14">
           <BookOpen className="w-8 h-8 text-[var(--v3-orange)] mx-auto" />
           {correctedOnly ? (
@@ -227,9 +227,16 @@ export default function V3BookManagerPage() {
 
       ) : (
         <div className="mt-10 space-y-3">
-          {rows.map((b) => {
+          {showAllFallback && (
+            <div className="v3-card border border-[var(--v3-orange)]/40 text-sm">
+              <p className="font-semibold">Aucun livre n’a encore été enregistré comme corrigé.</p>
+              <p className="mt-1 text-[var(--v3-muted)]">Voici tous vos livres : lancez la correction ou la relecture éditoriale directement depuis la liste.</p>
+            </div>
+          )}
+          {displayRows.map((b) => {
             const chapterCount = Array.isArray(b.chapters) ? b.chapters.length : 0;
             return (
+
             <div key={b.id} className="v3-card flex items-center gap-4">
               <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
               <div className="flex-1 min-w-0">
