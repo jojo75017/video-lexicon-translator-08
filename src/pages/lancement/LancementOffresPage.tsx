@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/accordion';
 import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
-import { PayPalSubscribeButton } from '@/components/v3/PayPalSubscribeButton';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 import { V3_PLANS, type V3BillingInterval, type V3PlanId } from '@/data/v3Pricing';
 import {
@@ -184,28 +183,19 @@ export default function LancementOffresPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-6 space-y-3">
+                  {/* PayPal retiré du tunnel de lancement : paiement par carte uniquement. */}
+                  <div className="mt-6 space-y-2">
                     <Button
                       size="lg"
                       className="w-full"
                       variant={highlight ? 'default' : 'outline'}
                       onClick={() => openCheckout(plan.id, plan.name)}
                     >
-                      Payer par carte
+                      Je choisis {plan.name}
                     </Button>
-                    <PayPalSubscribeButton
-                      planId={plan.id}
-                      interval={interval}
-                      planName={plan.name}
-                      amount={amount}
-                      accent="hsl(var(--primary))"
-                      returnUrl={`${window.location.origin}/lancement/merci?paypal=1${
-                        source ? `&source=${encodeURIComponent(source)}` : ''
-                      }`}
-                      cancelUrl={`${window.location.origin}/lancement/offres?paypal=annule${
-                        source ? `&source=${encodeURIComponent(source)}` : ''
-                      }`}
-                    />
+                    <p className="text-center text-xs text-muted-foreground">
+                      Paiement sécurisé par carte bancaire
+                    </p>
                   </div>
                 </div>
               );
