@@ -58,6 +58,8 @@ export default function V3BookManagerPage() {
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
   const [cleaning, setCleaning] = useState(false);
   const [tab, setTab] = useState<'books' | 'editorial'>('books');
+  const [selectedBookId, setSelectedBookId] = useState<string>('');
+
 
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
@@ -85,6 +87,10 @@ export default function V3BookManagerPage() {
   })();
   const duplicateCount = duplicateGroups.reduce((total, group) => total + group.length - 1, 0);
   const duplicateIds = new Set(duplicateGroups.flatMap((group) => group.map((book) => book.id)));
+  /** Sur « Livres corrigés » sans aucun livre corrigé, on affiche tous les livres pour pouvoir agir directement. */
+  const showAllFallback = correctedOnly && rows.length === 0 && allBooks.length > 0;
+  const displayRows = showAllFallback ? allBooks : rows;
+
 
   const cleanDuplicates = async () => {
     if (duplicateCount === 0) return;
@@ -197,10 +203,10 @@ export default function V3BookManagerPage() {
       {tab === 'editorial' ? (
         loading ? <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
         : allBooks.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre enregistré à analyser pour l’instant.</p>
-        : <EditorialReviewPanel books={allBooks} />
+        : <EditorialReviewPanel books={allBooks} initialBookId={selectedBookId || undefined} autoLoad={Boolean(selectedBookId)} />
       ) : loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
-      ) : rows.length === 0 ? (
+      ) : displayRows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-14">
           <BookOpen className="w-8 h-8 text-[var(--v3-orange)] mx-auto" />
           {correctedOnly ? (
@@ -225,9 +231,16 @@ export default function V3BookManagerPage() {
 
       ) : (
         <div className="mt-10 space-y-3">
-          {rows.map((b) => {
+          {showAllFallback && (
+            <div className="v3-card border border-[var(--v3-orange)]/40 text-sm">
+              <p className="font-semibold">Aucun livre n’a encore été enregistré comme corrigé.</p>
+              <p className="mt-1 text-[var(--v3-muted)]">Voici tous vos livres : lancez la correction ou la relecture éditoriale directement depuis la liste.</p>
+            </div>
+          )}
+          {displayRows.map((b) => {
             const chapterCount = Array.isArray(b.chapters) ? b.chapters.length : 0;
             return (
+
             <div key={b.id} className="v3-card flex items-center gap-4">
               <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
               <div className="flex-1 min-w-0">
@@ -243,11 +256,13 @@ export default function V3BookManagerPage() {
                 </div>
               </div>
               <div className="flex flex-wrap justify-end gap-2">
-                {!correctedOnly && (
-                  <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
-                    <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
-                  </button>
-                )}
+                <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                  <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
+                </button>
+                <button onClick={() => { setSelectedBookId(b.id); setTab('editorial'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="v3-btn v3-btn-outline text-xs">
+                  <Wand2 className="w-3.5 h-3.5" /> Correction éditoriale
+                </button>
+
                 <button
                   onClick={() => void openExport(b)}
                   disabled={exportLoadingId === b.id}
