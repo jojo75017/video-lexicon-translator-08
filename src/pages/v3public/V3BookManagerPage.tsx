@@ -188,18 +188,16 @@ export default function V3BookManagerPage() {
 
 
 
-      {correctedOnly && (
-        <div className="mt-6 flex gap-2 border-b border-black/10">
-          {([['books', 'Mes livres corrigés'], ['editorial', 'Correction éditoriale']] as const).map(([k, l]) => (
-            <button key={k} onClick={() => setTab(k)} className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 ${tab === k ? 'border-[var(--v3-orange)] text-[var(--v3-ink)]' : 'border-transparent text-[var(--v3-muted)]'}`}>{l}</button>
-          ))}
-        </div>
-      )}
+      <div className="mt-6 flex gap-2 border-b border-black/10">
+        {([['books', correctedOnly ? 'Mes livres corrigés' : 'Mes livres'], ['editorial', 'Correction éditoriale']] as const).map(([k, l]) => (
+          <button key={k} onClick={() => setTab(k)} className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 ${tab === k ? 'border-[var(--v3-orange)] text-[var(--v3-ink)]' : 'border-transparent text-[var(--v3-muted)]'}`}>{l}</button>
+        ))}
+      </div>
 
-      {correctedOnly && tab === 'editorial' ? (
+      {tab === 'editorial' ? (
         loading ? <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
-        : rows.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre corrigé à analyser pour l’instant.</p>
-        : <EditorialReviewPanel books={rows} />
+        : allBooks.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre enregistré à analyser pour l’instant.</p>
+        : <EditorialReviewPanel books={allBooks} />
       ) : loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
       ) : rows.length === 0 ? (
