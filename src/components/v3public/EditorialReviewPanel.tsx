@@ -88,7 +88,14 @@ export default function EditorialReviewPanel({ books, initialBookId, autoLoad }:
     }
   };
 
+  // Chargement automatique du texte quand un livre est présélectionné depuis la liste.
+  useEffect(() => {
+    if (!autoLoad || !book || chapters.length || fetching) return;
+    void fetchBook();
+  }, [autoLoad, bookId]); // eslint-disable-line
+
   const signs = chapters.reduce((total, c) => total + c.content.length, 0);
+
 
   const run = async () => {
     if (!book || !chapters.length) return;
