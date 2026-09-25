@@ -9,7 +9,6 @@ import {
 } from '@/components/ui/accordion';
 import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
-import { PayPalSubscribeButton } from '@/components/v3/PayPalSubscribeButton';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 import { V3_PLANS, type V3BillingInterval, type V3PlanId } from '@/data/v3Pricing';
 import {
