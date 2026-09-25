@@ -73,7 +73,7 @@ export function useV3Entitlement() {
           .select('plan_id, status')
           .ilike('email', email)
           .eq('status', 'active');
-        const paypalEdition = (paypalRows ?? []).some((r: any) => r.plan_id === 'edition');
+        const paypalEdition = (paypalRows ?? []).some((r: any) => (r.plan_id === 'edition' || r.plan_id === 'maison'));
         const paypalPlume = (paypalRows ?? []).some((r: any) => r.plan_id === 'plume');
         if (paypalEdition) setHasFull(true);
         base = base || paypalEdition || paypalPlume;
