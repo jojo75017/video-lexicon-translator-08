@@ -62,13 +62,14 @@ export default function V3BookManagerPage() {
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
-    let query = supabase.from('ebook_projects')
+    const { data, error } = await supabase.from('ebook_projects')
       .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at,draft_state')
-      .eq('user_id', auth.user.id);
-    if (correctedOnly) query = query.eq('project_type', 'corrected');
-    const { data, error } = await query.order('updated_at', { ascending: false });
+      .eq('user_id', auth.user.id)
+      .order('updated_at', { ascending: false });
     if (error) toast.error(`Chargement impossible : ${error.message}`);
-    setRows((data as Book[]) || []);
+    const list = (data as (Book & { project_type?: string | null })[]) || [];
+    setAllBooks(list);
+    setRows(correctedOnly ? list.filter((b) => b.project_type === 'corrected') : list);
     setLoading(false);
   };
   useEffect(() => { load(); }, []); // eslint-disable-line
