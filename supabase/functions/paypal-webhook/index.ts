@@ -2,6 +2,8 @@
 // Uses PayPal's webhook verification endpoint (server-side verification).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { grantV3SubscriptionAccess, sendV3AccessEmail } from "../_shared/v3Access.ts";
+
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
