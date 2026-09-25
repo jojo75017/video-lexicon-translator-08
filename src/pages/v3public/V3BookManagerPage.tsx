@@ -252,11 +252,13 @@ export default function V3BookManagerPage() {
                 </div>
               </div>
               <div className="flex flex-wrap justify-end gap-2">
-                {!correctedOnly && (
-                  <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
-                    <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
-                  </button>
-                )}
+                <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                  <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
+                </button>
+                <button onClick={() => { setSelectedBookId(b.id); setTab('editorial'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="v3-btn v3-btn-outline text-xs">
+                  <Wand2 className="w-3.5 h-3.5" /> Correction éditoriale
+                </button>
+
                 <button
                   onClick={() => void openExport(b)}
                   disabled={exportLoadingId === b.id}
