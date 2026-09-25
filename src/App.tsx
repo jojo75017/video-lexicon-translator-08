@@ -507,6 +507,11 @@ const App = () => {
             {/* Tunnel de commande : toujours accessible (les CTA emails/bannières doivent
                 arriver sur le paiement, même pour un admin ou un abonné connecté). */}
             <Route path="/commander" element={<V3CommanderPage />} />
+            {/* Tunnel de lancement du 1er octobre : capture → offres → remerciement */}
+            <Route path="/lancement" element={<LancementCapturePage />} />
+            <Route path="/lancement/offres" element={<LancementOffresPage />} />
+            <Route path="/lancement/merci" element={<LancementMerciPage />} />
+
             <Route path="/essai" element={<EssaiPage />} />
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             <Route path="/decouverte" element={<DecouvertePage />} />
