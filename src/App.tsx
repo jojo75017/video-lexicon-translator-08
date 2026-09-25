@@ -85,6 +85,10 @@ const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const DecouvertePage = lazy(() => import('./pages/launch/DecouvertePage'));
 const AvantPremiereV3Page = lazy(() => import('./pages/AvantPremiereV3Page'));
+const LancementCapturePage = lazy(() => import('./pages/lancement/LancementCapturePage'));
+const LancementOffresPage = lazy(() => import('./pages/lancement/LancementOffresPage'));
+const LancementMerciPage = lazy(() => import('./pages/lancement/LancementMerciPage'));
+
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
 const EssaiGratuit7JoursPage = lazy(() => import('./pages/launch/EssaiGratuit7JoursPage'));
 const V3WaitingRoomPage = lazy(() => import('./pages/launch/V3WaitingRoomPage'));
@@ -507,6 +511,11 @@ const App = () => {
             {/* Tunnel de commande : toujours accessible (les CTA emails/bannières doivent
                 arriver sur le paiement, même pour un admin ou un abonné connecté). */}
             <Route path="/commander" element={<V3CommanderPage />} />
+            {/* Tunnel de lancement du 1er octobre : capture → offres → remerciement */}
+            <Route path="/lancement" element={<LancementCapturePage />} />
+            <Route path="/lancement/offres" element={<LancementOffresPage />} />
+            <Route path="/lancement/merci" element={<LancementMerciPage />} />
+
             <Route path="/essai" element={<EssaiPage />} />
             <Route path="/essai/inscription" element={<EssaiInscriptionPage />} />
             <Route path="/decouverte" element={<DecouvertePage />} />

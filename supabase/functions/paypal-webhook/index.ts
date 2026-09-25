@@ -2,6 +2,8 @@
 // Uses PayPal's webhook verification endpoint (server-side verification).
 
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { grantV3SubscriptionAccess, sendV3AccessEmail } from "../_shared/v3Access.ts";
+
 
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -74,6 +76,13 @@ Deno.serve(async (req) => {
     switch (type) {
       case "BILLING.SUBSCRIPTION.ACTIVATED":
       case "BILLING.SUBSCRIPTION.CREATED": {
+        const { data: sub } = await supabase
+          .from("paypal_subscriptions")
+          .select("email, plan_id, interval, status")
+          .eq("paypal_subscription_id", resource.id)
+          .maybeSingle();
+        const wasActive = String((sub as { status?: string } | null)?.status || "") === "active";
+
         await supabase
           .from("paypal_subscriptions")
           .update({
@@ -83,8 +92,17 @@ Deno.serve(async (req) => {
             updated_at: new Date().toISOString(),
           })
           .eq("paypal_subscription_id", resource.id);
+
+        // Accès + email de code, une seule fois, après activation réelle.
+        const row = sub as { email?: string; plan_id?: string; interval?: string } | null;
+        if (type === "BILLING.SUBSCRIPTION.ACTIVATED" && !wasActive && row?.email) {
+          const priceId = `v3_${row.plan_id}_${row.interval === "year" ? "annual" : "monthly"}`;
+          const { code, info } = await grantV3SubscriptionAccess(row.email, priceId);
+          await sendV3AccessEmail(row.email, info?.label || "Abonnement EbookStudio V3", code);
+        }
         break;
       }
+
       case "PAYMENT.SALE.COMPLETED":
       case "PAYMENT.CAPTURE.COMPLETED": {
         const subId = resource.billing_agreement_id || resource.custom_id || null;

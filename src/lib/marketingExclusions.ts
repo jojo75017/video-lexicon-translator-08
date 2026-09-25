@@ -22,6 +22,9 @@ export const MARKETING_EXCLUDED_PREFIXES = [
   '/10-niches-offertes',
   '/methode',
   '/avant-premiere',
+  // Tunnel de lancement : message unique, aucune offre concurrente affichée.
+  '/lancement',
+
 ];
 
 export const isMarketingExcluded = (pathname: string): boolean =>

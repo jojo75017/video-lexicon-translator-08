@@ -7,6 +7,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { type StripeEnv, verifyWebhook, stripeRequest } from "../_shared/stripe.ts";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
 import { pushToSystemeIo } from "../_shared/systemeio.ts";
+import { grantV3SubscriptionAccess, sendV3AccessEmail } from "../_shared/v3Access.ts";
+
 
 // Marque l'acheteur CLIENT-47 dans Systeme.io : l'automatisation « stop sur tag »
 // sort immédiatement le contact de la campagne de vente.
@@ -372,14 +374,37 @@ async function handleV3CheckoutCompleted(session: any) {
 async function handleV3SubscriptionCompleted(session: any) {
   const orderId = session.metadata?.order_id;
   if (!orderId) return;
-  await getSupabase().from("v3_installment_orders").update({
+  const supabase = getSupabase();
+
+  // On ne renvoie jamais deux fois l'email d'accès : seule la première
+  // confirmation (commande encore non active) déclenche l'envoi.
+  const { data: order } = await supabase
+    .from("v3_installment_orders")
+    .select("status")
+    .eq("id", orderId)
+    .maybeSingle();
+  const alreadyActive = String((order as { status?: string } | null)?.status || "") === "active";
+
+  await supabase.from("v3_installment_orders").update({
     status: "active",
     installments_paid: 1,
     stripe_subscription_id: session.subscription || null,
     stripe_customer_id: session.customer || null,
     grace_until: null,
   }).eq("id", orderId);
+
+  const email = String(
+    session.metadata?.email || session.customer_email || session.customer_details?.email || "",
+  ).toLowerCase();
+  const priceId = String(session.metadata?.plan || "");
+  if (!email) return;
+
+  const { code, info } = await grantV3SubscriptionAccess(email, priceId);
+  if (!alreadyActive) {
+    await sendV3AccessEmail(email, info?.label || "Abonnement EbookStudio V3", code);
+  }
 }
+
 
 
 async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
