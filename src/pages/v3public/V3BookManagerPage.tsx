@@ -87,6 +87,10 @@ export default function V3BookManagerPage() {
   })();
   const duplicateCount = duplicateGroups.reduce((total, group) => total + group.length - 1, 0);
   const duplicateIds = new Set(duplicateGroups.flatMap((group) => group.map((book) => book.id)));
+  /** Sur « Livres corrigés » sans aucun livre corrigé, on affiche tous les livres pour pouvoir agir directement. */
+  const showAllFallback = correctedOnly && rows.length === 0 && allBooks.length > 0;
+  const displayRows = showAllFallback ? allBooks : rows;
+
 
   const cleanDuplicates = async () => {
     if (duplicateCount === 0) return;
