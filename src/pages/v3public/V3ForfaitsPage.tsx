@@ -145,7 +145,7 @@ export default function V3ForfaitsPage() {
 
                 <div className="mb-4 rounded-md p-3 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}><strong style={{ color: "var(--v3-ink)" }}>Idéal pour :</strong> {plan.idealFor}</div>
                 <Button onClick={() => setCheckout({ priceId: getV3PriceId(plan.id, interval, hasV2), planName: plan.name })}>Choisir {plan.name} · {formatPrice(publicPrice)}</Button>
-                {plan.id !== "maison" && <div className="mt-2">
+                <div className="mt-2">
                   <PayPalSubscribeButton
                     planId={plan.id}
                     interval={interval}
@@ -154,7 +154,7 @@ export default function V3ForfaitsPage() {
                     accent="var(--v3-emerald)"
                     legacyV2={hasV2}
                   />
-                </div>}
+                </div>
                 <p className="mt-2 text-center text-[11px]" style={{ color: "var(--v3-muted)" }}>
                   Prélèvement automatique {interval === "month" ? "mensuel" : "annuel"} · Annulable à tout moment
                 </p>

@@ -15,6 +15,7 @@ const PAYPAL_BASE = "https://api-m.paypal.com"; // Live
 const PLANS = {
   plume:   { name: "EbookStudio — Plume", monthly: 27, yearly: 270 },
   edition: { name: "EbookStudio — Édition", monthly: 47, yearly: 470 },
+  maison:  { name: "EbookStudio — Maison d'Édition", monthly: 97, yearly: 897 },
 } as const;
 
 type PlanId = keyof typeof PLANS;
