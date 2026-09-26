@@ -33,3 +33,9 @@
 - [x] Générer la consigne visuelle depuis le synopsis réel du livre (scène, décor, couleurs) avant l'image
 
 - [x] Livres corrigés : onglet « Correction éditoriale » (sujet hors-thème, continuité personnages, chronologie, lieux, événements, incohérences internes, répétitions, grammaire, ponctuation, typo FR, fluidité)
+
+## HumanizeAI
+
+- [x] Transformer l’humaniseur en espace HumanizeAI avec humanisation et audit stylométrique
+- [x] Ajouter les accès HumanizeAI dans la barre d’actions, le menu V3 et l’index des outils
+- [x] Vérifier le parcours complet sur ordinateur et mobile

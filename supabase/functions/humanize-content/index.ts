@@ -62,7 +62,7 @@ serve(async (req) => {
 - Éviter les formulations trop lisses ou génériques`,
       strong: `Transforme complètement ce texte pour qu'il paraisse écrit par un humain:
 - Restructurer entièrement les paragraphes
-- Ajouter des anecdotes, exemples concrets ou métaphores
+- Employer des exemples ou métaphores uniquement lorsqu'ils existent déjà dans le texte
 - Utiliser un ton conversationnel avec des expressions familières (mais professionnelles)
 - Inclure des parenthèses, des tirets, des questions rhétoriques
 - Varier radicalement le rythme (phrases courtes puis longues)
@@ -97,6 +97,9 @@ RÈGLES CRITIQUES:
 4. TOUJOURS varier la longueur des paragraphes
 5. INCLURE des imperfections naturelles (mais pas de fautes d'orthographe)
 6. Le texte final doit passer les détecteurs d'IA comme Originality.ai ou GPTZero
+7. PRÉSERVER 100 % du sens, des idées, des noms, des chiffres et des faits du texte original
+8. NE JAMAIS inventer d'anecdote, de témoignage, de citation, de personne ou de fait
+9. ÉVITER aussi les automatismes « En conclusion », « En somme », « Au cœur de », « Crucial » et « Notamment »
 
 Retourne UNIQUEMENT le texte réécrit, sans commentaires ni explications.`;
 
