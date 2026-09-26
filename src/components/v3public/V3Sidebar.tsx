@@ -74,7 +74,7 @@ const NAV: NavSection[] = [
       { to: '/v3/create/illustre?preset=maternelle-3-6', label: 'Album maternelle 3-6 ans', icon: Sparkles },
       { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen },
       { to: '/v3/corriger', label: 'Corriger mon livre', icon: Wand2 },
-      { to: '/v3/outils/humanizer', label: 'Humaniseur IA', icon: Sparkles },
+      { to: '/v3/outils/humanizer', label: 'HumanizeAI', icon: Wand2, badge: 'Nouveau' },
       { to: '/v3/outils/editeur', label: 'Éditeur WYSIWYG', icon: FileText },
       { to: '/v3/outils/traduction', label: 'Traduction 10 langues', icon: ListTree },
     ],

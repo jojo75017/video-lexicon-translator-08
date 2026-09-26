@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Palette, Sparkles, Save, Plus, FileText } from 'lucide-react';
+import { Rocket, Palette, Sparkles, Save, Plus, FileText, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { clearBookBrief, readBookBrief, writeBookBrief } from '@/lib/v3/bookBrief';
 
@@ -32,6 +32,14 @@ export default function V3QuickActionsBar() {
 
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
+      <button
+        type="button"
+        onClick={() => navigate('/v3/outils/humanizer')}
+        className={solid}
+        style={{ background: 'var(--v3-action-orange)', color: 'var(--v3-action-orange-text)' }}
+      >
+        <Wand2 className="h-3.5 w-3.5" /> HumanizeAI
+      </button>
       <button
         type="button"
         onClick={() => navigate('/v3/create')}
