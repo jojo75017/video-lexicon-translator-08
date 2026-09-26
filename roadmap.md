@@ -38,4 +38,4 @@
 
 - [x] Transformer l’humaniseur en espace HumanizeAI avec humanisation et audit stylométrique
 - [x] Ajouter les accès HumanizeAI dans la barre d’actions, le menu V3 et l’index des outils
-- [ ] Vérifier le parcours complet sur ordinateur et mobile
+- [x] Vérifier le parcours complet sur ordinateur et mobile

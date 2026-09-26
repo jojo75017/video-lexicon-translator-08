@@ -74,7 +74,7 @@ const ApiKeysFloatingButton = () => {
         title="Choisir mon IA · Clés API (Gemini / Claude / ChatGPT / OpenRouter)"
         className={cn(
           'fixed bottom-32 right-5 md:right-6 z-[9997]',
-          'h-12 px-4 rounded-full shadow-2xl flex items-center gap-2',
+          'h-12 w-12 px-0 sm:w-auto sm:px-4 rounded-full shadow-2xl flex items-center justify-center gap-2',
           'text-sm font-semibold transition-all duration-200',
           valid
             ? 'bg-[#008296] text-white hover:bg-[#006b7a]'
@@ -82,7 +82,7 @@ const ApiKeysFloatingButton = () => {
         )}
       >
         {valid ? <CheckCircle2 className="h-4 w-4" /> : <KeyRound className="h-4 w-4" />}
-        <span className="whitespace-nowrap">
+        <span className="hidden whitespace-nowrap sm:inline">
           {valid ? `IA : ${activeLabel}` : 'Choisir mon IA · Clés API'}
         </span>
       </button>

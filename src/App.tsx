@@ -826,7 +826,7 @@ const App = () => {
               <Route path="outils/offerts" element={<V3LockedGate><V3OutilsOffertsPage /></V3LockedGate>} />
               <Route path="nouveautes" element={<V3LockedGate><V3NouveautesPage /></V3LockedGate>} />
               <Route path="outils/royalties" element={<V3PaidModuleRoute><V3RoyaltiesPage /></V3PaidModuleRoute>} />
-              <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="Humanizer IA"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="HumanizeAI"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/mockup-3d" element={<V3LockedGate><TrialGate label="Mockup 3D"><V3MockupPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/audiobook" element={<V3PaidModuleRoute><V3AudiobookPage /></V3PaidModuleRoute>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
