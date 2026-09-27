@@ -40,11 +40,13 @@ const COMPARISON = [
   { label: "Génie et sommaire", legacy: "Inclus", plume: "Guidé", edition: "Avancé + séries", maison: "Inclus" },
   { label: "Correction et exports", legacy: "Inclus", plume: "Complets", edition: "Professionnels", maison: "Inclus" },
   { label: "Recherche avancée", legacy: "Incluse", plume: "Incluse", edition: "Incluse + Amazon Spy", maison: "Inclus" },
-  { label: "Couvertures", legacy: "Simple (comme la V2)", plume: "Kindle + broché", edition: "Cover Studio Pro + relié", maison: "Inclus" },
+  { label: "Couvertures", legacy: "Simple (comme la V2)", plume: "Kindle + broché", edition: "Kindle + broché", maison: "Kindle + broché" },
+  { label: "Cover Studio Pro", legacy: "—", plume: "Option 67 €", edition: "Option 67 €", maison: "Option 67 €" },
   { label: "Audiolivre", legacy: "—", plume: "Standard", edition: "Premium inclus", maison: "Inclus" },
   { label: "Traductions 10 langues", legacy: "—", plume: "À la carte", edition: "Incluses", maison: "Inclus" },
   { label: "Sélection maisons d'édition", legacy: "—", plume: "À la carte", edition: "Incluse", maison: "Inclus" },
-  { label: "BD Studio Pro et Studio Jeunesse", legacy: "—", plume: "—", edition: "Inclus", maison: "Inclus" },
+  { label: "BD Studio Pro", legacy: "—", plume: "—", edition: "Inclus", maison: "Inclus" },
+  { label: "Studio Jeunesse", legacy: "—", plume: "Option 47 €", edition: "Option 47 €", maison: "Option 47 €" },
   { label: "Tous les compléments payants", legacy: "—", plume: "À la carte", edition: "À la carte", maison: "Tous inclus" },
 ] as const;
 

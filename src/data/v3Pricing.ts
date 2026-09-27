@@ -260,6 +260,24 @@ export const V3_ADDON_LIST: V3Addon[] = [
     to: "/contact-support?sujet=pack-serenite",
     inEdition: true,
   },
+  {
+    key: "cover_pro",
+    priceId: "v3_addon_cover_pro_once",
+    title: "Cover Studio Pro",
+    description: "Couvertures photoréalistes 300 DPI, gabarits KDP (Kindle, broché, relié) et variantes multiples.",
+    price: 67,
+    to: "/v3/cover-pro",
+    inEdition: false,
+  },
+  {
+    key: "studio_jeunesse",
+    priceId: "v3_addon_studio_jeunesse_once",
+    title: "Studio Jeunesse",
+    description: "Albums illustrés pour enfants : histoires, illustrations cohérentes et exports prêts pour KDP.",
+    price: 47,
+    to: "/v3/create/illustre",
+    inEdition: false,
+  },
 ];
 
 /** Valeur totale des compléments premium proposés à la carte. */
