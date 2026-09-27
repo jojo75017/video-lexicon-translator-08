@@ -1274,11 +1274,11 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     await saveProjectToCloud();
   };
 
-  const resetWizard = () => {
-    if (!confirm('Recommencer un nouveau livre ? Le brouillon en cours sera effacé.')) return;
+  /** Remet l'assistant à vide : champs, sommaire, progression et sauvegardes locales. */
+  const applyBlankBook = () => {
     setTitle(''); setDescription(''); setCategory('Roman'); setCustomCategory('');
     setTone('Inspirant'); setChapters(12); setWordsPerChapter(2500);
-    setCharacters([makeCharacter()]); setOutline(buildFallbackOutline('', 'Roman', 12)); setFinalTitle(''); setSubtitle('');
+    setCharacters([makeCharacter()]); setOutline([]); setFinalTitle(''); setSubtitle('');
     setAiTopic(''); setAiSeries([]); setAiConseils([]); setActiveSerie(0); setChosenIdeaId(null);
     setRefineIdeaId(null); setRefineInstruction('');
     setStep(0); setLaunched(false); setCompletedBook(null); setCoverUrl(null);
@@ -1288,13 +1288,32 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       'ebook_workflow_progress',
       'ebook_workflow_results',
       'ebook_workflow_sync_data',
+      'edition_chapter_target_words_v1',
       WIZARD_KEY,
       CONFIG_KEY,
       PROJECT_ID_KEY,
     ].forEach((k) => localStorage.removeItem(k));
     restoreRef.current = true; // évite qu'un effet de reprise ne recharge l'ancien brouillon
+  };
+
+  const resetWizard = () => {
+    if (!confirm('Recommencer un nouveau livre ? Le brouillon en cours sera effacé.')) return;
+    applyBlankBook();
     toast.success('Nouveau livre — formulaire réinitialisé.');
   };
+
+  // « Nouveau livre (remettre à zéro) » : quand la fiche locale disparaît,
+  // l'assistant doit se vider aussi. Sans cela, il réécrivait l'ancien livre
+  // (titre + sommaire) depuis son état en mémoire juste après l'effacement.
+  useEffect(() => {
+    const onBriefChanged = () => {
+      if (readBookBrief()) return;
+      applyBlankBook();
+    };
+    window.addEventListener(BOOK_BRIEF_EVENT, onBriefChanged);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, onBriefChanged);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
 
   const generateOutline = async () => {
