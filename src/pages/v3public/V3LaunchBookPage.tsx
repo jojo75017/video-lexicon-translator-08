@@ -7,6 +7,7 @@ import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3KeyHint from '@/components/v3public/V3KeyHint';
 import V3PipelinePanel from '@/components/v3public/V3PipelinePanel';
+import V3ResetBookButton from '@/components/v3public/V3ResetBookButton';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 
@@ -22,7 +23,10 @@ export default function V3LaunchBookPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <BackButton />
-          <V3QuickActionsBar />
+          <div className="flex flex-wrap items-center gap-2">
+            <V3ResetBookButton />
+            <V3QuickActionsBar />
+          </div>
         </div>
 
         <div className="mt-6 text-center">
