@@ -122,13 +122,34 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
         })}
       </div>
 
+      {selectedAvatar && (
+        <div
+          className="mt-4 rounded-2xl border-2 p-4"
+          style={{ borderColor: '#1a7f4b', background: 'rgba(26,127,75,0.08)' }}
+        >
+          <p className="flex items-center gap-2 text-sm font-extrabold" style={{ color: '#1a7f4b' }}>
+            <Check className="h-4 w-4" /> Profil « {selectedAvatar.name} » activé pour votre livre
+          </p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-ink)' }}>
+            Vos agents écriront désormais pour ce lecteur : {selectedAvatar.profil}
+          </p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-ink)' }}>
+            <strong>Ton retenu :</strong> {selectedAvatar.ton}
+          </p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+            <strong style={{ color: 'var(--v3-ink)' }}>À éviter :</strong> {selectedAvatar.frustrations}
+          </p>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={() => { setCustom((v) => !v); }}
         className="v3-btn v3-btn-ghost mt-3 text-xs"
       >
-        {custom ? 'Masquer mes précisions' : 'Décrire mon lecteur moi-même'}
+        {custom ? 'Masquer les détails' : 'Voir et modifier les détails de mon lecteur'}
       </button>
+
 
       {(custom || value.avatarId) && (
         <div className="mt-3 space-y-3 rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)' }}>
