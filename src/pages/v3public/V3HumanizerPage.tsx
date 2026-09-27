@@ -37,6 +37,18 @@ const INTENSITIES: { value: Intensity; label: string; help: string }[] = [
 
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : 'opération impossible';
 
+// Récupère le vrai message renvoyé par le serveur au lieu du « non-2xx » générique.
+const readFunctionError = async (error: unknown): Promise<Error> => {
+  const ctx = (error as { context?: Response })?.context;
+  if (ctx && typeof ctx.json === 'function') {
+    try {
+      const body = await ctx.clone().json();
+      if (body?.error) return new Error(String(body.error));
+    } catch { /* ignore */ }
+  }
+  return error instanceof Error ? error : new Error('opération impossible');
+};
+
 export default function V3HumanizerPage() {
   const [input, setInput] = useState('');
   const [output, setOutput] = useState('');
