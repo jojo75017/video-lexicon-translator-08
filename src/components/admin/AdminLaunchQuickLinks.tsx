@@ -33,6 +33,18 @@ export default function AdminLaunchQuickLinks({ className = '' }: { className?: 
         Tout le pilotage du lancement V3 en un seul endroit
       </h2>
 
+      <button
+        type="button"
+        onClick={() => navigate('/lancement')}
+        className="mt-4 flex w-full items-center justify-center gap-3 rounded-xl px-5 py-4 text-base font-bold text-[#0F2E1F] shadow-lg transition hover:brightness-110 md:text-lg"
+        style={{ background: 'linear-gradient(90deg,#D4AF37,#FFD97A)' }}
+      >
+        <Rocket className="h-5 w-5" />
+        Voir le tunnel de lancement
+        <span className="hidden text-xs font-semibold opacity-80 sm:inline">/lancement</span>
+      </button>
+
+
       <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {TILES.map((tile) => {
           const Icon = tile.icon;
