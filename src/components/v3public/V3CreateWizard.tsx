@@ -7,6 +7,7 @@ import { ApiProviderQuickSettings } from '@/components/ebook/ApiProviderQuickSet
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import V3KdpPublishPanel from '@/components/v3public/V3KdpPublishPanel';
 import V3LiveBookProgress from '@/components/v3public/V3LiveBookProgress';
+import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 import { publishWrittenChapters } from '@/lib/v3/writtenChapters';
@@ -418,6 +419,8 @@ export default function V3CreateWizard() {
       if (w.cibleNiveau) setCibleNiveau(w.cibleNiveau);
       if (w.cibleBesoins) setCibleBesoins(w.cibleBesoins);
       if (w.cibleFrustrations) setCibleFrustrations(w.cibleFrustrations);
+      if (w.readerAvatarId || w.avatarId) setAvatarId(w.readerAvatarId || w.avatarId);
+      if (w.avatarConsigne) setAvatarConsigne(w.avatarConsigne);
       if (w.promesseCentrale) setPromesseCentrale(w.promesseCentrale);
       if (w.promesseBenefices) setPromesseBenefices(w.promesseBenefices);
       if (w.promesseDifferenciation) setPromesseDifferenciation(w.promesseDifferenciation);
@@ -508,6 +511,9 @@ export default function V3CreateWizard() {
   const [cibleNiveau, setCibleNiveau] = useState('tous');
   const [cibleBesoins, setCibleBesoins] = useState('');
   const [cibleFrustrations, setCibleFrustrations] = useState('');
+  // Avatar lecteur choisi dans l'encart « Mon avatar lecteur ».
+  const [avatarId, setAvatarId] = useState('');
+  const [avatarConsigne, setAvatarConsigne] = useState('');
   const [promesseCentrale, setPromesseCentrale] = useState('');
   const [promesseBenefices, setPromesseBenefices] = useState('');
   const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
@@ -683,6 +689,7 @@ export default function V3CreateWizard() {
       cibleProfil.trim() && `Lecteur visé : ${cibleProfil.trim()}`,
       cibleBesoins.trim() && `Besoins du lecteur : ${cibleBesoins.trim()}`,
       cibleFrustrations.trim() && `Difficultés du lecteur : ${cibleFrustrations.trim()}`,
+      avatarConsigne.trim() && `Consigne d’écriture pour ce lecteur : ${avatarConsigne.trim()}`,
       promesseCentrale.trim() && `Promesse souhaitée : ${promesseCentrale.trim()}`,
       sourceText.trim() && `Matière fournie par l’auteur : ${sourceText.trim().slice(0, 3500)}`,
     ].filter(Boolean).join('\n');
@@ -1043,11 +1050,11 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
         objectif: c.objectif,
       })),
       characters: characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, description: c.traits, traits: c.traits })),
-      cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
+      cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, readerAvatarId: avatarId, avatarConsigne,
       promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
       projectId,
     } as any);
-  }, [title, finalTitle, subtitle, authorName, description, sourceText, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
+  }, [title, finalTitle, subtitle, authorName, description, sourceText, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarId, avatarConsigne, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
 
   const [showTocPaste, setShowTocPaste] = useState(false);
   const [tocPasteText, setTocPasteText] = useState('');
@@ -1115,6 +1122,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       cibleNiveau && `Niveau : ${cibleNiveau}`,
       cibleBesoins && `Besoins : ${cibleBesoins}`,
       cibleFrustrations && `Frustrations : ${cibleFrustrations}`,
+      avatarConsigne && `Consigne d'écriture pour ce lecteur (à respecter mot pour mot) : ${avatarConsigne}`,
     ].filter(Boolean).join('\n');
     const promLines = [
       promesseCentrale && `Promesse centrale : ${promesseCentrale}`,
@@ -1613,7 +1621,7 @@ Règles :
       localStorage.setItem(TARGET_WORDS_KEY, String(wordsPerChapter));
       localStorage.setItem(WIZARD_KEY, JSON.stringify({
         ...config,
-        cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations,
+        cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarId, avatarConsigne,
         promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
         bibleUnivers, arbreNarratif,
       }));
@@ -2301,6 +2309,18 @@ Règles :
               )}
             </label>
           </div>
+          <V3AvatarPickerCard
+            category={effectiveCategory}
+            value={{ avatarId, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarConsigne }}
+            onChange={(patch) => {
+              setAvatarId(patch.avatarId || '');
+              setCibleProfil(patch.cibleProfil || '');
+              setCibleNiveau(patch.cibleNiveau || 'tous');
+              setCibleBesoins(patch.cibleBesoins || '');
+              setCibleFrustrations(patch.cibleFrustrations || '');
+              setAvatarConsigne(patch.avatarConsigne || '');
+            }}
+          />
           <label className="block space-y-2">
             <span className="flex items-center justify-between gap-3 text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
               Synopsis du livre
