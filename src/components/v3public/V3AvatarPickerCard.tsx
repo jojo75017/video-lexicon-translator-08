@@ -43,16 +43,21 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
   const [custom, setCustom] = useState(() => Boolean(value.cibleProfil && !value.avatarId));
 
   const group = V3_BOOK_AVATARS.find((g) => g.id === groupId) || V3_BOOK_AVATARS[0];
+  // Choix affiché immédiatement, même si la fiche du livre met un instant à se
+  // synchroniser : l'auteur doit voir tout de suite que son lecteur est pris en compte.
+  const [pickedId, setPickedId] = useState<string | undefined>(value.avatarId);
+  const activeId = pickedId || value.avatarId;
   const selectedAvatar = useMemo(
     () =>
-      value.avatarId
-        ? V3_BOOK_AVATARS.flatMap((g) => g.avatars).find((a) => a.id === value.avatarId)
+      activeId
+        ? V3_BOOK_AVATARS.flatMap((g) => g.avatars).find((a) => a.id === activeId)
         : undefined,
-    [value.avatarId],
+    [activeId],
   );
 
   const applyAvatar = (avatar: BookAvatar) => {
     setCustom(false);
+    setPickedId(avatar.id);
     onChange({
       avatarId: avatar.id,
       cibleProfil: avatar.profil,
