@@ -705,6 +705,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                         }}
                         onChange={(patch) => {
                           writeBookBrief({
+                            ...(readBookBrief() || {}),
                             readerAvatarId: patch.avatarId,
                             cibleProfil: patch.cibleProfil,
                             cibleNiveau: patch.cibleNiveau,
