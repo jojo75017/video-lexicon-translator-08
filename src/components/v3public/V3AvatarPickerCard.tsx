@@ -158,7 +158,7 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
       </button>
 
 
-      {(custom || value.avatarId) && (
+      {custom && (
         <div className="mt-3 space-y-3 rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)' }}>
           <label className="block space-y-1">
             <span className="text-xs font-bold" style={{ color: 'var(--v3-ink)' }}>À qui s’adresse ce livre ?</span>
