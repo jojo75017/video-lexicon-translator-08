@@ -13,7 +13,12 @@ export default function V3ResetBookButton() {
     setTimeout(() => window.location.reload(), 400);
   };
   return (
-    <button type="button" onClick={onClick} className="v3-btn text-xs border border-destructive text-destructive bg-background hover:bg-destructive/10">
+    <button
+      type="button"
+      onClick={onClick}
+      className="v3-btn v3-btn-reset-green text-xs font-semibold shadow-sm hover:opacity-90 transition-opacity"
+      style={{ background: 'var(--v3-emerald, #2d3e33)', borderColor: 'var(--v3-emerald, #2d3e33)' }}
+    >
       <RotateCcw className="w-3.5 h-3.5" /> Nouveau livre (remettre à zéro)
     </button>
   );
