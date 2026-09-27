@@ -548,6 +548,11 @@ export function resetBookProject() {
     'edition_book_config_v1',
     'v3_genie_thread_v1',
     'v3_written_chapters_v1',
+    'v3_create_workflow_config_v2',
+    'v3_create_wizard_config_v1',
+    'v3_create_current_project_id_v1',
+    'ebook_workflow_progress',
+    'ebook_workflow_results',
   ];
   for (const key of keys) {
     try { localStorage.removeItem(key); } catch { /* mode privé */ }
