@@ -434,6 +434,13 @@
   color: #ffffff !important;
   border-color: #9a3412 !important;
 }
+/* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
+.v3pub .v3-btn-reset-green,
+.v3pub .v3-btn-reset-green:not(:disabled):hover {
+  background: var(--v3-emerald, #2d3e33) !important;
+  color: #ffffff !important;
+  border-color: var(--v3-emerald, #2d3e33) !important;
+}
 .v3pub button:not(:disabled) *,
 .v3pub [role="button"]:not([aria-disabled="true"]) *,
 .v3pub .v3-btn * {
