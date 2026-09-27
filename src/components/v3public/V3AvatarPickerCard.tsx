@@ -43,9 +43,21 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
   const [custom, setCustom] = useState(() => Boolean(value.cibleProfil && !value.avatarId));
 
   const group = V3_BOOK_AVATARS.find((g) => g.id === groupId) || V3_BOOK_AVATARS[0];
+  // Choix affiché immédiatement, même si la fiche du livre met un instant à se
+  // synchroniser : l'auteur doit voir tout de suite que son lecteur est pris en compte.
+  const [pickedId, setPickedId] = useState<string | undefined>(value.avatarId);
+  const activeId = pickedId || value.avatarId;
+  const selectedAvatar = useMemo(
+    () =>
+      activeId
+        ? V3_BOOK_AVATARS.flatMap((g) => g.avatars).find((a) => a.id === activeId)
+        : undefined,
+    [activeId],
+  );
 
   const applyAvatar = (avatar: BookAvatar) => {
     setCustom(false);
+    setPickedId(avatar.id);
     onChange({
       avatarId: avatar.id,
       cibleProfil: avatar.profil,
@@ -65,7 +77,7 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
         <span className="v3-chip v3-chip-orange">
           <Target className="h-3.5 w-3.5" /> Mon avatar lecteur
         </span>
-        {value.avatarId && (
+        {activeId && (
           <span className="inline-flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--v3-orange-600)' }}>
             <Check className="h-3.5 w-3.5" /> Profil appliqué
           </span>
@@ -95,7 +107,7 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {group.avatars.map((avatar) => {
-          const active = value.avatarId === avatar.id;
+          const active = activeId === avatar.id;
           return (
             <button
               key={avatar.id}
@@ -122,15 +134,36 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
         })}
       </div>
 
+      {selectedAvatar && (
+        <div
+          className="mt-4 rounded-2xl border-2 p-4"
+          style={{ borderColor: '#1a7f4b', background: 'rgba(26,127,75,0.08)' }}
+        >
+          <p className="flex items-center gap-2 text-sm font-extrabold" style={{ color: '#1a7f4b' }}>
+            <Check className="h-4 w-4" /> Profil « {selectedAvatar.name} » activé pour votre livre
+          </p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-ink)' }}>
+            Vos agents écriront désormais pour ce lecteur : {selectedAvatar.profil}
+          </p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-ink)' }}>
+            <strong>Ton retenu :</strong> {selectedAvatar.ton}
+          </p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>
+            <strong style={{ color: 'var(--v3-ink)' }}>À éviter :</strong> {selectedAvatar.frustrations}
+          </p>
+        </div>
+      )}
+
       <button
         type="button"
         onClick={() => { setCustom((v) => !v); }}
         className="v3-btn v3-btn-ghost mt-3 text-xs"
       >
-        {custom ? 'Masquer mes précisions' : 'Décrire mon lecteur moi-même'}
+        {custom ? 'Masquer les détails' : 'Voir et modifier les détails de mon lecteur'}
       </button>
 
-      {(custom || value.avatarId) && (
+
+      {custom && (
         <div className="mt-3 space-y-3 rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)' }}>
           <label className="block space-y-1">
             <span className="text-xs font-bold" style={{ color: 'var(--v3-ink)' }}>À qui s’adresse ce livre ?</span>
