@@ -63,6 +63,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Écris pour une lectrice experte du genre : respecte scrupuleusement le code narratif choisi, soigne les retournements attendus tout en les renouvelant, garde une cohérence stricte des personnages et des lieux d’un chapitre à l’autre.',
       },
+      {
+        id: 'romance-lea',
+        name: 'Léa, 22 ans',
+        badge: 'New adult & romance intense',
+        profil: 'Jeune lectrice de 18 à 25 ans, fan de romance universitaire ou new adult, découvre ses livres sur les réseaux',
+        niveau: 'debutant',
+        besoins: 'Des émotions fortes et immédiates, des héros de son âge, une intensité dramatique assumée',
+        frustrations: 'Les personnages trop lisses, une intrigue sans obstacles réels, un ton trop sage',
+        ton: 'Émotionnel',
+        consigne:
+          'Écris pour une jeune lectrice de new adult : émotions à vif, obstacles puissants entre les héros, dialogues modernes et spontanés, rythme rapide. Aucune morale, aucune froideur.',
+      },
     ],
   },
   {
@@ -93,6 +105,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Expert',
         consigne:
           'Écris pour un lecteur de série : respecte à la lettre le caractère, le passé et les tics de langage de l’enquêteur, entretiens l’atmosphère sombre, mêle l’enquête à une blessure personnelle du héros.',
+      },
+      {
+        id: 'thriller-marie',
+        name: 'Marie, 37 ans',
+        badge: 'Thriller psychologique',
+        profil: 'Lectrice de thrillers psychologiques et de huis clos, aime les narrateurs dont on doute',
+        niveau: 'intermediaire',
+        besoins: 'Une tension intérieure, des secrets de famille ou de couple, un retournement final inattendu mais préparé',
+        frustrations: 'La violence gratuite, les personnages féminins réduits à des victimes, un retournement triché',
+        ton: 'Émotionnel',
+        consigne:
+          'Écris un thriller psychologique : la menace vient de l’intimité, pas de l’action. Distille les indices du retournement final dès le début, sans jamais tricher avec le lecteur.',
       },
     ],
   },
@@ -125,6 +149,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Écris pour un lecteur jeune adulte : entre dans l’action dès la première ligne, dialogues vifs et naturels, chapitres courts, enjeux émotionnels forts. Jamais de ton donneur de leçons ni de clichés générationnels.',
       },
+      {
+        id: 'jeunesse-nina',
+        name: 'Nina, 33 ans',
+        badge: 'Premières lectures 6-9 ans',
+        profil: 'Parent ou enseignant qui cherche des lectures pour un enfant qui apprend à lire seul',
+        niveau: 'debutant',
+        besoins: 'Des chapitres très courts, des mots simples, une intrigue claire qui donne confiance au jeune lecteur',
+        frustrations: 'Les phrases à rallonge, le vocabulaire soutenu, les intrigues trop complexes',
+        ton: 'Pédagogique',
+        consigne:
+          'Écris pour un enfant de 6 à 9 ans qui lit seul : chapitres de quelques pages, phrases simples, héros attachant, humour léger et petite victoire à la fin de chaque chapitre.',
+      },
     ],
   },
   {
@@ -155,6 +191,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Expert',
         consigne:
           'Écris pour une lectrice de saga : garde chaque fil narratif vivant, prépare les révélations par des indices posés à l’avance, respecte à la lettre le système de magie ou de technologie établi.',
+      },
+      {
+        id: 'imaginaire-hugo',
+        name: 'Hugo, 19 ans',
+        badge: 'Aventure & progression',
+        profil: 'Jeune lecteur de fantasy d’aventure et de litRPG, veut de l’action et un héros qui progresse',
+        niveau: 'debutant',
+        besoins: 'Un héros qui gagne en puissance, des combats lisibles, un rythme sans temps mort',
+        frustrations: 'Les pavés descriptifs, un héros passif, un début trop lent',
+        ton: 'Direct',
+        consigne:
+          'Écris une fantasy d’aventure nerveuse : le héros agit et progresse à chaque chapitre, les scènes d’action sont claires et visuelles, l’univers se découvre en chemin.',
       },
     ],
   },
@@ -187,6 +235,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Écris un guide pratique : titres de chapitres formulés comme les questions réelles du lecteur, réponse utile dès le premier paragraphe, listes et étapes numérotées, zéro remplissage.',
       },
+      {
+        id: 'dev-pauline',
+        name: 'Pauline, 29 ans',
+        badge: 'Confiance & estime de soi',
+        profil: 'Jeune lectrice qui veut gagner en confiance, sensible aux récits personnels et aux exercices doux',
+        niveau: 'debutant',
+        besoins: 'Un ton bienveillant et jamais culpabilisant, des petits exercices quotidiens, des exemples auxquels s’identifier',
+        frustrations: 'Le ton de gourou, les injonctions au bonheur, les méthodes trop brutales',
+        ton: 'Inspirant',
+        consigne:
+          'Écris avec bienveillance : parle à une amie, jamais d’en haut. Un petit exercice réaliste par chapitre, des exemples proches du quotidien, aucune culpabilisation.',
+      },
     ],
   },
   {
@@ -217,6 +277,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Direct',
         consigne:
           'Écris pour un débutant motivé : explique chaque terme technique en une phrase, illustre par des cas concrets chiffrés, termine chaque chapitre par une action réalisable dans la semaine. Rappelle les risques honnêtement.',
+      },
+      {
+        id: 'business-sandrine',
+        name: 'Sandrine, 45 ans',
+        badge: 'Cheffe d’entreprise',
+        profil: 'Dirigeante de petite entreprise, cherche à structurer, déléguer et développer sans s’épuiser',
+        niveau: 'avance',
+        besoins: 'Des méthodes de gestion concrètes, des outils directement utilisables, des retours d’expérience réels',
+        frustrations: 'La théorie de cabinet de conseil, les conseils pensés pour les grands groupes, le jargon anglais',
+        ton: 'Expert',
+        consigne:
+          'Écris pour une dirigeante de TPE : conseils applicables à petite échelle, outils concrets cités, exemples d’entreprises réelles de taille modeste. Aucun anglicisme inutile.',
       },
     ],
   },
@@ -249,6 +321,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Écris pour quelqu’un qui manque de temps : étapes numérotées, durées et quantités précises, ingrédients ou matériel courants, alternatives simples. Jamais de programme culpabilisant.',
       },
+      {
+        id: 'sante-karim',
+        name: 'Karim, 52 ans',
+        badge: 'Retour en forme après 50 ans',
+        profil: 'Lecteur de plus de 50 ans qui veut reprendre une activité douce et mieux manger, sans se blesser ni se priver',
+        niveau: 'debutant',
+        besoins: 'Des exercices adaptés et progressifs, des explications rassurantes, des habitudes tenables sur la durée',
+        frustrations: 'Les programmes de jeune athlète, les promesses de transformation en 30 jours, le mépris des contraintes de l’âge',
+        ton: 'Pédagogique',
+        consigne:
+          'Écris pour un lecteur de plus de 50 ans : progression douce et sécurisée, ton encourageant, alternatives pour chaque exercice ou recette. Invite à l’avis médical avant tout changement important.',
+      },
     ],
   },
   {
@@ -279,6 +363,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Émotionnel',
         consigne:
           'Écris un témoignage authentique : montre l’épreuve sans complaisance et la reconstruction pas à pas. Aucune leçon de morale, aucun conseil médical, une lueur d’espoir à la fin de chaque chapitre.',
+      },
+      {
+        id: 'memoires-helene',
+        name: 'Hélène, 55 ans',
+        badge: 'Biographie de figure inspirante',
+        profil: 'Lectrice de biographies de personnalités, veut comprendre le parcours et les coulisses',
+        niveau: 'intermediaire',
+        besoins: 'Un récit documenté, des moments charnières bien racontés, le contexte de l’époque',
+        frustrations: 'Les ragots, les faits non sourcés, une admiration béate sans distance',
+        ton: 'Expert',
+        consigne:
+          'Écris une biographie rigoureuse : faits vérifiables, contexte historique expliqué simplement, regard équilibré sur la personnalité. N’invente ni citation ni anecdote.',
       },
     ],
   },
@@ -311,6 +407,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Écris de façon sobre et argumentée : une idée par chapitre, un exemple concret, un exercice d’introspection. N’attribue une citation que si sa source est certaine, sinon reformule sans auteur.',
       },
+      {
+        id: 'spi-manon',
+        name: 'Manon, 34 ans',
+        badge: 'Astrologie & rituels',
+        profil: 'Jeune lectrice curieuse d’astrologie, de cycles lunaires et de rituels du quotidien',
+        niveau: 'debutant',
+        besoins: 'Des explications accessibles, des rituels simples à faire chez soi, un calendrier clair',
+        frustrations: 'Le jargon ésotérique, les promesses miraculeuses, un ton qui infantilise',
+        ton: 'Inspirant',
+        consigne:
+          'Écris pour une débutante curieuse : explique chaque notion simplement, propose des rituels courts et réalisables, reste dans l’invitation jamais dans la prédiction. Aucune promesse de résultat.',
+      },
     ],
   },
   {
@@ -341,6 +449,18 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Direct',
         consigne:
           'Écris un carnet de suivi structuré : mêmes rubriques à chaque page, objectifs mesurables, bilan hebdomadaire avec trois questions précises. Structure identique du début à la fin.',
+      },
+      {
+        id: 'carnet-elodie',
+        name: 'Élodie, 41 ans',
+        badge: 'Carnet de voyage & souvenirs',
+        profil: 'Voyageuse qui veut un carnet pour consigner itinéraires, rencontres et émotions',
+        niveau: 'tous',
+        besoins: 'Des pages thématiques variées, des invitations à dessiner ou coller, des listes pratiques',
+        frustrations: 'Un carnet trop rigide, des rubriques inutiles, l’absence de place pour les souvenirs',
+        ton: 'Inspirant',
+        consigne:
+          'Écris un carnet de voyage vivant : alterne pages pratiques et pages souvenirs, invitations courtes et poétiques, espace libre pour l’écriture et les collages du lecteur.',
       },
     ],
   },

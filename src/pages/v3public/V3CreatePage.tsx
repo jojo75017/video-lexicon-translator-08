@@ -565,6 +565,30 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     <SaveStatusLine />
                   </div>
                 </div>
+                <div className="mt-4">
+                  <V3AvatarPickerCard
+                    category={bookBrief.genre || bookBrief.category}
+                    value={{
+                      avatarId: bookBrief.readerAvatarId,
+                      cibleProfil: bookBrief.cibleProfil,
+                      cibleNiveau: bookBrief.cibleNiveau,
+                      cibleBesoins: bookBrief.cibleBesoins,
+                      cibleFrustrations: bookBrief.cibleFrustrations,
+                      avatarConsigne: bookBrief.avatarConsigne,
+                    }}
+                    onChange={(patch) => {
+                      writeBookBrief({
+                        readerAvatarId: patch.avatarId,
+                        cibleProfil: patch.cibleProfil,
+                        cibleNiveau: patch.cibleNiveau,
+                        cibleBesoins: patch.cibleBesoins,
+                        cibleFrustrations: patch.cibleFrustrations,
+                        avatarConsigne: patch.avatarConsigne,
+                      });
+                      window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+                    }}
+                  />
+                </div>
                 <div className="mt-4 flex flex-wrap justify-end gap-2">
                   <button type="button" onClick={() => setDesk(2)} className="v3-btn v3-btn-outline text-xs">
                     Passer au sommaire <ArrowRight className="w-3.5 h-3.5" />

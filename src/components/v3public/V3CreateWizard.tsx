@@ -2470,6 +2470,18 @@ Règles :
               <p className="mt-2 text-xs" style={{ color: 'var(--v3-muted)' }}>{totalWords.toLocaleString('fr-FR')} mots estimés · environ {estimatedPages} pages</p>
             </div>
           </div>
+          <V3AvatarPickerCard
+            category={effectiveCategory}
+            value={{ avatarId, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarConsigne }}
+            onChange={(patch) => {
+              setAvatarId(patch.avatarId || '');
+              setCibleProfil(patch.cibleProfil || '');
+              setCibleNiveau(patch.cibleNiveau || 'tous');
+              setCibleBesoins(patch.cibleBesoins || '');
+              setCibleFrustrations(patch.cibleFrustrations || '');
+              setAvatarConsigne(patch.avatarConsigne || '');
+            }}
+          />
         </div>
       )}
 
