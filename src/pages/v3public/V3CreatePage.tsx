@@ -11,6 +11,7 @@ import V3PipelinePanel from '@/components/v3public/V3PipelinePanel';
 
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
 import V3QuickActionsBar from '@/components/v3public/V3QuickActionsBar';
+import V3ResetBookButton from '@/components/v3public/V3ResetBookButton';
 import V3ResumeBookCard from '@/components/v3public/V3ResumeBookCard';
 import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
