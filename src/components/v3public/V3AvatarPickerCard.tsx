@@ -107,7 +107,7 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         {group.avatars.map((avatar) => {
-          const active = value.avatarId === avatar.id;
+          const active = activeId === avatar.id;
           return (
             <button
               key={avatar.id}
