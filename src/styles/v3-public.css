@@ -435,8 +435,10 @@
   border-color: #9a3412 !important;
 }
 /* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
-.v3pub .v3-btn-reset-green,
-.v3pub .v3-btn-reset-green:not(:disabled):hover {
+.v3pub button.v3-btn-reset-green:not(:disabled),
+.v3pub button.v3-btn-reset-green:not(:disabled):hover,
+.v3pub .v3-btn.v3-btn-reset-green,
+.v3pub .v3-btn.v3-btn-reset-green:not(:disabled):hover {
   background: var(--v3-emerald, #2d3e33) !important;
   color: #ffffff !important;
   border-color: var(--v3-emerald, #2d3e33) !important;
