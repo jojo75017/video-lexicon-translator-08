@@ -43,6 +43,13 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
   const [custom, setCustom] = useState(() => Boolean(value.cibleProfil && !value.avatarId));
 
   const group = V3_BOOK_AVATARS.find((g) => g.id === groupId) || V3_BOOK_AVATARS[0];
+  const selectedAvatar = useMemo(
+    () =>
+      value.avatarId
+        ? V3_BOOK_AVATARS.flatMap((g) => g.avatars).find((a) => a.id === value.avatarId)
+        : undefined,
+    [value.avatarId],
+  );
 
   const applyAvatar = (avatar: BookAvatar) => {
     setCustom(false);
