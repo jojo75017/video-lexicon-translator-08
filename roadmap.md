@@ -39,3 +39,6 @@
 - [x] Transformer l’humaniseur en espace HumanizeAI avec humanisation et audit stylométrique
 - [x] Ajouter les accès HumanizeAI dans la barre d’actions, le menu V3 et l’index des outils
 - [x] Vérifier le parcours complet sur ordinateur et mobile
+- [ ] Forfait Maison 97€ invisible sur /v3/forfaits : diagnostiquer et corriger
+- [ ] Retirer Cover Studio Pro + Studio Jeunesse des offres Édition et Maison
+- [ ] Créer upsells Cover Studio Pro 67€ et Studio Jeunesse 47€ (Stripe + catalogue + verrous)

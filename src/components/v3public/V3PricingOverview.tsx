@@ -45,10 +45,10 @@ const cards = [
     description: V3_PLANS[1].idealFor,
     items: [
       '60 chapitres · 8 000 mots · personnages illimités',
-      'Cover Studio Pro : Kindle, broché et relié',
-      'BD Studio Pro et Studio Jeunesse',
+      'BD Studio Pro',
       'Traductions, audiolivre premium et maisons d’édition inclus',
       'Amazon Spy, KDP avancé et priorité aux nouveautés V4',
+      'En option : Cover Studio Pro (67 €) et Studio Jeunesse (47 €)',
     ],
     to: '/v3/forfaits',
     icon: Crown,
