@@ -77,7 +77,7 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
         <span className="v3-chip v3-chip-orange">
           <Target className="h-3.5 w-3.5" /> Mon avatar lecteur
         </span>
-        {value.avatarId && (
+        {activeId && (
           <span className="inline-flex items-center gap-1 text-xs font-bold" style={{ color: 'var(--v3-orange-600)' }}>
             <Check className="h-3.5 w-3.5" /> Profil appliqué
           </span>
