@@ -113,7 +113,7 @@ export default function V3MainTabs() {
             }}
           >
             <span aria-hidden>✨</span>
-            <span>Offre V3 · 1er oct.</span>
+            <span>Offre 1er oct.</span>
           </NavLink>
           <NavLink
             to="/v3/upsells"
@@ -154,7 +154,7 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-nav-item flex items-center gap-1 px-1.5 py-2 text-[13px] v3-serif font-semibold whitespace-nowrap"
+                  className="v3-nav-item flex items-center gap-1 px-1 py-2 text-[12.5px] v3-serif font-semibold whitespace-nowrap"
                   style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)' }}
                 >
                   <span aria-hidden className="text-[15px]">{cat.emoji}</span>
