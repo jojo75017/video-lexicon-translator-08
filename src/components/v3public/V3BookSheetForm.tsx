@@ -9,6 +9,7 @@ import {
   writeBookBrief,
   type BookBrief,
 } from '@/lib/v3/bookBrief';
+import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 
 type SectionId = 'sheet' | 'identity' | 'author' | 'pitch' | 'characters' | 'ending' | 'review';
 
@@ -213,6 +214,27 @@ export default function V3BookSheetForm() {
                         style={inputStyle}
                       />
                     </label>
+                    <div className="sm:col-span-2">
+                      <V3AvatarPickerCard
+                        category={brief.genre || brief.category}
+                        value={{
+                          avatarId: brief.readerAvatarId,
+                          cibleProfil: brief.cibleProfil,
+                          cibleNiveau: brief.cibleNiveau,
+                          cibleBesoins: brief.cibleBesoins,
+                          cibleFrustrations: brief.cibleFrustrations,
+                          avatarConsigne: brief.avatarConsigne,
+                        }}
+                        onChange={(patch) => set({
+                          readerAvatarId: patch.avatarId,
+                          cibleProfil: patch.cibleProfil,
+                          cibleNiveau: patch.cibleNiveau,
+                          cibleBesoins: patch.cibleBesoins,
+                          cibleFrustrations: patch.cibleFrustrations,
+                          avatarConsigne: patch.avatarConsigne,
+                        })}
+                      />
+                    </div>
                   </div>
                 )}
 

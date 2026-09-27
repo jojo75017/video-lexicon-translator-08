@@ -17,6 +17,7 @@ import V3BookActionsBar from '@/components/v3public/V3BookActionsBar';
 import V3OutlineCoBuilder from '@/components/v3public/V3OutlineCoBuilder';
 import V3PassageCorrector from '@/components/v3public/V3PassageCorrector';
 import V3BookSheetForm from '@/components/v3public/V3BookSheetForm';
+import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 
 import { BOOK_BRIEF_EVENT, clearBookBrief, parseTocText, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
@@ -667,6 +668,30 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   )
                 ) : (
                   <>
+                    <div className="mb-4">
+                      <V3AvatarPickerCard
+                        category={bookBrief.genre || bookBrief.category}
+                        value={{
+                          avatarId: bookBrief.readerAvatarId,
+                          cibleProfil: bookBrief.cibleProfil,
+                          cibleNiveau: bookBrief.cibleNiveau,
+                          cibleBesoins: bookBrief.cibleBesoins,
+                          cibleFrustrations: bookBrief.cibleFrustrations,
+                          avatarConsigne: bookBrief.avatarConsigne,
+                        }}
+                        onChange={(patch) => {
+                          writeBookBrief({
+                            readerAvatarId: patch.avatarId,
+                            cibleProfil: patch.cibleProfil,
+                            cibleNiveau: patch.cibleNiveau,
+                            cibleBesoins: patch.cibleBesoins,
+                            cibleFrustrations: patch.cibleFrustrations,
+                            avatarConsigne: patch.avatarConsigne,
+                          });
+                          window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+                        }}
+                      />
+                    </div>
                     <V3OutlineCoBuilder />
                     <div id="sommaire-ia" className="mt-5">
                       <V3GenieOutlinePanel key={briefKey} outlineMode={sommaireIa ? 'guided' : undefined} />

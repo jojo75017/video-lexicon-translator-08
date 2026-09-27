@@ -90,6 +90,10 @@ export type BookBrief = {
   cibleNiveau?: string;
   cibleBesoins?: string;
   cibleFrustrations?: string;
+  /** Identifiant de l'avatar lecteur choisi (voir src/data/v3BookAvatars.ts). */
+  readerAvatarId?: string;
+  /** Consigne d'écriture liée à l'avatar lecteur, transmise aux agents. */
+  avatarConsigne?: string;
   promesseCentrale?: string;
   promesseBenefices?: string;
   promesseDifferenciation?: string;
