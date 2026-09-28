@@ -10,7 +10,7 @@ Le passage doit être rassurant et ne demander aucune manipulation compliquée :
 4. Il découvre ses avantages V3 et choisit, seulement s’il le souhaite, Plume ou Édition avec **−20 % à vie**.
 5. Son accès V2 reste disponible jusqu’au **31 décembre 2026** ; aucun livre ni projet n’est perdu.
 
-L’email sera envoyé depuis **Systeme.io**, conformément au canal marketing du projet. Il mènera vers la page « Ancien client V2 » déjà prévue, plutôt que vers une page de vente générale.
+L’email sera envoyé par **Systeme.io**, depuis **Georges — EbookStudio <contact@ebookstudio-mail.fr>**, conformément au canal marketing du projet. Georges déclenchera l’envoi depuis Systeme.io après validation du texte et de la liste des abonnés. Il mènera vers la page « Ancien client V2 » déjà prévue, plutôt que vers une page de vente générale.
 
 ## Email proposé
 
@@ -76,7 +76,7 @@ EbookStudio — écrire son livre, simplement
 
 ## Mise en place
 
-- Ajouter cet email à la séquence Systeme.io destinée exclusivement aux abonnés existants.
+- Ajouter cet email à la séquence Systeme.io destinée exclusivement aux abonnés existants, avec l’expéditeur **Georges — EbookStudio <contact@ebookstudio-mail.fr>**.
 - Utiliser le bouton vers `/v3/migration`, avec un lien court suivi pour mesurer les clics.
 - Exclure les désabonnés et les clients ayant déjà choisi une formule V3.
 - Vérifier que la page affiche bien les prix fidélité calculés sur les tarifs actuels : Plume 21,60 €/mois ou 216 €/an ; Édition 37,60 €/mois ou 376 €/an.
