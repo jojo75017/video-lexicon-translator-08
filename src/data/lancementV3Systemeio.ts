@@ -14,6 +14,7 @@
 import { SITE_ORIGIN } from './externalLinks';
 
 export const LANCEMENT_V3_SENDER = 'contact@ebookstudio-mail.fr';
+export const LANCEMENT_V3_SENDER_NAME = 'Georges — EbookStudio';
 export const LANCEMENT_V3_TAG = 'CLIENT-V2';
 export const LANCEMENT_V3_DATE = '1er octobre 2026';
 
@@ -34,6 +35,61 @@ export type LancementV3Email = {
 };
 
 export const LANCEMENT_V3_EMAILS: LancementV3Email[] = [
+  {
+    id: 'passage-abonnes-v3',
+    step: 'Passage abonnés',
+    sendDate: '29 septembre 2026',
+    sendTime: '09 h 00',
+    goal: 'Rassurer, présenter la V3 et l’avantage fidélité',
+    subject: 'Votre EbookStudio évolue : bienvenue dans la V3',
+    preheader: 'Vos livres restent avec vous, et votre fidélité vous donne droit à −20 % à vie sur la V3.',
+    body: `Bonjour [Prénom],
+
+Vous m’avez fait confiance pour écrire, structurer ou publier votre livre avec EbookStudio.
+
+Aujourd’hui, je suis heureux de vous ouvrir les portes d’une nouvelle étape : EbookStudio V3.
+
+J’ai entièrement repensé le studio pour rendre la création d’un livre plus simple, plus guidée et beaucoup plus complète — sans vous faire repartir de zéro.
+
+Vos livres et vos projets restent avec vous. Vous ne perdez rien.
+
+Votre espace V2 reste accessible jusqu’au 31 décembre 2026, afin que vous puissiez terminer tranquillement ce que vous avez commencé et découvrir la V3 à votre rythme.
+
+Ce qui vous attend dans la V3 :
+
+— un parcours guidé, de l’idée jusqu’au livre terminé ;
+— un sommaire construit avec vous, et non à votre place ;
+— une rédaction chapitre par chapitre adaptée à votre lecteur ;
+— la correction professionnelle de votre manuscrit ;
+— les exports PDF, DOCX, EPUB et Kindle ;
+— des outils pour la couverture, la publication et la vente sur Amazon KDP ;
+— de nouveaux studios spécialisés selon votre formule.
+
+Et parce que vous faites partie des premiers abonnés EbookStudio, vous bénéficiez d’un avantage qui vous restera acquis : −20 % à vie sur votre forfait V3.
+
+Tant que votre abonnement reste actif, votre tarif fidélité ne change pas :
+
+— Plume : 21,60 € par mois au lieu de 27 €, ou 216 € par an au lieu de 270 € ;
+— Édition : 37,60 € par mois au lieu de 47 €, ou 376 € par an au lieu de 470 €.
+
+Vous n’avez aucun code à saisir. Utilisez simplement l’adresse email liée à votre compte EbookStudio : votre avantage sera reconnu automatiquement.
+
+Vous n’avez pas besoin de choisir dans la précipitation. Prenez quelques minutes pour découvrir les différences entre les formules et sélectionnez celle qui correspond réellement à votre façon d’écrire et de publier.
+
+Je veux que ce passage soit simple et serein. Si vous avez une question, répondez directement à cet email : je vous aiderai personnellement.
+
+Merci de faire partie de l’aventure EbookStudio.
+
+À très vite dans la V3,
+
+Georges Boubet
+EbookStudio — écrire son livre, simplement
+
+P.S. Votre accès V2 reste disponible jusqu’au 31 décembre 2026. Vos livres et vos projets ne sont pas supprimés lors du passage à la V3.`,
+    ctaLabel: 'Découvrir ma V3 et mon tarif fidélité',
+    ctaUrl: `${SITE_ORIGIN}/r/v3fidelite`,
+    note: 'Envoyer uniquement aux abonnés V2. Exclure les désabonnés et les clients ayant déjà choisi une formule V3.',
+  },
   {
     id: 'lancement-v3-j7',
     step: 'J−7',
@@ -175,7 +231,10 @@ export const LANCEMENT_V3_HOWTO: Array<{ title: string; detail: string }> = [
     title: '1. Créez la diffusion dans Systeme.io',
     detail:
       'Emails → Diffusions → Nouvelle diffusion. Expéditeur : ' +
+      LANCEMENT_V3_SENDER_NAME +
+      ' <' +
       LANCEMENT_V3_SENDER +
+      '>' +
       '. Cible : vos clients actuels (tag ' +
       LANCEMENT_V3_TAG +
       ').',

@@ -31,6 +31,7 @@ import {
   LANCEMENT_V3_EMAILS,
   LANCEMENT_V3_HOWTO,
   LANCEMENT_V3_SENDER,
+  LANCEMENT_V3_SENDER_NAME,
   LANCEMENT_V3_TAG,
   lancementV3ToText,
   type LancementV3Email,
@@ -520,11 +521,11 @@ function LancementV3Panel() {
       <Card className="rounded-2xl border-border bg-card p-6">
         <Badge className="rounded-full">Lancement V3</Badge>
         <h2 className="mt-3 text-xl font-bold text-foreground">
-          4 emails pour l'ouverture du {LANCEMENT_V3_DATE}
+          5 emails pour préparer le passage vers la V3
         </h2>
         <p className="mt-2 text-sm text-muted-foreground">
           Diffusions à programmer dans Systeme.io. Expéditeur :{' '}
-          <strong>{LANCEMENT_V3_SENDER}</strong> · cible : <strong>{LANCEMENT_V3_TAG}</strong> (vos
+          <strong>{LANCEMENT_V3_SENDER_NAME} &lt;{LANCEMENT_V3_SENDER}&gt;</strong> · cible : <strong>{LANCEMENT_V3_TAG}</strong> (vos
           clients actuels). L'application n'envoie rien : ici on copie et on colle.
         </p>
         <ul className="mt-4 space-y-1 text-sm text-muted-foreground">
