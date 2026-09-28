@@ -15,7 +15,7 @@
 
 - [x] Corriger le tarif annoncé dans l'email de relance des paniers abandonnés
 - [x] Relancer les paniers abandonnés réellement en attente
-- [ ] Préparer l’email Systeme.io de passage des abonnés V2 vers la V3 avec leur remise fidélité
+- [x] Préparer l’email Systeme.io de passage des abonnés V2 vers la V3 avec leur remise fidélité
 - [ ] Kit d'approche affiliation YouTubeurs KDP (à décider)
 - [ ] Test Google Ads 50 € (reporté : à revoir après une première vente)
 
