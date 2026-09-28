@@ -98,6 +98,9 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
    * en second. C'est le lien à coller dans Systeme.io. */
   apv3: { key: 'apv3', destination: '/avant-premiere', template: 'v3-avant-premiere', label: 'Voir la V3 en avant-première' },
 
+  /* Passage des abonnés existants vers leur offre V3 fidélité. */
+  v3fidelite: { key: 'v3fidelite', destination: '/v3/migration', template: 'v3-passage-abonnes', label: 'Découvrir ma V3 et mon tarif fidélité' },
+
   /* Relance « devis + inscription V3 » : deux boutons de poids égal. */
   devis1: { key: 'devis1', destination: '/prestation-kdp', template: 'relance-devis-v3', label: 'Demander mon devis' },
   v3insc: { key: 'v3insc', destination: '/v3/forfaits', template: 'relance-devis-v3', label: "M'inscrire à la V3" },
