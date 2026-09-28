@@ -23,6 +23,8 @@ import {
   type KidsPresetId,
 } from '@/config/kidsBookConfig';
 import type { V3Plan } from '@/data/v3ToolPlans';
+import useModuleAccess from '@/hooks/useModuleAccess';
+import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
 
 
 const STORAGE_KEY = 'v3_kids_book_draft_v2';
@@ -65,6 +67,9 @@ export default function V3KidsBookCreatePage() {
   const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const [plan, setPlan] = useState<V3Plan | null>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
+  // Studio Jeunesse : option payante à l'unité (47 €), jamais incluse dans un forfait.
+  const { loading: jeunesseLoading, hasAccess: hasJeunesse } = useModuleAccess('studio-jeunesse');
+  const [showJeunesseCheckout, setShowJeunesseCheckout] = useState(false);
   const [draft, setDraft] = useState<KidsBookDraft>(loadDraft);
   const [preset, setPreset] = useState<KidsPresetId>(
     (searchParams.get('preset') as KidsPresetId) === 'histoires-du-soir-3-7'
@@ -744,7 +749,7 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
     );
   }
 
-  const planAllowed = canUseKidsBook(plan);
+  const planAllowed = canUseKidsBook(plan) && hasJeunesse;
   const busy = phase === 'stories' || phase === 'illustrations';
 
   return (
@@ -830,17 +835,38 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
         </div>
 
 
-        {!planAllowed && (
+        {!planAllowed && !jeunesseLoading && (
           <div className="v3-card mb-4 border-l-4 border-[#C97A14] bg-[#fff7ec]">
             <div className="flex items-start gap-3">
               <Lock className="w-5 h-5 text-[#C97A14] shrink-0 mt-0.5" />
               <div className="text-sm text-[var(--v3-ink)]">
-                <strong>Mode aperçu.</strong> La génération d'illustrations est incluse dans les forfaits{' '}
-                <strong>Studio</strong> et <strong>Éditeur</strong>.{' '}
-                <Link to="/v3/forfaits" className="underline text-[#C97A14]">Voir les forfaits</Link>
+                <strong>Mode aperçu.</strong> Le Studio Jeunesse est une option à part, au prix unique de{' '}
+                <strong>47 €</strong> (accès à vie). Vous pouvez tout préparer ici ; la génération des
+                histoires et des illustrations s'ouvre après l'achat.
+                <div className="mt-3">
+                  <Button
+                    onClick={() => setShowJeunesseCheckout(true)}
+                    className="bg-[#C97A14] hover:bg-[#a8620f] text-white text-sm"
+                  >
+                    Débloquer le Studio Jeunesse · 47 €
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
+        )}
+
+        {showJeunesseCheckout && (
+          <V3UpsellCheckout
+            pack={{
+              id: 'studio_jeunesse',
+              title: 'Studio Jeunesse — Accès à vie',
+              subtitle: 'Albums illustrés pour enfants : histoires, illustrations cohérentes et exports KDP.',
+              price: 47,
+              priceId: 'v3_pack_studio_jeunesse_once',
+            } as never}
+            onClose={() => setShowJeunesseCheckout(false)}
+          />
         )}
 
         {/* 1. Le livre */}
