@@ -126,6 +126,7 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   bd_comic: "bd-comic",
   bd_comic_pro: "bd-comic-pro",
   cover_studio_pro: "cover_studio_pro",
+  studio_jeunesse: "studio-jeunesse",
   ebook_version_longue: "ebook-version-longue",
   ebook_version_longue_47: "ebook-version-longue",
 };
@@ -139,8 +140,6 @@ const ADDON_PRICE_MODULES: Record<string, string> = {
   v3_audio_single: "audio_premium",
   v3_addon_publishers_once: "publishers",
   v3_addon_serenity_once: "serenity",
-  v3_addon_cover_pro_once: "cover_studio_pro",
-  v3_addon_studio_jeunesse_once: "studio-jeunesse",
   v3_upsell_relecture_once: "editorial",
   v3_upsell_docstudio_once: "documentation-studio",
 };
