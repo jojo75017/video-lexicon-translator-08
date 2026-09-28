@@ -16,6 +16,9 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
  */
 const PAID_STATUSES = new Set(['active', 'completed', 'paid']);
 
+/** Modules vendus uniquement à l'unité : jamais inclus dans un forfait. */
+const PURCHASE_ONLY_MODULES = new Set(['cover_studio_pro', 'studio-jeunesse']);
+
 export type ModuleAccessReason = 'admin' | 'plan' | 'purchased' | null;
 
 export function useModuleAccess(moduleKey: string | null | undefined) {
@@ -31,7 +34,11 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
     if (isAdmin) { setHasAccess(true); setReason('admin'); setLoading(false); return; }
     if (entLoading) { setLoading(true); return; }
     // Formule Édition : les modules professionnels sont inclus, sans achat séparé.
-    if (hasFull) { setHasAccess(true); setReason('plan'); setLoading(false); return; }
+    // Exception : Cover Studio Pro et Studio Jeunesse restent des options payantes
+    // pour tout le monde (Plume, Édition et Maison d'Édition).
+    if (hasFull && !PURCHASE_ONLY_MODULES.has(moduleKey)) {
+      setHasAccess(true); setReason('plan'); setLoading(false); return;
+    }
 
     setLoading(true);
     try {

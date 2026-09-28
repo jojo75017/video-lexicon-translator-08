@@ -33,8 +33,6 @@ const ALLOWED_PRICES = new Set([
   "v3_addon_audio_premium_once",
   "v3_addon_publishers_once",
   "v3_addon_serenity_once",
-  "v3_addon_cover_pro_once",
-  "v3_addon_studio_jeunesse_once",
   // Legacy / upsells
   "v3_upsell_selection_month",
   "v3_upsell_aplus_month",
