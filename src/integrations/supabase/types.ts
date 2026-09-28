@@ -3037,6 +3037,36 @@ export type Database = {
         }
         Relationships: []
       }
+      v3_migration_sends: {
+        Row: {
+          created_at: string
+          email: string
+          email_id: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          email_id: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          email_id?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       v3_workflow_projects: {
         Row: {
           brief: Json
