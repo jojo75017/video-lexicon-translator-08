@@ -17,6 +17,7 @@ import {
 import { toast } from 'sonner';
 import { AdminLaunchLinkCheck } from '@/components/admin/AdminLaunchLinkCheck';
 import { MigrationV3SendPanel } from '@/components/admin/MigrationV3SendPanel';
+import { MICRO_SERIES_EMAIL } from '@/data/microSeriesEmail';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -179,6 +180,12 @@ function AdminLancementContent() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
         <AdminPanelNav />
+
+        <MigrationV3SendPanel
+          emailId="micro-series-precommande"
+          customEmail={MICRO_SERIES_EMAIL}
+          title="Envoyer la précommande Studio Micro-Séries (67 €) à mes abonnés"
+        />
 
         <MigrationV3SendPanel />
 
