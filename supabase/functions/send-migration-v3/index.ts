@@ -66,6 +66,7 @@ Deno.serve(async (req) => {
     const mode = body?.mode === "send" ? "send" : body?.mode === "test" ? "test" : "preview";
     const ALLOWED_IDS = [EMAIL_ID, "micro-series-precommande"];
     const emailId = ALLOWED_IDS.includes(body?.emailId) ? body.emailId as string : EMAIL_ID;
+    console.log("send-migration-v3 request", { mode, emailId, received: body?.emailId ?? null });
     const subject = typeof body?.subject === "string" ? body.subject.trim() : "";
     const html = typeof body?.html === "string" ? body.html : "";
 
