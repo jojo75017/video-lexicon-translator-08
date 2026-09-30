@@ -129,10 +129,12 @@ export default function V3CommanderPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [now, setNow] = useState(() => Date.now());
+  const [seats, setSeats] = useState<FondateurStatus>(FONDATEUR_FALLBACK);
 
-  const offerOver = now > OFFER_END.getTime();
+  const dateOver = now > OFFER_END.getTime();
+  const offerOver = dateOver || seats.closed;
 
-  /** Compte à rebours honnête vers la fin de l'offre 47 € (30 sept. minuit Paris). */
+  /** Compte à rebours honnête vers la fin de l'opération (15 oct. minuit Paris). */
   const countdown = useMemo(() => {
     const diff = Math.max(0, OFFER_END.getTime() - now);
     const d = Math.floor(diff / 86_400_000);
@@ -145,6 +147,25 @@ export default function V3CommanderPage() {
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
+  }, []);
+
+  /**
+   * Places réellement restantes, relues toutes les 60 secondes : le compteur
+   * affiché correspond aux commandes payées, jamais à un chiffre inventé.
+   */
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { data } = await supabase.functions.invoke("offre-fondateur-status");
+      const next = data as FondateurStatus | null;
+      if (active && next && typeof next.remaining === "number") setSeats(next);
+    };
+    void load();
+    const id = window.setInterval(() => void load(), 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(id);
+    };
   }, []);
 
   // Email du prospect connecté récupéré automatiquement s'il n'est pas dans l'URL.
