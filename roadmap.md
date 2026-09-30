@@ -48,6 +48,6 @@
 
 ## Opération 15 jours / 15 places à 47 € — octobre 2026
 
-- [ ] Prolonger /commander au 15 octobre 2026 avec quota de 15 places
-- [ ] Compteur de places restantes en temps réel + fermeture automatique
-- [ ] Envoi Resend par lots de 300/500 prospects (panneau admin + journal anti-doublon)
+- [x] Prolonger /commander au 15 octobre 2026 avec quota de 15 places
+- [x] Compteur de places restantes en temps réel + fermeture automatique (verrou serveur dans v3-pack-checkout)
+- [x] Envoi Resend par lots de 50/100/300/500 prospects (panneau admin + journal anti-doublon)
