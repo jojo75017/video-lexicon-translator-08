@@ -588,6 +588,7 @@ export default function AdminSequenceEmailPage() {
           </TabsList>
 
           <TabsContent value="lancement-v3" className="space-y-6">
+            <OffreFondateurSendPanel />
             <MigrationV3SendPanel />
             <LancementV3Panel />
           </TabsContent>
