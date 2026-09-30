@@ -479,37 +479,52 @@ export default function V3CommanderPage() {
                   intégralement.
                 </p>
 
-                <button
-                  id="ebookstudio-payment-button"
-                  className="pay"
-                  onClick={startPayment}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…
-                    </>
-                  ) : (
-                    <>Payer 47 € →</>
-                  )}
-                </button>
+                {offerOver ? (
+                  <>
+                    {/* Offre fermée : plus aucun paiement à vie possible,
+                        on redirige vers les abonnements. */}
+                    <a href="/v3/forfaits" className="pay" style={{ textAlign: "center" }}>
+                      Voir les abonnements →
+                    </a>
+                    <p className="secure">
+                      Les {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} € sont toutes prises.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      id="ebookstudio-payment-button"
+                      className="pay"
+                      onClick={startPayment}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…
+                        </>
+                      ) : (
+                        <>Payer {FONDATEUR_PRICE} € →</>
+                      )}
+                    </button>
 
-                <button
-                  type="button"
-                  className="pay pay-paypal"
-                  onClick={startPaypal}
-                  disabled={paypalLoading}
-                >
-                  {paypalLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Ouverture de PayPal…
-                    </>
-                  ) : (
-                    <>Payer 47 € avec PayPal</>
-                  )}
-                </button>
+                    <button
+                      type="button"
+                      className="pay pay-paypal"
+                      onClick={startPaypal}
+                      disabled={paypalLoading}
+                    >
+                      {paypalLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Ouverture de PayPal…
+                        </>
+                      ) : (
+                        <>Payer {FONDATEUR_PRICE} € avec PayPal</>
+                      )}
+                    </button>
 
-                <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
+                    <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
+                  </>
+                )}
 
                 {/* RÉPONSES AUX 5 OBJECTIONS, juste sous le bouton */}
                 <div className="objections">
@@ -532,8 +547,8 @@ export default function V3CommanderPage() {
                       <span>Les modules qui demandent une clé personnelle l'expliquent pas à pas. Beaucoup de fonctions fonctionnent sans aucune clé.</span>
                     </li>
                     <li>
-                      <b>« Et après le 1ᵉʳ octobre ? »</b>
-                      <span>En commandant maintenant, votre accès à vie est conservé. Après cette date, EbookStudio passe en abonnement uniquement.</span>
+                      <b>« Et quand les 15 places seront prises ? »</b>
+                      <span>En commandant maintenant, votre accès à vie vous reste acquis. Dès la dernière place vendue, ou après le {FONDATEUR_END_SHORT}, EbookStudio passe en abonnement uniquement.</span>
                     </li>
                   </ul>
                 </div>
