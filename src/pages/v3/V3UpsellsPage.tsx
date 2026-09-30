@@ -54,7 +54,6 @@ export default function V3UpsellsPage() {
               price={MICRO_SERIES_OFFER.price}
               description="Transformez vos livres en mini-séries verticales : scripts, storyboards et exports prêts pour Reels, TikTok et Shorts. Précommande avec accès à vie dès la sortie."
               to={MICRO_SERIES_OFFER.route}
-              packId={MICRO_SERIES_OFFER.stripePackId}
               badge="Bientôt V4"
             />
           </div>
