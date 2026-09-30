@@ -4,6 +4,7 @@ import { V3_ADDON_LIST, V3_ADDONS_TOTAL_VALUE, V3_PLANS, formatPrice } from '@/d
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
+import { MICRO_SERIES_OFFER } from '@/data/microSeriesOffer';
 
 /** /v3/upsells — Gros compléments premium proposés séparément des forfaits. */
 export default function V3UpsellsPage() {
@@ -36,6 +37,27 @@ export default function V3UpsellsPage() {
         <div className="mb-8">
           <BdComicNewsBanner compact />
         </div>
+
+        <section className="mb-8" aria-labelledby="v4-preview-title">
+          <div className="mb-4">
+            <p className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-emerald-600)' }}>
+              En avant-première
+            </p>
+            <h2 id="v4-preview-title" className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+              Bientôt dans la V4
+            </h2>
+          </div>
+          <div className="max-w-md">
+            <V3UpsellPromoCard
+              figureId="micro_series"
+              title={MICRO_SERIES_OFFER.title}
+              price={MICRO_SERIES_OFFER.price}
+              description="Transformez vos livres en mini-séries verticales : scripts, storyboards et exports prêts pour Reels, TikTok et Shorts. Précommande avec accès à vie dès la sortie."
+              to={MICRO_SERIES_OFFER.route}
+              badge="Bientôt V4"
+            />
+          </div>
+        </section>
 
         <section className="mb-10 overflow-hidden rounded-lg border" style={{ borderColor: 'var(--v3-line)' }}>
           <div className="px-4 py-3" style={{ background: 'var(--v3-cream)' }}>

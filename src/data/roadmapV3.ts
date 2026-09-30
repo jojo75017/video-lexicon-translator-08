@@ -5,7 +5,7 @@
 export type V3Pillar = 'publier' | 'monetiser' | 'marketing' | 'ia' | 'edition' | 'distribution' | 'promotion' | 'data';
 export type V3Status = 'todo' | 'in_progress' | 'done';
 export type V3Tier = 'core' | 'upsell';
-export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve' | 'short_stories' | 'cover_studio_pro';
+export type V3PackId = 'cover' | 'marketing' | 'social' | 'monetisation' | 'editorial' | 'distribution' | 'promotion' | 'transcription' | 'market-research' | 'documentation-studio' | 'boost_lancement' | 'puzzle_book' | 'cherche_trouve' | 'short_stories' | 'cover_studio_pro' | 'micro_series';
 
 export interface V3Module {
   id: string;
@@ -193,6 +193,17 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     badge: 'Nouveau',
     alacarte: true,
     modules: ['short-stories'],
+  },
+  {
+    id: 'micro_series',
+    title: 'Studio Micro-Séries IA — Précommande V4',
+    desc: 'Transformez un livre en 3, 5 ou 10 épisodes verticaux : accroches, voix off, storyboards et exports SRT/CSV, sans génération vidéo imposée.',
+    price: 67,
+    priceId: 'v3_pack_micro_series_once',
+    to: '/v3/offre-micro-series',
+    badge: 'Bientôt V4',
+    alacarte: true,
+    modules: ['micro-series'],
   },
 ];
 

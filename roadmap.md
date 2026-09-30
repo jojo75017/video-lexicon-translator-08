@@ -51,3 +51,9 @@
 - [x] Prolonger /commander au 15 octobre 2026 avec quota de 15 places
 - [x] Compteur de places restantes en temps réel + fermeture automatique (verrou serveur dans v3-pack-checkout)
 - [x] Envoi Resend par lots de 50/100/300/500 prospects (panneau admin + journal anti-doublon)
+
+## Précommande V4 — Studio Micro-Séries IA
+
+- [x] Ajouter la page publique et la démonstration sans consommation vidéo
+- [x] Ajouter la précommande carte à 67 € et l'enregistrement du droit d'accès
+- [x] Afficher l'upsell sur la page des compléments et dans la barre V3

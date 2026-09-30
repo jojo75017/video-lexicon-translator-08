@@ -17,7 +17,7 @@ import useV3Entitlement from '@/hooks/useV3Entitlement';
 const PAID_STATUSES = new Set(['active', 'completed', 'paid']);
 
 /** Modules vendus uniquement à l'unité : jamais inclus dans un forfait. */
-const PURCHASE_ONLY_MODULES = new Set(['cover_studio_pro', 'studio-jeunesse']);
+const PURCHASE_ONLY_MODULES = new Set(['cover_studio_pro', 'studio-jeunesse', 'micro-series']);
 
 export type ModuleAccessReason = 'admin' | 'plan' | 'purchased' | null;
 
