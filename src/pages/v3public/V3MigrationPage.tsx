@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Check, Crown, Feather, Gift, Infinity as InfinityIcon, Lock } from "lucide-react";
 import {
   V3_PLANS,
@@ -14,11 +14,12 @@ import {
   legacyPrice,
 } from "@/data/v2LegacyAccess";
 import { BackButton } from "@/components/v3/BackButton";
-import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 import V3SubscribeCheckout from "@/components/v3public/V3SubscribeCheckout";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
 
-const PLAN_ICONS = { plume: Feather, edition: Crown } as const;
+// Remise fidélité -20 % : réservée à Plume et Édition (Maison d'Édition au tarif public).
+const LOYALTY_PLANS = V3_PLANS.filter((p) => p.id === "plume" || p.id === "edition");
+const PLAN_ICONS: Record<string, typeof Feather> = { plume: Feather, edition: Crown };
 const PLAN_ACCENTS: Record<string, string> = {
   plume: "#0d7a5f",
   edition: "#5B21B6",
@@ -37,7 +38,34 @@ export default function V3MigrationPage() {
     );
   }
 
-  if (!hasV2) return <Navigate to="/v3/forfaits" replace />;
+  if (!hasV2) {
+    return (
+      <div className="min-h-screen grid place-items-center px-4" style={{ background: "#FAFAFA" }}>
+        <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #e5e7eb" }}>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
+            Tarif fidélité -20 % à vie
+          </p>
+          <h1 className="text-2xl font-serif mb-3" style={{ color: "#232F3E" }}>
+            Connectez-vous pour voir votre tarif fidélité
+          </h1>
+          <p className="text-sm mb-6" style={{ color: "#4b5563" }}>
+            Utilisez l'adresse email de votre abonnement EbookStudio : votre remise
+            d'ancien abonné est reconnue automatiquement.
+          </p>
+          <Link
+            to="/connexion-abonne?redirect=/v3/migration"
+            className="block w-full py-3 rounded-lg font-semibold"
+            style={{ background: "#008296", color: "#fff" }}
+          >
+            Me connecter
+          </Link>
+          <Link to="/v3/forfaits" className="block text-sm mt-4 underline" style={{ color: "#008296" }}>
+            Voir les formules au tarif public
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
@@ -57,11 +85,11 @@ export default function V3MigrationPage() {
             Ancien client V2
           </p>
           <h1 className="text-4xl md:text-5xl font-serif mb-4" style={{ color: "#232F3E" }}>
-            Votre V2 reste à vie — et la V3 s'ouvre à vous
+            Bienvenue dans la V3 — avec votre tarif fidélité
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
-            Vous avez acheté EbookStudio V2 : rien ne change, votre accès reste acquis à vie.
-             En plus, cinq modules V3 vous sont offerts, et vous gardez
+            Vos livres et vos projets restent avec vous, et votre espace V2 reste accessible
+            jusqu'au 31 décembre 2026. Des modules V3 vous sont offerts, et vous bénéficiez de
             <strong> -20 % à vie</strong> si vous voulez la version complète.
           </p>
         </header>
@@ -77,7 +105,7 @@ export default function V3MigrationPage() {
             </div>
             <div>
               <h2 className="text-2xl font-serif" style={{ color: "#232F3E" }}>
-                Offert à vie : 5 modules V3
+                Offerts : vos modules V3
               </h2>
               <p className="text-sm" style={{ color: "#6b7280" }}>
                 Déjà actives dans votre compte, sans rien payer.
@@ -112,7 +140,7 @@ export default function V3MigrationPage() {
                 <li>{V2_LEGACY_QUOTAS.chaptersMax} chapitres max · {V2_LEGACY_QUOTAS.wordsPerChapter.toLocaleString("fr-FR")} mots / chapitre</li>
                 <li>Export PDF / DOCX / EPUB avec sommaire stylé</li>
                 <li className="flex items-center gap-1">
-                  <InfinityIcon size={14} /> Votre V2 complète, inchangée
+                  <InfinityIcon size={14} /> Votre V2 complète, jusqu'au 31/12/2026
                 </li>
               </ul>
             </div>
@@ -162,7 +190,7 @@ export default function V3MigrationPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {V3_PLANS.map((plan) => {
+            {LOYALTY_PLANS.map((plan) => {
               const Icon = PLAN_ICONS[plan.id];
               const accent = PLAN_ACCENTS[plan.id];
               const publicPrice = interval === "month" ? plan.monthlyPrice : plan.yearlyPrice;
@@ -228,16 +256,6 @@ export default function V3MigrationPage() {
                     Activer ma remise — {formatPrice(yourPrice)}
                   </button>
 
-                  <div className="mt-2">
-                    <PayPalSubscribeButton
-                      planId={plan.id}
-                      interval={interval}
-                      planName={`${plan.name} (ancien client)`}
-                      amount={yourPrice}
-                      accent={accent}
-                      legacyV2
-                    />
-                  </div>
 
                   <p className="text-[11px] text-center mt-2" style={{ color: "#9ca3af" }}>
                     Prélèvement {interval === "month" ? "mensuel" : "annuel"} · Annulable à tout moment
