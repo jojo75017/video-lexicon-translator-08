@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Check, Crown, Feather, Gift, Infinity as InfinityIcon, Lock } from "lucide-react";
 import {
   V3_PLANS,
@@ -85,11 +85,11 @@ export default function V3MigrationPage() {
             Ancien client V2
           </p>
           <h1 className="text-4xl md:text-5xl font-serif mb-4" style={{ color: "#232F3E" }}>
-            Votre V2 reste à vie — et la V3 s'ouvre à vous
+            Bienvenue dans la V3 — avec votre tarif fidélité
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
-            Vous avez acheté EbookStudio V2 : rien ne change, votre accès reste acquis à vie.
-             En plus, cinq modules V3 vous sont offerts, et vous gardez
+            Vos livres et vos projets restent avec vous, et votre espace V2 reste accessible
+            jusqu'au 31 décembre 2026. Des modules V3 vous sont offerts, et vous bénéficiez de
             <strong> -20 % à vie</strong> si vous voulez la version complète.
           </p>
         </header>
@@ -105,7 +105,7 @@ export default function V3MigrationPage() {
             </div>
             <div>
               <h2 className="text-2xl font-serif" style={{ color: "#232F3E" }}>
-                Offert à vie : 5 modules V3
+                Offerts : vos modules V3
               </h2>
               <p className="text-sm" style={{ color: "#6b7280" }}>
                 Déjà actives dans votre compte, sans rien payer.
@@ -140,7 +140,7 @@ export default function V3MigrationPage() {
                 <li>{V2_LEGACY_QUOTAS.chaptersMax} chapitres max · {V2_LEGACY_QUOTAS.wordsPerChapter.toLocaleString("fr-FR")} mots / chapitre</li>
                 <li>Export PDF / DOCX / EPUB avec sommaire stylé</li>
                 <li className="flex items-center gap-1">
-                  <InfinityIcon size={14} /> Votre V2 complète, inchangée
+                  <InfinityIcon size={14} /> Votre V2 complète, jusqu'au 31/12/2026
                 </li>
               </ul>
             </div>
@@ -190,7 +190,7 @@ export default function V3MigrationPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            {V3_PLANS.map((plan) => {
+            {LOYALTY_PLANS.map((plan) => {
               const Icon = PLAN_ICONS[plan.id];
               const accent = PLAN_ACCENTS[plan.id];
               const publicPrice = interval === "month" ? plan.monthlyPrice : plan.yearlyPrice;
@@ -256,16 +256,6 @@ export default function V3MigrationPage() {
                     Activer ma remise — {formatPrice(yourPrice)}
                   </button>
 
-                  <div className="mt-2">
-                    <PayPalSubscribeButton
-                      planId={plan.id}
-                      interval={interval}
-                      planName={`${plan.name} (ancien client)`}
-                      amount={yourPrice}
-                      accent={accent}
-                      legacyV2
-                    />
-                  </div>
 
                   <p className="text-[11px] text-center mt-2" style={{ color: "#9ca3af" }}>
                     Prélèvement {interval === "month" ? "mensuel" : "annuel"} · Annulable à tout moment
