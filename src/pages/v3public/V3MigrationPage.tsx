@@ -32,7 +32,7 @@ export default function V3MigrationPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen grid place-items-center" style={{ background: "#FAFAFA" }}>
+      <div className="py-16 grid place-items-center" style={{ background: "#FAFAFA" }}>
         <p className="text-sm text-slate-500">Vérification de votre accès V2…</p>
       </div>
     );
@@ -40,7 +40,7 @@ export default function V3MigrationPage() {
 
   if (!hasV2) {
     return (
-      <div className="min-h-screen grid place-items-center px-4" style={{ background: "#FAFAFA" }}>
+      <div className="py-10 md:py-16 grid place-items-center px-4" style={{ background: "#FAFAFA" }}>
         <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #e5e7eb" }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Tarif fidélité -20 % à vie
