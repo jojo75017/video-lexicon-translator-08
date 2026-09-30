@@ -4,3 +4,4 @@
 - [Avatars lecteurs](mem://features/book/avatars-lecteurs) — 10 univers KDP × 2 avatars, encart « Mon avatar lecteur », consigne transmise aux agents
 - [Options Cover Pro 67 € et Studio Jeunesse 47 €](mem://business/pricing/options-cover-pro-67-jeunesse-47) — jamais inclus dans un forfait, paiement unique à vie
 - [Offre fondateur 15 places 47 €](mem://business/pricing/offre-fondateur-15-places) — dernier contingent à vie, 15 places ou 15/10/2026, verrou serveur + campagne Resend par lots
+- [Studio Micro-Séries IA V4](mem://business/pricing/studio-micro-series-v4) — précommande 67 € à vie, bientôt V4, jamais inclus dans les forfaits
