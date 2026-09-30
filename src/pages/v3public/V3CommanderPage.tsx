@@ -74,7 +74,11 @@ const INCLUDED = [
 const FAQ: Array<{ q: string; a: string }> = [
   {
     q: "Que comprend exactement le paiement de 47 € ?",
-    a: "Le paiement ouvre votre accès à vie à EbookStudio V3 et aux fonctionnalités incluses dans cette offre. Il n'y a aucune mensualité à régler.",
+    a: "Le paiement ouvre votre accès à vie à EbookStudio V3 et aux fonctionnalités incluses dans cette offre. Il n'y a aucune mensualité à régler. Deux studios restent vendus séparément pour tout le monde : Cover Studio Pro (67 €) et Studio Jeunesse (47 €).",
+  },
+  {
+    q: "Pourquoi seulement 15 places ?",
+    a: "Parce que c'est le tout dernier contingent d'accès à vie avant le passage définitif aux abonnements. L'offre ferme dès la 15e commande réglée, ou au 15 octobre 2026 au plus tard, selon ce qui arrive en premier. Le compteur affiché en haut de page correspond aux commandes réellement payées.",
   },
   {
     q: "Puis-je payer avec PayPal ?",
@@ -98,7 +102,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Parce que l'offre à 47 € en paiement unique prend fin le 30 septembre. Après cette date, EbookStudio sera proposé uniquement par abonnement.",
+    a: "Parce qu'il ne reste que 15 accès à vie à 47 €, pendant 15 jours au maximum. Ensuite, EbookStudio est proposé uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
