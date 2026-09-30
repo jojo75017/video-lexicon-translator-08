@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { AdminLaunchLinkCheck } from '@/components/admin/AdminLaunchLinkCheck';
+import { MigrationV3SendPanel } from '@/components/admin/MigrationV3SendPanel';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -178,6 +179,8 @@ function AdminLancementContent() {
     <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
         <AdminPanelNav />
+
+        <MigrationV3SendPanel />
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
