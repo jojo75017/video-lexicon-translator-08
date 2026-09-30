@@ -14,11 +14,12 @@ import {
   legacyPrice,
 } from "@/data/v2LegacyAccess";
 import { BackButton } from "@/components/v3/BackButton";
-import { PayPalSubscribeButton } from "@/components/v3/PayPalSubscribeButton";
 import V3SubscribeCheckout from "@/components/v3public/V3SubscribeCheckout";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
 
-const PLAN_ICONS = { plume: Feather, edition: Crown } as const;
+// Remise fidélité -20 % : réservée à Plume et Édition (Maison d'Édition au tarif public).
+const LOYALTY_PLANS = V3_PLANS.filter((p) => p.id === "plume" || p.id === "edition");
+const PLAN_ICONS: Record<string, typeof Feather> = { plume: Feather, edition: Crown };
 const PLAN_ACCENTS: Record<string, string> = {
   plume: "#0d7a5f",
   edition: "#5B21B6",
@@ -37,7 +38,34 @@ export default function V3MigrationPage() {
     );
   }
 
-  if (!hasV2) return <Navigate to="/v3/forfaits" replace />;
+  if (!hasV2) {
+    return (
+      <div className="min-h-screen grid place-items-center px-4" style={{ background: "#FAFAFA" }}>
+        <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #e5e7eb" }}>
+          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
+            Tarif fidélité -20 % à vie
+          </p>
+          <h1 className="text-2xl font-serif mb-3" style={{ color: "#232F3E" }}>
+            Connectez-vous pour voir votre tarif fidélité
+          </h1>
+          <p className="text-sm mb-6" style={{ color: "#4b5563" }}>
+            Utilisez l'adresse email de votre abonnement EbookStudio : votre remise
+            d'ancien abonné est reconnue automatiquement.
+          </p>
+          <Link
+            to="/connexion-abonne?redirect=/v3/migration"
+            className="block w-full py-3 rounded-lg font-semibold"
+            style={{ background: "#008296", color: "#fff" }}
+          >
+            Me connecter
+          </Link>
+          <Link to="/v3/forfaits" className="block text-sm mt-4 underline" style={{ color: "#008296" }}>
+            Voir les formules au tarif public
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
