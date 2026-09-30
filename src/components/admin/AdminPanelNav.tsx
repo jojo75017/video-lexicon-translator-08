@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
+import { openV3 } from '@/lib/openV3';
 
 type AdminNavItem = {
   label: string;
