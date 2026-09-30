@@ -15,6 +15,7 @@ import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
+import V3MicroSeriesSurpriseBanner from '@/components/v3public/V3MicroSeriesSurpriseBanner';
 import V3PresentationVideo from '@/components/v3public/V3PresentationVideo';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
 import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
@@ -64,6 +65,9 @@ export default function V3HomePage() {
 
       {/* 2. PROMESSE PRINCIPALE */}
       <V3HeroBanner />
+
+      {/* SURPRISE V4 — précommande Studio Micro-Séries */}
+      <V3MicroSeriesSurpriseBanner />
 
       {/* PREUVE AUTEUR — visible avant les offres */}
       <section className="v3-section-dark">
