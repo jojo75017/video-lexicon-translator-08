@@ -64,6 +64,8 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => null);
     const mode = body?.mode === "send" ? "send" : body?.mode === "test" ? "test" : "preview";
+    const ALLOWED_IDS = [EMAIL_ID, "micro-series-precommande"];
+    const emailId = ALLOWED_IDS.includes(body?.emailId) ? body.emailId as string : EMAIL_ID;
     const subject = typeof body?.subject === "string" ? body.subject.trim() : "";
     const html = typeof body?.html === "string" ? body.html : "";
 
