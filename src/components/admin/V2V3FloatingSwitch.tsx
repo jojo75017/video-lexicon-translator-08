@@ -3,6 +3,7 @@ import { Crown, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useV3Mode } from '@/hooks/useV3Mode';
+import { openV3 } from '@/lib/openV3';
 
 const GOLD = '#c9a84c';
 const LS_V3_MODE_KEY = 'ebookstudio_v3_mode';
@@ -65,7 +66,7 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
         duration: 3500,
         style: { zIndex: 99999 },
       });
-      navigate('/v3');
+      openV3(navigate);
     } else {
       resetV2PlannerEntryPoint();
       toast.success('Ouverture de la V2', {

@@ -68,7 +68,7 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
             <Shield className="mr-2 h-4 w-4" />
             Tableau de bord admin
           </Button>
-          <Button type="button" variant="outline" onClick={() => navigate('/v3')} className="rounded-xl border-teal-500 text-teal-700 hover:bg-teal-50">
+          <Button type="button" variant="outline" onClick={() => openV3(navigate)} className="rounded-xl border-teal-500 text-teal-700 hover:bg-teal-50">
             <Rocket className="mr-2 h-4 w-4" />
             Ouvrir V3
           </Button>
