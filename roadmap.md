@@ -44,3 +44,4 @@
 - [x] Retirer Cover Studio Pro + Studio Jeunesse des offres Édition et Maison
 - [x] Upsells Cover Studio Pro 67€ et Studio Jeunesse 47€ (paiement à l'unité + verrous)
 - [x] Onglet « Forfaits » visible dans la barre d'en-tête V3
+- [x] Page tarif fidélité /v3/migration blanche : corrigée (plantage + invitation à se connecter)
