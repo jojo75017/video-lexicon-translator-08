@@ -163,6 +163,14 @@ export const V3_PAID_MODULES: V3PaidModule[] = [
     routes: [],
     packId: 'short_stories',
   },
+  {
+    key: 'micro-series',
+    title: 'Studio Micro-Séries IA',
+    price: 67,
+    pitch: 'Scripts, storyboards verticaux et exports prêts pour Reels, TikTok et YouTube Shorts.',
+    routes: [],
+    packId: 'micro_series',
+  },
 ];
 
 /** Accès par clé d'entitlement. */

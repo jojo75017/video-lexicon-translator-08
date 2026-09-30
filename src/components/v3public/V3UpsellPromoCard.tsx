@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Check, Lock, ShoppingBag } from 'lucide-react';
 import AgentAvatar from '@/components/v3public/AgentAvatar';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
-import useV3Entitlement from '@/hooks/useV3Entitlement';
 import useModuleAccess from '@/hooks/useModuleAccess';
 import { resolveModuleKey } from '@/data/v3ModuleAccess';
 import { getUpsellFigure, type UpsellFigure } from '@/data/v3UpsellFigures';
@@ -50,7 +49,6 @@ export default function V3UpsellPromoCard({
   className = '',
 }: V3UpsellPromoCardProps) {
   const navigate = useNavigate();
-  const { hasFull } = useV3Entitlement();
   // Droit réel d'après les achats (module_entitlements) : un abonné sans achat
   // voit « Acheter », un acheteur voit « Ouvrir ».
   const { hasAccess } = useModuleAccess(resolveModuleKey(packId ?? figureId));
@@ -73,7 +71,7 @@ export default function V3UpsellPromoCard({
     path.startsWith('http') ? path : `${path}${path.includes('?') ? '&' : '?'}from=upsells`;
 
   // Forfait Édition, achat du complément ou inclusion explicite → « Ouvrir ».
-  const isIncluded = included || hasFull || hasAccess;
+  const isIncluded = included || hasAccess;
 
   const handleOpen = () => {
     if (isIncluded) {

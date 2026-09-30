@@ -98,6 +98,11 @@ export const V3_UPSELL_FIGURES: Record<string, UpsellFigure> = {
     accent: C.purple,
     phrase: 'Comme Aurèle, édite un recueil de contes illustrés en une soirée.',
   },
+  micro_series: {
+    prenom: 'Malo',
+    accent: C.emerald,
+    phrase: 'Comme Malo, transforme chaque chapitre en épisodes qui donnent envie de lire la suite.',
+  },
 
   // ===== Compléments (V3_ADDON_LIST) =====
   bookperfect: {

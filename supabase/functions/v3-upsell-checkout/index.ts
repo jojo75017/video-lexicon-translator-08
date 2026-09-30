@@ -43,6 +43,8 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   studio_jeunesse: { label: "Studio Jeunesse — Accès à vie", amount: 4700 },
   // Ebook Version Longue — accès anticipé V4, paiement unique.
   ebook_version_longue: { label: "Ebook Version Longue V4 — Accès à vie", amount: 4700 },
+  // Précommande V4 — droit enregistré dès le paiement, outil activé à sa sortie.
+  micro_series: { label: "Studio Micro-Séries IA V4 — Précommande accès à vie", amount: 6700 },
 };
 
 Deno.serve(async (req) => {

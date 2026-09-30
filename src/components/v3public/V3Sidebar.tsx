@@ -39,6 +39,7 @@ const NAV: NavSection[] = [
     section: 'Lancement',
     items: [
       { to: '/v3/offre-version-longue', label: '📚 Ebook Version Longue — 47 €', icon: BookOpen, end: true, badge: 'V4' },
+      { to: '/v3/offre-micro-series', label: '🎬 Studio Micro-Séries — 67 €', icon: Film, end: true, badge: 'Bientôt V4' },
       { to: '/v3/version-longue', label: '✍️ Outil Version Longue', icon: BookOpen, badge: 'V4' },
       { to: '/v3/upsells', label: 'UPSELLS — packs & compléments', icon: Sparkles, badge: '6 compléments' },
       { to: '/essai', label: '🎁 Essai gratuit — chapitre 1', icon: Rocket, end: true, badge: 'Gratuit' },

@@ -129,6 +129,7 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   studio_jeunesse: "studio-jeunesse",
   ebook_version_longue: "ebook-version-longue",
   ebook_version_longue_47: "ebook-version-longue",
+  micro_series: "micro-series",
 };
 
 // Compléments achetés à l'unité via `v3-subscription-checkout`
