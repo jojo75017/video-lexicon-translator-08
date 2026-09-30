@@ -552,10 +552,19 @@ export default function V3CommanderPage() {
           <div className="why-icon">∞</div>
           <div>
             <small>POURQUOI MAINTENANT ?</small>
-            <h2>L'accès à vie disparaît le 30 septembre</h2>
+            <h2>
+              Les {FONDATEUR_SEATS} derniers accès à vie, puis c'est terminé
+            </h2>
             <p>
-              À partir du 1<sup>er</sup> octobre, EbookStudio sera proposé uniquement par abonnement.
-              Aujourd'hui, vous payez 47 € une seule fois et conservez votre accès à vie, sans mensualité.
+              EbookStudio V3 est désormais proposé par abonnement : Plume 27 €/mois, Édition
+              47 €/mois ou Maison d'Édition 97 €/mois. Avant de fermer définitivement l'accès à vie,
+              j'ouvre un tout dernier contingent de {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} €,
+              valable jusqu'au {FONDATEUR_END_LABEL} au plus tard. Vous payez une seule fois et
+              vous ne repayez jamais.
+            </p>
+            <p style={{ fontSize: "0.9rem", opacity: 0.85 }}>
+              Les deux studios vendus séparément restent des options payantes pour tout le monde :
+              Cover Studio Pro (67 €) et Studio Jeunesse (47 €).
             </p>
           </div>
         </section>
