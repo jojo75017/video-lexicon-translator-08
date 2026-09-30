@@ -12,6 +12,17 @@ import { COMMANDER_URL, BLOG_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
 import { useLaunchSettings } from "@/hooks/useLaunchSettings";
+import {
+  FONDATEUR_END_ISO,
+  FONDATEUR_END_LABEL,
+  FONDATEUR_END_SHORT,
+  FONDATEUR_FALLBACK,
+  FONDATEUR_PLAN,
+  FONDATEUR_PRICE,
+  FONDATEUR_SEATS,
+  fondateurScarcityLabel,
+  type FondateurStatus,
+} from "@/data/offreFondateur";
 import "@/styles/commander-maquette.css";
 
 /**
@@ -45,10 +56,10 @@ function CommanderVideo() {
 }
 
 /** Paiement unique uniquement : plus de 2× ni 3×. */
-const PLAN_ID = "v2_1x" as const;
+const PLAN_ID = FONDATEUR_PLAN;
 
-/** Fin de l'offre 47 € : 30 septembre 2026, 23 h 59 (heure de Paris). */
-const OFFER_END = new Date("2026-09-30T21:59:59Z");
+/** Fin de l'opération fondateur : 15 octobre 2026, 23 h 59 (heure de Paris). */
+const OFFER_END = new Date(FONDATEUR_END_ISO);
 
 const INCLUDED = [
   "Génération complète du livre : plan, chapitres et correction en 4 passes",
