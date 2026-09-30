@@ -57,3 +57,4 @@
 - [x] Ajouter la page publique et la démonstration sans consommation vidéo
 - [x] Ajouter la précommande carte à 67 € et l'enregistrement du droit d'accès
 - [x] Afficher l'upsell sur la page des compléments et dans la barre V3
+- [x] Ajouter la bannière « surprise avant la V4 » sur l'accueil V3
