@@ -31,19 +31,21 @@ const PRICE = 47;
 const END_LABEL = "15 octobre 2026";
 const COMMANDER = `${SITE_ORIGIN}/commander?src=email&t=${EMAIL_ID}`;
 
-const SUBJECT = `15 jours ou 15 places : les tout derniers accès à vie à ${PRICE} €`;
-const PREHEADER = `EbookStudio passe en abonnement. Avant de fermer, j'ouvre ${SEATS} derniers accès à vie.`;
-const CTA_LABEL = `Prendre une des ${SEATS} places à ${PRICE} €`;
+const SUBJECT = `${SEATS} places à ${PRICE} €, puis l'accès à vie ferme pour toujours`;
+const PREHEADER = `Après ces ${SEATS} places, EbookStudio ne se prendra plus qu'en abonnement à 27, 47 ou 97 € par mois.`;
+const CTA_LABEL = `Je prends ma place à ${PRICE} € →`;
 
 const PARAGRAPHS = [
-  "EbookStudio vient de passer en V3, et cette version se prend désormais par abonnement : 27 € par mois pour Plume, 47 € par mois pour Édition, 97 € par mois pour Maison d'Édition.",
-  `Avant de fermer définitivement l'accès à vie, j'ouvre un tout dernier contingent : ${SEATS} places à ${PRICE} €, une seule fois, sans mensualité, jamais.`,
-  `Deux limites, et la première atteinte ferme l'offre : les ${SEATS} places, ou le ${END_LABEL}. Le compteur affiché sur la page correspond aux commandes réellement réglées — quand il tombe à zéro, c'est terminé.`,
-  "Ce que vous obtenez pour ce paiement unique :",
-  "- votre livre construit avec vous : sujet, sommaire, chapitres rédigés un par un ;\n- la correction professionnelle du manuscrit ;\n- les exports Word, PDF, EPUB et Kindle aux normes Amazon KDP ;\n- la couverture Kindle et broché, recadrée aux dimensions exactes ;\n- la fiche de vente KDP : description, mots-clés, catégories ;\n- la traduction dans 10 langues et le livre audio.",
-  "Deux studios restent vendus séparément, pour tout le monde : Cover Studio Pro (67 €) et Studio Jeunesse (47 €). Je préfère vous le dire franchement plutôt que de vous laisser le découvrir après.",
-  "Garantie 30 jours, sans justification : si l'outil ne vous convient pas, un simple message et vous êtes remboursé.",
-  "Si vous hésitez, répondez à cet email : c'est moi qui lis et qui réponds.",
+  `<b>${SEATS} places. ${PRICE} € une seule fois. Et c'est fini.</b>`,
+  "EbookStudio V3 est en ligne. À partir de maintenant, il se prend par abonnement : 27 €, 47 € ou 97 € par mois, tous les mois, à vie.",
+  `Sauf pour ${SEATS} personnes. J'ouvre un tout dernier contingent de ${SEATS} accès à vie à ${PRICE} €. Vous payez une fois. Vous ne repayez jamais. Même dans cinq ans.`,
+  `Deux limites, la première atteinte ferme la porte : les ${SEATS} places, ou le ${END_LABEL}. Le compteur sur la page compte les commandes réellement payées — pas un chiffre décoratif. Quand il tombe à zéro, la page passe d'elle-même aux abonnements.`,
+  "Concrètement, pour 47 € :",
+  "- vous arrivez avec une idée, vous repartez avec un manuscrit complet, chapitre par chapitre ;\n- la correction professionnelle du texte ;\n- les fichiers Word, PDF, EPUB et Kindle aux normes Amazon KDP ;\n- la couverture Kindle et broché, aux dimensions exactes ;\n- la fiche de vente KDP : description, mots-clés, catégories ;\n- la traduction en 10 langues et la version audio.",
+  `Faites le calcul : l'abonnement Édition coûte 47 € <i>par mois</i>. Ici, c'est 47 € <i>en tout</i>. Un seul livre publié et l'affaire est déjà rentable.`,
+  "Je joue franc-jeu : deux studios restent vendus à part, pour tout le monde — Cover Studio Pro (67 €) et Studio Jeunesse (47 €). Autant le savoir avant, pas après.",
+  "Et si ça ne vous plaît pas : 30 jours, un message, remboursé. Sans justification, sans discussion.",
+  `<b>Il reste ${SEATS} places au moment où j'écris. Il y a plus de ${SEATS} personnes qui lisent cet email.</b>`,
 ];
 
 const SIGN_NAME = "Georges Boubet";
