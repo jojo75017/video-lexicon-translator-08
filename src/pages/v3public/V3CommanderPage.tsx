@@ -423,8 +423,8 @@ export default function V3CommanderPage() {
               <>
                 <div className="deadline">
                   {offerOver
-                    ? "● L'offre 47 € à vie est terminée"
-                    : "● Accès à vie à 47 € — disponible jusqu'au 30 septembre"}
+                    ? `● L'offre ${FONDATEUR_PRICE} € à vie est terminée`
+                    : `● ${seats.remaining} place${seats.remaining > 1 ? "s" : ""} sur ${FONDATEUR_SEATS} — jusqu'au ${FONDATEUR_END_SHORT}`}
                 </div>
 
                 {!offerOver && (
@@ -442,13 +442,13 @@ export default function V3CommanderPage() {
                 </div>
 
                 <div className="checkout-price">
-                  <b>47 €</b>
+                  <b>{FONDATEUR_PRICE} €</b>
                   <span>paiement unique</span>
                 </div>
                 <p className="subscription">
                   {offerOver
-                    ? "EbookStudio est désormais accessible uniquement par abonnement."
-                    : "Après le 30 septembre, EbookStudio sera accessible uniquement par abonnement."}
+                    ? "EbookStudio est désormais accessible uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois."
+                    : `Après ces ${FONDATEUR_SEATS} places, EbookStudio sera accessible uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois.`}
                 </p>
 
                 <label htmlFor="cmdq-email">Votre adresse e-mail</label>
