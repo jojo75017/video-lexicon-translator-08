@@ -45,3 +45,9 @@
 - [x] Upsells Cover Studio Pro 67€ et Studio Jeunesse 47€ (paiement à l'unité + verrous)
 - [x] Onglet « Forfaits » visible dans la barre d'en-tête V3
 - [x] Page tarif fidélité /v3/migration blanche : corrigée (plantage + invitation à se connecter)
+
+## Opération 15 jours / 15 places à 47 € — octobre 2026
+
+- [ ] Prolonger /commander au 15 octobre 2026 avec quota de 15 places
+- [ ] Compteur de places restantes en temps réel + fermeture automatique
+- [ ] Envoi Resend par lots de 300/500 prospects (panneau admin + journal anti-doublon)
