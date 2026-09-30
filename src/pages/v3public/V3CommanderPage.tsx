@@ -271,16 +271,32 @@ export default function V3CommanderPage() {
   return (
     <div className="cmdq">
       <SeoHead
-        title="Commander EbookStudio — 47 € accès à vie"
-        description="Accédez à EbookStudio V3 à vie pour 47 € en paiement unique jusqu'au 30 septembre. Carte bancaire ou PayPal, accès immédiat, garantie 30 jours."
+        title={`Commander EbookStudio — ${FONDATEUR_PRICE} € accès à vie`}
+        description={`Les ${FONDATEUR_SEATS} derniers accès à vie à EbookStudio V3 pour ${FONDATEUR_PRICE} € en paiement unique, jusqu'au ${FONDATEUR_END_LABEL}. Paiement sécurisé, accès immédiat, garantie 30 jours.`}
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
 
       <div className="topbar">
-        <b>OFFRE FONDATEUR</b>
-        <span className="desktop-only">47 € à vie jusqu'au 30 septembre</span>
+        <b>{FONDATEUR_SEATS} DERNIERS ACCÈS À VIE</b>
+        <span className="desktop-only">
+          {FONDATEUR_PRICE} € à vie jusqu'au {FONDATEUR_END_SHORT}
+        </span>
         <span>Ensuite, uniquement par abonnement</span>
+      </div>
+
+      {/* RARETÉ RÉELLE — places restantes comptées sur les commandes payées */}
+      <div className="seats-banner" role="status" aria-live="polite">
+        <span className="seats-badge">
+          {offerOver ? "TERMINÉ" : `${seats.remaining} / ${FONDATEUR_SEATS}`}
+        </span>
+        <span className="seats-text">{fondateurScarcityLabel(seats)}</span>
+        {!offerOver && (
+          <span className="seats-note">
+            L'offre ferme dès la {FONDATEUR_SEATS}
+            <sup>e</sup> commande, ou le {FONDATEUR_END_LABEL} — au premier des deux.
+          </span>
+        )}
       </div>
 
       <div className="container">
