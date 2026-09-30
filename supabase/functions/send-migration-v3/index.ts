@@ -64,6 +64,9 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => null);
     const mode = body?.mode === "send" ? "send" : body?.mode === "test" ? "test" : "preview";
+    const ALLOWED_IDS = [EMAIL_ID, "micro-series-precommande"];
+    const emailId = ALLOWED_IDS.includes(body?.emailId) ? body.emailId as string : EMAIL_ID;
+    console.log("send-migration-v3 request", { mode, emailId, received: body?.emailId ?? null });
     const subject = typeof body?.subject === "string" ? body.subject.trim() : "";
     const html = typeof body?.html === "string" ? body.html : "";
 
@@ -79,7 +82,7 @@ Deno.serve(async (req) => {
     const { data: already } = await db
       .from("v3_migration_sends")
       .select("email, status")
-      .eq("email_id", EMAIL_ID);
+      .eq("email_id", emailId);
     const sentSet = new Set(
       (already ?? [])
         .filter((r) => String((r as { status?: string }).status) === "sent")
@@ -96,7 +99,7 @@ Deno.serve(async (req) => {
     const pending = all.filter((e) => !sentSet.has(e));
 
     if (mode === "preview") {
-      return json({ emailId: EMAIL_ID, total: all.length, pending, alreadySent: [...sentSet] });
+      return json({ emailId, total: all.length, pending, alreadySent: [...sentSet] });
     }
 
     if (!subject || subject.length > 300) return json({ error: "Objet invalide" }, 400);
@@ -122,7 +125,7 @@ Deno.serve(async (req) => {
       await db.from("v3_migration_sends").upsert(
         {
           email: to,
-          email_id: EMAIL_ID,
+          email_id: emailId,
           status: r.ok ? "sent" : "error",
           error: r.error,
           sent_at: r.ok ? new Date().toISOString() : null,

@@ -31,8 +31,14 @@ ${paragraphs}
 }
 
 /** Envoi en 1 clic de l'email de passage à la V3 aux abonnés enregistrés. */
-export function MigrationV3SendPanel() {
-  const email = LANCEMENT_V3_EMAILS.find((e) => e.id === 'passage-abonnes-v3');
+interface PanelProps {
+  emailId?: string;
+  customEmail?: LancementV3Email;
+  title?: string;
+}
+
+export function MigrationV3SendPanel({ emailId = 'passage-abonnes-v3', customEmail, title }: PanelProps = {}) {
+  const email = customEmail ?? LANCEMENT_V3_EMAILS.find((e) => e.id === 'passage-abonnes-v3');
   const [pending, setPending] = useState<string[] | null>(null);
   const [alreadySent, setAlreadySent] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -55,7 +61,7 @@ export function MigrationV3SendPanel() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-migration-v3', {
-        body: { mode: 'preview' },
+        body: { mode: 'preview', emailId },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -73,7 +79,7 @@ export function MigrationV3SendPanel() {
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-migration-v3', {
-        body: { mode: 'test', to: testTo.trim(), subject: email.subject, html },
+        body: { mode: 'test', emailId, to: testTo.trim(), subject: email.subject, html },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -87,11 +93,11 @@ export function MigrationV3SendPanel() {
   const sendAll = async () => {
     const count = pending?.length ?? 0;
     if (!count) return toast.error('Chargez d’abord la liste des abonnés');
-    if (!window.confirm(`Envoyer l’email de passage à la V3 à ${count} abonné(s) ? Chacun ne le recevra qu’une seule fois.`)) return;
+    if (!window.confirm(`Envoyer cet email à ${count} abonné(s) ? Chacun ne le recevra qu’une seule fois.`)) return;
     setSending(true);
     try {
       const { data, error } = await supabase.functions.invoke('send-migration-v3', {
-        body: { mode: 'send', subject: email.subject, html },
+        body: { mode: 'send', emailId, subject: email.subject, html },
       });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
@@ -111,7 +117,7 @@ export function MigrationV3SendPanel() {
       <div className="flex flex-wrap items-center gap-3">
         <Badge className="bg-emerald-600 text-white">Envoi automatique</Badge>
         <h3 className="text-base font-semibold text-emerald-900">
-          Prévenir mes abonnés du passage à la V3
+          {title ?? 'Prévenir mes abonnés du passage à la V3'}
         </h3>
       </div>
       <p className="text-sm text-emerald-900/80">
