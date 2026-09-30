@@ -12,6 +12,17 @@ import { COMMANDER_URL, BLOG_URL } from "@/data/externalLinks";
 import { V3_LAUNCH_BONUSES } from "@/data/v3Launch";
 import { trackCaptureEvent } from "@/lib/captureTracking";
 import { useLaunchSettings } from "@/hooks/useLaunchSettings";
+import {
+  FONDATEUR_END_ISO,
+  FONDATEUR_END_LABEL,
+  FONDATEUR_END_SHORT,
+  FONDATEUR_FALLBACK,
+  FONDATEUR_PLAN,
+  FONDATEUR_PRICE,
+  FONDATEUR_SEATS,
+  fondateurScarcityLabel,
+  type FondateurStatus,
+} from "@/data/offreFondateur";
 import "@/styles/commander-maquette.css";
 
 /**
@@ -45,10 +56,10 @@ function CommanderVideo() {
 }
 
 /** Paiement unique uniquement : plus de 2× ni 3×. */
-const PLAN_ID = "v2_1x" as const;
+const PLAN_ID = FONDATEUR_PLAN;
 
-/** Fin de l'offre 47 € : 30 septembre 2026, 23 h 59 (heure de Paris). */
-const OFFER_END = new Date("2026-09-30T21:59:59Z");
+/** Fin de l'opération fondateur : 15 octobre 2026, 23 h 59 (heure de Paris). */
+const OFFER_END = new Date(FONDATEUR_END_ISO);
 
 const INCLUDED = [
   "Génération complète du livre : plan, chapitres et correction en 4 passes",
@@ -63,7 +74,11 @@ const INCLUDED = [
 const FAQ: Array<{ q: string; a: string }> = [
   {
     q: "Que comprend exactement le paiement de 47 € ?",
-    a: "Le paiement ouvre votre accès à vie à EbookStudio V3 et aux fonctionnalités incluses dans cette offre. Il n'y a aucune mensualité à régler.",
+    a: "Le paiement ouvre votre accès à vie à EbookStudio V3 et aux fonctionnalités incluses dans cette offre. Il n'y a aucune mensualité à régler. Deux studios restent vendus séparément pour tout le monde : Cover Studio Pro (67 €) et Studio Jeunesse (47 €).",
+  },
+  {
+    q: "Pourquoi seulement 15 places ?",
+    a: "Parce que c'est le tout dernier contingent d'accès à vie avant le passage définitif aux abonnements. L'offre ferme dès la 15e commande réglée, ou au 15 octobre 2026 au plus tard, selon ce qui arrive en premier. Le compteur affiché en haut de page correspond aux commandes réellement payées.",
   },
   {
     q: "Puis-je payer avec PayPal ?",
@@ -87,7 +102,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Parce que l'offre à 47 € en paiement unique prend fin le 30 septembre. Après cette date, EbookStudio sera proposé uniquement par abonnement.",
+    a: "Parce qu'il ne reste que 15 accès à vie à 47 €, pendant 15 jours au maximum. Ensuite, EbookStudio est proposé uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -118,10 +133,12 @@ export default function V3CommanderPage() {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [now, setNow] = useState(() => Date.now());
+  const [seats, setSeats] = useState<FondateurStatus>(FONDATEUR_FALLBACK);
 
-  const offerOver = now > OFFER_END.getTime();
+  const dateOver = now > OFFER_END.getTime();
+  const offerOver = dateOver || seats.closed;
 
-  /** Compte à rebours honnête vers la fin de l'offre 47 € (30 sept. minuit Paris). */
+  /** Compte à rebours honnête vers la fin de l'opération (15 oct. minuit Paris). */
   const countdown = useMemo(() => {
     const diff = Math.max(0, OFFER_END.getTime() - now);
     const d = Math.floor(diff / 86_400_000);
@@ -134,6 +151,25 @@ export default function V3CommanderPage() {
   useEffect(() => {
     const id = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(id);
+  }, []);
+
+  /**
+   * Places réellement restantes, relues toutes les 60 secondes : le compteur
+   * affiché correspond aux commandes payées, jamais à un chiffre inventé.
+   */
+  useEffect(() => {
+    let active = true;
+    const load = async () => {
+      const { data } = await supabase.functions.invoke("offre-fondateur-status");
+      const next = data as FondateurStatus | null;
+      if (active && next && typeof next.remaining === "number") setSeats(next);
+    };
+    void load();
+    const id = window.setInterval(() => void load(), 60_000);
+    return () => {
+      active = false;
+      window.clearInterval(id);
+    };
   }, []);
 
   // Email du prospect connecté récupéré automatiquement s'il n'est pas dans l'URL.
@@ -239,16 +275,32 @@ export default function V3CommanderPage() {
   return (
     <div className="cmdq">
       <SeoHead
-        title="Commander EbookStudio — 47 € accès à vie"
-        description="Accédez à EbookStudio V3 à vie pour 47 € en paiement unique jusqu'au 30 septembre. Carte bancaire ou PayPal, accès immédiat, garantie 30 jours."
+        title={`Commander EbookStudio — ${FONDATEUR_PRICE} € accès à vie`}
+        description={`Les ${FONDATEUR_SEATS} derniers accès à vie à EbookStudio V3 pour ${FONDATEUR_PRICE} € en paiement unique, jusqu'au ${FONDATEUR_END_LABEL}. Paiement sécurisé, accès immédiat, garantie 30 jours.`}
         canonical={COMMANDER_URL}
       />
       <PaymentTestModeBanner />
 
       <div className="topbar">
-        <b>OFFRE FONDATEUR</b>
-        <span className="desktop-only">47 € à vie jusqu'au 30 septembre</span>
+        <b>{FONDATEUR_SEATS} DERNIERS ACCÈS À VIE</b>
+        <span className="desktop-only">
+          {FONDATEUR_PRICE} € à vie jusqu'au {FONDATEUR_END_SHORT}
+        </span>
         <span>Ensuite, uniquement par abonnement</span>
+      </div>
+
+      {/* RARETÉ RÉELLE — places restantes comptées sur les commandes payées */}
+      <div className="seats-banner" role="status" aria-live="polite">
+        <span className="seats-badge">
+          {offerOver ? "TERMINÉ" : `${seats.remaining} / ${FONDATEUR_SEATS}`}
+        </span>
+        <span className="seats-text">{fondateurScarcityLabel(seats)}</span>
+        {!offerOver && (
+          <span className="seats-note">
+            L'offre ferme dès la {FONDATEUR_SEATS}
+            <sup>e</sup> commande, ou le {FONDATEUR_END_LABEL} — au premier des deux.
+          </span>
+        )}
       </div>
 
       <div className="container">
@@ -375,8 +427,8 @@ export default function V3CommanderPage() {
               <>
                 <div className="deadline">
                   {offerOver
-                    ? "● L'offre 47 € à vie est terminée"
-                    : "● Accès à vie à 47 € — disponible jusqu'au 30 septembre"}
+                    ? `● L'offre ${FONDATEUR_PRICE} € à vie est terminée`
+                    : `● ${seats.remaining} place${seats.remaining > 1 ? "s" : ""} sur ${FONDATEUR_SEATS} — jusqu'au ${FONDATEUR_END_SHORT}`}
                 </div>
 
                 {!offerOver && (
@@ -394,13 +446,13 @@ export default function V3CommanderPage() {
                 </div>
 
                 <div className="checkout-price">
-                  <b>47 €</b>
+                  <b>{FONDATEUR_PRICE} €</b>
                   <span>paiement unique</span>
                 </div>
                 <p className="subscription">
                   {offerOver
-                    ? "EbookStudio est désormais accessible uniquement par abonnement."
-                    : "Après le 30 septembre, EbookStudio sera accessible uniquement par abonnement."}
+                    ? "EbookStudio est désormais accessible uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois."
+                    : `Après ces ${FONDATEUR_SEATS} places, EbookStudio sera accessible uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois.`}
                 </p>
 
                 <label htmlFor="cmdq-email">Votre adresse e-mail</label>
@@ -427,37 +479,52 @@ export default function V3CommanderPage() {
                   intégralement.
                 </p>
 
-                <button
-                  id="ebookstudio-payment-button"
-                  className="pay"
-                  onClick={startPayment}
-                  disabled={loading}
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…
-                    </>
-                  ) : (
-                    <>Payer 47 € →</>
-                  )}
-                </button>
+                {offerOver ? (
+                  <>
+                    {/* Offre fermée : plus aucun paiement à vie possible,
+                        on redirige vers les abonnements. */}
+                    <a href="/v3/forfaits" className="pay" style={{ textAlign: "center" }}>
+                      Voir les abonnements →
+                    </a>
+                    <p className="secure">
+                      Les {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} € sont toutes prises.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      id="ebookstudio-payment-button"
+                      className="pay"
+                      onClick={startPayment}
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Préparation du paiement…
+                        </>
+                      ) : (
+                        <>Payer {FONDATEUR_PRICE} € →</>
+                      )}
+                    </button>
 
-                <button
-                  type="button"
-                  className="pay pay-paypal"
-                  onClick={startPaypal}
-                  disabled={paypalLoading}
-                >
-                  {paypalLoading ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" /> Ouverture de PayPal…
-                    </>
-                  ) : (
-                    <>Payer 47 € avec PayPal</>
-                  )}
-                </button>
+                    <button
+                      type="button"
+                      className="pay pay-paypal"
+                      onClick={startPaypal}
+                      disabled={paypalLoading}
+                    >
+                      {paypalLoading ? (
+                        <>
+                          <Loader2 className="h-4 w-4 animate-spin" /> Ouverture de PayPal…
+                        </>
+                      ) : (
+                        <>Payer {FONDATEUR_PRICE} € avec PayPal</>
+                      )}
+                    </button>
 
-                <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
+                    <p className="secure">🔒 Carte bancaire ou PayPal · paiement sécurisé</p>
+                  </>
+                )}
 
                 {/* RÉPONSES AUX 5 OBJECTIONS, juste sous le bouton */}
                 <div className="objections">
@@ -480,8 +547,8 @@ export default function V3CommanderPage() {
                       <span>Les modules qui demandent une clé personnelle l'expliquent pas à pas. Beaucoup de fonctions fonctionnent sans aucune clé.</span>
                     </li>
                     <li>
-                      <b>« Et après le 1ᵉʳ octobre ? »</b>
-                      <span>En commandant maintenant, votre accès à vie est conservé. Après cette date, EbookStudio passe en abonnement uniquement.</span>
+                      <b>« Et quand les 15 places seront prises ? »</b>
+                      <span>En commandant maintenant, votre accès à vie vous reste acquis. Dès la dernière place vendue, ou après le {FONDATEUR_END_SHORT}, EbookStudio passe en abonnement uniquement.</span>
                     </li>
                   </ul>
                 </div>
@@ -504,10 +571,19 @@ export default function V3CommanderPage() {
           <div className="why-icon">∞</div>
           <div>
             <small>POURQUOI MAINTENANT ?</small>
-            <h2>L'accès à vie disparaît le 30 septembre</h2>
+            <h2>
+              Les {FONDATEUR_SEATS} derniers accès à vie, puis c'est terminé
+            </h2>
             <p>
-              À partir du 1<sup>er</sup> octobre, EbookStudio sera proposé uniquement par abonnement.
-              Aujourd'hui, vous payez 47 € une seule fois et conservez votre accès à vie, sans mensualité.
+              EbookStudio V3 est désormais proposé par abonnement : Plume 27 €/mois, Édition
+              47 €/mois ou Maison d'Édition 97 €/mois. Avant de fermer définitivement l'accès à vie,
+              j'ouvre un tout dernier contingent de {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} €,
+              valable jusqu'au {FONDATEUR_END_LABEL} au plus tard. Vous payez une seule fois et
+              vous ne repayez jamais.
+            </p>
+            <p style={{ fontSize: "0.9rem", opacity: 0.85 }}>
+              Les deux studios vendus séparément restent des options payantes pour tout le monde :
+              Cover Studio Pro (67 €) et Studio Jeunesse (47 €).
             </p>
           </div>
         </section>

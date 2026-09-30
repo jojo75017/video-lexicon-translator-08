@@ -12,6 +12,7 @@ const corsHeaders = {
 };
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { getFondateurStatus } from "../_shared/offreFondateur.ts";
 
 function getSupabase() {
   return createClient(
@@ -70,6 +71,21 @@ Deno.serve(async (req) => {
 
     // Enregistrer la commande (suivi des échéances).
     const supabase = getSupabase();
+
+    // Opération fondateur : les formules d'accès à vie ne sont vendables que
+    // dans la limite des places et de la date. Le contrôle est fait ici, côté
+    // serveur, pour qu'un lien direct ou une page obsolète ne puisse pas
+    // créer une vente après fermeture.
+    if (normalizedPlan.startsWith("v2_")) {
+      const status = await getFondateurStatus(supabase);
+      if (status.closed) {
+        throw new Error(
+          status.reason === "sold_out"
+            ? "Les 15 places à 47 € sont toutes prises. L'offre est définitivement close ; les abonnements restent disponibles."
+            : "L'offre à vie à 47 € est terminée. Les abonnements restent disponibles.",
+        );
+      }
+    }
     const { data: order, error: orderErr } = await supabase
       .from("v3_installment_orders")
       .insert({

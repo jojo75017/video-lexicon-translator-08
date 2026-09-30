@@ -10,6 +10,7 @@ import { NewsletterClicksPanel } from '@/components/admin/NewsletterClicksPanel'
 import { FunnelUnifiedPanel } from '@/components/admin/FunnelUnifiedPanel';
 import { NewsletterEngagementPanel } from '@/components/admin/NewsletterEngagementPanel';
 import { MigrationV3SendPanel } from '@/components/admin/MigrationV3SendPanel';
+import OffreFondateurSendPanel from '@/components/admin/OffreFondateurSendPanel';
 
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -588,6 +589,7 @@ export default function AdminSequenceEmailPage() {
           </TabsList>
 
           <TabsContent value="lancement-v3" className="space-y-6">
+            <OffreFondateurSendPanel />
             <MigrationV3SendPanel />
             <LancementV3Panel />
           </TabsContent>

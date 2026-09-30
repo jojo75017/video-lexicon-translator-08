@@ -2239,6 +2239,42 @@ export type Database = {
         }
         Relationships: []
       }
+      offre_fondateur_sends: {
+        Row: {
+          batch_index: number | null
+          created_at: string
+          email: string
+          email_id: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          batch_index?: number | null
+          created_at?: string
+          email: string
+          email_id: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          batch_index?: number | null
+          created_at?: string
+          email?: string
+          email_id?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_confirmations: {
         Row: {
           created_at: string
