@@ -26,6 +26,8 @@ C’est pour cela que je prépare le Studio Micro-Séries IA, un module de la fu
 
 Vous n’avez plus qu’à monter vos vidéos.
 
+Bon à savoir : le studio fonctionne avec votre clé IA gratuite (Google Gemini ou OpenRouter), donc sans surcoût ni crédit à racheter. Aucune vidéo n’est facturée par EbookStudio : vous générez les images dans l’outil de votre choix (CapCut, Leonardo, Pika, Canva…) et vous assemblez avec les sous-titres fournis.
+
 En tant qu’abonné, vous pouvez le réserver dès maintenant à 67 € au lieu de 197 €, en paiement unique. Votre accès à vie s’ouvrira automatiquement à la sortie de la V4.
 
 Ce module est un complément à part : il n’est inclus dans aucun forfait.
