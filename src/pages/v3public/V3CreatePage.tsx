@@ -553,6 +553,29 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
             {/* ① J'écris : à gauche je parle, à droite mon livre se remplit. */}
             {desk === 1 && (
               <>
+                {biography && (
+                  <div className="v3-card mb-4" style={{ borderColor: 'var(--v3-gold)' }}>
+                    <p className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>🔒 Quel livre personnel voulez-vous écrire ?</p>
+                    <p className="mt-1 text-xs" style={{ color: 'var(--v3-muted)' }}>
+                      Livre intime, pour vous et vos proches : aucun avatar lecteur, aucun code commercial. Vos mots sont conservés.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {['Récit de ma vie (livre familial)', 'Arbre généalogique / Histoire de famille', 'Souvenirs pour mes enfants et petits-enfants'].map((c) => {
+                        const active = (bookBrief.category || bookBrief.genre) === c;
+                        return (
+                          <button
+                            key={c}
+                            type="button"
+                            onClick={() => writeBookBrief({ category: c, genre: c })}
+                            className={`v3-btn text-xs ${active ? 'v3-btn-action-orange' : ''}`}
+                          >
+                            {active && <Check className="h-3.5 w-3.5" />} {c}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
                 <div className="grid gap-4 lg:grid-cols-2 lg:items-start">
                   <div className="min-w-0">
                     <V3GenieDialog
