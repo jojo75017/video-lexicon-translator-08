@@ -94,14 +94,14 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
                 onClick={() => navigate(item.path)}
                 className={cn(
                   'rounded-xl',
-                  item.isNew && 'border-2 border-success bg-success text-success-foreground font-semibold hover:bg-success/90 hover:text-success-foreground',
-                  item.isNew && isActive(item) && 'ring-2 ring-success ring-offset-2',
+                  item.isNew && 'border-2 border-emerald-700 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 hover:text-white',
+                  item.isNew && isActive(item) && 'ring-2 ring-emerald-500 ring-offset-2',
                 )}
               >
                 <Icon className="mr-2 h-4 w-4" />
                 {item.label}
                 {item.isNew && (
-                  <span className="ml-2 rounded-full bg-background/90 px-1.5 py-0.5 text-[10px] font-bold uppercase text-success">
+                  <span className="ml-2 rounded-full bg-background/90 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700">
                     Nouveau
                   </span>
                 )}
