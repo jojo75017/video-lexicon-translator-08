@@ -20,7 +20,7 @@
   --v3-cream: #f2f9f4;
   --v3-ink: #0a1f18;
   --v3-ink-2: #1a2e26;
-  --v3-editorial-ink: #5b8a6e;
+  --v3-editorial-ink: #3f6b52;
   --v3-editorial-ink-soft: #344456;
   --v3-ivory: #f8f5ed;
   --v3-muted: #5b6b64;
@@ -179,10 +179,12 @@
 
 /* Section sombre — fond émeraude nuit */
 .v3pub .v3-section-dark {
-  background: linear-gradient(180deg, #4f7a62 0%, #3f6a53 100%);
-  color: #f5f0e0;
+  background: #e4f0e8;
+  color: #2f4a3a;
 }
-.v3pub .v3-section-dark .v3-serif { color: #fff; }
+.v3pub .v3-section-dark .v3-serif { color: #2f5a42; }
+.v3pub .v3-section-dark [class*='text-white'] { color: #4a6656 !important; }
+.v3pub .v3-section-dark { border-top: 3px solid #f2c9a5; }
 
 /* Section papier */
 .v3pub .v3-section-paper {
@@ -416,9 +418,9 @@
 .v3pub .v3-btn-outline,
 .v3pub .v3-btn-ghost,
 .v3pub .v3-btn-on-dark {
-  background: #f97316 !important;
+  background: #6a9e7d !important;
   color: #ffffff !important;
-  border-color: #f97316 !important;
+  border-color: #6a9e7d !important;
 }
 .v3pub button:not(:disabled):hover,
 .v3pub [role="button"]:not([aria-disabled="true"]):hover,
@@ -430,9 +432,9 @@
 .v3pub .v3-btn-outline:hover,
 .v3pub .v3-btn-ghost:hover,
 .v3pub .v3-btn-on-dark:hover {
-  background: #ea580c !important;
+  background: #e9a46f !important;
   color: #ffffff !important;
-  border-color: #ea580c !important;
+  border-color: #e9a46f !important;
 }
 /* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
 .v3pub button.v3-btn-reset-green:not(:disabled),
@@ -468,5 +470,10 @@
 }
 
 /* Palette vert sauge & orange : bandeaux clairs */
-.v3pub .v3-header-sage { background: linear-gradient(180deg,#8fb89c 0%,#7aa888 100%) !important; border-bottom:2px solid #f97316 !important; }
-.v3pub .v3-header-sage .v3-mobile-panel { background:#7aa888 !important; }
+.v3pub .v3-header-sage { background: linear-gradient(180deg,#e4f0e8 0%,#d6e8dc 100%) !important; border-bottom:2px solid #f2c9a5 !important; }
+.v3pub .v3-header-sage .text-white { color:#2f5a42 !important; }
+.v3pub .v3-header-sage input { background:#fff !important; color:#2f4a3a !important; }
+.v3pub .v3-launch-sage { background:#eef6f0 !important; border-bottom:1px solid #f2c9a5 !important; }
+.v3pub .v3-launch-sage h2, .v3pub .v3-launch-sage h2 *, .v3pub .v3-launch-sage a, .v3pub .v3-launch-sage span { color:#3f6b52 !important; }
+.v3pub .v3-launch-sage strong { color:#c97a45 !important; }
+.v3pub .v3-header-sage .v3-mobile-panel { background:#e4f0e8 !important; }
