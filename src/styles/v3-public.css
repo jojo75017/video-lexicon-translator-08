@@ -447,6 +447,20 @@
   color: #ffffff !important;
   border-color: #e9a46f !important;
 }
+/* Exception : boutons « Jovial Premium Gold » de l'accueil (héro, Commencez ici). */
+.v3pub button.v3-joy-cta:not(:disabled),
+.v3pub a.v3-joy-cta {
+  background: var(--v3-joy-orange) !important;
+  border-color: var(--v3-joy-orange) !important;
+  color: #ffffff !important;
+}
+.v3pub button.v3-joy-cta:not(:disabled):hover,
+.v3pub a.v3-joy-cta:hover {
+  background: var(--v3-joy-orange-600) !important;
+  border-color: var(--v3-joy-orange-600) !important;
+  color: #ffffff !important;
+}
+
 /* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
 .v3pub button.v3-btn-reset-green:not(:disabled),
 .v3pub button.v3-btn-reset-green:not(:disabled):hover,

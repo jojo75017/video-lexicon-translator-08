@@ -79,7 +79,7 @@ export default function V3StartHereHomeBanner() {
         <div className="mt-12 text-center">
           <Link
             to="/v3/commence-ici"
-            className="inline-flex items-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold text-white transition-all hover:-translate-y-0.5"
+            className="v3-joy-cta inline-flex items-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold text-white transition-all hover:-translate-y-0.5"
             style={{
               background: 'var(--v3-joy-orange)',
               boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)',

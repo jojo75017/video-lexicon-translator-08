@@ -153,7 +153,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               void trackCaptureEvent('v3', 'reserve_open', { leadMagnet: '10-niches-offertes' });
               setCaptureOpen(true);
             }}
-            className="mt-7 inline-flex h-auto min-h-12 max-w-full items-center justify-center gap-2 whitespace-normal rounded-2xl px-8 py-4 text-center text-[14px] font-bold text-white transition-all hover:-translate-y-0.5 sm:text-[15px]"
+            className="v3-joy-cta mt-7 inline-flex h-auto min-h-12 max-w-full items-center justify-center gap-2 whitespace-normal rounded-2xl px-8 py-4 text-center text-[14px] font-bold text-white transition-all hover:-translate-y-0.5 sm:text-[15px]"
             style={{
               background: 'var(--v3-joy-orange)',
               boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)',
