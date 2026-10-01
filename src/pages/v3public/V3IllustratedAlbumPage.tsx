@@ -73,7 +73,7 @@ export default function V3IllustratedAlbumPage() {
     setBusy(`character-${character.id}`);
     try {
       const style = ILLUSTRATION_STYLES.find((item) => item.id === draft.style)?.prompt || '';
-      const { data, error } = await supabase.functions.invoke('agent-illustrator', {
+      const { data, error } = await supabase.functions.invoke('album-illustrated-image', {
         body: {
           bookId: 'album-reference',
           storyId: character.id,
@@ -134,7 +134,7 @@ export default function V3IllustratedAlbumPage() {
     const references = draft.characters.filter((character) => page.characters.includes(character.name) && character.referenceUrl);
     const fallbackReferences = references.length ? references : draft.characters.filter((character) => character.referenceUrl);
     const style = ILLUSTRATION_STYLES.find((item) => item.id === draft.style)?.prompt || '';
-    const { data, error } = await supabase.functions.invoke('agent-illustrator', {
+    const { data, error } = await supabase.functions.invoke('album-illustrated-image', {
       body: {
         bookId: projectId || 'album-draft',
         storyId: page.id,

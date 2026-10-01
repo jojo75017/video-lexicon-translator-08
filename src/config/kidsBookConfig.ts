@@ -1,5 +1,5 @@
 // Configuration du mode "Livre illustré maternelle"
-// Studio Jeunesse vendu séparément : jamais inclus dans un forfait.
+// Inclus dans les deux forfaits ; version Pro sur Édition.
 
 import type { V3Plan } from '@/data/v3ToolPlans';
 
@@ -27,8 +27,8 @@ export const KIDS_BOOK_IMAGE_QUOTA: Record<V3Plan, number> = {
 
 // Modèle image par forfait
 export const KIDS_BOOK_IMAGE_MODEL: Record<V3Plan, string> = {
-  plume: 'openai/gpt-image-2.5-sunburst',
-  edition: 'openai/gpt-image-2.5-sunburst',
+  plume: 'google/gemini-3.1-flash-image',
+  edition: 'google/gemini-3-pro-image',
 };
 
 export function canUseKidsBook(plan: V3Plan | null | undefined): boolean {
