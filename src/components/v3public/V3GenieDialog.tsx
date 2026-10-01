@@ -40,9 +40,9 @@ const CATEGORIES = [
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
 
 const EXAMPLES = [
-  'Un guide pratique pour débuter sur Amazon KDP en 30 jours, pour débutants complets.',
-  'Un thriller psychologique dans un village breton où une journaliste enquête sur sa propre famille.',
-  'Un livre de recettes minceur méditerranéennes, 30 plats simples avec photos.',
+  'Je suis né en 1952 à Berck-sur-Mer. Je veux raconter mon enfance au bord de la mer à mes petits-enfants.',
+  'Je veux retracer l’histoire de ma famille, de mes grands-parents à aujourd’hui, avec les noms, les lieux et les dates.',
+  'Je veux transmettre à mes enfants les moments forts de ma vie : mon métier, mes rencontres et ce que j’ai appris.',
 ];
 
 type Props = {
