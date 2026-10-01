@@ -29,10 +29,10 @@ export default function V3TutorielsPage() {
                 className="rounded-lg border bg-card p-4 text-left hover:border-primary">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Tuto {t.num} · {t.duree}</span>
-                  {t.video && <Badge>🎬 Vidéo</Badge>}
+                  {t.videos?.length && <Badge>🎬 Vidéo{t.videos.length > 1 ? `s (${t.videos.length})` : ''}</Badge>}
                 </div>
                 <div className="mt-1 font-medium">{t.titre}</div>
-                <div className="mt-2 flex items-center gap-1 text-sm text-primary"><PlayCircle className="h-4 w-4" /> {t.video ? 'Regarder la vidéo' : 'Voir le tuto'}</div>
+                <div className="mt-2 flex items-center gap-1 text-sm text-primary"><PlayCircle className="h-4 w-4" /> {t.videos?.length ? 'Regarder la vidéo' : 'Voir le tuto'}</div>
               </button>
             ))}
           </div>
