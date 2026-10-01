@@ -10,14 +10,17 @@ type AdminNavItem = {
   path: string;
   icon: typeof Shield;
   exact?: boolean;
+  isNew?: boolean;
 };
 
 const adminNavItems: AdminNavItem[] = [
+  { label: 'Lancement V3', path: '/admin/lancement', icon: Rocket, exact: true, isNew: true },
+  { label: 'Emails lancement', path: '/admin/emails-lancement', icon: Mail, exact: true, isNew: true },
+  { label: 'Tunnel V3 (avant-première)', path: '/admin/tunnel-v3', icon: TrendingUp, exact: true, isNew: true },
+  { label: 'Voir le tunnel de lancement', path: '/lancement', icon: Rocket, exact: true, isNew: true },
   { label: 'Tableau de bord admin', path: ADMIN_HOME_PATH, icon: BarChart3, exact: true },
   { label: 'Business Center', path: '/business-center', icon: Gauge, exact: true },
   { label: 'Tunnel', path: '/admin/funnel', icon: TrendingUp, exact: true },
-  { label: 'Tunnel V3 (avant-première)', path: '/admin/tunnel-v3', icon: TrendingUp, exact: true },
-  { label: 'Voir le tunnel de lancement', path: '/lancement', icon: Rocket, exact: true },
   { label: 'Cadeaux PDF', path: '/admin/cadeaux-pdf', icon: FileText, exact: true },
   { label: 'Codes Bêta', path: '/admin/codes-beta', icon: Ticket, exact: true },
   { label: 'Bêta-testeurs', path: '/admin/beta-testeurs', icon: Users, exact: true },
@@ -31,9 +34,7 @@ const adminNavItems: AdminNavItem[] = [
   { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
   { label: 'CRM', path: '/crm', icon: Contact, exact: true },
   { label: 'Plans V3', path: '/admin/plans-v3', icon: Table, exact: true },
-  { label: 'Lancement V3', path: '/admin/lancement', icon: Rocket, exact: true },
   { label: 'Campagnes', path: '/admin/campagnes', icon: Send, exact: true },
-  { label: 'Emails lancement', path: '/admin/emails-lancement', icon: Mail, exact: true },
   { label: 'Script vidéo V3', path: '/admin/script-video', icon: Video, exact: true },
   { label: 'Scripts tutoriels Loom', path: '/admin/scripts-tutoriels', icon: Video, exact: true },
   { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
@@ -91,10 +92,19 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
                 type="button"
                 variant={isActive(item) ? 'default' : 'outline'}
                 onClick={() => navigate(item.path)}
-                className="rounded-xl"
+                className={cn(
+                  'rounded-xl',
+                  item.isNew && 'border-2 border-emerald-700 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 hover:text-white',
+                  item.isNew && isActive(item) && 'ring-2 ring-emerald-500 ring-offset-2',
+                )}
               >
                 <Icon className="mr-2 h-4 w-4" />
                 {item.label}
+                {item.isNew && (
+                  <span className="ml-2 rounded-full bg-background/90 px-1.5 py-0.5 text-[10px] font-bold uppercase text-emerald-700">
+                    Nouveau
+                  </span>
+                )}
               </Button>
             );
           })}
