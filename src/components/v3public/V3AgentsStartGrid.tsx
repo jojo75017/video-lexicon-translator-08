@@ -45,7 +45,7 @@ export default function V3AgentsStartGrid() {
             to={agent.route}
             className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
-            <div className="relative h-36 overflow-hidden bg-muted">
+            <div className="relative aspect-square overflow-hidden bg-muted">
               <span
                 className="absolute right-3 top-2 z-10 text-3xl font-black leading-none opacity-25"
                 style={{ color: agent.accent }}
