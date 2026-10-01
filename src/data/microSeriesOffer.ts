@@ -19,4 +19,27 @@ export const MICRO_SERIES_OFFER = {
     { icon: Smartphone, label: 'Storyboard vertical scène par scène' },
     { icon: FileDown, label: 'Exports PDF, texte et CSV sans génération vidéo imposée' },
   ],
+  videoSteps: [
+    {
+      number: '01',
+      title: 'EbookStudio écrit la série',
+      description: 'Accroche, voix off minutée, découpage scène par scène, sous-titres et consignes visuelles pour chaque épisode.',
+    },
+    {
+      number: '02',
+      title: 'Vous générez les images',
+      description: 'Vous copiez les consignes fournies dans l’outil visuel de votre choix, ou vous filmez simplement avec votre téléphone.',
+    },
+    {
+      number: '03',
+      title: 'Vous assemblez en 2 minutes',
+      description: 'Vous importez les sous-titres SRT et la trame d’épisode dans votre logiciel de montage, puis vous publiez.',
+    },
+  ],
+  recommendedTools: [
+    { name: 'CapCut', usage: 'Montage et sous-titres automatiques', cost: 'Gratuit' },
+    { name: 'Leonardo AI', usage: 'Plans d’ambiance et visuels', cost: 'Crédits gratuits quotidiens' },
+    { name: 'Pika / Kling', usage: 'Plans animés courts', cost: 'Offres gratuites limitées' },
+    { name: 'Canva', usage: 'Habillage, titres et miniatures', cost: 'Gratuit' },
+  ],
 } as const;

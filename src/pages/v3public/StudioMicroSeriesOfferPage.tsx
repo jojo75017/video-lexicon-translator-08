@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
-import { ArrowRight, Check, CreditCard, Film, Loader2, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, CreditCard, Film, KeyRound, Loader2, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import SeoHead from '@/components/funnel/SeoHead';
@@ -116,6 +116,55 @@ export default function StudioMicroSeriesOfferPage() {
                 ].map(([time, label, copy]) => <div key={time} className="grid grid-cols-[56px_1fr] gap-3 rounded-md bg-muted p-3"><span className="text-xs font-black text-primary">{time}</span><div><strong className="text-sm">{label}</strong><p className="mt-1 text-xs leading-5 text-muted-foreground">{copy}</p></div></div>)}
               </div>
               <p className="mt-4 text-xs leading-5 text-muted-foreground">Démonstration visuelle uniquement : elle ne consomme aucun crédit IA ou vidéo.</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="border-t border-border bg-muted/40 px-4 py-16 sm:px-6" aria-labelledby="how-title">
+          <div className="mx-auto max-w-6xl">
+            <div className="border-l-4 border-accent bg-accent/10 p-5">
+              <p className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-accent">
+                <KeyRound className="h-4 w-4" /> Clé IA gratuite acceptée · 0 € de surcoût
+              </p>
+              <p className="mt-3 text-sm leading-6">
+                Le studio se connecte directement à votre propre clé Google Gemini (gratuite) ou OpenRouter, enregistrée
+                dans votre navigateur et visible de vous seul. Vous composez autant d’épisodes et de storyboards que vous
+                voulez, sans abonnement caché ni crédit supplémentaire à acheter.
+                {' '}
+                <Link to="/v3/fonctionnalites/cles" className="font-bold text-primary underline">
+                  Voir où coller ma clé
+                </Link>
+                .
+              </p>
+            </div>
+
+            <h2 id="how-title" className="mt-12 text-3xl font-black sm:text-4xl">Comment vous allez créer vos vidéos en 3 étapes</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+              Le Studio Micro-Séries écrit et structure toute la série. Le rendu vidéo final reste fait dans l’outil de
+              votre choix : aucune vidéo n’est calculée ni facturée ici.
+            </p>
+
+            <div className="mt-8 grid gap-3 md:grid-cols-3">
+              {MICRO_SERIES_OFFER.videoSteps.map(({ number, title, description }) => (
+                <article key={number} className="border border-border bg-card p-5 shadow-sm">
+                  <span className="text-sm font-black text-primary">{number}</span>
+                  <h3 className="mt-4 text-lg font-black">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-10 border border-border bg-card p-5 shadow-sm">
+              <h3 className="text-lg font-black">Outils conseillés pour le montage et les images</h3>
+              <div className="mt-4 divide-y divide-border">
+                {MICRO_SERIES_OFFER.recommendedTools.map(({ name, usage, cost }) => (
+                  <div key={name} className="grid gap-1 py-3 sm:grid-cols-[180px_1fr_auto] sm:items-center sm:gap-4">
+                    <strong className="text-sm">{name}</strong>
+                    <span className="text-sm text-muted-foreground">{usage}</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-accent">{cost}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
