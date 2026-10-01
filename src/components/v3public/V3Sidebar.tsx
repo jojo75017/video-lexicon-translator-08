@@ -160,6 +160,9 @@ const NAV: NavSection[] = [
   },
 ];
 
+/** Libellés publics affichés dans la navigation, réutilisés sur l'accueil. */
+export const V3_SIDEBAR_LABELS = NAV.flatMap((group) => group.items.map((item) => item.label));
+
 export default function V3Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { hasV2 } = useV3Entitlement();

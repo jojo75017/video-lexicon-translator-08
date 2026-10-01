@@ -1,11 +1,27 @@
-const ROWS: string[][] = [
+import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
+import { V3_SIDEBAR_LABELS } from './V3Sidebar';
+
+const BOOK_FORMATS: string[][] = [
   ['Roman policier', 'Thriller psychologique', 'Polar noir', 'Cozy mystery', 'Romance contemporaine', 'Comédie romantique', 'Dark romance', 'Science-fiction', 'Space opera', 'Dystopie', 'Fantasy urbaine', 'Heroic fantasy', 'Roman historique', 'Thriller médical', 'Micro-série en épisodes', 'Recueil de nouvelles', "Roman d'aventure", 'Conte philosophique', 'Drame familial', 'Roman feel-good', 'Récit de voyage initiatique', 'Épopée mythologique', 'Roman fantastique', 'Roman épistolaire', 'Saga familiale'],
   ['Album illustré 3–6 ans', 'Contes du soir', 'Histoire avec morale', 'Bande dessinée', 'Webtoon', 'Fable animalière', 'Premières lectures 7–9 ans', 'Aventure 9–12 ans', 'Livre des émotions', 'Roman ado', 'Biographie', 'Récit de vie', 'Livre de transmission familiale', 'Roman témoignage', 'Journal intime romancé', 'Album de souvenirs', 'Mythologie pour enfants', 'Lecture parents-enfants', 'Comptines & poèmes', 'Parentalité bienveillante', 'Album nature & animaux', 'Roman graphique', 'Mémoires de famille', 'Livre hommage', 'Histoire personnalisée'],
   ['Guide pratique pas-à-pas', 'Livre de cuisine', 'Nutrition & équilibre', 'Développement personnel', 'Gestion du stress', 'Sommeil réparateur', 'Productivité', 'Finances personnelles', 'Investissement & immobilier', 'Guide du freelance', 'Management & leadership', 'Prise de parole', 'Reconversion professionnelle', 'Vente & persuasion', 'Marketing digital', 'Philosophie pratique', 'Guide de voyage', 'Écologie du quotidien', 'Bricolage', 'Sport & bien-être', 'Santé naturelle', 'Méditation', 'Psychologie positive', 'Guide métier', 'Essai & manifeste'],
   ['Carnet de gratitude', 'Suivi d’habitudes', 'Journal guidé', "Cahier d'exercices", 'Jeux & énigmes', 'Escape game papier', "Cahier d'activités", 'Carnet de projet', 'Journal de lecture', 'Carnet de recettes', 'Planificateur 90 jours', 'Citations inspirantes', 'Poésie contemporaine', 'Jardinage & potager', 'Herboristerie', 'Livre audio MP3', 'Couverture rigide KDP', 'Couverture brochée KDP', 'Ebook Kindle', 'Grand format illustré', 'Export Word', 'Export EPUB', 'Export PDF', 'Traduction du livre', 'Audit KDP Pilot'],
 ];
 
-const SPEEDS = ['90s', '110s', '100s', '120s'];
+const cleanLabel = (label: string) => label.replace(/^[^\p{L}\p{N}]+/u, '').trim();
+
+const navigationLabels = [
+  ...V3_HEADER_MENU.flatMap((category) => [category.label, ...category.links.map((link) => link.label)]),
+  ...V3_SIDEBAR_LABELS,
+].map(cleanLabel);
+
+const allPossibilities = Array.from(new Set([...BOOK_FORMATS.flat(), ...navigationLabels]));
+const ROW_COUNT = 6;
+const ROWS = Array.from({ length: ROW_COUNT }, (_, rowIndex) =>
+  allPossibilities.filter((_, itemIndex) => itemIndex % ROW_COUNT === rowIndex),
+);
+
+const SPEEDS = ['120s', '135s', '125s', '145s', '130s', '150s'];
 
 /** Pastille joviale : alternance orange / jaune soleil. */
 const pillStyle = (index: number) =>
@@ -29,10 +45,10 @@ export default function V3FormatsMarquee() {
           className="inline-block rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em]"
           style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
         >
-          {total} créations possibles
+          {total} possibilités EbookStudio V3
         </div>
         <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
-          EbookStudio V3 peut créer{' '}
+          EbookStudio V3 vous permet de{' '}
           <span
             style={{
               background: 'linear-gradient(90deg, var(--v3-joy-orange), var(--v3-joy-yellow))',
@@ -41,9 +57,9 @@ export default function V3FormatsMarquee() {
               color: 'transparent',
             }}
           >
-            tous les livres
+            tout créer, écrire et publier
           </span>{' '}
-          que vous imaginez…
+          au même endroit…
         </h2>
       </div>
       <div className="mt-6 space-y-3 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)' }}>
@@ -69,7 +85,7 @@ export default function V3FormatsMarquee() {
           className="v3-chip"
           style={{ background: 'var(--v3-joy-yellow-soft)', color: 'var(--v3-joy-yellow-600)', borderColor: 'transparent' }}
         >
-          Et des dizaines d’autres formats à inventer…
+          Tous les formats, outils et accompagnements réunis…
         </span>
         <p className="mx-auto mt-3 max-w-2xl text-sm" style={{ color: 'var(--v3-joy-muted)' }}>
           De l’idée au livre complet, relu, mis en page et prêt à publier — vos spécialistes IA vous accompagnent, vous gardez la décision finale.
