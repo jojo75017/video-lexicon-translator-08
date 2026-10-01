@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { AGENT_FILTERS, V3_AGENTS, type AgentFilter } from '@/data/v3Agents';
-import AgentAvatar from './AgentAvatar';
+import AgentPortrait from './AgentPortrait';
 
 /**
  * Grille « Commence ici » : un agent-personnage par type de livre.
@@ -45,23 +45,15 @@ export default function V3AgentsStartGrid() {
             to={agent.route}
             className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
-            {/* Bandeau portrait */}
-            <div
-              className="relative flex h-24 items-center justify-center"
-              style={{ background: `linear-gradient(135deg, ${agent.accent}22, ${agent.accent}0d)` }}
-            >
+            <div className="relative h-36 overflow-hidden bg-muted">
               <span
-                className="absolute right-3 top-2 text-3xl font-black leading-none opacity-15"
+                className="absolute right-3 top-2 z-10 text-3xl font-black leading-none opacity-25"
                 style={{ color: agent.accent }}
               >
                 {agent.num}
               </span>
-              <span
-                className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-background shadow-sm ring-2 transition-transform duration-300 group-hover:scale-105"
-                style={{ ['--tw-ring-color' as string]: `${agent.accent}55` }}
-              >
-                <AgentAvatar seed={agent.id} accent={agent.accent} robot={agent.robot} size={56} />
-              </span>
+              <AgentPortrait id={agent.id} name={agent.name} />
+              <span className="absolute inset-x-0 bottom-0 h-px bg-border" aria-hidden="true" />
             </div>
 
             <div className="flex flex-1 flex-col p-4">
