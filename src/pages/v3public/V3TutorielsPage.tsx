@@ -37,12 +37,14 @@ export default function V3TutorielsPage() {
       ))}
 
       <Dialog open={!!open} onOpenChange={(o) => !o && setOpen(null)}>
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-3xl">
           {open && (
             <>
               <DialogHeader><DialogTitle>Tuto {open.num} — {open.titre}</DialogTitle></DialogHeader>
               <Progress value={((i + 1) / open.etapes.length) * 100} />
               <div className="min-h-32 py-4">
+                <img src={`/tutoriels/tuto-${open.num}.jpg`} alt={`Capture : ${open.titre}`}
+                  className="mb-3 w-full rounded-md border" loading="lazy" />
                 <div className="text-sm text-muted-foreground">Écran {i + 1} / {open.etapes.length}</div>
                 <p className="mt-2 text-lg">{open.etapes[i]}</p>
               </div>
