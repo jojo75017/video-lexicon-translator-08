@@ -21,6 +21,13 @@ const BodySchema = z.object({
   characters: z.array(CharacterSchema).min(1).max(3),
 });
 
+const GeneratedPageSchema = z.object({
+  pageNumber: z.number().int().min(1).max(30),
+  text: z.string().trim().min(1).max(600),
+  scene: z.string().trim().min(1).max(1500),
+  characters: z.array(z.string().trim().min(1).max(80)).max(3),
+});
+
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 }
@@ -109,9 +116,11 @@ Le tableau pages doit contenir exactement ${pageCount} objets numérotés de 1 �
     const text = await readResponseText(response);
     const match = text.match(/\{[\s\S]*\}/);
     if (!match) return json({ error: 'Le découpage reçu est illisible. Relancez la création.' }, 502);
-    const parsed = JSON.parse(match[0]);
-    if (!Array.isArray(parsed.pages) || parsed.pages.length !== pageCount) return json({ error: `Le moteur a produit ${parsed.pages?.length || 0} pages au lieu de ${pageCount}. Relancez la création.` }, 502);
-    return json({ pages: parsed.pages });
+    const generated = z.object({ pages: z.array(GeneratedPageSchema).length(pageCount) }).safeParse(JSON.parse(match[0]));
+    if (!generated.success) return json({ error: 'Le découpage reçu est incomplet. Relancez la création.' }, 502);
+    const pageNumbersAreValid = generated.data.pages.every((page, index) => page.pageNumber === index + 1);
+    if (!pageNumbersAreValid) return json({ error: 'La numérotation des pages est incorrecte. Relancez la création.' }, 502);
+    return json({ pages: generated.data.pages });
   } catch (error) {
     return json({ error: error instanceof Error ? error.message : 'Erreur inconnue.' }, 500);
   }
