@@ -59,6 +59,7 @@ export default function V3ShortStoriesPage() {
   const [generating, setGenerating] = useState(false);
   const [regenerating, setRegenerating] = useState<number | null>(null);
   const [progress, setProgress] = useState(0);
+  const [goal, setGoal] = useState(0);
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const [copied, setCopied] = useState<number | 'all' | null>(null);
   const cancelRef = useRef(false);
@@ -84,22 +85,21 @@ export default function V3ShortStoriesPage() {
     return theme.trim() ? `Histoires courtes — ${theme.trim()}` : `Mon livre d'${ageLabel.toLowerCase()}`;
   }, [bookTitle, targetAge, theme]);
 
-  const generate = useCallback(async () => {
-    if (!theme.trim()) {
-      toast.error('Indiquez un thème pour votre livre d\'histoires.');
-      return;
-    }
-    const total = Math.min(Math.max(count || 10, 1), MAX_STORIES);
-    cancelRef.current = false;
-    setGenerating(true);
-    setProgress(0);
-    setStories([]);
-
-    try {
-      let generated = 0;
-      while (generated < total) {
+  /** Appelle un lot, avec 2 nouvelles tentatives espacées si le réseau ou le service IA cale. */
+  const invokeBatch = useCallback(async (
+    batchCount: number,
+    startIndex: number,
+    existingStories: { title: string; synopsis: string }[],
+  ): Promise<ShortStory[]> => {
+    const delays = [4000, 12000];
+    let lastError = 'Génération impossible.';
+    for (let attempt = 0; attempt <= delays.length; attempt++) {
+      if (attempt > 0) {
+        toast.info(`Lot ${Math.floor(startIndex / BATCH_SIZE) + 1} : nouvelle tentative (${attempt}/${delays.length})…`);
+        await new Promise((r) => setTimeout(r, delays[attempt - 1]));
         if (cancelRef.current) break;
-        const batchCount = Math.min(BATCH_SIZE, total - generated);
+      }
+      try {
         const { data, error } = await supabase.functions.invoke('short-stories-generate', {
           body: {
             bookTitle: effectiveTitle,
@@ -110,48 +110,105 @@ export default function V3ShortStoriesPage() {
             wordsPerStory,
             characterBible: characterBible.trim() || undefined,
             generateImages,
-            startIndex: generated,
+            startIndex,
+            existingStories,
           },
         });
-        if (error) throw new Error(error.message);
-        const batch = (data as { stories?: ShortStory[] })?.stories ?? [];
-        if (batch.length === 0) throw new Error('Réponse IA vide — réessayez.');
-        setStories((prev) => [...prev, ...batch]);
-        generated += batch.length;
-        setProgress(generated);
+        if (error) {
+          const status = (error as { context?: { status?: number } }).context?.status;
+          lastError = error.message;
+          if (status && status >= 400 && status < 500 && status !== 429) break;
+          continue;
+        }
+        const payload = data as { stories?: ShortStory[]; error?: string; status?: number };
+        if (payload?.error) {
+          lastError = payload.error;
+          const s = payload.status ?? 500;
+          if (s >= 400 && s < 500 && s !== 429) break; // erreur définitive : pas de relance
+          continue;
+        }
+        const batch = payload?.stories ?? [];
+        if (batch.length > 0) return batch;
+        lastError = 'Réponse IA vide.';
+      } catch (err) {
+        lastError = err instanceof Error ? err.message : lastError;
       }
-      if (!cancelRef.current) {
-        toast.success(`${generated} histoire${generated > 1 ? 's' : ''} générée${generated > 1 ? 's' : ''} !`);
+    }
+    throw new Error(lastError);
+  }, [effectiveTitle, targetAge, theme, tone, wordsPerStory, characterBible, generateImages]);
+
+  /** Génère jusqu'à `target` histoires au total en partant de `base`, par lots de 5. */
+  const runBatches = useCallback(async (base: ShortStory[], target: number) => {
+    cancelRef.current = false;
+    setGenerating(true);
+    setGoal(target);
+    setProgress(base.length);
+    let all = [...base];
+    let emptyRounds = 0;
+    try {
+      while (all.length < target && !cancelRef.current) {
+        const batchCount = Math.min(BATCH_SIZE, target - all.length);
+        const memory = all.map((s) => ({ title: s.title, synopsis: s.synopsis }));
+        const batch = await invokeBatch(batchCount, all.length, memory);
+        const known = new Set(all.map((s) => s.title.trim().toLowerCase()));
+        const fresh = batch
+          .filter((s) => !known.has(s.title.trim().toLowerCase()))
+          .map((s, i) => ({ ...s, numero: all.length + i + 1 }));
+        if (fresh.length === 0) {
+          emptyRounds += 1;
+          if (emptyRounds >= 2) throw new Error('L’IA ne propose plus d’histoires nouvelles — précisez le thème pour en obtenir d’autres.');
+          continue;
+        }
+        emptyRounds = 0;
+        all = [...all, ...fresh];
+        setStories(all);
+        setProgress(all.length);
+      }
+      if (!cancelRef.current && all.length >= target) {
+        toast.success(`${all.length} histoire${all.length > 1 ? 's' : ''} prête${all.length > 1 ? 's' : ''} !`);
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Génération impossible.');
+      const msg = err instanceof Error ? err.message : 'Génération impossible.';
+      toast.error(`${all.length}/${target} histoires générées. ${msg} Cliquez sur « Compléter » pour reprendre.`);
     } finally {
       setGenerating(false);
     }
-  }, [theme, count, targetAge, tone, wordsPerStory, characterBible, generateImages, effectiveTitle]);
+  }, [invokeBatch]);
+
+  const generate = useCallback(async () => {
+    if (!theme.trim()) {
+      toast.error('Indiquez un thème pour votre livre d\'histoires.');
+      return;
+    }
+    const total = Math.min(Math.max(count || 10, 1), MAX_STORIES);
+    setStories([]);
+    await runBatches([], total);
+  }, [theme, count, runBatches]);
+
+  /** Reprend là où la génération s'est arrêtée, ou ajoute 5 histoires. */
+  const complete = useCallback(async () => {
+    if (!theme.trim()) {
+      toast.error('Indiquez un thème pour votre livre d\'histoires.');
+      return;
+    }
+    const requested = Math.min(Math.max(count || 10, 1), MAX_STORIES);
+    const target = stories.length < requested
+      ? requested
+      : Math.min(stories.length + BATCH_SIZE, MAX_STORIES);
+    if (target <= stories.length) {
+      toast.info(`Maximum de ${MAX_STORIES} histoires atteint.`);
+      return;
+    }
+    await runBatches(stories, target);
+  }, [theme, count, stories, runBatches]);
 
   const regenerateOne = async (numero: number) => {
     setRegenerating(numero);
     try {
       const story = stories.find((s) => s.numero === numero);
       if (!story) return;
-      const { data, error } = await supabase.functions.invoke('short-stories-generate', {
-        body: {
-          bookTitle: effectiveTitle,
-          targetAge,
-          theme: theme.trim(),
-          tone: TONES.find((t) => t.id === tone)?.label ?? tone,
-          count: 1,
-          wordsPerStory,
-          characterBible: characterBible.trim() || undefined,
-          generateImages,
-          startIndex: numero - 1,
-        },
-      });
-      if (error) throw new Error(error.message);
-      const batch = (data as { stories?: ShortStory[] })?.stories ?? [];
-      if (batch.length === 0) throw new Error('Réponse IA vide.');
-      const [replacement] = batch;
+      const memory = stories.map((s) => ({ title: s.title, synopsis: s.synopsis }));
+      const [replacement] = await invokeBatch(1, numero - 1, memory);
       setStories((prev) =>
         prev.map((s) =>
           s.numero === numero
