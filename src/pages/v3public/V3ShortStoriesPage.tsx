@@ -434,11 +434,23 @@ export default function V3ShortStoriesPage() {
             style={{ background: `linear-gradient(90deg, ${EMERALD}, #0d7a5f)` }}
           >
             {generating ? (
-              <><Loader2 className="h-4 w-4 animate-spin" /> Génération {progress}/{Math.min(count, MAX_STORIES)}…</>
+              <><Loader2 className="h-4 w-4 animate-spin" /> Génération {progress}/{goal || Math.min(count, MAX_STORIES)}…</>
             ) : (
               <><Sparkles className="h-4 w-4" /> Générer le livre</>
             )}
           </button>
+          {!generating && stories.length > 0 && stories.length < MAX_STORIES && (
+            <button
+              onClick={complete}
+              className="mt-2 w-full inline-flex items-center justify-center gap-2 rounded-xl border-2 px-6 py-3 text-sm font-bold transition-transform hover:-translate-y-0.5"
+              style={{ borderColor: EMERALD, color: EMERALD }}
+            >
+              <Plus className="h-4 w-4" />
+              {stories.length < Math.min(count, MAX_STORIES)
+                ? `Compléter (${Math.min(count, MAX_STORIES) - stories.length} histoire${Math.min(count, MAX_STORIES) - stories.length > 1 ? 's' : ''} manquante${Math.min(count, MAX_STORIES) - stories.length > 1 ? 's' : ''})`
+                : `Compléter (+${Math.min(BATCH_SIZE, MAX_STORIES - stories.length)} histoires)`}
+            </button>
+          )}
           {generating && (
             <button
               onClick={() => { cancelRef.current = true; }}
@@ -448,6 +460,9 @@ export default function V3ShortStoriesPage() {
               Arrêter après ce lot
             </button>
           )}
+          <p className="mt-2 text-[11px] leading-snug" style={{ color: MUTED }}>
+            Génération par lots de 5, sans doublon de titre ni de scène. Un lot qui échoue est relancé automatiquement.
+          </p>
         </div>
 
         {/* ——— Exports ——— */}
