@@ -568,8 +568,10 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                             key={c}
                             type="button"
                             onClick={() => { setBioCategory(c); try { localStorage.setItem('v3-bio-category', c); } catch { /* ignore */ } const next = { ...bookBrief, category: c, genre: c }; writeBookBrief(next); setBookBrief(next); toast.success(`Choisi : ${c}`); }}
-                            className="v3-btn text-xs"
-                            style={active ? { background: '#15803D', color: '#fff', borderColor: '#15803D' } : undefined}
+                            className="inline-flex items-center gap-2 rounded-full border-2 px-4 py-2 text-xs font-semibold transition-colors"
+                            style={active
+                              ? { background: '#15803D', color: '#fff', borderColor: '#15803D' }
+                              : { background: '#fff', color: 'var(--v3-ink)', borderColor: 'var(--v3-border)' }}
                           >
                             {active && <Check className="h-3.5 w-3.5" />} {c}
                           </button>
