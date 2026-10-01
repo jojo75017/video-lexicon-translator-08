@@ -69,3 +69,7 @@
 - [x] Verrouiller les personnages par fiches et images de référence
 - [x] Ajouter Léonie dans « Commence ici »
 - [x] Vérifier la création, la cohérence et l’export KDP
+
+## Accueil V3 — accès abonnés
+
+- [x] Ajouter un encart professionnel « Commencez ici » avec explication et accès direct aux spécialistes
