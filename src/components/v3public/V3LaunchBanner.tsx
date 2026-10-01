@@ -43,7 +43,7 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
 
   return (
     <section
-      className="w-full"
+      className="w-full v3-launch-sage"
       style={{
         background: 'var(--v3-editorial-ink)',
         borderBottom: '1px solid var(--v3-gold)',

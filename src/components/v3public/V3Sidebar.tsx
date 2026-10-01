@@ -241,7 +241,7 @@ export default function V3Sidebar() {
           to="/v3/hub?tab=parcours&module=cover-studio-pro"
           title="Créer ma couverture — Cover Studio Pro"
           aria-label="Créer ma couverture — Cover Studio Pro"
-          className="relative flex min-h-12 items-center gap-2.5 rounded-md bg-orange-500 px-2.5 py-2 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-orange-600"
+          className="relative flex min-h-12 items-center gap-2.5 rounded-md bg-[#6a9e7d] px-2.5 py-2 text-sm font-bold text-primary-foreground shadow-sm transition-colors hover:bg-[#e9a46f]"
         >
           <ImageIcon className="h-5 w-5 shrink-0" />
           {!collapsed && (
