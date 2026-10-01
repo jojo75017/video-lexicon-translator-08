@@ -1,10 +1,25 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { z } from 'npm:zod@3.23.8';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+const CharacterSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().min(1).max(80),
+  age: z.string().trim().min(1).max(30),
+  physical: z.string().trim().min(1).max(1000),
+  outfit: z.string().trim().min(1).max(600),
+  distinctiveFeatures: z.string().max(300),
+  personality: z.string().max(300),
+});
+
+const BodySchema = z.object({
+  title: z.string().trim().min(1).max(160),
+  targetAge: z.string().trim().min(1).max(30),
+  pitch: z.string().trim().min(20).max(4000),
+  moral: z.string().max(300),
+  pageCount: z.union([z.literal(16), z.literal(20), z.literal(24), z.literal(28), z.literal(30)]),
+  characters: z.array(CharacterSchema).min(1).max(3),
+});
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
@@ -47,9 +62,10 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) return json({ error: 'Le moteur d’écriture n’est pas configuré.' }, 500);
 
-    const body = await req.json();
-    const pageCount = [16, 20, 24, 28, 30].includes(Number(body.pageCount)) ? Number(body.pageCount) : 24;
-    if (!body.title || !body.pitch || !Array.isArray(body.characters) || body.characters.length === 0) return json({ error: 'Titre, histoire et personnage requis.' }, 400);
+    const parsedBody = BodySchema.safeParse(await req.json());
+    if (!parsedBody.success) return json({ error: 'Certains champs sont incomplets ou trop longs.', fields: parsedBody.error.flatten().fieldErrors }, 400);
+    const body = parsedBody.data;
+    const pageCount = body.pageCount;
     const prompt = `Tu es un auteur et directeur artistique français spécialisé dans les vrais albums illustrés pour enfants de ${body.targetAge || '3-6 ans'}.
 Crée UNE SEULE HISTOIRE CONTINUE intitulée « ${body.title} », découpée en exactement ${pageCount} pages intérieures.
 Pitch imposé: ${body.pitch}
