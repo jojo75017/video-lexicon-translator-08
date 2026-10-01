@@ -120,6 +120,55 @@ export default function StudioMicroSeriesOfferPage() {
           </div>
         </section>
 
+        <section className="border-t border-border bg-muted/40 px-4 py-16 sm:px-6" aria-labelledby="how-title">
+          <div className="mx-auto max-w-6xl">
+            <div className="border-l-4 border-accent bg-accent/10 p-5">
+              <p className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-accent">
+                <KeyRound className="h-4 w-4" /> Clé IA gratuite acceptée · 0 € de surcoût
+              </p>
+              <p className="mt-3 text-sm leading-6">
+                Le studio se connecte directement à votre propre clé Google Gemini (gratuite) ou OpenRouter, enregistrée
+                dans votre navigateur et visible de vous seul. Vous composez autant d’épisodes et de storyboards que vous
+                voulez, sans abonnement caché ni crédit supplémentaire à acheter.
+                {' '}
+                <Link to="/v3/fonctionnalites/cles" className="font-bold text-primary underline">
+                  Voir où coller ma clé
+                </Link>
+                .
+              </p>
+            </div>
+
+            <h2 id="how-title" className="mt-12 text-3xl font-black sm:text-4xl">Comment vous allez créer vos vidéos en 3 étapes</h2>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
+              Le Studio Micro-Séries écrit et structure toute la série. Le rendu vidéo final reste fait dans l’outil de
+              votre choix : aucune vidéo n’est calculée ni facturée ici.
+            </p>
+
+            <div className="mt-8 grid gap-3 md:grid-cols-3">
+              {MICRO_SERIES_OFFER.videoSteps.map(({ number, title, description }) => (
+                <article key={number} className="border border-border bg-card p-5 shadow-sm">
+                  <span className="text-sm font-black text-primary">{number}</span>
+                  <h3 className="mt-4 text-lg font-black">{title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{description}</p>
+                </article>
+              ))}
+            </div>
+
+            <div className="mt-10 border border-border bg-card p-5 shadow-sm">
+              <h3 className="text-lg font-black">Outils conseillés pour le montage et les images</h3>
+              <div className="mt-4 divide-y divide-border">
+                {MICRO_SERIES_OFFER.recommendedTools.map(({ name, usage, cost }) => (
+                  <div key={name} className="grid gap-1 py-3 sm:grid-cols-[180px_1fr_auto] sm:items-center sm:gap-4">
+                    <strong className="text-sm">{name}</strong>
+                    <span className="text-sm text-muted-foreground">{usage}</span>
+                    <span className="text-xs font-black uppercase tracking-widest text-accent">{cost}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section id="precommande" className="scroll-mt-16 border-y border-border bg-secondary px-4 py-16 sm:px-6" aria-labelledby="order-title">
           <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div className="pt-3"><p className="text-sm font-bold uppercase tracking-widest text-accent">Accès anticipé V4</p><h2 id="order-title" className="mt-3 text-3xl font-black sm:text-4xl">Réservez votre accès à vie</h2><ul className="mt-7 space-y-3 text-base">{['67 € une seule fois, sans abonnement', 'Accès automatiquement ouvert dès la sortie V4', 'Aucune génération vidéo facturée aujourd’hui', 'Garantie 30 jours satisfait ou remboursé'].map((item) => <li key={item} className="flex items-center gap-3"><span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check className="h-3.5 w-3.5" /></span>{item}</li>)}</ul></div>
