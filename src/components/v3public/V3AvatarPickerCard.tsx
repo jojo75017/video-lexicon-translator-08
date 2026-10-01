@@ -37,7 +37,13 @@ const inputStyle = {
  * son univers, ou décrit le sien. Le profil retenu est transmis aux agents
  * (sommaire, chapitres, relecture) via les champs Cible & Promesse de la fiche.
  */
-export default function V3AvatarPickerCard({ category, value, onChange }: Props) {
+export const PERSONAL_CATEGORIES = [
+  'Récit de ma vie (livre familial)',
+  'Arbre généalogique / Histoire de famille',
+  'Souvenirs pour mes enfants et petits-enfants',
+];
+
+export default function V3AvatarPickerCard({ category, value, onChange, personal }: Props & { personal?: boolean }) {
   const suggested = useMemo(() => findAvatarCategory(category), [category]);
   const [groupId, setGroupId] = useState(() => suggested?.id || V3_BOOK_AVATARS[0].id);
   const [custom, setCustom] = useState(() => Boolean(value.cibleProfil && !value.avatarId));
@@ -67,6 +73,17 @@ export default function V3AvatarPickerCard({ category, value, onChange }: Props)
       avatarConsigne: avatar.consigne,
     });
   };
+
+  if (personal || PERSONAL_CATEGORIES.includes(category || '')) {
+    return (
+      <div className="rounded-xl border p-4 text-sm" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
+        <p className="font-semibold">🔒 Livre personnel — aucun avatar lecteur</p>
+        <p className="mt-1" style={{ color: 'var(--v3-muted)' }}>
+          Ce récit est écrit pour vous et vos proches. Aucun profil commercial n'est appliqué : vos mots et vos souvenirs sont conservés tels quels.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
