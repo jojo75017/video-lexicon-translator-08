@@ -29,10 +29,10 @@ export default function V3TutorielsPage() {
                 className="rounded-lg border bg-card p-4 text-left hover:border-primary">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Tuto {t.num} · {t.duree}</span>
-                  {t.video && <Badge>🎬 Vidéo</Badge>}
+                  {t.videos?.length && <Badge>🎬 Vidéo{t.videos.length > 1 ? `s (${t.videos.length})` : ''}</Badge>}
                 </div>
                 <div className="mt-1 font-medium">{t.titre}</div>
-                <div className="mt-2 flex items-center gap-1 text-sm text-primary"><PlayCircle className="h-4 w-4" /> {t.video ? 'Regarder la vidéo' : 'Voir le tuto'}</div>
+                <div className="mt-2 flex items-center gap-1 text-sm text-primary"><PlayCircle className="h-4 w-4" /> {t.videos?.length ? 'Regarder la vidéo' : 'Voir le tuto'}</div>
               </button>
             ))}
           </div>
@@ -44,15 +44,20 @@ export default function V3TutorielsPage() {
           {open && (
             <>
               <DialogHeader><DialogTitle>Tuto {open.num} — {open.titre}</DialogTitle></DialogHeader>
-              {open.video && (
+              {open.videos?.length ? (
                 <div className="rounded-lg border bg-muted/40 p-3">
-                  <div className="mb-2 flex items-center gap-2 text-sm font-medium"><PlayCircle className="h-4 w-4 text-primary" /> Regardez la vidéo, puis suivez les écrans ci-dessous</div>
-                  <video src={open.video} controls playsInline preload="metadata" className="w-full rounded-md" />
+                  <div className="mb-2 flex items-center gap-2 text-sm font-medium"><PlayCircle className="h-4 w-4 text-primary" /> Regardez {open.videos.length > 1 ? `les ${open.videos.length} vidéos` : 'la vidéo'}, puis suivez les écrans ci-dessous</div>
+                  {open.videos.map((v, vi) => (
+                    <div key={v} className={vi > 0 ? 'mt-3' : ''}>
+                      {open.videos.length > 1 && <div className="mb-1 text-xs font-medium text-muted-foreground">Vidéo {vi + 1} / {open.videos.length}</div>}
+                      <video src={v} controls playsInline preload="metadata" className="w-full rounded-md" />
+                    </div>
+                  ))}
                 </div>
-              )}
+              ) : null}
               <Progress value={((i + 1) / open.etapes.length) * 100} />
               <div className="min-h-32 py-4">
-                {!open.video && <img src={`/tutoriels/tuto-${open.num}.jpg`} alt={`Capture : ${open.titre}`}
+                {!open.videos?.length && <img src={`/tutoriels/tuto-${open.num}.jpg`} alt={`Capture : ${open.titre}`}
                   className="mb-3 w-full rounded-md border" loading="lazy" />}
                 <div className="text-sm text-muted-foreground">Écran {i + 1} / {open.etapes.length}</div>
                 <p className="mt-2 text-lg">{open.etapes[i]}</p>

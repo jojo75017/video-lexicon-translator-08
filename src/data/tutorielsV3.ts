@@ -12,7 +12,7 @@ export interface TutorielV3 {
   duree: string;
   route: string;
   etapes: string[];
-  video?: string;
+  videos?: string[];
 }
 
 const t = (num: number, rubrique: TutoRubrique, titre: string, route: string, etapes: string[], duree = '1 min'): TutorielV3 => ({
@@ -152,5 +152,6 @@ export const TUTORIELS_V3: TutorielV3[] = [
 
 export const RUBRIQUES_V3: TutoRubrique[] = ['Démarrer', 'Les 5 étapes', 'Créer', 'Écrire et corriger', 'Habiller', 'Publier et vendre'];
 
-const VIDEOS: Record<number, string> = { 6: etape1Video.url, 7: etape2Video.url, 8: etape3Video.url };
-TUTORIELS_V3.forEach((x) => { if (VIDEOS[x.num]) x.video = VIDEOS[x.num]; });
+// Tutoriel 8 = vidéos des Étapes 3 et 4 réunies (la vidéo 4 s'ajoute en 2e position quand elle est prête).
+const VIDEOS: Record<number, string[]> = { 6: [etape1Video.url], 7: [etape2Video.url], 8: [etape3Video.url] };
+TUTORIELS_V3.forEach((x) => { if (VIDEOS[x.num]?.length) x.videos = VIDEOS[x.num]; });
