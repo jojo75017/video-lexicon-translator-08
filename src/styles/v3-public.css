@@ -20,7 +20,7 @@
   --v3-cream: #f2f9f4;
   --v3-ink: #0a1f18;
   --v3-ink-2: #1a2e26;
-  --v3-editorial-ink: #232f3e;
+  --v3-editorial-ink: #5b8a6e;
   --v3-editorial-ink-soft: #344456;
   --v3-ivory: #f8f5ed;
   --v3-muted: #5b6b64;
@@ -179,7 +179,7 @@
 
 /* Section sombre — fond émeraude nuit */
 .v3pub .v3-section-dark {
-  background: linear-gradient(180deg, #052e23 0%, #041e18 100%);
+  background: linear-gradient(180deg, #4f7a62 0%, #3f6a53 100%);
   color: #f5f0e0;
 }
 .v3pub .v3-section-dark .v3-serif { color: #fff; }
@@ -416,9 +416,9 @@
 .v3pub .v3-btn-outline,
 .v3pub .v3-btn-ghost,
 .v3pub .v3-btn-on-dark {
-  background: #c2410c !important;
+  background: #f97316 !important;
   color: #ffffff !important;
-  border-color: #c2410c !important;
+  border-color: #f97316 !important;
 }
 .v3pub button:not(:disabled):hover,
 .v3pub [role="button"]:not([aria-disabled="true"]):hover,
@@ -430,9 +430,9 @@
 .v3pub .v3-btn-outline:hover,
 .v3pub .v3-btn-ghost:hover,
 .v3pub .v3-btn-on-dark:hover {
-  background: #9a3412 !important;
+  background: #ea580c !important;
   color: #ffffff !important;
-  border-color: #9a3412 !important;
+  border-color: #ea580c !important;
 }
 /* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
 .v3pub button.v3-btn-reset-green:not(:disabled),
@@ -466,3 +466,7 @@
   color: #fff !important;
   border-color: #15803D !important;
 }
+
+/* Palette vert sauge & orange : bandeaux clairs */
+.v3pub .v3-header-sage { background: linear-gradient(180deg,#8fb89c 0%,#7aa888 100%) !important; border-bottom:2px solid #f97316 !important; }
+.v3pub .v3-header-sage .v3-mobile-panel { background:#7aa888 !important; }

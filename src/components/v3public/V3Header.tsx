@@ -23,7 +23,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
 
   return (
     <header
-      className="sticky top-0 z-40 overflow-x-clip"
+      className="v3-header-sage sticky top-0 z-40 overflow-x-clip"
       style={{
         background: 'linear-gradient(180deg, #064e3b 0%, #053e2f 100%)',
         borderBottom: '1px solid rgba(201, 168, 76, 0.28)',
@@ -136,7 +136,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
 
       {/* Drawer mobile & tablette */}
       {open && (
-        <div className="xl:hidden" style={{ background: '#053e2f' }}>
+        <div className="xl:hidden v3-mobile-panel">
           <div className="px-5 py-4 space-y-2">
             <form onSubmit={submitSearch} className="relative">
               <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
