@@ -65,7 +65,7 @@
 
 ## Studio Album Illustré 3–6 ans
 
-- [ ] Créer un module séparé pour une histoire continue jusqu’à 30 pages
-- [ ] Verrouiller les personnages par fiches et images de référence
-- [ ] Ajouter Léonie dans « Commence ici »
-- [ ] Vérifier la création, la cohérence et l’export KDP
+- [x] Créer un module séparé pour une histoire continue jusqu’à 30 pages
+- [x] Verrouiller les personnages par fiches et images de référence
+- [x] Ajouter Léonie dans « Commence ici »
+- [x] Vérifier la création, la cohérence et l’export KDP
