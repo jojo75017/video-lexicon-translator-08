@@ -7,6 +7,12 @@ const ROWS: string[][] = [
 
 const SPEEDS = ['90s', '110s', '100s', '120s'];
 
+/** Pastille joviale : alternance orange / jaune soleil. */
+const pillStyle = (index: number) =>
+  index % 2
+    ? { border: '2px solid var(--v3-joy-yellow-soft)', color: 'var(--v3-joy-ink)' }
+    : { border: '2px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-ink)' };
+
 export default function V3FormatsMarquee() {
   const total = ROWS.reduce((n, r) => n + r.length, 0);
   return (
@@ -19,11 +25,25 @@ export default function V3FormatsMarquee() {
         @media (prefers-reduced-motion: reduce) { .v3mq-track { animation: none; flex-wrap: wrap; width:auto; } }
       `}</style>
       <div className="text-center">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold-600)' }}>
+        <div
+          className="inline-block rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em]"
+          style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
+        >
           {total} créations possibles
         </div>
-        <h2 className="v3-serif mt-2 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-emerald)' }}>
-          EbookStudio V3 peut créer tous les livres que vous imaginez…
+        <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
+          EbookStudio V3 peut créer{' '}
+          <span
+            style={{
+              background: 'linear-gradient(90deg, var(--v3-joy-orange), var(--v3-joy-yellow))',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}
+          >
+            tous les livres
+          </span>{' '}
+          que vous imaginez…
         </h2>
       </div>
       <div className="mt-6 space-y-3 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)' }}>
@@ -31,8 +51,12 @@ export default function V3FormatsMarquee() {
           <div key={i} className="v3mq-row overflow-hidden">
             <div className={`v3mq-track ${i % 2 ? 'v3mq-rev' : ''}`} style={{ ['--d' as string]: SPEEDS[i] }}>
               {[...row, ...row].map((t, j) => (
-                <span key={j} className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium"
-                  style={{ border: '1px solid var(--v3-line)', color: 'var(--v3-emerald)' }} aria-hidden={j >= row.length}>
+                <span
+                  key={j}
+                  className="whitespace-nowrap rounded-3xl bg-white px-5 py-2.5 text-sm font-bold shadow-sm"
+                  style={pillStyle(j)}
+                  aria-hidden={j >= row.length}
+                >
                   {t}
                 </span>
               ))}
@@ -41,13 +65,16 @@ export default function V3FormatsMarquee() {
         ))}
       </div>
       <div className="mt-6 text-center">
-        <span className="v3-chip" style={{ background: 'var(--v3-gold-soft)', color: '#6a4f10', borderColor: 'transparent' }}>
+        <span
+          className="v3-chip"
+          style={{ background: 'var(--v3-joy-yellow-soft)', color: 'var(--v3-joy-yellow-600)', borderColor: 'transparent' }}
+        >
           Et des dizaines d’autres formats à inventer…
         </span>
-        <p className="mx-auto mt-3 max-w-2xl text-sm" style={{ color: 'var(--v3-ink, #2f5a42)' }}>
+        <p className="mx-auto mt-3 max-w-2xl text-sm" style={{ color: 'var(--v3-joy-muted)' }}>
           De l’idée au livre complet, relu, mis en page et prêt à publier — vos spécialistes IA vous accompagnent, vous gardez la décision finale.
         </p>
-        <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-xs font-medium" style={{ color: 'var(--v3-emerald)' }}>
+        <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-xs font-bold" style={{ color: 'var(--v3-joy-orange-600)' }}>
           <span>✓ Aucune compétence en écriture</span>
           <span>✓ Aucun logiciel de mise en page</span>
           <span>✓ Couvertures aux normes Amazon KDP</span>
