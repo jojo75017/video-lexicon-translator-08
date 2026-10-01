@@ -240,6 +240,9 @@ verify_jwt = true
 [functions.agent-kids-stories]
 verify_jwt = true
 
+[functions.album-illustrated-story]
+verify_jwt = true
+
 [functions.agent-universe-volumes]
 verify_jwt = true
 

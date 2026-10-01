@@ -113,6 +113,7 @@ const V3BienvenuePage = lazy(() => import('./pages/v3public/V3BienvenuePage'));
 const V3CreatePage = lazy(() => import('./pages/v3public/V3CreatePage'));
 const V3LaunchBookPage = lazy(() => import('./pages/v3public/V3LaunchBookPage'));
 const V3KidsBookCreatePage = lazy(() => import('./pages/v3public/V3KidsBookCreatePage'));
+const V3IllustratedAlbumPage = lazy(() => import('./pages/v3public/V3IllustratedAlbumPage'));
 const V3BookPage = lazy(() => import('./pages/v3public/V3BookPage'));
 const V3LibraryPage = lazy(() => import('./pages/v3public/V3LibraryPage'));
 const V3GalleryPage = lazy(() => import('./pages/v3public/V3GalleryPage'));
@@ -774,6 +775,7 @@ const App = () => {
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
               <Route path="create" element={<V3LockedGate><TrialBookLimitGate><V3CreatePage /></TrialBookLimitGate></V3LockedGate>} />
+              <Route path="create/album-illustre" element={<V3LockedGate><TrialGate label="Album illustré 3–6 ans"><V3IllustratedAlbumPage /></TrialGate></V3LockedGate>} />
               {/* Parcours direct « comme la V2, en mieux » : fiche + workflow 15 agents */}
               <Route path="lancer" element={<V3LockedGate><TrialBookLimitGate><V3LaunchBookPage /></TrialBookLimitGate></V3LockedGate>} />
 
