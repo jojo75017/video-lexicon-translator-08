@@ -98,6 +98,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
   // Fiche livre synchronisée (titre, description, drapeau outlineFirst…).
   const [bookBrief, setBookBrief] = useState<BookBrief>(() => readBookBrief() || {});
+  const [bioCategory, setBioCategory] = useState<string>(() => { try { return localStorage.getItem('v3-bio-category') || ''; } catch { return ''; } });
   useEffect(() => {
     const sync = () => setBookBrief(readBookBrief() || {});
     sync();
@@ -561,14 +562,14 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {['Récit de ma vie (livre familial)', 'Arbre généalogique / Histoire de famille', 'Souvenirs pour mes enfants et petits-enfants'].map((c) => {
-                        const active = (bookBrief.category || bookBrief.genre) === c;
+                        const active = (bioCategory || bookBrief.category || bookBrief.genre) === c;
                         return (
                           <button
                             key={c}
                             type="button"
-                            onClick={() => { const next = { ...bookBrief, category: c, genre: c }; writeBookBrief(next); setBookBrief(next); toast.success(`Choisi : ${c}`); }}
-                            className="v3-btn text-xs"
-                            style={active ? { background: 'var(--v3-emerald, #065F46)', color: '#fff', borderColor: 'var(--v3-emerald, #065F46)' } : undefined}
+                            onClick={() => { setBioCategory(c); try { localStorage.setItem('v3-bio-category', c); } catch { /* ignore */ } const next = { ...bookBrief, category: c, genre: c }; writeBookBrief(next); setBookBrief(next); toast.success(`Choisi : ${c}`); }}
+                            aria-pressed={active}
+                            className={`v3-choice-pill inline-flex items-center gap-2 rounded-full border-2 px-4 py-2 text-xs font-semibold transition-colors ${active ? 'is-active' : ''}`}
                           >
                             {active && <Check className="h-3.5 w-3.5" />} {c}
                           </button>

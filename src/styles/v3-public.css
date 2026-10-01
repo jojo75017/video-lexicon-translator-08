@@ -452,3 +452,17 @@
 .v3pub [aria-disabled="true"] {
   opacity: 0.55;
 }
+
+/* Choix « livre personnel » : le choix actif reste vert, les autres en blanc. */
+.v3pub button.v3-choice-pill:not(:disabled) {
+  background: #fff !important;
+  color: var(--v3-ink) !important;
+  border-color: var(--v3-border) !important;
+}
+.v3pub button.v3-choice-pill:not(:disabled):hover { border-color: #15803D !important; color: #15803D !important; }
+.v3pub button.v3-choice-pill.is-active:not(:disabled),
+.v3pub button.v3-choice-pill.is-active:not(:disabled):hover {
+  background: #15803D !important;
+  color: #fff !important;
+  border-color: #15803D !important;
+}
