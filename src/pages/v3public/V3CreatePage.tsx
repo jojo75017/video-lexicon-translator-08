@@ -566,8 +566,9 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                           <button
                             key={c}
                             type="button"
-                            onClick={() => writeBookBrief({ category: c, genre: c })}
-                            className={`v3-btn text-xs ${active ? 'v3-btn-action-orange' : ''}`}
+                            onClick={() => { const next = { ...bookBrief, category: c, genre: c }; writeBookBrief(next); setBookBrief(next); toast.success(`Choisi : ${c}`); }}
+                            className="v3-btn text-xs"
+                            style={active ? { background: 'var(--v3-emerald, #065F46)', color: '#fff', borderColor: 'var(--v3-emerald, #065F46)' } : undefined}
                           >
                             {active && <Check className="h-3.5 w-3.5" />} {c}
                           </button>
