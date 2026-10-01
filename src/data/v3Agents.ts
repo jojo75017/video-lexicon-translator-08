@@ -49,6 +49,12 @@ export const V3_AGENTS: V3Agent[] = [
     filter: 'enfants', route: '/v3/livres/histoires-illustrees', accent: '#DB2777',
   },
   {
+    id: 'leonie', num: '03B', name: 'Léonie', role: 'Créatrice d’albums illustrés',
+    mission: 'Une histoire suivie, jusqu’à 30 pages, avec vos personnages illustrés verrouillés.',
+    deliverables: ['Scénario page par page', 'Personnages cohérents', 'Album carré KDP'],
+    filter: 'enfants', route: '/v3/create/album-illustre', accent: '#0F766E',
+  },
+  {
     id: 'basile', num: '04', name: 'Basile', role: 'Auteur business & méthode',
     mission: 'Guides pratiques, méthodes, développement professionnel, via le workflow.',
     deliverables: ['Livre méthode', 'Exercices', 'Promesse de couverture'],
