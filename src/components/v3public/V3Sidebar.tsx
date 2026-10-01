@@ -76,6 +76,7 @@ const NAV: NavSection[] = [
       { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen },
       { to: '/v3/corriger', label: 'Corriger mon livre', icon: Wand2 },
       { to: '/v3/outils/humanizer', label: 'HumanizeAI', icon: Wand2, badge: 'Nouveau' },
+      { to: '/v3/tutoriels-v3', label: 'Tutoriels V3 (25)', icon: Video, badge: 'Nouveau' },
       { to: '/v3/outils/editeur', label: 'Éditeur WYSIWYG', icon: FileText },
       { to: '/v3/outils/traduction', label: 'Traduction 10 langues', icon: ListTree },
     ],
