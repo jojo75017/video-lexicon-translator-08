@@ -1,0 +1,59 @@
+const ROWS: string[][] = [
+  ['Roman policier', 'Thriller psychologique', 'Polar noir', 'Cozy mystery', 'Romance contemporaine', 'Comédie romantique', 'Dark romance', 'Science-fiction', 'Space opera', 'Dystopie', 'Fantasy urbaine', 'Heroic fantasy', 'Roman historique', 'Thriller médical', 'Micro-série en épisodes', 'Recueil de nouvelles', "Roman d'aventure", 'Conte philosophique', 'Drame familial', 'Roman feel-good', 'Récit de voyage initiatique', 'Épopée mythologique', 'Roman fantastique', 'Roman épistolaire', 'Saga familiale'],
+  ['Album illustré 3–6 ans', 'Contes du soir', 'Histoire avec morale', 'Bande dessinée', 'Webtoon', 'Fable animalière', 'Premières lectures 7–9 ans', 'Aventure 9–12 ans', 'Livre des émotions', 'Roman ado', 'Biographie', 'Récit de vie', 'Livre de transmission familiale', 'Roman témoignage', 'Journal intime romancé', 'Album de souvenirs', 'Mythologie pour enfants', 'Lecture parents-enfants', 'Comptines & poèmes', 'Parentalité bienveillante', 'Album nature & animaux', 'Roman graphique', 'Mémoires de famille', 'Livre hommage', 'Histoire personnalisée'],
+  ['Guide pratique pas-à-pas', 'Livre de cuisine', 'Nutrition & équilibre', 'Développement personnel', 'Gestion du stress', 'Sommeil réparateur', 'Productivité', 'Finances personnelles', 'Investissement & immobilier', 'Guide du freelance', 'Management & leadership', 'Prise de parole', 'Reconversion professionnelle', 'Vente & persuasion', 'Marketing digital', 'Philosophie pratique', 'Guide de voyage', 'Écologie du quotidien', 'Bricolage', 'Sport & bien-être', 'Santé naturelle', 'Méditation', 'Psychologie positive', 'Guide métier', 'Essai & manifeste'],
+  ['Carnet de gratitude', 'Suivi d’habitudes', 'Journal guidé', "Cahier d'exercices", 'Jeux & énigmes', 'Escape game papier', "Cahier d'activités", 'Carnet de projet', 'Journal de lecture', 'Carnet de recettes', 'Planificateur 90 jours', 'Citations inspirantes', 'Poésie contemporaine', 'Jardinage & potager', 'Herboristerie', 'Livre audio MP3', 'Couverture rigide KDP', 'Couverture brochée KDP', 'Ebook Kindle', 'Grand format illustré', 'Export Word', 'Export EPUB', 'Export PDF', 'Traduction du livre', 'Audit KDP Pilot'],
+];
+
+const SPEEDS = ['90s', '110s', '100s', '120s'];
+
+export default function V3FormatsMarquee() {
+  const total = ROWS.reduce((n, r) => n + r.length, 0);
+  return (
+    <section className="v3-shell py-10">
+      <style>{`
+        @keyframes v3mq { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .v3mq-track { display:flex; width:max-content; gap:.6rem; animation: v3mq var(--d) linear infinite; }
+        .v3mq-row:hover .v3mq-track { animation-play-state: paused; }
+        .v3mq-rev { animation-direction: reverse; }
+        @media (prefers-reduced-motion: reduce) { .v3mq-track { animation: none; flex-wrap: wrap; width:auto; } }
+      `}</style>
+      <div className="text-center">
+        <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold-600)' }}>
+          {total} créations possibles
+        </div>
+        <h2 className="v3-serif mt-2 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-emerald)' }}>
+          EbookStudio V3 peut créer tous les livres que vous imaginez…
+        </h2>
+      </div>
+      <div className="mt-6 space-y-3 overflow-hidden" style={{ maskImage: 'linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)' }}>
+        {ROWS.map((row, i) => (
+          <div key={i} className="v3mq-row overflow-hidden">
+            <div className={`v3mq-track ${i % 2 ? 'v3mq-rev' : ''}`} style={{ ['--d' as string]: SPEEDS[i] }}>
+              {[...row, ...row].map((t, j) => (
+                <span key={j} className="whitespace-nowrap rounded-full bg-white px-4 py-2 text-sm font-medium"
+                  style={{ border: '1px solid var(--v3-line)', color: 'var(--v3-emerald)' }} aria-hidden={j >= row.length}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-6 text-center">
+        <span className="v3-chip" style={{ background: 'var(--v3-gold-soft)', color: '#6a4f10', borderColor: 'transparent' }}>
+          Et des dizaines d’autres formats à inventer…
+        </span>
+        <p className="mx-auto mt-3 max-w-2xl text-sm" style={{ color: 'var(--v3-ink, #2f5a42)' }}>
+          De l’idée au livre complet, relu, mis en page et prêt à publier — vos spécialistes IA vous accompagnent, vous gardez la décision finale.
+        </p>
+        <div className="mt-3 flex flex-wrap justify-center gap-x-5 gap-y-1 text-xs font-medium" style={{ color: 'var(--v3-emerald)' }}>
+          <span>✓ Aucune compétence en écriture</span>
+          <span>✓ Aucun logiciel de mise en page</span>
+          <span>✓ Couvertures aux normes Amazon KDP</span>
+          <span>✓ Export Word, EPUB et PDF</span>
+        </div>
+      </div>
+    </section>
+  );
+}
