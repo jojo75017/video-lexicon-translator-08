@@ -571,6 +571,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 </div>
                 <div className="mt-4">
                   <V3AvatarPickerCard
+                    personal={biography}
                     category={bookBrief.genre || bookBrief.category}
                     value={{
                       avatarId: bookBrief.readerAvatarId,
@@ -699,6 +700,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   <>
                     <div className="mb-4">
                       <V3AvatarPickerCard
+                    personal={biography}
                         category={bookBrief.genre || bookBrief.category}
                         value={{
                           avatarId: bookBrief.readerAvatarId,

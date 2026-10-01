@@ -10,6 +10,7 @@ const CATEGORIES = [
   'Roman', 'Thriller / Policier', 'Policier / Enquête', 'Romance', 'Romance historique',
   'Fantasy / Fantastique', 'Science-fiction', 'Horreur / Suspense', 'Aventure',
   'Nouvelles / Récits courts', 'Biographie / Mémoires', 'Témoignage / Récit de vie',
+  'Récit de ma vie (livre familial)', 'Arbre généalogique / Histoire de famille', 'Souvenirs pour mes enfants et petits-enfants',
   'Développement personnel', 'Productivité / Organisation', 'Business / Entrepreneuriat',
   'Finances personnelles / Investissement', 'Marketing / Vente en ligne',
   'Santé / Bien-être', 'Fitness / Sport', 'Nutrition / Régimes', 'Cuisine / Recettes',
