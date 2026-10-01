@@ -569,7 +569,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                             type="button"
                             onClick={() => { setBioCategory(c); try { localStorage.setItem('v3-bio-category', c); } catch { /* ignore */ } const next = { ...bookBrief, category: c, genre: c }; writeBookBrief(next); setBookBrief(next); toast.success(`Choisi : ${c}`); }}
                             className="v3-btn text-xs"
-                            style={active ? { background: 'var(--v3-emerald, #065F46)', color: '#fff', borderColor: 'var(--v3-emerald, #065F46)' } : undefined}
+                            style={active ? { background: '#15803D', color: '#fff', borderColor: '#15803D' } : undefined}
                           >
                             {active && <Check className="h-3.5 w-3.5" />} {c}
                           </button>
