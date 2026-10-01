@@ -15,7 +15,12 @@ const navigationLabels = [
   ...V3_SIDEBAR_LABELS,
 ].map(cleanLabel);
 
-const allPossibilities = Array.from(new Set([...BOOK_FORMATS.flat(), ...navigationLabels]));
+const bookFormats = BOOK_FORMATS.flat();
+const interleavedLabels = Array.from(
+  { length: Math.max(bookFormats.length, navigationLabels.length) },
+  (_, index) => [bookFormats[index], navigationLabels[index]],
+).flat().filter((label): label is string => Boolean(label));
+const allPossibilities = Array.from(new Set(interleavedLabels));
 const ROW_COUNT = 6;
 const ROWS = Array.from({ length: ROW_COUNT }, (_, rowIndex) =>
   allPossibilities.filter((_, itemIndex) => itemIndex % ROW_COUNT === rowIndex),
