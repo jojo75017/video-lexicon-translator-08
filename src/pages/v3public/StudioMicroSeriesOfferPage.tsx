@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { EmbeddedCheckout, EmbeddedCheckoutProvider } from '@stripe/react-stripe-js';
-import { ArrowRight, Check, CreditCard, Film, Loader2, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, CreditCard, Film, KeyRound, Loader2, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import SeoHead from '@/components/funnel/SeoHead';
