@@ -1,4 +1,5 @@
 import etape1Video from '@/assets/videos/tuto-etape-1.mp4.asset.json';
+import etape2Video from '@/assets/videos/tuto-etape-2.mp4.asset.json';
 // Source unique des tutoriels V3 (diaporamas + futures vidéos).
 export type TutoRubrique = 'Démarrer' | 'Les 5 étapes' | 'Créer' | 'Écrire et corriger' | 'Habiller' | 'Publier et vendre';
 
@@ -150,5 +151,5 @@ export const TUTORIELS_V3: TutorielV3[] = [
 
 export const RUBRIQUES_V3: TutoRubrique[] = ['Démarrer', 'Les 5 étapes', 'Créer', 'Écrire et corriger', 'Habiller', 'Publier et vendre'];
 
-const VIDEOS: Record<number, string> = { 6: etape1Video.url };
+const VIDEOS: Record<number, string> = { 6: etape1Video.url, 7: etape2Video.url };
 TUTORIELS_V3.forEach((x) => { if (VIDEOS[x.num]) x.video = VIDEOS[x.num]; });
