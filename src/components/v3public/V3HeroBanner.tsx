@@ -128,6 +128,13 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
             <Gift className="h-4 w-4 shrink-0" />
             Réserver ma place — kit + 10 niches offerts
           </Button>
+          <div className="mt-4">
+            <a href="/v3/tutoriels-v3" data-contemplation-allow="true"
+              className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[14px] font-bold"
+              style={{ background: 'var(--v3-paper)', border: '2px solid var(--v3-emerald)', color: 'var(--v3-emerald)' }}>
+              🎬 Voir les Tutoriels V3 (25)
+            </a>
+          </div>
         </div>
       </section>
 
