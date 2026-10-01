@@ -62,3 +62,10 @@
 ## Histoires courtes
 
 - [x] Mémoire anti-doublon entre les lots, relance automatique d'un lot échoué, bouton « Compléter »
+
+## Studio Album Illustré 3–6 ans
+
+- [ ] Créer un module séparé pour une histoire continue jusqu’à 30 pages
+- [ ] Verrouiller les personnages par fiches et images de référence
+- [ ] Ajouter Léonie dans « Commence ici »
+- [ ] Vérifier la création, la cohérence et l’export KDP
