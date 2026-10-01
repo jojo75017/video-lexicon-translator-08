@@ -1,6 +1,5 @@
 import { ArrowRight, BookOpenCheck, MousePointerClick, UserRoundSearch } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 
 const STEPS = [
   {
@@ -20,42 +19,75 @@ const STEPS = [
   },
 ];
 
+/** Carte joviale : bordure épaisse orange/jaune alternée, macaron d'étape incliné. */
+const cardStyle = (index: number) =>
+  index % 2
+    ? { border: '4px solid var(--v3-joy-yellow)', boxShadow: '0 20px 40px -20px color-mix(in srgb, var(--v3-joy-yellow) 45%, transparent)' }
+    : { border: '4px solid var(--v3-joy-orange)', boxShadow: '0 20px 40px -20px color-mix(in srgb, var(--v3-joy-orange) 45%, transparent)' };
+
+const macaronStyle = (index: number) =>
+  index % 2
+    ? { background: 'var(--v3-joy-yellow)' }
+    : { background: 'var(--v3-joy-orange)' };
+
 export default function V3StartHereHomeBanner() {
   return (
-    <section className="border-y border-border bg-card" aria-labelledby="v3-start-here-title">
-      <div className="v3-shell py-8 md:py-10">
-        <div className="grid gap-7 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.4fr)] lg:items-center">
-          <div>
-            <span className="inline-flex items-center rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase text-primary">
-              Votre point de départ
-            </span>
-            <h2 id="v3-start-here-title" className="mt-3 text-2xl font-bold text-foreground md:text-3xl">
-              Vous êtes abonné ? Commencez ici.
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted-foreground md:text-base">
-              Inutile de chercher le bon outil. Indiquez simplement le livre que vous voulez créer :
-              EbookStudio vous présente le spécialiste adapté et vous guide dès la première étape.
-            </p>
-            <Button asChild size="lg" className="mt-5 w-full gap-2 sm:w-auto">
-              <Link to="/v3/commence-ici">
-                Choisir mon spécialiste
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
-              </Link>
-            </Button>
-          </div>
+    <section
+      aria-labelledby="v3-start-here-title"
+      style={{ background: 'var(--v3-joy-cream)', borderTop: '1px solid var(--v3-joy-orange-soft)', borderBottom: '1px solid var(--v3-joy-orange-soft)' }}
+    >
+      <div className="v3-shell py-12 md:py-16">
+        <div className="text-center">
+          <span
+            className="inline-flex items-center rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]"
+            style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
+          >
+            Votre point de départ
+          </span>
+          <h2 id="v3-start-here-title" className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
+            Vous êtes abonné ? Commencez ici.
+          </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed md:text-base" style={{ color: 'var(--v3-joy-muted)' }}>
+            Inutile de chercher le bon outil. Indiquez simplement le livre que vous voulez créer :
+            EbookStudio vous présente le spécialiste adapté et vous guide dès la première étape.
+          </p>
+        </div>
 
-          <ol className="grid gap-3 sm:grid-cols-3">
-            {STEPS.map(({ icon: Icon, title, description }, index) => (
-              <li key={title} className="border-l-2 border-primary/40 pl-4">
-                <div className="flex items-center gap-2 text-primary">
-                  <span className="text-xs font-bold" aria-hidden="true">0{index + 1}</span>
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </div>
-                <h3 className="mt-2 text-sm font-bold text-foreground">{title}</h3>
-                <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{description}</p>
-              </li>
-            ))}
-          </ol>
+        <ol className="mt-12 grid gap-10 sm:grid-cols-3">
+          {STEPS.map(({ icon: Icon, title, description }, index) => (
+            <li
+              key={title}
+              className="group relative rounded-[3rem] bg-white p-8 pt-10 transition-transform hover:-translate-y-1.5"
+              style={cardStyle(index)}
+            >
+              <div
+                className="absolute -top-5 -left-3 grid h-12 w-12 -rotate-12 place-items-center rounded-2xl text-xl font-black text-white shadow-lg transition-transform group-hover:rotate-0"
+                style={macaronStyle(index)}
+                aria-hidden="true"
+              >
+                {index + 1}
+              </div>
+              <div className="flex items-center gap-2" style={{ color: index % 2 ? 'var(--v3-joy-yellow-600)' : 'var(--v3-joy-orange-600)' }}>
+                <Icon className="h-5 w-5" aria-hidden="true" />
+              </div>
+              <h3 className="mt-3 text-lg font-extrabold" style={{ color: 'var(--v3-joy-ink)' }}>{title}</h3>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>{description}</p>
+            </li>
+          ))}
+        </ol>
+
+        <div className="mt-12 text-center">
+          <Link
+            to="/v3/commence-ici"
+            className="v3-joy-cta inline-flex items-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold text-white transition-all hover:-translate-y-0.5"
+            style={{
+              background: 'var(--v3-joy-orange)',
+              boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)',
+            }}
+          >
+            Choisir mon spécialiste
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </section>

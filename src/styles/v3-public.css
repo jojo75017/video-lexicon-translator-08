@@ -33,6 +33,17 @@
   --v3-orange-50: #fff7ed;
   --v3-cloud: var(--v3-cream);
 
+  /* Palette « Jovial Premium Gold » — accueil chaleureux */
+  --v3-joy-orange: #f97316;
+  --v3-joy-orange-600: #ea580c;
+  --v3-joy-orange-soft: #ffedd5;
+  --v3-joy-yellow: #eab308;
+  --v3-joy-yellow-600: #ca8a04;
+  --v3-joy-yellow-soft: #fef9c3;
+  --v3-joy-cream: #fffdf9;
+  --v3-joy-ink: #1e293b;
+  --v3-joy-muted: #475569;
+
   /* Ombres éditoriales */
   --v3-shadow-card: 0 1px 2px rgba(45,62,51,.04), 0 12px 32px -18px rgba(45,62,51,.18);
   --v3-shadow-menu: 0 20px 60px -20px rgba(45,62,51,.28), 0 2px 6px rgba(45,62,51,.06);
@@ -436,6 +447,20 @@
   color: #ffffff !important;
   border-color: #e9a46f !important;
 }
+/* Exception : boutons « Jovial Premium Gold » de l'accueil (héro, Commencez ici). */
+.v3pub button.v3-joy-cta:not(:disabled),
+.v3pub a.v3-joy-cta {
+  background: var(--v3-joy-orange) !important;
+  border-color: var(--v3-joy-orange) !important;
+  color: #ffffff !important;
+}
+.v3pub button.v3-joy-cta:not(:disabled):hover,
+.v3pub a.v3-joy-cta:hover {
+  background: var(--v3-joy-orange-600) !important;
+  border-color: var(--v3-joy-orange-600) !important;
+  color: #ffffff !important;
+}
+
 /* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
 .v3pub button.v3-btn-reset-green:not(:disabled),
 .v3pub button.v3-btn-reset-green:not(:disabled):hover,
