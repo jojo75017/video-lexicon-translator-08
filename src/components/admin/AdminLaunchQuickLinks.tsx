@@ -44,6 +44,16 @@ export default function AdminLaunchQuickLinks({ className = '' }: { className?: 
         <span className="hidden text-xs font-semibold opacity-80 sm:inline">/lancement</span>
       </button>
 
+      <button
+        type="button"
+        onClick={() => navigate('/v3/tutoriels-v3')}
+        className="mt-3 flex w-full items-center justify-center gap-3 rounded-xl border-2 px-5 py-3 text-base font-bold text-white transition hover:brightness-110"
+        style={{ borderColor: '#D4AF37', background: 'rgba(212,175,55,0.12)' }}
+      >
+        🎬 Voir les Tutoriels V3 (25)
+      </button>
+
+
 
       <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
         {TILES.map((tile) => {
