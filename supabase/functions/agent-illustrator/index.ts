@@ -1,21 +1,17 @@
 // Agent illustrateur — génère une illustration cohérente pour un chapitre
 // de livre illustré maternelle et l'upload dans le bucket `ebook-images`.
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { z } from 'npm:zod@3.23.8';
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
-
-interface Body {
-  characterBible: string;
-  scene: string;
-  stylePrompt: string;
-  model?: string;
-  storyId: string;
-  bookId: string;
-}
+const BodySchema = z.object({
+  characterBible: z.string().trim().min(1).max(6000),
+  scene: z.string().trim().min(1).max(3000),
+  stylePrompt: z.string().max(1000).default(''),
+  storyId: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/),
+  bookId: z.string().min(1).max(100).regex(/^[a-zA-Z0-9_-]+$/),
+  referenceImageUrls: z.array(z.string().url().max(2000)).max(3).optional().default([]),
+});
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -35,10 +31,10 @@ Deno.serve(async (req) => {
     if (!userData?.user) return json({ error: 'Non authentifié' }, 401);
     const userId = userData.user.id;
 
-    const body = (await req.json()) as Body;
-    if (!body.characterBible || !body.scene) return json({ error: 'characterBible et scene requis' }, 400);
-
-    const model = body.model || 'google/gemini-3.1-flash-image';
+    const parsed = BodySchema.safeParse(await req.json());
+    if (!parsed.success) return json({ error: 'Paramètres d’illustration invalides.', fields: parsed.error.flatten().fieldErrors }, 400);
+    const body = parsed.data;
+    const model = 'openai/gpt-image-2.5-sunburst';
 
     const fullPrompt = [
       body.characterBible,
@@ -47,19 +43,34 @@ Deno.serve(async (req) => {
       'consistent character across all illustrations, same face, same outfit, same art style',
     ].join('\n\n');
 
-    // Appel Lovable AI Gateway — chat-shape pour les modèles Gemini image
-    const genRes = await fetch('https://ai.gateway.lovable.dev/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${lovableKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'user', content: fullPrompt }],
-        modalities: ['image', 'text'],
-      }),
-    });
+    let genRes: Response;
+    if (body.referenceImageUrls.length) {
+      const allowedHost = new URL(supabaseUrl).host;
+      const form = new FormData();
+      form.set('model', model);
+      form.set('prompt', fullPrompt);
+      form.set('stream', 'false');
+      for (const [index, referenceUrl] of body.referenceImageUrls.entries()) {
+        const parsedUrl = new URL(referenceUrl);
+        if (parsedUrl.protocol !== 'https:' || parsedUrl.host !== allowedHost || !parsedUrl.pathname.includes('/storage/v1/object/public/ebook-images/')) {
+          return json({ error: 'Une référence de personnage ne provient pas du stockage sécurisé.' }, 400);
+        }
+        const referenceRes = await fetch(referenceUrl);
+        if (!referenceRes.ok) return json({ error: `Référence ${index + 1} inaccessible.` }, 400);
+        const referenceBytes = await referenceRes.arrayBuffer();
+        if (referenceBytes.byteLength > 10_000_000) return json({ error: `Référence ${index + 1} trop volumineuse.` }, 400);
+        form.append('image[]', new File([referenceBytes], `reference-${index + 1}.png`, { type: referenceRes.headers.get('content-type') || 'image/png' }));
+      }
+      genRes = await fetch('https://ai.gateway.lovable.dev/v1/images/edits', {
+        method: 'POST', headers: { 'Authorization': `Bearer ${lovableKey}` }, body: form,
+      });
+    } else {
+      genRes = await fetch('https://ai.gateway.lovable.dev/v1/images/generations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${lovableKey}` },
+        body: JSON.stringify({ model, prompt: fullPrompt, stream: false }),
+      });
+    }
 
     if (!genRes.ok) {
       const txt = await genRes.text();

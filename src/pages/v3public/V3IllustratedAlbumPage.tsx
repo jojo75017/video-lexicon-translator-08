@@ -16,6 +16,8 @@ import {
   type IllustratedAlbumDraft,
 } from '@/config/illustratedAlbumConfig';
 import { useProjectSave } from '@/hooks/useProjectSave';
+import useModuleAccess from '@/hooks/useModuleAccess';
+import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
 
 const STORAGE_KEY = 'v3_illustrated_album_draft_v1';
 const PROJECT_KEY = 'v3_illustrated_album_project_id';
@@ -40,7 +42,9 @@ export default function V3IllustratedAlbumPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [imageProgress, setImageProgress] = useState({ done: 0, total: 0 });
   const [projectId, setProjectId] = useState<string | null>(() => localStorage.getItem(PROJECT_KEY));
+  const [showCheckout, setShowCheckout] = useState(false);
   const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
+  const { loading: accessLoading, hasAccess } = useModuleAccess('studio-jeunesse');
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
@@ -62,6 +66,7 @@ export default function V3IllustratedAlbumPage() {
   };
 
   const generateReference = async (character: AlbumCharacter) => {
+    if (!hasAccess) { setShowCheckout(true); return; }
     if (!character.name.trim() || !character.physical.trim() || !character.outfit.trim()) {
       return toast.error('Indiquez le nom, l’apparence et la tenue du personnage.');
     }
@@ -88,6 +93,7 @@ export default function V3IllustratedAlbumPage() {
   };
 
   const generateStoryBoard = async () => {
+    if (!hasAccess) { setShowCheckout(true); return; }
     if (!requireBook()) return;
     if (draft.characters.some((character) => !character.locked || !character.referenceUrl)) {
       setStep(1);
@@ -144,6 +150,7 @@ export default function V3IllustratedAlbumPage() {
   };
 
   const generateAllImages = async () => {
+    if (!hasAccess) { setShowCheckout(true); return; }
     if (!draft.pages.length) return toast.error('Créez d’abord le découpage page par page.');
     setBusy('images');
     setStep(3);
@@ -165,6 +172,7 @@ export default function V3IllustratedAlbumPage() {
   };
 
   const regeneratePage = async (page: AlbumPage) => {
+    if (!hasAccess) { setShowCheckout(true); return; }
     setBusy(`page-${page.id}`);
     try {
       await generatePageImage(page);
@@ -238,6 +246,10 @@ export default function V3IllustratedAlbumPage() {
           <h1 className="text-3xl font-bold md:text-4xl">Studio Album Illustré 3–6 ans</h1>
           <p className="mt-2 max-w-3xl text-muted-foreground">Une seule histoire suivie, jusqu’à 30 pages, avec les mêmes personnages du début à la fin.</p>
         </header>
+
+        {!accessLoading && !hasAccess && <div className="rounded-lg border-l-4 border-[#C97A14] bg-[#fff7ec] p-5 text-sm text-[#2A2118]"><div className="flex items-start gap-3"><LockKeyhole className="mt-0.5 h-5 w-5 shrink-0 text-[#C97A14]" /><div><strong>Mode aperçu.</strong> Cet album fait partie du Studio Jeunesse, un upsell séparé à 47 € et jamais inclus dans un forfait. Vous pouvez préparer votre projet avant l’achat.<div className="mt-3"><Button onClick={() => setShowCheckout(true)} className="bg-[#C97A14] text-white hover:bg-[#a8620f]">Débloquer le Studio Jeunesse · 47 €</Button></div></div></div></div>}
+
+        {showCheckout && <V3UpsellCheckout pack={{ id: 'studio_jeunesse', title: 'Studio Jeunesse — Accès à vie', subtitle: 'Histoires courtes et albums illustrés cohérents jusqu’à 30 pages.', price: 47, priceId: 'v3_pack_studio_jeunesse_once' } as never} onClose={() => setShowCheckout(false)} />}
 
         <nav className="grid grid-cols-5 gap-1" aria-label="Étapes de création">
           {STEPS.map((label, index) => <Button key={label} variant={step === index ? 'default' : 'outline'} className="h-auto min-h-14 flex-col gap-1 px-1 text-xs" onClick={() => setStep(index)}><span>{index + 1}</span><span className="hidden sm:block">{label}</span></Button>)}
