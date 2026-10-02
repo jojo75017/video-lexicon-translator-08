@@ -287,7 +287,10 @@ export default function V3HomePage() {
                   </p>
                 </div>
                 <div className="flex md:justify-end">
-                  <span className="v3-btn v3-joy-cta inline-flex items-center gap-2 whitespace-nowrap px-6 py-3 text-[15px] font-semibold">
+                  <span
+                    className="v3-btn inline-flex items-center gap-2 whitespace-nowrap px-6 py-3 text-[15px] font-semibold"
+                    style={{ background: 'var(--v3-joy-orange)', color: '#ffffff' }}
+                  >
                     Ouvrir le blog
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
