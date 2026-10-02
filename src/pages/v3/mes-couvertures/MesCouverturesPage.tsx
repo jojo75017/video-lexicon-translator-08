@@ -348,6 +348,9 @@ export default function MesCouverturesPage() {
           <Button asChild variant="outline" className="gap-2">
             <Link to="/v3/paiements">Mes paiements</Link>
           </Button>
+          <Button asChild variant="outline" className="gap-2">
+            <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">Ouvrir le Studio V4</Link>
+          </Button>
           <div className="max-w-[230px]">
             <Button asChild className="w-full gap-2 bg-orange-500 text-primary-foreground hover:bg-orange-600">
               <Link to="/v3/couverture-express">
@@ -404,7 +407,7 @@ export default function MesCouverturesPage() {
       {!loading && !error && paidProjects.length > 0 && (
         <section className="space-y-3">
           <h2 className="text-xl font-bold text-foreground">
-            Couvertures de l’offre à 67 € ({paidProjects.length})
+            Couvertures du Studio V4 ({paidProjects.length})
           </h2>
           <div className="grid justify-items-start gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {paidProjects.map((project) => {
@@ -505,7 +508,7 @@ export default function MesCouverturesPage() {
             Mes couvertures du studio classique ({classicCoverCount})
           </h2>
           <p className="text-sm text-muted-foreground">
-            Les couvertures que vous avez créées vous-même dans le studio de couverture inclus, en dehors de l’offre à 67 €.
+            Les couvertures que vous avez créées vous-même dans le studio de couverture inclus.
           </p>
           {classicCoverCount === 0 ? (
             <p className="text-sm text-muted-foreground">Aucune couverture enregistrée dans le studio classique.</p>
