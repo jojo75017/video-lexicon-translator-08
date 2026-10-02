@@ -300,6 +300,7 @@
 
 /* Surfaces claires posées en classes utilitaires */
 .dark .v3pub .bg-white,
+.dark .v3pub [class*="bg-white/"],
 .dark .v3pub .bg-slate-50,
 .dark .v3pub .bg-gray-50,
 .dark .v3pub .bg-neutral-50 {
@@ -381,6 +382,16 @@
 }
 .dark .v3pub .v3-section-dark .v3-serif,
 .dark .v3pub .v3-section-dark [class*='text-white'] { color: var(--v3-ink) !important; }
+
+/* En sombre, le choix d'une ambiance conserve sa typographie et son accent,
+   mais ne doit pas réintroduire des surfaces claires illisibles. */
+.dark .v3pub .v3-ambiance {
+  --amb-bg: var(--v3-paper) !important;
+  --amb-surface: var(--v3-surface) !important;
+  --amb-surface-alt: var(--v3-cream) !important;
+  --amb-text: var(--v3-ink) !important;
+  --amb-muted: var(--v3-muted) !important;
+}
 
 /* ============ Ambiances d'écriture (variables --amb-* posées par applyAmbiance) ============ */
 .v3-ambiance {
