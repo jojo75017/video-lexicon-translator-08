@@ -84,20 +84,16 @@ export function V2V3FloatingSwitch({ forceVisible = false }: V2V3FloatingSwitchP
     <button
       type="button"
       onClick={handleClick}
-      aria-label={displayV3Mode ? 'Ouvrir EbookStudio V2' : 'Ouvrir EbookStudio V3'}
-      title={displayV3Mode ? 'Ouvrir EbookStudio V2' : 'Ouvrir EbookStudio V3'}
-      className="fixed left-4 top-[6.5rem] z-[9998] inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-extrabold shadow-xl transition-all duration-200 hover:scale-[1.04] hover:shadow-2xl"
+      aria-label={displayV3Mode ? 'Revenir à EbookStudio V2' : 'Ouvrir EbookStudio V3'}
+      title={displayV3Mode ? 'Revenir à EbookStudio V2' : 'Ouvrir EbookStudio V3'}
+      className="fixed left-4 top-[6.5rem] z-[9998] inline-flex min-h-[40px] items-center gap-2 rounded-full border border-white/50 px-5 py-2.5 text-sm font-extrabold text-white shadow-lg transition-all duration-200 hover:scale-[1.04] hover:shadow-xl"
       style={{
-        borderColor: 'rgba(255,255,255,0.45)',
-        background: displayV3Mode
-          ? '#141414'
-          : 'linear-gradient(90deg,#FF9E2D 0%,#FF6B35 100%)',
-        color: displayV3Mode ? GOLD : '#ffffff',
-        textShadow: displayV3Mode ? undefined : '0 1px 0 rgba(0,0,0,0.12)',
+        background: 'linear-gradient(90deg,#FF9E2D 0%,#FF6B35 100%)',
+        textShadow: '0 1px 0 rgba(0,0,0,0.12)',
       }}
     >
       {displayV3Mode ? <Crown className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
-      <span className="tracking-wide">{displayV3Mode ? 'Ouvrir V2' : 'Ouvrir V3'}</span>
+      <span className="tracking-wide">{displayV3Mode ? 'Revenir à la V2' : 'Ouvrir la V3'}</span>
     </button>
   );
 }
