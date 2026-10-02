@@ -38,7 +38,7 @@ import type { MyBookOption } from '@/lib/cover-editor/myBooks';
 import { listSavedCovers, type SavedCover } from '@/lib/coverLibrary';
 import { supabase } from '@/integrations/supabase/client';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
-import { useEffectiveAdmin } from '@/hooks/useEffectiveAdmin';
+import useEffectiveAdmin from '@/hooks/useEffectiveAdmin';
 import {
   createCoverProject,
   deleteCoverProject,
