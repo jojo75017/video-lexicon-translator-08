@@ -43,7 +43,7 @@ const NAV: NavSection[] = [
       { to: '/v3/upsells', label: 'UPSELLS — packs & compléments', icon: Sparkles, badge: '6 compléments' },
       { to: '/essai', label: '🎁 Essai gratuit — chapitre 1', icon: Rocket, end: true, badge: 'Gratuit' },
       { to: '/v3/attente', label: '👑 Salon des membres fondateurs', icon: Crown, end: true, badge: '1er mois' },
-      { to: '/commander', label: '47 € à vie — jusqu’au 30 septembre', icon: Gem, end: true, badge: '30 septembre' },
+      { to: '/lancement/offres#offres', label: '47 € à vie — jusqu’au 15 octobre', icon: Gem, end: true, badge: '15 octobre' },
     ],
   },
   {

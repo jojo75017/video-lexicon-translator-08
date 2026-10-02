@@ -232,7 +232,7 @@ export default function V3HomePage() {
                     </div>
                     <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-muted)' }}>{t.desc}</p>
                     <div className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
-                      Disponible à l'ouverture · 1er octobre
+                      Disponible
                     </div>
                   </div>
                 ))}

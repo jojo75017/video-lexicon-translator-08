@@ -1,3 +1,4 @@
+import ProspectSegmentsPanel from '@/components/admin/ProspectSegmentsPanel';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -541,6 +542,7 @@ const ProspectManagerPage = () => {
 
           {/* PROSPECTS TAB */}
           <TabsContent value="prospects" className="space-y-4">
+            <ProspectSegmentsPanel />
             <div className="flex flex-wrap items-center gap-3">
               <label className="cursor-pointer">
                 <Input
