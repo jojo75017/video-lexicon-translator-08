@@ -350,8 +350,10 @@ export default function MesCouverturesPage() {
           <Button asChild variant="outline" className="gap-2">
             <Link to="/v3/paiements">Mes paiements</Link>
           </Button>
-          <Button asChild variant="outline" className="gap-2">
-            <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">Ouvrir le Studio V4</Link>
+          <Button asChild className="gap-2 bg-primary font-semibold text-primary-foreground hover:bg-primary/90">
+            <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">
+              <ImageIcon className="h-4 w-4" /> Ouvrir le Studio V4
+            </Link>
           </Button>
           {isAdmin === true && (
             <div className="max-w-[230px]">
@@ -401,8 +403,10 @@ export default function MesCouverturesPage() {
             <p className="text-muted-foreground">
               Créez votre première couverture : vous pourrez la retrouver et la modifier ici.
             </p>
-            <Button onClick={() => setCreateOpen(true)} className="gap-2">
-              <Plus className="h-4 w-4" /> Créer une couverture
+            <Button asChild className="gap-2">
+              <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">
+                <Plus className="h-4 w-4" /> Ouvrir le Studio V4
+              </Link>
             </Button>
           </CardContent>
         </Card>
