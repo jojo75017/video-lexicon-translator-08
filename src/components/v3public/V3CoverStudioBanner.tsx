@@ -35,26 +35,25 @@ const ACTIONS = [
 export default function V3CoverStudioBanner() {
   return (
     <section
-      className="w-full"
+      className="w-full border-b"
       style={{
-        background: 'var(--v3-paper)',
-        borderBottom: '1px solid var(--v3-line)',
+        background: 'var(--v3-joy-cream)',
+        borderColor: 'var(--v3-joy-orange-soft)',
       }}
     >
-      <div className="v3-shell py-8 md:py-10">
+      <div className="v3-shell py-8">
         <div
-          className="relative overflow-hidden rounded-md px-5 py-6 sm:px-8 sm:py-7"
+          className="relative overflow-hidden rounded-3xl bg-white px-5 py-6 sm:px-8 sm:py-7"
           style={{
-            background: 'var(--v3-ivory)',
-            border: '1px solid color-mix(in srgb, var(--v3-gold) 45%, var(--v3-border))',
-            boxShadow: 'var(--v3-shadow-card)',
+            border: '1px solid var(--v3-joy-orange-soft)',
+            boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)',
           }}
         >
-          {/* Filet or supérieur discret */}
+          {/* Filet orange supérieur discret */}
           <div
             aria-hidden
             className="absolute inset-x-0 top-0 h-px"
-            style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }}
+            style={{ background: 'var(--v3-joy-orange-soft)' }}
           />
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -62,26 +61,26 @@ export default function V3CoverStudioBanner() {
               <span
                 aria-hidden
                 className="mt-0.5 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
-                style={{ background: 'var(--v3-gold-soft)', border: '1px solid color-mix(in srgb, var(--v3-gold) 50%, transparent)' }}
+                style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
               >
-                <BookOpen className="h-5 w-5" style={{ color: 'var(--v3-gold-600)' }} />
+                <BookOpen className="h-5 w-5" />
               </span>
               <div>
                 <span
                   className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em]"
-                  style={{ color: 'var(--v3-gold-600)' }}
+                  style={{ color: 'var(--v3-joy-orange-600)' }}
                 >
                   <Crown className="h-3.5 w-3.5" /> Studio de couverture V4 — Nouveauté en avance
                 </span>
                 <h2
                   className="v3-serif mt-1 text-2xl font-bold leading-tight sm:text-3xl"
-                  style={{ color: 'var(--v3-editorial-ink)' }}
+                  style={{ color: 'var(--v3-joy-ink)' }}
                 >
                   Votre maison d’édition de couvertures
                 </h2>
               </div>
             </div>
-            <p className="max-w-sm text-sm leading-relaxed sm:text-right" style={{ color: 'var(--v3-muted)' }}>
+            <p className="max-w-sm text-sm leading-relaxed sm:text-right" style={{ color: 'var(--v3-joy-muted)' }}>
               Créez l’illustration, ajoutez vos textes et téléchargez une couverture prête pour Amazon KDP.
             </p>
           </div>
@@ -90,23 +89,23 @@ export default function V3CoverStudioBanner() {
             {ACTIONS.map(({ to, title, description, icon: Icon, primary }) => (
               <div
                 key={to}
-                className="flex min-h-[112px] flex-col rounded-md p-3"
-                style={{ border: '1px solid var(--v3-border)', background: 'var(--v3-paper)' }}
+                className="flex min-h-[112px] flex-col rounded-2xl p-3"
+                style={{ border: '1px solid var(--v3-joy-orange-soft)', background: 'var(--v3-joy-cream)' }}
               >
-                <div className="flex items-center gap-2 text-sm font-bold" style={{ color: 'var(--v3-editorial-ink)' }}>
-                  <Icon className="h-4 w-4" style={{ color: 'var(--v3-gold-600)' }} /> {title}
+                <div className="flex items-center gap-2 text-sm font-bold" style={{ color: 'var(--v3-joy-ink)' }}>
+                  <Icon className="h-4 w-4" style={{ color: 'var(--v3-joy-orange-600)' }} /> {title}
                 </div>
-                <p className="mt-1 flex-1 text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{description}</p>
+                <p className="mt-1 flex-1 text-xs leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>{description}</p>
                 <Button
                   asChild
                   size="sm"
                   variant={primary ? 'default' : 'outline'}
                   className={primary
-                    ? 'mt-3 w-full'
+                    ? 'v3-joy-cta mt-3 w-full'
                     : 'mt-3 w-full bg-transparent'}
                   style={primary
-                    ? { background: 'var(--v3-emerald)', color: '#f8f5ed' }
-                    : { borderColor: 'color-mix(in srgb, var(--v3-emerald) 45%, transparent)', color: 'var(--v3-emerald)' }}
+                    ? undefined
+                    : { borderColor: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
                 >
                   <Link to={to}>
                     {primary ? 'Commencer' : 'Ouvrir'} <ArrowRight className="h-4 w-4" />
