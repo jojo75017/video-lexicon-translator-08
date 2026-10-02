@@ -18,6 +18,14 @@ interface PdfGift {
 // Centralisé : ajouter ici tous les PDF disponibles dans /public
 const PDF_GIFTS: PdfGift[] = [
   {
+    id: 'apercu-accueil-v3',
+    title: 'Aperçu complet de l’accueil EbookStudio V3',
+    description: 'Présentation figée de toute la page d’accueil abonné, prête à être jointe à un email. Aucun bouton ni lien n’est actif dans le document.',
+    path: '/apercu-accueil-ebookstudio-v3.pdf',
+    category: 'formation',
+    internal: true,
+  },
+  {
     id: 'manuel-ebookstudio',
     title: '📘 Manuel Officiel Ebookstudio',
     description: 'Le guide principal du générateur : 15 agents IA, brief, génération chapitres, couverture KDP, export. À envoyer en priorité à tout nouvel abonné.',
@@ -158,9 +166,9 @@ const AdminPdfGiftsPage: React.FC = () => {
             <Gift className="h-6 w-6 text-[#008296]" />
           </div>
           <div>
-            <h1 className="text-2xl font-bold text-foreground">Cadeaux PDF</h1>
+            <h1 className="text-2xl font-bold text-foreground">Documents PDF</h1>
             <p className="text-sm text-muted-foreground">
-              Tous les PDF disponibles pour être offerts à vos prospects / abonnés.
+              Tous les PDF disponibles, dont l’aperçu complet de l’accueil V3.
               Téléchargez-les ou copiez le lien public pour les partager.
             </p>
           </div>
