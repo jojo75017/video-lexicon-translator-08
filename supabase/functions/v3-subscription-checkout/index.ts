@@ -218,7 +218,16 @@ Deno.serve(async (req) => {
         })
         .select("id")
         .single();
-      if (orderError || !order?.id) throw new Error("Impossible d'enregistrer l'abonnement");
+      if (orderError || !order?.id) {
+        console.error("v3_installment_orders insert failed", {
+          plan: priceId,
+          message: orderError?.message,
+          code: orderError?.code,
+          details: orderError?.details,
+          hint: orderError?.hint,
+        });
+        throw new Error("Impossible d'enregistrer l'abonnement");
+      }
       orderId = order.id as string;
       sessionMeta.order_id = orderId;
       sessionMeta.kind = "v3_subscription";
