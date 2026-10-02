@@ -38,6 +38,7 @@ import type { MyBookOption } from '@/lib/cover-editor/myBooks';
 import { listSavedCovers, type SavedCover } from '@/lib/coverLibrary';
 import { supabase } from '@/integrations/supabase/client';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
+import useIsAdmin from '@/hooks/useIsAdmin';
 import {
   createCoverProject,
   deleteCoverProject,
@@ -70,6 +71,7 @@ export default function MesCouverturesPage() {
   const [savedCovers, setSavedCovers] = useState<SavedCover[]>([]);
   const [bookCovers, setBookCovers] = useState<SavedCover[]>([]);
   const coverPro = useCoverProAccess();
+  const { isAdmin } = useIsAdmin();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -351,6 +353,16 @@ export default function MesCouverturesPage() {
           <Button asChild variant="outline" className="gap-2">
             <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">Ouvrir le Studio V4</Link>
           </Button>
+          {isAdmin === true && (
+            <div className="max-w-[230px]">
+              <Button asChild className="w-full gap-2 bg-orange-500 text-primary-foreground hover:bg-orange-600">
+                <Link to="/v3/couverture-express">
+                  <Plus className="h-4 w-4" /> Créer ma couverture
+                </Link>
+              </Button>
+              <p className="mt-1 text-xs text-muted-foreground">Accès admin — essais et tests.</p>
+            </div>
+          )}
           <div className="max-w-[230px]">
             <Button onClick={() => setCreateOpen(true)} variant="outline" className="w-full gap-2">
               <Plus className="h-4 w-4" /> Créer un projet manuellement
