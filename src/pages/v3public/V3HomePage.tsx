@@ -33,6 +33,7 @@ import V3GoFurtherPanel from '@/components/v3public/V3GoFurtherPanel';
 import ReadingGate from '@/components/marketing/ReadingGate';
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import V3FormatsMarquee from '@/components/v3public/V3FormatsMarquee';
+import V3SubscriberZoomHelp from '@/components/v3public/V3SubscriberZoomHelp';
 
 const FEATURED_TOOLS = [
   { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', badge: 'Commencer ici' },
@@ -85,6 +86,9 @@ export default function V3HomePage() {
 
       {/* BANDEAUX DÉFILANTS — tout ce qu'on peut créer */}
       <V3FormatsMarquee />
+
+      {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
+      {user && <V3SubscriberZoomHelp />}
 
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
       {!user && <V3StartHereHomeBanner />}
