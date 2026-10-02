@@ -12,7 +12,6 @@ import useIsAdmin from '@/hooks/useIsAdmin';
 import useTrialAccess from '@/hooks/useTrialAccess';
 import { isTrialLockedPath } from '@/lib/trialLockedPaths';
 import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
-import ThemeToggle from './ThemeToggle';
 import { setSpaceChoice } from '@/lib/v3OpenState';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
 
@@ -423,11 +422,6 @@ export default function V3Sidebar() {
           <ChevronLeft className="w-4 h-4 shrink-0" />
           {!collapsed && <span className="truncate">Mon espace habituel</span>}
         </a>
-      </div>
-
-      {/* Thème clair / sombre / automatique, toujours accessible. */}
-      <div className="px-2 pb-4 pt-1" style={{ borderTop: '1px solid var(--v3-line)' }}>
-        <ThemeToggle variant="plain" showLabel={!collapsed} className="w-full justify-center mt-3" />
       </div>
     </aside>
 

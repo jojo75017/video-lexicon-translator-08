@@ -13,7 +13,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { BarChart3, Clipboard, Copy, Download, Eraser, FileUp, Languages, Loader2, RefreshCw, ShieldCheck, Wand2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import ThemeToggle from '@/components/v3public/ThemeToggle';
 import { analyzeStylometry, countWords, type StylometricMetrics } from '@/lib/v3/humanizeMetrics';
 import { getProvider, getProviderKey } from '@/services/aiWritingService';
 import { usePageMeta } from '@/hooks/usePageMeta';
@@ -208,7 +207,6 @@ export default function V3HumanizerPage() {
               <SelectTrigger className="w-28" aria-label="Langue de l’interface"><SelectValue /></SelectTrigger>
               <SelectContent><SelectItem value="fr">FR</SelectItem><SelectItem value="en">EN</SelectItem></SelectContent>
             </Select>
-            <ThemeToggle variant="plain" showLabel={false} />
           </div>
         </header>
 
