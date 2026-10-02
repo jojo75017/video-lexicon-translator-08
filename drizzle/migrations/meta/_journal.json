@@ -1,0 +1,13 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1790945892158,
+      "tag": "0000_segment_lancement_and_sends",
+      "breakpoints": true
+    }
+  ]
+}
