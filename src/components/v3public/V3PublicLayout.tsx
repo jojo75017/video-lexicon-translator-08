@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Home, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import '@/styles/v3-public.css';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
@@ -116,6 +116,18 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
           )}
           <main className="flex-1 min-w-0">
             <V3UpsellReturnBar />
+            {/* Retour à l'accueil : présent sur toutes les pages internes V3. */}
+            {!isHome && (
+              <div className="border-b px-3 py-2" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+                <Link
+                  to="/v3"
+                  className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-semibold transition-colors hover:opacity-80"
+                  style={{ color: 'var(--v3-ink)' }}
+                >
+                  <Home className="h-4 w-4" /> Retour à l'accueil V3
+                </Link>
+              </div>
+            )}
             <Outlet />
           </main>
         </div>

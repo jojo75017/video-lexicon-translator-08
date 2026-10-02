@@ -2,6 +2,7 @@ import { Helmet } from 'react-helmet';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { KDP_TAB_PAGES } from '@/data/kdpTabPages';
+import BackButton from '@/components/v3/BackButton';
 
 /** Espace KDP — sommaire de l'onglet, une page par usage. */
 export default function V3KdpHubPage() {
@@ -12,7 +13,9 @@ export default function V3KdpHubPage() {
         <meta name="description" content="Toutes les pages KDP réunies : fiche audit à partir d'un ASIN, mots-clés Amazon, catégories et audit avant publication." />
       </Helmet>
 
-      <header className="mb-6">
+      <BackButton to="/v3" label="Retour à l'accueil V3" />
+
+      <header className="mb-6 mt-2">
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--v3-gold-600)' }}>
           Espace KDP
         </p>
