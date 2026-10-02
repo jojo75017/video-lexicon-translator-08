@@ -1,3 +1,4 @@
+import OffreLancementSendPanel from '@/components/admin/OffreLancementSendPanel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, CalendarDays, Mail, RefreshCw, Send } from 'lucide-react';
@@ -124,6 +125,9 @@ export default function AdminLancementEmailsPage() {
 
         <div className="mb-6">
           <FunnelConversionPanel />
+        </div>
+        <div className="mb-6">
+          <OffreLancementSendPanel />
         </div>
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">

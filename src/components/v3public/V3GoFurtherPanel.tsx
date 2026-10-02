@@ -17,7 +17,7 @@ export default function V3GoFurtherPanel() {
   const iconStyle = { background: 'var(--v3-gold-soft)', color: '#6a4f10' } as const;
   const availability = (
     <span className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
-      Disponible à l'ouverture · 1er octobre
+      Disponible
     </span>
   );
 

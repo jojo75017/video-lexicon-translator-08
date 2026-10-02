@@ -2275,6 +2275,42 @@ export type Database = {
         }
         Relationships: []
       }
+      offre_lancement_sends: {
+        Row: {
+          batch_index: number | null
+          created_at: string
+          email: string
+          email_id: string
+          error: string | null
+          id: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          batch_index?: number | null
+          created_at?: string
+          email: string
+          email_id?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          batch_index?: number | null
+          created_at?: string
+          email?: string
+          email_id?: string
+          error?: string | null
+          id?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payment_confirmations: {
         Row: {
           created_at: string
@@ -2530,6 +2566,7 @@ export type Database = {
           relance_round: number
           relance_sent_at: string | null
           relance_status: string | null
+          segment_lancement: string | null
           source: string | null
           status: string | null
           systemeio_sync_error: string | null
@@ -2551,6 +2588,7 @@ export type Database = {
           relance_round?: number
           relance_sent_at?: string | null
           relance_status?: string | null
+          segment_lancement?: string | null
           source?: string | null
           status?: string | null
           systemeio_sync_error?: string | null
@@ -2572,6 +2610,7 @@ export type Database = {
           relance_round?: number
           relance_sent_at?: string | null
           relance_status?: string | null
+          segment_lancement?: string | null
           source?: string | null
           status?: string | null
           systemeio_sync_error?: string | null
