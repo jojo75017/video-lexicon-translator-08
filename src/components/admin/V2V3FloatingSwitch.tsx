@@ -5,7 +5,6 @@ import { toast } from 'sonner';
 import { useV3Mode } from '@/hooks/useV3Mode';
 import { openV3 } from '@/lib/openV3';
 
-const GOLD = '#c9a84c';
 const LS_V3_MODE_KEY = 'ebookstudio_v3_mode';
 
 interface V2V3FloatingSwitchProps {
