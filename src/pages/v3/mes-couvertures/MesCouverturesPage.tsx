@@ -25,6 +25,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import '@/styles/v3-public.css';
 import {
   Dialog,
   DialogContent,
@@ -337,7 +338,7 @@ export default function MesCouverturesPage() {
   const classicCoverCount = allClassic.length;
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8 space-y-6">
+    <main className="v3-theme-scope mx-auto w-full max-w-6xl px-4 py-8 space-y-6">
       <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1">
           <Badge variant="secondary" className="uppercase tracking-wide">

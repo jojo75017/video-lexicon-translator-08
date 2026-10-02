@@ -208,7 +208,7 @@ export default function V3Sidebar() {
     <aside
       className={`hidden shrink-0 transition-all duration-200 md:block ${collapsed ? 'w-14' : 'w-60'}`}
       style={{
-        background: '#fff',
+        background: 'var(--v3-surface)',
         borderRight: '1px solid var(--v3-line)',
         position: 'sticky',
         top: 0,

@@ -261,10 +261,33 @@
   --v3-muted: #9db3ab;
   --v3-line: rgba(217, 187, 99, 0.18);
   --v3-border: rgba(217, 187, 99, 0.18);
+  --v3-joy-cream: var(--v3-paper);
+  --v3-joy-ink: var(--v3-ink);
+  --v3-joy-muted: var(--v3-muted);
+  --v3-joy-orange-soft: rgba(240, 138, 36, 0.18);
+  --v3-joy-yellow-soft: rgba(234, 179, 8, 0.14);
   --v3-shadow-card: 0 1px 2px rgba(0,0,0,.35), 0 16px 40px -20px rgba(0,0,0,.6);
   --v3-shadow-menu: 0 24px 60px -20px rgba(0,0,0,.7), 0 2px 6px rgba(0,0,0,.4);
   color: var(--v3-ink);
   background: var(--v3-paper);
+}
+
+/* Variables sémantiques utilisées par les composants UI V3 (cartes, champs,
+   dialogues). Le scope dédié couvre les rares pages V3 hors layout public. */
+.dark .v3pub,
+.dark .v3-theme-scope {
+  --background: 163 35% 6%;
+  --foreground: 150 18% 96%;
+  --card: 160 28% 10%;
+  --card-foreground: 150 18% 96%;
+  --popover: 160 28% 10%;
+  --popover-foreground: 150 18% 96%;
+  --secondary: 160 22% 14%;
+  --secondary-foreground: 150 18% 96%;
+  --muted: 160 18% 15%;
+  --muted-foreground: 154 12% 70%;
+  --border: 37 58% 64% / 0.22;
+  --input: 37 58% 64% / 0.22;
 }
 
 .dark .v3pub .v3-halo,
@@ -277,10 +300,16 @@
 
 /* Surfaces claires posées en classes utilitaires */
 .dark .v3pub .bg-white,
+.dark .v3pub [class*="bg-white/"],
 .dark .v3pub .bg-slate-50,
 .dark .v3pub .bg-gray-50,
 .dark .v3pub .bg-neutral-50 {
   background-color: var(--v3-surface) !important;
+}
+.dark .v3pub .v3-card,
+.dark .v3pub .v3-chip {
+  background-color: var(--v3-surface) !important;
+  color: var(--v3-ink);
 }
 .dark .v3pub .text-slate-900,
 .dark .v3pub .text-gray-900,
@@ -306,7 +335,10 @@
 .dark .v3pub [style*="#FAFAFA"],
 .dark .v3pub [style*="#fafafa"],
 .dark .v3pub [style*="#f9fafb"],
-.dark .v3pub [style*="#F9FAFB"] {
+.dark .v3pub [style*="#F9FAFB"],
+.dark .v3pub [style*="background: rgb(255, 255, 255)"],
+.dark .v3pub [style*="background: rgba(255, 255, 255"],
+.dark .v3pub [style*="background-color: rgb(255, 255, 255)"] {
   background-color: var(--v3-surface) !important;
   color: var(--v3-ink);
 }
@@ -342,6 +374,24 @@
 .dark .v3pub table thead { background-color: var(--v3-cream) !important; }
 .dark .v3pub table td,
 .dark .v3pub table th { border-color: var(--v3-line) !important; }
+
+.dark .v3pub .v3-section-dark {
+  background: var(--v3-cream) !important;
+  color: var(--v3-ink-2);
+  border-color: var(--v3-line);
+}
+.dark .v3pub .v3-section-dark .v3-serif,
+.dark .v3pub .v3-section-dark [class*='text-white'] { color: var(--v3-ink) !important; }
+
+/* En sombre, le choix d'une ambiance conserve sa typographie et son accent,
+   mais ne doit pas réintroduire des surfaces claires illisibles. */
+.dark .v3pub .v3-ambiance {
+  --amb-bg: var(--v3-paper) !important;
+  --amb-surface: var(--v3-surface) !important;
+  --amb-surface-alt: var(--v3-cream) !important;
+  --amb-text: var(--v3-ink) !important;
+  --amb-muted: var(--v3-muted) !important;
+}
 
 /* ============ Ambiances d'écriture (variables --amb-* posées par applyAmbiance) ============ */
 .v3-ambiance {
