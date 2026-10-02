@@ -31,8 +31,8 @@ export function FunnelUnifiedPanel() {
     try {
       const [opens, clicks, events, leads, orders] = await Promise.all([
         supabase.from('email_opens').select('id', { count: 'exact', head: true }),
-        supabase.from('email_clicks').select('clicked_url, template_name, email_step').limit(10000),
-        supabase.from('capture_events').select('event_type').eq('surface', 'essai').limit(10000),
+        supabase.from('email_clicks').select('clicked_url, template_name, email_step').limit(3000),
+        supabase.from('capture_events').select('event_type').eq('surface', 'essai').limit(3000),
         supabase.from('funnel_leads').select('id', { count: 'exact', head: true }),
         supabase.from('funnel_orders').select('status').limit(5000),
       ]);
