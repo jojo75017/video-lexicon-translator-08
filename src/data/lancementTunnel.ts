@@ -1,15 +1,25 @@
-// Contenus du tunnel de lancement du 1er octobre 2026.
+// Contenus du tunnel de lancement (V3 ouverte depuis le 1er octobre 2026).
 // Structure : accrocher → projeter → prouver → sécuriser.
 // Source unique des textes des pages /lancement, /lancement/offres et /lancement/merci.
 
 export const LANCEMENT_DATE_LABEL = "1er octobre 2026";
 export const LANCEMENT_DATE_ISO = "2026-10-01T09:00:00+02:00";
 
+/** Offre de lancement : Édition à vie, 47 € payés une seule fois. */
+export const LANCEMENT_PLACES = 15;
+export const LANCEMENT_PRIX = 47;
+export const LANCEMENT_PRICE_ID = "v3_edition_lifetime";
+export const LANCEMENT_FIN_ISO = "2026-10-15T23:59:59+02:00";
+export const LANCEMENT_FIN_LABEL = "15 octobre 2026";
+export const LANCEMENT_APRES_LABEL =
+  "À partir du 16 octobre 2026 : abonnements Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois.";
+export const isLancementOuvert = (now = Date.now()) => now <= Date.parse(LANCEMENT_FIN_ISO);
+
 /** Source enregistrée pour les prospects du tunnel. */
 export const LANCEMENT_LEAD_SOURCE = "lancement-octobre";
 
 export const LANCEMENT_HERO = {
-  eyebrow: `Ouverture le ${LANCEMENT_DATE_LABEL}`,
+  eyebrow: "La V3 est ouverte",
   title: "Écrivez et publiez votre livre sur Amazon, même en partant d'une page blanche",
   subtitle:
     "EbookStudio vous accompagne de l'idée au livre publié : sommaire, rédaction chapitre par chapitre, correction, couverture, mise en page et fiche de vente. Vous gardez la main sur tout, l'atelier fait le travail pénible.",
@@ -19,9 +29,9 @@ export const LANCEMENT_HERO = {
     "Correction éditoriale : cohérence, chronologie, répétitions, grammaire, typographie française",
     "Fiche de vente, mots-clés et calendrier de publication",
   ],
-  formTitle: "Recevez l'accès au lancement et les 10 niches offertes",
+  formTitle: "Recevez les 10 niches offertes et l'offre de lancement",
   formNote:
-    "Vous recevez immédiatement le document des 10 niches qui vendent, puis l'ouverture des offres.",
+    "Vous recevez immédiatement le document des 10 niches qui vendent, puis le détail de l'offre de lancement.",
 };
 
 /** « Est-ce que c'est pour moi ? » */
@@ -146,11 +156,15 @@ export const LANCEMENT_OBJECTIONS = [
 export const LANCEMENT_FAQ = [
   {
     q: "Quand mon accès est-il ouvert ?",
-    a: `Les offres s'ouvrent le ${LANCEMENT_DATE_LABEL}. Dès votre paiement confirmé, vous recevez par email votre code d'accès personnel et votre espace est disponible immédiatement.`,
+    a: `La V3 est ouverte depuis le ${LANCEMENT_DATE_LABEL}. Dès votre paiement confirmé, vous recevez par email votre code d'accès personnel et votre espace est disponible immédiatement.`,
   },
   {
-    q: "Puis-je payer en plusieurs fois ?",
-    a: "L'abonnement mensuel étale déjà le coût. PayPal peut aussi proposer ses propres facilités de paiement selon votre éligibilité.",
+    q: "Que contient l'offre de lancement ?",
+    a: `L'accès à vie à la V3 niveau Édition pour ${47} € payés une seule fois, sans abonnement. Elle est limitée à ${15} places et s'arrête au plus tard le 15 octobre 2026.`,
+  },
+  {
+    q: "Et après le 15 octobre ?",
+    a: "La V3 passe uniquement en abonnement : Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois.",
   },
   {
     q: "Puis-je résilier ?",
@@ -168,7 +182,7 @@ export const LANCEMENT_FAQ = [
 
 export const LANCEMENT_GARANTIES = [
   "Sans engagement : résiliation en un clic",
-  "Paiement sécurisé par carte ou PayPal",
+  "Paiement sécurisé par carte bancaire",
   "Vos livres et vos textes restent votre propriété",
   "Support par email, réponse sous 24 h",
 ];

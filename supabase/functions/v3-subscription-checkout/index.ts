@@ -25,6 +25,8 @@ const ALLOWED_PRICES = new Set([
   "v3_edition_annual_legacy",
   "v3_maison_monthly_legacy",
   "v3_maison_annual_legacy",
+  // Offre de lancement : Édition à vie, paiement unique (15 places, jusqu'au 15/10/2026)
+  "v3_edition_lifetime",
   // Version audio d'un livre (paiement unique)
   "v3_audio_single",
   // Compléments (paiement unique)
@@ -142,6 +144,20 @@ Deno.serve(async (req) => {
     }
 
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
+
+    // Offre à vie : refusée côté serveur après la date de fin ou au-delà de 15 places.
+    if (priceId === "v3_edition_lifetime") {
+      const END = Date.parse("2026-10-15T23:59:59+02:00");
+      if (Date.now() > END) throw new Error("L'offre de lancement est terminée");
+      const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+      const { count } = await sb
+        .from("v3_installment_orders")
+        .select("id", { count: "exact", head: true })
+        .eq("plan", "v3_edition_lifetime")
+        .eq("environment", env)
+        .in("status", ["active", "completed", "paid"]);
+      if ((count ?? 0) >= 15) throw new Error("Les 15 places de lancement sont prises");
+    }
     if (!returnUrl || typeof returnUrl !== "string") {
       throw new Error("returnUrl requis");
     }
@@ -198,7 +214,7 @@ Deno.serve(async (req) => {
           currency: String(stripePrice.currency ?? "eur").toUpperCase(),
           status: "pending",
           environment: env,
-          metadata: { user_id: userId ?? null, recurring: true },
+          metadata: { user_id: userId ?? null, recurring: isRecurring },
         })
         .select("id")
         .single();
@@ -217,6 +233,7 @@ Deno.serve(async (req) => {
       line_items: [{ price: stripePriceId, quantity: 1 }],
       ...(customerId && { customer: customerId }),
       ...(Object.keys(sessionMeta).length > 0 && { metadata: sessionMeta }),
+      ...(!isRecurring && { payment_intent_data: { description: "EbookStudio V3 Édition — accès à vie" } }),
       ...(isRecurring && Object.keys(subscriptionData).length > 0 && {
         subscription_data: subscriptionData,
       }),

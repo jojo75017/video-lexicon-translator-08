@@ -11,6 +11,7 @@ export interface V3PlanInfo {
   plan: V3PlanKey;
   interval: "month" | "year";
   label: string;
+  lifetime?: boolean;
 }
 
 const PLAN_LABELS: Record<V3PlanKey, string> = {
@@ -21,6 +22,9 @@ const PLAN_LABELS: Record<V3PlanKey, string> = {
 
 /** Déduit le forfait et la périodicité depuis un identifiant de prix `v3_*`. */
 export function parseV3PriceId(priceId: string): V3PlanInfo | null {
+  if (priceId === "v3_edition_lifetime") {
+    return { plan: "edition", interval: "year", label: "Édition — accès à vie (offre de lancement)", lifetime: true };
+  }
   const m = /^v3_(plume|edition|maison)_(monthly|annual)(_legacy)?$/.exec(priceId || "");
   if (!m) return null;
   const plan = m[1] as V3PlanKey;
@@ -70,8 +74,8 @@ export async function grantV3SubscriptionAccess(
     {
       email: clean,
       access_code: code,
-      status: "active",
-      plan_type: "subscription",
+      status: info?.lifetime ? "lifetime" : "active",
+      plan_type: info?.lifetime ? "lifetime" : "subscription",
       plan_tier: info?.plan ?? "plume",
       expires_at: null,
     },

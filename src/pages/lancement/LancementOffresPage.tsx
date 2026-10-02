@@ -8,11 +8,13 @@ import {
   Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from '@/components/ui/accordion';
 import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
+import LancementOfferBanner from '@/components/lancement/LancementOfferBanner';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 import { V3_PLANS, type V3BillingInterval, type V3PlanId } from '@/data/v3Pricing';
 import {
-  LANCEMENT_DATE_LABEL, LANCEMENT_FAQ, LANCEMENT_GARANTIES, LANCEMENT_OBJECTIONS,
+  LANCEMENT_FAQ, LANCEMENT_FIN_LABEL, LANCEMENT_PLACES, LANCEMENT_PRIX, LANCEMENT_PRICE_ID,
+  LANCEMENT_APRES_LABEL, isLancementOuvert, LANCEMENT_GARANTIES, LANCEMENT_OBJECTIONS,
   LANCEMENT_OBTENU, LANCEMENT_POURQUOI, LANCEMENT_POUR_QUI,
 } from '@/data/lancementTunnel';
 
@@ -23,14 +25,17 @@ export default function LancementOffresPage() {
   const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
 
   usePageMeta({
-    title: "Les offres du lancement EbookStudio — Plume, Édition, Maison d'Édition",
-    description: `Trois formules ouvertes le ${LANCEMENT_DATE_LABEL} : Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois. Sans engagement.`,
+    title: "Offre de lancement EbookStudio V3 — Édition à vie pour 47 €",
+    description: `Accès à vie à la V3 niveau Édition pour 47 € payés une seule fois. ${LANCEMENT_PLACES} places, jusqu'au ${LANCEMENT_FIN_LABEL}.`,
     canonical: 'https://ebookstudio.fr/lancement/offres',
   });
 
   useEffect(() => {
     void trackCaptureEvent('lancement', 'offer_view');
   }, []);
+
+  const ouvert = isLancementOuvert();
+  const edition = V3_PLANS.find((p) => p.id === 'edition');
 
   const openCheckout = (plan: V3PlanId, planName: string) => {
     const priceId = `v3_${plan}_${interval === 'month' ? 'monthly' : 'annual'}`;
@@ -45,15 +50,18 @@ export default function LancementOffresPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
       <PaymentTestModeBanner />
+      <LancementOfferBanner source={source} />
 
       <div className="mx-auto max-w-6xl px-4 py-12 md:py-16">
         {/* Accrocher */}
         <header className="text-center">
           <span className="inline-block rounded-full bg-primary/10 px-4 py-1 text-sm font-semibold text-primary">
-            Ouverture le {LANCEMENT_DATE_LABEL}
+            {ouvert ? `Tarif de lancement · jusqu'au ${LANCEMENT_FIN_LABEL}` : 'La V3 est ouverte'}
           </span>
           <h1 className="mx-auto mt-5 max-w-3xl text-3xl font-bold leading-tight md:text-5xl">
-            Choisissez la formule qui correspond à votre rythme d'écriture
+            {ouvert
+              ? "L'atelier V3 Édition, à vie, pour 47 € une seule fois"
+              : "Choisissez la formule qui correspond à votre rythme d'écriture"}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Toutes les formules contiennent l'atelier complet : écrire, corriger, habiller, publier,
@@ -124,6 +132,47 @@ export default function LancementOffresPage() {
         </section>
 
         {/* Offres */}
+        {ouvert ? (
+        <section id="offres" className="mt-20">
+          <div className="mx-auto max-w-xl rounded-2xl border-2 border-primary bg-card p-8 shadow-lg">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Tarif de lancement</p>
+            <h2 className="mt-2 font-serif text-2xl font-bold md:text-3xl">V3 Édition — accès à vie</h2>
+            <p className="mt-5 text-5xl font-bold">
+              {LANCEMENT_PRIX} €
+              <span className="ml-2 text-base font-normal text-muted-foreground">payés une seule fois</span>
+            </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Aucun abonnement. {LANCEMENT_PLACES} places, jusqu'au {LANCEMENT_FIN_LABEL} au plus tard.
+            </p>
+            <ul className="mt-6 space-y-2 text-sm">
+              {(edition?.features ?? []).slice(0, 9).map((f) => (
+                <li key={f} className="flex gap-2">
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{f}
+                </li>
+              ))}
+            </ul>
+            <Button
+              size="lg"
+              className="mt-7 w-full"
+              onClick={() => {
+                void trackCaptureEvent('lancement', 'checkout_open');
+                setCheckout({ priceId: LANCEMENT_PRICE_ID, planName: 'Édition — accès à vie' });
+              }}
+            >
+              Je réserve ma place à {LANCEMENT_PRIX} €
+            </Button>
+            <p className="mt-2 text-center text-xs text-muted-foreground">Paiement sécurisé par carte bancaire</p>
+            <p className="mt-6 border-t pt-4 text-center text-xs text-muted-foreground">{LANCEMENT_APRES_LABEL}</p>
+          </div>
+          <div className="mt-8 grid gap-3 rounded-xl border bg-muted/40 p-6 sm:grid-cols-2 lg:grid-cols-4">
+            {LANCEMENT_GARANTIES.filter((g) => !g.startsWith('Sans engagement')).map((g) => (
+              <div key={g} className="flex gap-2 text-sm">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{g}
+              </div>
+            ))}
+          </div>
+        </section>
+        ) : (
         <section id="offres" className="mt-20">
           <h2 className="text-center text-2xl font-bold md:text-3xl">Les trois formules</h2>
           <div className="mt-6 flex justify-center gap-2 rounded-full border bg-muted/40 p-1 w-fit mx-auto">
@@ -210,6 +259,7 @@ export default function LancementOffresPage() {
             ))}
           </div>
         </section>
+        )}
 
         {/* Sécuriser */}
         <section className="mt-20">
