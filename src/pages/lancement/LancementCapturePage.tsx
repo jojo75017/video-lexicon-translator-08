@@ -12,8 +12,9 @@ import {
   LANCEMENT_HERO,
   LANCEMENT_GARANTIES,
   LANCEMENT_LEAD_SOURCE,
-  LANCEMENT_DATE_LABEL,
+  LANCEMENT_FIN_LABEL,
 } from '@/data/lancementTunnel';
+import LancementOfferBanner from '@/components/lancement/LancementOfferBanner';
 
 export default function LancementCapturePage() {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ export default function LancementCapturePage() {
 
   usePageMeta({
     title: 'Lancement EbookStudio — écrivez et publiez votre livre sur Amazon',
-    description: `Ouverture le ${LANCEMENT_DATE_LABEL} : l'atelier complet pour écrire, corriger, habiller et publier votre livre sur Amazon KDP.`,
+    description: `Offre de lancement : la V3 Édition à vie pour 47 €, 15 places jusqu'au ${LANCEMENT_FIN_LABEL}. L'atelier complet pour écrire, corriger, habiller et publier votre livre sur Amazon KDP.`,
     canonical: 'https://ebookstudio.fr/lancement',
   });
 
@@ -34,8 +35,8 @@ export default function LancementCapturePage() {
   }, []);
 
   const offersUrl = source
-    ? `/lancement/offres?source=${encodeURIComponent(source)}`
-    : '/lancement/offres';
+    ? `/lancement/offres?source=${encodeURIComponent(source)}#offres`
+    : '/lancement/offres#offres';
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +74,7 @@ export default function LancementCapturePage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <LancementOfferBanner source={source} />
 
       <div className="mx-auto max-w-6xl px-4 py-12 md:py-20">
         <div className="grid gap-10 md:grid-cols-2 md:items-start">
@@ -123,7 +125,7 @@ export default function LancementCapturePage() {
             </p>
             <div className="mt-6 border-t pt-4 text-sm">
               <Link to={offersUrl} className="font-semibold text-primary hover:underline">
-                Voir directement les offres du {LANCEMENT_DATE_LABEL} →
+                Voir directement l'offre de lancement →
               </Link>
             </div>
           </div>
