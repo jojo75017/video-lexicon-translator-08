@@ -268,34 +268,26 @@ export default function V3HomePage() {
               rel="noopener noreferrer"
               className="group relative block overflow-hidden rounded-3xl transition-all"
               style={{
-                background: 'var(--v3-editorial-ink)',
-                border: '1px solid rgba(201,168,76,0.45)',
-                boxShadow: '0 30px 60px -30px color-mix(in srgb, var(--v3-editorial-ink) 55%, transparent)',
+                background: 'var(--v3-joy-cream)',
+                border: '1px solid var(--v3-joy-orange-soft)',
+                boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)',
               }}
             >
-              <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
               <div className="grid items-center gap-6 px-6 py-8 md:grid-cols-[1fr_auto] md:px-10">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold)' }}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
                     Blog · nouvelle édition
                   </span>
-                  <h2 className="v3-serif mt-3 text-2xl font-semibold leading-tight text-white md:text-3xl">
+                  <h2 className="v3-serif mt-3 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
                     Le Blog EbookStudio — la méthode, en clair
                   </h2>
-                  <p className="mt-2 max-w-2xl text-[14px] text-white/75">
+                  <p className="mt-2 max-w-2xl text-[14px]" style={{ color: 'var(--v3-joy-muted)' }}>
                     Articles, guides pratiques et retours d'expérience pour écrire, illustrer et publier
                     votre livre.
                   </p>
                 </div>
                 <div className="flex md:justify-end">
-                  <span
-                    className="inline-flex items-center gap-2 whitespace-nowrap rounded-full px-6 py-3 text-[15px] font-semibold"
-                    style={{
-                      background: 'var(--v3-gold)',
-                      color: '#1a1408',
-                      boxShadow: '0 10px 30px -10px rgba(201,168,76,0.7)',
-                    }}
-                  >
+                  <span className="v3-btn v3-joy-cta inline-flex items-center gap-2 whitespace-nowrap px-6 py-3 text-[15px] font-semibold">
                     Ouvrir le blog
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
