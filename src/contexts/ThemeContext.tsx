@@ -17,9 +17,11 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 function readStored(): ThemeChoice {
+  // Le mode sombre est retiré : on force le thème clair et on ignore
+  // toute préférence sombre enregistrée (ebookstudio_theme / v3-theme).
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw === 'light' || raw === 'dark' || raw === 'auto') return raw;
+    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem('v3-theme');
   } catch {
     /* stockage indisponible */
   }
