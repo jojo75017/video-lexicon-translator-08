@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
 import {
   LANCEMENT_FIN_ISO, LANCEMENT_FIN_LABEL, LANCEMENT_PLACES, LANCEMENT_PRIX,
   LANCEMENT_APRES_LABEL,
@@ -19,9 +20,10 @@ export default function LancementOfferBanner({ source }: { source?: string }) {
     return () => window.clearInterval(t);
   }, []);
   const r = remaining(now);
+  const { places } = useLancementPlaces();
   const href = `/lancement/offres${source ? `?source=${encodeURIComponent(source)}` : ''}#offres`;
 
-  if (r.ms === 0) {
+  if (r.ms === 0 || places <= 0) {
     return (
       <div className="w-full border-b border-primary/20 bg-primary/5 px-4 py-3 text-center text-sm text-foreground">
         L'offre de lancement est terminée. {LANCEMENT_APRES_LABEL.replace('À partir du 16 octobre 2026 : a', 'A')}
@@ -38,7 +40,7 @@ export default function LancementOfferBanner({ source }: { source?: string }) {
             Offre de lancement
           </span>
           <strong className="font-serif">Édition à vie, {LANCEMENT_PRIX} € une seule fois</strong>
-          <span className="text-muted-foreground"> — {LANCEMENT_PLACES} places, jusqu'au {LANCEMENT_FIN_LABEL}</span>
+          <span className="text-muted-foreground"> — {placesLabel(places)}, jusqu'au {LANCEMENT_FIN_LABEL}</span>
         </p>
         <div className="flex items-center gap-4">
           <div className="flex gap-1.5 font-mono text-sm tabular-nums" aria-label="Temps restant">
