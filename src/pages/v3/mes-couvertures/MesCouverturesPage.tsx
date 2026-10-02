@@ -71,7 +71,9 @@ export default function MesCouverturesPage() {
   const [savedCovers, setSavedCovers] = useState<SavedCover[]>([]);
   const [bookCovers, setBookCovers] = useState<SavedCover[]>([]);
   const coverPro = useCoverProAccess();
-  const { isAdmin } = useIsAdmin();
+  // Admin effectif : admin réel ET mode « Voir comme un abonné » désactivé.
+  // En vue abonné, aucun lien vers le studio de couverture payant.
+  const { effectiveAdmin: isAdmin } = useEffectiveAdmin();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
