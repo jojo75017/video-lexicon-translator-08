@@ -129,11 +129,11 @@ export default function V3WhatsNewPanel() {
               </div>
               <h3
                 className="v3-serif mt-3 text-xl font-semibold leading-snug"
-                style={{ color: 'var(--v3-emerald)' }}
+                style={{ color: 'var(--v3-joy-ink)' }}
               >
                 {it.title}
               </h3>
-              <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
                 {it.desc}
               </p>
 
@@ -152,8 +152,7 @@ export default function V3WhatsNewPanel() {
               )}
 
               <span
-                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-5 py-2.5 text-[13.5px] font-semibold"
-                style={{ background: '#0d7a5f', color: '#fff' }}
+                className="v3-btn v3-joy-cta mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-5 py-2.5 text-[13.5px] font-semibold"
               >
                 {it.cta}
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -166,7 +165,7 @@ export default function V3WhatsNewPanel() {
         <div className="px-6 md:px-10 pb-8">
           <div
             className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em]"
-            style={{ color: 'var(--v3-gold-600)' }}
+            style={{ color: 'var(--v3-joy-orange-600)' }}
           >
             Et aussi, depuis la dernière version
           </div>
@@ -176,20 +175,20 @@ export default function V3WhatsNewPanel() {
                 key={it.title}
                 to={it.to}
                 className="group rounded-2xl bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
-                style={{ border: '1px solid var(--v3-line)' }}
+                style={{ border: '1px solid var(--v3-joy-orange-soft)' }}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl leading-none">{it.emoji}</span>
                   <div className="min-w-0">
-                    <div className="text-[14px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+                    <div className="text-[14px] font-bold" style={{ color: 'var(--v3-joy-ink)' }}>
                       {it.title}
                     </div>
-                    <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-muted)' }}>
+                    <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-joy-muted)' }}>
                       {it.desc}
                     </p>
                     <span
                       className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold"
-                      style={{ color: '#0d7a5f' }}
+                      style={{ color: 'var(--v3-joy-orange-600)' }}
                     >
                       {it.cta}
                       <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />

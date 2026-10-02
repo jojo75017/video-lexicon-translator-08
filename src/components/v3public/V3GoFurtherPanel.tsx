@@ -14,9 +14,9 @@ export default function V3GoFurtherPanel() {
   const card =
     'flex flex-col rounded-2xl border bg-white p-4';
   const iconWrap = 'grid h-9 w-9 place-items-center rounded-full';
-  const iconStyle = { background: 'var(--v3-gold-soft)', color: '#6a4f10' } as const;
+  const iconStyle = { background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' } as const;
   const availability = (
-    <span className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
+    <span className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-joy-muted)' }}>
       Disponible
     </span>
   );
