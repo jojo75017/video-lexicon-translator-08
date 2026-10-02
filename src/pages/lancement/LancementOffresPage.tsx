@@ -10,6 +10,7 @@ import {
 import { PaymentTestModeBanner } from '@/components/PaymentTestModeBanner';
 import LancementOfferBanner from '@/components/lancement/LancementOfferBanner';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
+import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 import { V3_PLANS, type V3BillingInterval, type V3PlanId } from '@/data/v3Pricing';
 import {
@@ -34,7 +35,7 @@ export default function LancementOffresPage() {
     void trackCaptureEvent('lancement', 'offer_view');
   }, []);
 
-  const ouvert = isLancementOuvert();
+  const { places, ouvert } = useLancementPlaces();
   const edition = V3_PLANS.find((p) => p.id === 'edition');
 
   const openCheckout = (plan: V3PlanId, planName: string) => {
@@ -64,8 +65,9 @@ export default function LancementOffresPage() {
               : "Choisissez la formule qui correspond à votre rythme d'écriture"}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
+            {ouvert ? "L'atelier complet pour écrire, corriger, habiller, publier et vendre votre livre. Un seul paiement, aucun abonnement." : <>
             Toutes les formules contiennent l'atelier complet : écrire, corriger, habiller, publier,
-            vendre. Elles se distinguent par le volume et les studios professionnels inclus.
+            vendre. Elles se distinguent par le volume et les studios professionnels inclus.</>}
           </p>
         </header>
 
@@ -142,7 +144,7 @@ export default function LancementOffresPage() {
               <span className="ml-2 text-base font-normal text-muted-foreground">payés une seule fois</span>
             </p>
             <p className="mt-2 text-sm text-muted-foreground">
-              Aucun abonnement. {LANCEMENT_PLACES} places, jusqu'au {LANCEMENT_FIN_LABEL} au plus tard.
+              Aucun abonnement. {placesLabel(places)}, jusqu'au {LANCEMENT_FIN_LABEL} au plus tard.
             </p>
             <ul className="mt-6 space-y-2 text-sm">
               {(edition?.features ?? []).slice(0, 9).map((f) => (
@@ -270,7 +272,7 @@ export default function LancementOffresPage() {
             {LANCEMENT_OBJECTIONS.map((o) => (
               <div key={o.objection} className="rounded-xl border bg-card p-6">
                 <h3 className="font-semibold">« {o.objection} »</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{o.answer}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{ouvert && o.answerLancement ? o.answerLancement : o.answer}</p>
               </div>
             ))}
           </div>
@@ -279,7 +281,7 @@ export default function LancementOffresPage() {
         <section className="mt-16">
           <h2 className="text-2xl font-bold md:text-3xl">Questions fréquentes</h2>
           <Accordion type="single" collapsible className="mt-4">
-            {LANCEMENT_FAQ.map((f, i) => (
+            {LANCEMENT_FAQ.filter((f) => !(ouvert && f.abonnementOnly)).map((f, i) => (
               <AccordionItem key={f.q} value={`q${i}`}>
                 <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">{f.a}</AccordionContent>
@@ -290,7 +292,7 @@ export default function LancementOffresPage() {
 
         <div className="mt-14 text-center">
           <Button size="lg" asChild>
-            <a href="#offres">Choisir ma formule</a>
+            <a href="#offres">{ouvert ? `Je réserve ma place à ${LANCEMENT_PRIX} €` : 'Choisir ma formule'}</a>
           </Button>
         </div>
       </div>

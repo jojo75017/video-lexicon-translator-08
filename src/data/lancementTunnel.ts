@@ -125,11 +125,13 @@ export const LANCEMENT_POURQUOI = {
 };
 
 /** « Qu'est-ce qui m'empêche d'acheter maintenant ? » */
-export const LANCEMENT_OBJECTIONS = [
+export const LANCEMENT_OBJECTIONS: { objection: string; answer: string; answerLancement?: string }[] = [
   {
     objection: "C'est trop cher",
     answer:
       "Un seul livre confié à un prestataire (couverture, correction, mise en page) coûte largement plus qu'un abonnement mensuel ici. Et vous pouvez arrêter quand vous voulez : l'abonnement se résilie en un clic, sans engagement.",
+    answerLancement:
+      "Un seul livre confié à un prestataire (couverture, correction, mise en page) coûte largement plus que 47 €. Ici vous payez une seule fois, sans abonnement, et vous gardez l'atelier à vie.",
   },
   {
     objection: "Je n'ai pas le temps",
@@ -140,6 +142,8 @@ export const LANCEMENT_OBJECTIONS = [
     objection: "Et si ça ne marche pas pour moi ?",
     answer:
       "Vous commencez par un mois, vous écrivez un premier livre et vous jugez sur le résultat. Si l'atelier ne vous convient pas, vous résiliez avant la période suivante.",
+    answerLancement:
+      "Vous payez une seule fois, sans abonnement ni reconduction. Vous avancez à votre rythme, livre après livre, et Georges vous répond par email si vous bloquez.",
   },
   {
     objection: "Je ne suis pas à l'aise avec la technique",
@@ -153,7 +157,7 @@ export const LANCEMENT_OBJECTIONS = [
   },
 ];
 
-export const LANCEMENT_FAQ = [
+export const LANCEMENT_FAQ: { q: string; a: string; abonnementOnly?: boolean }[] = [
   {
     q: "Quand mon accès est-il ouvert ?",
     a: `La V3 est ouverte depuis le ${LANCEMENT_DATE_LABEL}. Dès votre paiement confirmé, vous recevez par email votre code d'accès personnel et votre espace est disponible immédiatement.`,
@@ -168,6 +172,7 @@ export const LANCEMENT_FAQ = [
   },
   {
     q: "Puis-je résilier ?",
+    abonnementOnly: true,
     a: "Oui, à tout moment, depuis votre espace. Votre accès reste actif jusqu'à la fin de la période déjà réglée.",
   },
   {
@@ -176,6 +181,7 @@ export const LANCEMENT_FAQ = [
   },
   {
     q: "Le mensuel ou l'annuel ?",
+    abonnementOnly: true,
     a: "L'annuel revient à dix mois payés : deux mois offerts. Le mensuel convient si vous préférez tester d'abord.",
   },
 ];

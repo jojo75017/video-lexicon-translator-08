@@ -3270,6 +3270,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      lancement_places_restantes: { Args: { _env?: string }; Returns: number }
       vip_days_remaining: { Args: never; Returns: number }
     }
     Enums: {
