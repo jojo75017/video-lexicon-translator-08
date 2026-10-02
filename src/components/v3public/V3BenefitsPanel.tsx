@@ -30,15 +30,15 @@ const BENEFITS = [
 
 export default function V3BenefitsPanel() {
   return (
-    <section id="v3-benefices" className="v3-shell py-16 scroll-mt-24">
+    <section id="v3-benefices" className="v3-shell py-10 scroll-mt-24">
       <div className="max-w-3xl">
-        <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+        <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>
           Le résultat pour vous
         </div>
-        <h2 className="v3-serif mt-2 text-3xl md:text-4xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+        <h2 className="v3-serif mt-2 text-3xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
           Ce que la V3 vous apporte
         </h2>
-        <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+        <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
           Pas des fonctionnalités : des livrables. Voilà ce que vous avez entre les mains à la fin du parcours.
         </p>
       </div>
@@ -48,18 +48,18 @@ export default function V3BenefitsPanel() {
           <div
             key={b.title}
             className="rounded-2xl bg-white p-6"
-            style={{ border: '1px solid var(--v3-line)' }}
+            style={{ border: '1px solid var(--v3-joy-orange-soft)' }}
           >
             <span
               className="grid h-10 w-10 place-items-center rounded-full"
-              style={{ background: 'rgba(201,168,76,0.18)', color: '#8a6d1f' }}
+              style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
             >
               <b.icon className="h-5 w-5" />
             </span>
-            <h3 className="v3-serif mt-3 text-[19px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+            <h3 className="v3-serif mt-3 text-[19px] font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
               {b.title}
             </h3>
-            <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+            <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
               {b.text}
             </p>
           </div>
@@ -67,13 +67,13 @@ export default function V3BenefitsPanel() {
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
-        <Link to="/v3/fonctionnalites" className="v3-btn v3-btn-gold">
+        <Link to="/v3/fonctionnalites" className="v3-btn v3-joy-cta">
           Voir les 12 modules <ArrowRight className="h-4 w-4" />
         </Link>
         <Link
           to="/v3/forfaits"
           className="inline-flex items-center gap-1.5 text-[13px] font-semibold"
-          style={{ color: 'var(--v3-emerald)' }}
+          style={{ color: 'var(--v3-joy-ink)' }}
         >
           Comparer les deux forfaits <ArrowRight className="h-3.5 w-3.5" />
         </Link>

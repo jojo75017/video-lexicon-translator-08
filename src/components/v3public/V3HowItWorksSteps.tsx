@@ -74,43 +74,43 @@ const STEPS = [
 
 export default function V3HowItWorksSteps() {
   return (
-    <section id="v3-etapes" className="scroll-mt-24" style={{ background: 'var(--v3-cream)' }}>
-      <div className="v3-shell py-16">
+    <section id="v3-etapes" className="scroll-mt-24" style={{ background: 'var(--v3-joy-cream)' }}>
+      <div className="v3-shell py-10">
         <div className="max-w-3xl">
-          <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+          <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>
             Le parcours complet
           </div>
-          <h2 className="v3-serif mt-2 text-3xl md:text-4xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+          <h2 className="v3-serif mt-2 text-3xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
             Comment ça marche, étape par étape
           </h2>
-          <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+          <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
             Six étapes, de l’idée au fichier prêt pour Amazon. Chaque étape est un écran réel de l’application,
             que vous pouvez ouvrir dès maintenant.
           </p>
         </div>
 
-        <ol className="mt-10 space-y-10 list-none p-0">
+        <ol className="mt-8 space-y-10 list-none p-0">
           {STEPS.map((s) => (
             <li key={s.n} className="grid gap-6 lg:grid-cols-[1fr_1.15fr] lg:gap-10 lg:items-center">
               <div>
                 <div className="flex items-center gap-3">
                   <span
                     className="grid h-10 w-10 place-items-center rounded-full text-[15px] font-bold"
-                    style={{ background: 'var(--v3-emerald)', color: 'var(--v3-gold)' }}
+                    style={{ background: 'var(--v3-joy-orange)', color: 'var(--v3-joy-cream)' }}
                   >
                     {s.n}
                   </span>
-                  <h3 className="v3-serif text-[22px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+                  <h3 className="v3-serif text-[22px] font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
                     {s.title}
                   </h3>
                 </div>
-                <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+                <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
                   {s.text}
                 </p>
                 <Link
                   to={s.to}
                   className="mt-4 inline-flex items-center gap-1.5 text-[13px] font-semibold"
-                  style={{ color: 'var(--v3-gold-600)' }}
+                  style={{ color: 'var(--v3-joy-orange-600)' }}
                 >
                   {s.cta} <ArrowRight className="h-3.5 w-3.5" />
                 </Link>

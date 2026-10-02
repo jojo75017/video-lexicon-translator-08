@@ -11,11 +11,11 @@ export default function V3AnchorNav() {
     <nav aria-label="Découvrir la V3" className="v3-shell pt-6">
       <div
         className="rounded-2xl px-5 py-4 flex flex-wrap items-center gap-3"
-        style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}
+        style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}
       >
         <span
           className="text-[10px] font-bold uppercase tracking-[0.22em]"
-          style={{ color: 'var(--v3-gold-600)' }}
+          style={{ color: 'var(--v3-joy-orange-600)' }}
         >
           Découvrir la V3
         </span>
@@ -25,7 +25,7 @@ export default function V3AnchorNav() {
               key={l.id}
               href={`#${l.id}`}
               className="rounded-full px-4 py-1.5 text-[12.5px] font-semibold transition hover:opacity-80"
-              style={{ background: '#fff', border: '1px solid var(--v3-line)', color: 'var(--v3-emerald)' }}
+              style={{ background: '#fff', border: '1px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-ink)' }}
             >
               {l.label}
             </a>
