@@ -2,9 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Rocket, Crown } from 'lucide-react';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
+import { LANCEMENT_FIN_ISO, LANCEMENT_PRIX } from '@/data/lancementTunnel';
+import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
 
-/** Fin de l'offre 47 € à vie : 30 septembre 2026, 23h59 heure de Paris. */
-const DEADLINE = new Date('2026-09-30T23:59:59+02:00').getTime();
+/** Fin de l'offre de lancement : 15 octobre 2026, 23h59 heure de Paris. */
+const DEADLINE = Date.parse(LANCEMENT_FIN_ISO);
 
 function useCountdown(target: number) {
   const [now, setNow] = useState(() => Date.now());
@@ -25,14 +27,15 @@ function useCountdown(target: number) {
 }
 
 /**
- * Bandeau de lancement : rappelle la fin de l'accès à vie à 47 € (30 septembre)
- * et l'ouverture de la V3 le 1er octobre avec le premier mois offert.
+ * Bandeau de l'offre de lancement : Édition à vie, places réelles, jusqu'au 15 octobre.
  * Affiché en haut de l'accueil V3 et de la page de commande.
  */
 export default function V3LaunchBanner({ compact = false }: { compact?: boolean }) {
   const { settings } = useLaunchSettings();
   const video = String(settings.launch_video?.url || '');
   const t = useCountdown(DEADLINE);
+  const { places } = useLancementPlaces();
+  const over = t.over || places <= 0;
 
   const cells = [
     { value: t.days, label: 'jours' },
@@ -57,20 +60,22 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
               className="inline-flex items-center gap-1.5 border-r pr-3 text-[9px] font-bold uppercase tracking-[0.18em]"
               style={{ color: 'var(--v3-gold)', borderColor: 'color-mix(in srgb, var(--v3-gold) 45%, transparent)' }}
             >
-              <Crown className="h-3 w-3" /> Lancement V3
+              <Crown className="h-3 w-3" /> Offre de lancement
             </span>
             <h2 className="text-[13px] font-semibold leading-snug sm:text-[14px]" style={{ color: 'var(--v3-gold-soft)' }}>
-              <strong style={{ color: 'var(--v3-gold)' }}>47 € à vie jusqu’au 30 septembre</strong>
-              <span className="hidden sm:inline"> — ouverture V3 le 1<sup>er</sup> octobre, 1<sup>er</sup> mois offert</span>
+              {over ? (
+                <strong style={{ color: 'var(--v3-gold)' }}>La V3 est ouverte — abonnements Plume, Édition et Maison d'Édition</strong>
+              ) : (
+                <>
+                  <strong style={{ color: 'var(--v3-gold)' }}>V3 Édition à vie pour {LANCEMENT_PRIX} € une seule fois</strong>
+                  <span> — {placesLabel(places)}, jusqu'au 15 octobre</span>
+                </>
+              )}
             </h2>
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5" aria-label="Temps restant">
-            {t.over ? (
-              <span className="rounded px-2 py-1 text-[11px] font-semibold text-primary-foreground/90" style={{ background: 'color-mix(in srgb, var(--v3-gold) 12%, transparent)' }}>
-                Offre 47 € terminée — rendez-vous le 1<sup>er</sup> octobre
-              </span>
-            ) : (
+            {over ? null : (
               cells.map((c) => (
                 <div
                   key={c.label}
@@ -84,15 +89,15 @@ export default function V3LaunchBanner({ compact = false }: { compact?: boolean 
                 </div>
               ))
             )}
-            <Link to="/essai" className="ml-1 inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[11px] font-bold" style={{ background: 'var(--v3-gold)', color: 'var(--v3-editorial-ink)' }}>
-              <Rocket className="h-3.5 w-3.5" /> Essayer gratuitement
-            </Link>
-            <Link to="/v3/attente" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
-              Réserver ma place
-            </Link>
-            <Link to="/commander" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
-              Accès à vie 47 €
-            </Link>
+            {over ? (
+              <Link to="/lancement/offres#offres" className="ml-1 inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[11px] font-bold" style={{ background: 'var(--v3-gold)', color: 'var(--v3-editorial-ink)' }}>
+                <Rocket className="h-3.5 w-3.5" /> Voir les formules
+              </Link>
+            ) : (
+              <Link to="/lancement/offres#offres" className="ml-1 inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-[11px] font-bold" style={{ background: 'var(--v3-gold)', color: 'var(--v3-editorial-ink)' }}>
+                <Rocket className="h-3.5 w-3.5" /> Je réserve ma place à {LANCEMENT_PRIX} €
+              </Link>
+            )}
             {video && (
               <a href={video} target="_blank" rel="noopener noreferrer" className="px-2 text-[10.5px] font-semibold text-primary-foreground/80 underline underline-offset-4">
                 Voir la vidéo

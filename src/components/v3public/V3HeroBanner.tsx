@@ -9,6 +9,9 @@ import {
 } from '@/components/ui/dialog';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { trackCaptureEvent } from '@/lib/captureTracking';
+import { Link } from 'react-router-dom';
+import { LANCEMENT_FIN_ISO, LANCEMENT_PRIX } from '@/data/lancementTunnel';
+import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
 
 const PILLS = [
   { label: 'Kindle', icon: BookOpen },
@@ -18,7 +21,7 @@ const PILLS = [
   { label: 'Métadonnées', icon: Tags },
 ];
 
-const OPENING_DATE = new Date('2026-10-01T00:00:00+02:00').getTime();
+const OPENING_DATE = Date.parse(LANCEMENT_FIN_ISO);
 
 const remainingUntilOpening = () => {
   const difference = Math.max(0, OPENING_DATE - Date.now());
@@ -44,6 +47,7 @@ const CountdownValue = ({ value, label }: { value: number; label: string }) => (
 export default function V3HeroBanner({ className = '' }: { className?: string }) {
   const [remaining, setRemaining] = useState(remainingUntilOpening);
   const [captureOpen, setCaptureOpen] = useState(false);
+  const { places, ouvert } = useLancementPlaces();
 
   useEffect(() => {
     const interval = window.setInterval(() => setRemaining(remainingUntilOpening()), 30_000);
@@ -84,13 +88,13 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               border: '1px solid color-mix(in srgb, var(--v3-joy-orange) 35%, transparent)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" /> Ouverture le 1er octobre
+            <Sparkles className="h-3.5 w-3.5" /> {ouvert ? `Offre de lancement · ${placesLabel(places)}` : 'La V3 est ouverte'}
           </span>
 
-          <div
+          {ouvert && <div
             className="mx-auto mt-4 inline-flex overflow-hidden rounded-2xl bg-white shadow-sm"
             style={{ border: '2px solid var(--v3-joy-orange-soft)' }}
-            aria-label={`${remaining.days} jours, ${remaining.hours} heures et ${remaining.minutes} minutes avant l'ouverture`}
+            aria-label={`${remaining.days} jours, ${remaining.hours} heures et ${remaining.minutes} minutes avant la fin de l'offre`}
           >
             <CountdownValue value={remaining.days} label="jours" />
             <CountdownValue value={remaining.hours} label="heures" />
@@ -102,7 +106,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
                 minutes
               </div>
             </div>
-          </div>
+          </div>}
 
           <h1
             className="v3-serif mx-auto mt-5 max-w-4xl text-[28px] font-semibold leading-[1.1] md:text-[40px]"
@@ -123,12 +127,14 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           </h1>
 
           <p className="v3-serif mt-3 text-lg italic" style={{ color: 'var(--v3-joy-orange-600)' }}>
-            Votre maison d'édition IA ouvre le 1er octobre.
+            {ouvert
+              ? `Offre de lancement : V3 Édition à vie pour ${LANCEMENT_PRIX} € une seule fois — ${placesLabel(places)}, jusqu'au 15 octobre.`
+              : "Votre maison d'édition IA est ouverte."}
           </p>
 
           <p className="mx-auto mt-4 max-w-3xl text-[15px] leading-relaxed md:text-[16.5px]" style={{ color: 'var(--v3-joy-muted)' }}>
             D'une simple idée à un livre complet, prêt pour Amazon : texte, couverture, version Kindle et brochée,
-            livre audio et métadonnées. Réservez votre place et recevez dès maintenant le kit de démarrage + 10 niches rentables.
+            livre audio et métadonnées. Recevez aussi le kit de démarrage + 10 niches rentables.
           </p>
 
           <ul className="mt-6 flex flex-wrap items-center justify-center gap-2">
@@ -146,6 +152,15 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
             ))}
           </ul>
 
+          {ouvert && (
+            <div className="mt-7">
+              <Link to="/lancement/offres#offres" data-contemplation-allow="true"
+                className="v3-joy-cta inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold text-white"
+                style={{ background: 'var(--v3-joy-orange)', boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)' }}>
+                Je réserve ma place à {LANCEMENT_PRIX} €
+              </Link>
+            </div>
+          )}
           <button
             type="button"
             data-contemplation-allow="true"
@@ -160,7 +175,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
             }}
           >
             <Gift className="h-4 w-4 shrink-0" />
-            Réserver ma place — kit + 10 niches offerts
+            Recevoir le kit + 10 niches offerts
           </button>
           <div className="mt-4">
             <a href="/v3/tutoriels-v3" data-contemplation-allow="true"
