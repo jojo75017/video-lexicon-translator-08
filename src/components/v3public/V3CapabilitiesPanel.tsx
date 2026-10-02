@@ -25,16 +25,16 @@ export default function V3CapabilitiesPanel() {
   return (
     <section
       className="rounded-2xl bg-white p-6 md:p-8"
-      style={{ border: '1px solid var(--v3-line)', boxShadow: '0 8px 24px rgba(6,78,59,0.06)' }}
+      style={{ border: '1px solid var(--v3-joy-orange-soft)', boxShadow: '0 8px 24px rgba(30, 41, 59, 0.06)' }}
       aria-label="Ce que vous pouvez créer avec Ebookstudio V3"
     >
       <p
         className="text-[10.5px] font-bold uppercase tracking-[0.22em]"
-        style={{ color: 'var(--v3-gold-600)' }}
+        style={{ color: 'var(--v3-joy-orange-600)' }}
       >
         Ce que vous pouvez produire
       </p>
-      <h2 className="mt-1 text-2xl font-bold md:text-3xl" style={{ color: 'var(--v3-ink)' }}>
+      <h2 className="mt-1 text-2xl font-bold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
         Ebookstudio V3 vous aide à créer :
       </h2>
 
@@ -44,21 +44,21 @@ export default function V3CapabilitiesPanel() {
             key={item}
             className="flex items-start gap-2 rounded-xl px-3 py-2.5 text-[13.5px] leading-snug"
             style={{
-              border: '1px solid var(--v3-line)',
-              background: 'var(--v3-emerald-50)',
-              color: 'var(--v3-ink)',
+              border: '1px solid var(--v3-joy-orange-soft)',
+              background: 'var(--v3-joy-cream)',
+              color: 'var(--v3-joy-ink)',
             }}
           >
             <span
               className="mt-1.5 inline-block h-1.5 w-1.5 shrink-0 rounded-full"
-              style={{ background: 'var(--v3-gold)' }}
+              style={{ background: 'var(--v3-joy-orange)' }}
             />
             {item}
           </li>
         ))}
       </ul>
 
-      <p className="mt-5 max-w-3xl text-[14px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+      <p className="mt-5 max-w-3xl text-[14px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
         Au lieu d’utiliser cinq outils différents et de consacrer des semaines à un travail manuel,
         vous utilisez un seul agent d’IA.
       </p>

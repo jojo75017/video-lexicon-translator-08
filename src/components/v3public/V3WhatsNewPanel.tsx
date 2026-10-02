@@ -85,46 +85,43 @@ export default function V3WhatsNewPanel() {
     <section className="v3-shell pt-8" id="nouveautes">
       <div
         className="rounded-3xl overflow-hidden"
-        style={{ border: '1px solid var(--v3-line)', background: 'var(--v3-cream)' }}
+        style={{ border: '1px solid var(--v3-joy-orange-soft)', background: 'var(--v3-joy-cream)' }}
       >
-        <div
-          className="px-6 md:px-10 py-6"
-          style={{ background: 'var(--v3-editorial-ink)' }}
-        >
+        <div className="px-6 md:px-10 py-6">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
+            <Sparkles className="w-4 h-4" style={{ color: 'var(--v3-joy-orange-600)' }} />
             <span
               className="text-[10px] font-bold uppercase tracking-[0.24em]"
-              style={{ color: 'var(--v3-gold)' }}
+              style={{ color: 'var(--v3-joy-orange-600)' }}
             >
               Ce qui a changé
             </span>
           </div>
-          <h2 className="v3-serif mt-2 text-2xl md:text-3xl font-semibold text-white leading-tight">
+          <h2 className="v3-serif mt-2 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
             Les nouveautés de la V3
           </h2>
-          <p className="mt-2 text-[14px] text-white/80 max-w-3xl">
+          <p className="mt-2 max-w-3xl text-[14px]" style={{ color: 'var(--v3-joy-muted)' }}>
             Le studio a beaucoup évolué. Deux nouveautés changent tout : le{' '}
-            <strong className="text-white">Sommaire IA</strong>, qui mène le livre du début à la fin,
-            et les <strong className="text-white">25 agents spécialisés</strong>, un par type de livre.
+            <strong style={{ color: 'var(--v3-joy-ink)' }}>Sommaire IA</strong>, qui mène le livre du début à la fin,
+            et les <strong style={{ color: 'var(--v3-joy-ink)' }}>25 agents spécialisés</strong>, un par type de livre.
           </p>
         </div>
 
         {/* Les deux nouveautés majeures */}
-        <div className="grid gap-4 px-6 md:px-10 py-6 md:grid-cols-2">
+        <div className="grid gap-4 px-6 pb-6 md:grid-cols-2 md:px-10">
           {HEADLINE.map((it) => (
             <Link
               key={it.title}
               to={it.to}
               className="group flex flex-col rounded-2xl bg-white p-6 transition-all hover:-translate-y-0.5 hover:shadow-lg"
-              style={{ border: '1px solid rgba(201,168,76,0.45)' }}
+              style={{ border: '1px solid var(--v3-joy-orange-soft)' }}
             >
               <div className="flex items-center justify-between">
                 <span className="text-3xl">{it.emoji}</span>
                 {it.badge && (
                   <span
                     className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]"
-                    style={{ background: 'rgba(201,168,76,0.18)', color: '#8a6d1f' }}
+                    style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
                   >
                     {it.badge}
                   </span>
@@ -132,11 +129,11 @@ export default function V3WhatsNewPanel() {
               </div>
               <h3
                 className="v3-serif mt-3 text-xl font-semibold leading-snug"
-                style={{ color: 'var(--v3-emerald)' }}
+                style={{ color: 'var(--v3-joy-ink)' }}
               >
                 {it.title}
               </h3>
-              <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
                 {it.desc}
               </p>
 
@@ -155,8 +152,7 @@ export default function V3WhatsNewPanel() {
               )}
 
               <span
-                className="mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-5 py-2.5 text-[13.5px] font-semibold"
-                style={{ background: '#0d7a5f', color: '#fff' }}
+                className="v3-btn v3-joy-cta mt-5 inline-flex w-fit items-center gap-1.5 rounded-full px-5 py-2.5 text-[13.5px] font-semibold"
               >
                 {it.cta}
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
@@ -169,7 +165,7 @@ export default function V3WhatsNewPanel() {
         <div className="px-6 md:px-10 pb-8">
           <div
             className="mb-3 text-[10px] font-bold uppercase tracking-[0.22em]"
-            style={{ color: 'var(--v3-gold-600)' }}
+            style={{ color: 'var(--v3-joy-orange-600)' }}
           >
             Et aussi, depuis la dernière version
           </div>
@@ -179,20 +175,20 @@ export default function V3WhatsNewPanel() {
                 key={it.title}
                 to={it.to}
                 className="group rounded-2xl bg-white p-4 transition-all hover:-translate-y-0.5 hover:shadow-md"
-                style={{ border: '1px solid var(--v3-line)' }}
+                style={{ border: '1px solid var(--v3-joy-orange-soft)' }}
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl leading-none">{it.emoji}</span>
                   <div className="min-w-0">
-                    <div className="text-[14px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+                    <div className="text-[14px] font-bold" style={{ color: 'var(--v3-joy-ink)' }}>
                       {it.title}
                     </div>
-                    <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-muted)' }}>
+                    <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-joy-muted)' }}>
                       {it.desc}
                     </p>
                     <span
                       className="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold"
-                      style={{ color: '#0d7a5f' }}
+                      style={{ color: 'var(--v3-joy-orange-600)' }}
                     >
                       {it.cta}
                       <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-0.5" />

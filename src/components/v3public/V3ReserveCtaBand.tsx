@@ -25,20 +25,21 @@ export default function V3ReserveCtaBand() {
         <div
           className="rounded-3xl px-6 py-8 text-center md:px-10"
           style={{
-            background: 'linear-gradient(160deg,#064e3b 0%,#053e2f 60%,#0a5a45 100%)',
-            border: '1px solid rgba(201,168,76,0.35)',
+            background: 'var(--v3-joy-cream)',
+            border: '1px solid var(--v3-joy-orange-soft)',
+            boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)',
           }}
         >
           <span
             className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em]"
-            style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--v3-gold)', border: '1px solid rgba(201,168,76,0.35)' }}
+            style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
           >
-            <span aria-hidden>🎁</span> Ouverture le 1er octobre
+            <span aria-hidden>🎁</span> EbookStudio V3 est ouvert
           </span>
-          <h2 className="v3-serif mt-4 text-2xl font-semibold leading-tight text-white md:text-3xl">
+          <h2 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
             Réservez votre place dès maintenant
           </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-[14px] leading-relaxed text-white/85">
+          <p className="mx-auto mt-3 max-w-2xl text-[14px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
             Laissez votre email : vous serez prévenu à l'ouverture et vous recevez tout de suite
             le kit de démarrage + 10 niches rentables, offerts.
           </p>
@@ -46,11 +47,11 @@ export default function V3ReserveCtaBand() {
             type="button"
             size="lg"
             data-contemplation-allow="true"
+            className="v3-joy-cta mt-6 h-auto min-h-12 max-w-full whitespace-normal px-6 py-3 text-center text-[14px] font-bold sm:text-[15px]"
             onClick={() => {
               void trackCaptureEvent('v3', 'reserve_open', { leadMagnet: '10-niches-offertes' });
               setCaptureOpen(true);
             }}
-            className="mt-6 h-auto min-h-12 max-w-full whitespace-normal px-6 py-3 text-center text-[14px] font-bold sm:text-[15px]"
           >
             <Gift className="h-4 w-4 shrink-0" />
             Réserver ma place — kit + 10 niches offerts

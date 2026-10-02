@@ -50,22 +50,22 @@ const BLOCS = [
 
 export default function V3WhatIsPanel() {
   return (
-    <section id="v3-quoi" className="v3-shell py-14 scroll-mt-24">
+    <section id="v3-quoi" className="v3-shell py-10 scroll-mt-24">
       <div className="max-w-3xl">
-        <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
+        <div className="text-[10px] uppercase tracking-[0.24em] font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>
           La V3, sans jargon
         </div>
-        <h2 className="v3-serif mt-2 text-3xl md:text-4xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+        <h2 className="v3-serif mt-2 text-3xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
           Qu’est-ce que la V3, concrètement ?
         </h2>
-        <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+        <p className="mt-3 text-[15px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
           Ce n’est pas un générateur de texte. C’est une maison d’édition en ligne : elle cadre votre projet,
           construit le plan avec vous, écrit, corrige, habille et prépare le dossier Amazon KDP.
           Voici les écrans que vous utiliserez vraiment.
         </p>
       </div>
 
-      <div className="mt-10 space-y-12">
+      <div className="mt-8 space-y-10">
         {BLOCS.map((b, i) => (
           <article
             key={b.tag}
@@ -73,18 +73,18 @@ export default function V3WhatIsPanel() {
           >
             <div>
               <span className="v3-chip">{b.tag}</span>
-              <h3 className="v3-serif mt-3 text-2xl font-semibold" style={{ color: 'var(--v3-ink)' }}>
+              <h3 className="v3-serif mt-3 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
                 {b.title}
               </h3>
-              <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              <p className="mt-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
                 {b.text}
               </p>
               <ul className="mt-4 space-y-2">
                 {b.points.map((p) => (
-                  <li key={p} className="flex items-start gap-2 text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>
+                  <li key={p} className="flex items-start gap-2 text-[13.5px]" style={{ color: 'var(--v3-joy-ink)' }}>
                     <span
                       className="mt-[6px] h-1.5 w-1.5 shrink-0 rounded-full"
-                      style={{ background: 'var(--v3-gold)' }}
+                      style={{ background: 'var(--v3-joy-orange)' }}
                     />
                     {p}
                   </li>

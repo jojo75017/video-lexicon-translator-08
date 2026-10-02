@@ -33,35 +33,34 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
   return (
     <section className="v3-shell">
       <div
-        className="overflow-hidden rounded-2xl border"
+        className="overflow-hidden rounded-3xl border bg-white"
         style={{
-          borderColor: 'var(--v3-gold)',
-          background: 'var(--v3-ivory)',
-          boxShadow: 'var(--v3-shadow-card)',
+          borderColor: 'var(--v3-joy-orange-soft)',
+          boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)',
         }}
       >
         <div className="grid gap-6 p-6 md:grid-cols-[1.4fr,1fr] md:p-8">
           <div>
             <span
               className="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wider"
-              style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-gold-600)' }}
+              style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
             >
               <Sparkles className="h-3.5 w-3.5" /> Grande nouveauté V4
             </span>
             <h2
               className="v3-serif mt-3 text-2xl font-bold sm:text-3xl"
-              style={{ color: 'var(--v3-ink)' }}
+              style={{ color: 'var(--v3-joy-ink)' }}
             >
               Studio BD &amp; Jeunesse : votre atelier de livres pour enfants
             </h2>
-            <p className="mt-2 text-sm" style={{ color: 'var(--v3-muted)' }}>
+            <p className="mt-2 text-sm" style={{ color: 'var(--v3-joy-muted)' }}>
               Bandes dessinées, coloriages, histoires illustrées et couvertures : vous décrivez votre idée,
               l’IA crée les personnages, écrit l’histoire, illustre chaque case et prépare vos fichiers
               prêts à publier sur Amazon KDP. Aucun talent de dessin nécessaire.
             </p>
             <Link
               to="/bd-offre"
-              className="v3-btn v3-btn-gold mt-5 inline-flex items-center gap-2 px-6 py-3.5 text-sm font-bold"
+              className="v3-btn v3-joy-cta mt-5 inline-flex items-center gap-2 px-6 py-3.5 text-sm font-bold"
             >
               Découvrir l’offre — {BD_COMIC_OFFER.price} € à vie <ArrowRight className="h-4 w-4" />
             </Link>
@@ -69,7 +68,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             <div className="mt-4">
               <p
                 className="text-xs font-bold uppercase tracking-wider"
-                style={{ color: 'var(--v3-gold-600)' }}
+                style={{ color: 'var(--v3-joy-orange-600)' }}
               >
                 Pas seulement des livres numériques
               </p>
@@ -88,8 +87,8 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
                     key={item}
                     className="rounded-full border px-2.5 py-1"
                     style={{
-                      borderColor: 'var(--v3-border)',
-                      background: 'var(--v3-paper)',
+                      borderColor: 'var(--v3-joy-orange-soft)',
+                      background: '#ffffff',
                       color: 'var(--v3-ink-2)',
                     }}
                   >
@@ -122,12 +121,12 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
                   key={text}
                   className="flex items-start gap-3 rounded-xl border p-2.5"
                   style={{
-                    borderColor: 'var(--v3-border)',
-                    background: 'var(--v3-paper)',
+                    borderColor: 'var(--v3-joy-orange-soft)',
+                    background: '#ffffff',
                     color: 'var(--v3-ink-2)',
                   }}
                 >
-                  <Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-gold-600)' }} />
+                  <Icon className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />
                   <span>{text}</span>
                 </li>
               ))}
@@ -137,7 +136,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
 
         <div
           className="border-t px-6 py-6 md:px-8"
-          style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}
+          style={{ borderColor: 'var(--v3-joy-orange-soft)', background: '#ffffff' }}
         >
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
             <h3 className="v3-serif text-lg font-bold" style={{ color: 'var(--v3-ink)' }}>
@@ -145,7 +144,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             </h3>
             <span
               className="text-[11px] font-bold uppercase tracking-[0.18em]"
-              style={{ color: 'var(--v3-gold-600)' }}
+              style={{ color: 'var(--v3-joy-orange-600)' }}
             >
               Inclus dans l’offre {BD_COMIC_OFFER.price} €
             </span>
@@ -155,7 +154,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
             d’histoires et couleurs.
           </p>
           <div className="mt-5 grid gap-px overflow-hidden rounded-xl border sm:grid-cols-2 lg:grid-cols-4"
-            style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-border)' }}
+            style={{ borderColor: 'var(--v3-joy-orange-soft)', background: 'var(--v3-joy-orange-soft)' }}
           >
             {[
               { title: 'Quiz des animaux', desc: 'Questions illustrées' },
@@ -163,7 +162,7 @@ export default function BdComicNewsBanner({ compact = false }: Props) {
               { title: 'Crée ton histoire', desc: 'Récits à composer' },
               { title: 'Jeu des couleurs', desc: 'Palettes à deviner' },
             ].map(({ title, desc }) => (
-              <div key={title} className="px-4 py-4" style={{ background: 'var(--v3-ivory)' }}>
+              <div key={title} className="px-4 py-4" style={{ background: 'var(--v3-joy-cream)' }}>
                 <p className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>
                   {title}
                 </p>

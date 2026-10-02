@@ -58,11 +58,11 @@ const cards = [
 export default function V3PricingOverview() {
   return (
     <section className="v3-shell" aria-labelledby="v3-offers-title">
-      <div className="rounded-lg px-5 py-7 md:px-7" style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}>
+      <div className="rounded-3xl px-5 py-7 md:px-7" style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}>
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--v3-gold-600)' }}>Trois façons d’entrer dans la V3</p>
-            <h2 id="v3-offers-title" className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--v3-joy-orange-600)' }}>Trois façons d’entrer dans la V3</p>
+            <h2 id="v3-offers-title" className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
               Choisissez seulement ce dont vous avez besoin
             </h2>
           </div>
@@ -72,25 +72,25 @@ export default function V3PricingOverview() {
         </div>
 
         <div className="mt-3">
-          <p className="rounded-md px-3 py-2 text-xs font-semibold" style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-gold-600)' }}>
+          <p className="rounded-md px-3 py-2 text-xs font-semibold" style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}>
             {V2_ACCESS_NOTE} Dans les trois offres, vous gardez votre ancien espace en plus de la V3.
           </p>
         </div>
 
         <div className="mt-5 grid gap-3 md:grid-cols-3">
           {cards.map(({ icon: Icon, ...card }) => (
-            <article key={card.key} className="flex flex-col rounded-lg bg-background p-5" style={{ border: card.key === 'plume' ? '2px solid var(--v3-gold)' : '1px solid var(--v3-line)' }}>
+            <article key={card.key} className="flex flex-col rounded-2xl bg-white p-5" style={{ border: card.key === 'plume' ? '2px solid var(--v3-joy-orange)' : '1px solid var(--v3-joy-orange-soft)' }}>
               <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4" style={{ color: 'var(--v3-gold-600)' }} />
-                <h3 className="v3-serif text-lg font-semibold" style={{ color: 'var(--v3-ink)' }}>{card.title}</h3>
+                <Icon className="h-4 w-4" style={{ color: 'var(--v3-joy-orange-600)' }} />
+                <h3 className="v3-serif text-lg font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{card.title}</h3>
               </div>
-              <p className="mt-3 text-lg font-bold" style={{ color: 'var(--v3-emerald)' }}>{card.price}</p>
-              <p className="text-xs font-semibold" style={{ color: 'var(--v3-gold-600)' }}>{card.note}</p>
-              <p className="mt-3 min-h-12 text-xs leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{card.description}</p>
+              <p className="mt-3 text-lg font-bold" style={{ color: 'var(--v3-joy-ink)' }}>{card.price}</p>
+              <p className="text-xs font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>{card.note}</p>
+              <p className="mt-3 min-h-12 text-xs leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>{card.description}</p>
               <ul className="mt-3 space-y-1.5">
-                {card.items.map((item) => <li key={item} className="flex gap-2 text-xs"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-emerald)' }} />{item}</li>)}
+                {card.items.map((item) => <li key={item} className="flex gap-2 text-xs"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />{item}</li>)}
               </ul>
-              <Link to={card.to} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              <Link to={card.to} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>
                 Voir cette offre <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </article>

@@ -109,52 +109,56 @@ export default function V3HomePage() {
       <V3MicroSeriesSurpriseBanner />
 
       {/* PREUVE AUTEUR — visible avant les offres */}
-      <section className="v3-section-dark">
-        <div className="v3-shell py-8 md:py-10">
-          <div className="grid items-center gap-6 lg:grid-cols-[minmax(220px,0.75fr)_minmax(0,1.8fr)_auto]">
-            <div>
-              <span
-                className="v3-chip"
-                style={{ background: 'rgba(201,168,76,0.15)', color: 'var(--v3-gold)', borderColor: 'transparent' }}
-              >
-                Auteur invité
-              </span>
-              <h2 className="v3-serif mt-3 text-2xl font-semibold text-white md:text-3xl">Mr Georges Boubet</h2>
-              <p className="mt-1 text-sm text-white/70">
-                71 livres publiés sur Amazon.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-6 gap-2 sm:gap-3">
-              {AUTHOR_BOOKS.map((b) => (
-                <a
-                  key={b.asin}
-                  href={amazonBookUrl(b.asin)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group block"
-                  title={b.title}
-                >
-                  <div className="aspect-[2/3] overflow-hidden rounded-md bg-black/40 shadow-md ring-1 ring-white/10 transition-transform group-hover:-translate-y-1">
-                    <img
-                      src={coverUrl(b.asin)}
-                      alt={`Couverture ${b.title}`}
-                      loading="eager"
-                      onError={(e) => {
-                        const img = e.currentTarget;
-                        if (img.src !== fallbackCoverUrl(b.asin)) img.src = fallbackCoverUrl(b.asin);
-                      }}
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </a>
-              ))}
-            </div>
-
-            <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-btn-gold justify-self-start lg:justify-self-end">
-              Voir sur Amazon <ArrowRight className="h-4 w-4" />
-            </a>
+      <section className="v3-shell py-8">
+        <div
+          className="grid items-center gap-6 rounded-3xl bg-white p-6 md:p-8 lg:grid-cols-[minmax(220px,0.75fr)_minmax(0,1.8fr)_auto]"
+          style={{ border: '1px solid var(--v3-joy-orange-soft)', boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)' }}
+        >
+          <div>
+            <span
+              className="v3-chip"
+              style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)', borderColor: 'transparent' }}
+            >
+              Auteur invité
+            </span>
+            <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>Mr Georges Boubet</h2>
+            <p className="mt-1 text-sm" style={{ color: 'var(--v3-joy-muted)' }}>
+              71 livres publiés sur Amazon.
+            </p>
           </div>
+
+          <div className="grid grid-cols-6 gap-2 sm:gap-3">
+            {AUTHOR_BOOKS.map((b) => (
+              <a
+                key={b.asin}
+                href={amazonBookUrl(b.asin)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block"
+                title={b.title}
+              >
+                <div
+                  className="aspect-[2/3] overflow-hidden rounded-md shadow-md ring-1 transition-transform group-hover:-translate-y-1"
+                  style={{ background: 'var(--v3-joy-cream)', borderColor: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange-soft)' }}
+                >
+                  <img
+                    src={coverUrl(b.asin)}
+                    alt={`Couverture ${b.title}`}
+                    loading="eager"
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (img.src !== fallbackCoverUrl(b.asin)) img.src = fallbackCoverUrl(b.asin);
+                    }}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </a>
+            ))}
+          </div>
+
+          <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-joy-cta justify-self-start lg:justify-self-end">
+            Voir sur Amazon <ArrowRight className="h-4 w-4" />
+          </a>
         </div>
       </section>
 
@@ -167,10 +171,10 @@ export default function V3HomePage() {
 
       {/* 4. LES DEUX NOUVEAUTÉS — couvertures puis Studio BD & Jeunesse */}
       <section className="v3-shell">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold-600)' }}>
+        <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
           Les nouveautés
         </div>
-        <h2 className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+        <h2 className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
           Deux ateliers qui viennent d’ouvrir
         </h2>
       </section>
@@ -218,12 +222,12 @@ export default function V3HomePage() {
 
           {/* OUTILS VEDETTES */}
           <section className="v3-shell">
-            <div className="rounded-3xl p-8 md:p-10" style={{ background: 'var(--v3-cream)', border: '1px solid var(--v3-line)' }}>
+            <div className="rounded-3xl p-8" style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}>
               <div className="mb-8 text-center">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold-600)' }}>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
                   Les incontournables
                 </div>
-                <h2 className="v3-serif mt-2 text-3xl font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                <h2 className="v3-serif mt-2 text-3xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
                   Les outils au cœur du studio
                 </h2>
               </div>
@@ -232,22 +236,22 @@ export default function V3HomePage() {
                   <div
                     key={t.title}
                     className="block rounded-2xl bg-white p-5"
-                    style={{ border: '1px solid var(--v3-line)' }}
+                    style={{ border: '1px solid var(--v3-joy-orange-soft)' }}
                   >
                     <div className="flex items-center justify-between">
                       <span
                         className="grid h-9 w-9 place-items-center rounded-full"
-                        style={{ background: 'var(--v3-gold-soft)', color: '#6a4f10' }}
+                        style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
                       >
                         <Icon className="h-4 w-4" />
                       </span>
                       <span className="v3-badge">{t.badge}</span>
                     </div>
-                    <div className="v3-serif mt-3 text-[18px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+                    <div className="v3-serif mt-3 text-[18px] font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
                       {t.title}
                     </div>
-                    <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-muted)' }}>{t.desc}</p>
-                    <div className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
+                    <p className="mt-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-joy-muted)' }}>{t.desc}</p>
+                    <div className="mt-3 text-[12px] font-semibold" style={{ color: 'var(--v3-joy-muted)' }}>
                       Disponible
                     </div>
                   </div>
@@ -264,33 +268,28 @@ export default function V3HomePage() {
               rel="noopener noreferrer"
               className="group relative block overflow-hidden rounded-3xl transition-all"
               style={{
-                background: 'var(--v3-editorial-ink)',
-                border: '1px solid rgba(201,168,76,0.45)',
-                boxShadow: '0 30px 60px -30px color-mix(in srgb, var(--v3-editorial-ink) 55%, transparent)',
+                background: 'var(--v3-joy-cream)',
+                border: '1px solid var(--v3-joy-orange-soft)',
+                boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)',
               }}
             >
-              <div className="absolute inset-x-0 top-0 h-[3px]" style={{ background: 'linear-gradient(90deg, transparent, var(--v3-gold), transparent)' }} />
               <div className="grid items-center gap-6 px-6 py-8 md:grid-cols-[1fr_auto] md:px-10">
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold)' }}>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
                     Blog · nouvelle édition
                   </span>
-                  <h2 className="v3-serif mt-3 text-2xl font-semibold leading-tight text-white md:text-3xl">
+                  <h2 className="v3-serif mt-3 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
                     Le Blog EbookStudio — la méthode, en clair
                   </h2>
-                  <p className="mt-2 max-w-2xl text-[14px] text-white/75">
+                  <p className="mt-2 max-w-2xl text-[14px]" style={{ color: 'var(--v3-joy-muted)' }}>
                     Articles, guides pratiques et retours d'expérience pour écrire, illustrer et publier
                     votre livre.
                   </p>
                 </div>
                 <div className="flex md:justify-end">
                   <span
-                    className="inline-flex items-center gap-2 whitespace-nowrap rounded-full px-6 py-3 text-[15px] font-semibold"
-                    style={{
-                      background: 'var(--v3-gold)',
-                      color: '#1a1408',
-                      boxShadow: '0 10px 30px -10px rgba(201,168,76,0.7)',
-                    }}
+                    className="v3-btn inline-flex items-center gap-2 whitespace-nowrap px-6 py-3 text-[15px] font-semibold"
+                    style={{ background: 'var(--v3-joy-orange)', color: '#ffffff' }}
                   >
                     Ouvrir le blog
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
