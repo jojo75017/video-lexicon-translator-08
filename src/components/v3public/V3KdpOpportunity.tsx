@@ -6,7 +6,7 @@ export default function V3KdpOpportunity() {
   return (
     <section
       className="border-b"
-      style={{ background: 'var(--v3-editorial-ink)', borderColor: 'var(--v3-joy-orange-soft)' }}
+      style={{ background: 'var(--v3-joy-cream)', borderColor: 'var(--v3-joy-orange-soft)' }}
       aria-labelledby="kdp-opportunity-title"
     >
       <div className="v3-shell py-10 md:py-14">
@@ -17,7 +17,7 @@ export default function V3KdpOpportunity() {
           >
             <Euro className="h-3.5 w-3.5" /> Publier sur Amazon KDP
           </span>
-          <h2 id="kdp-opportunity-title" className="v3-serif mt-4 text-3xl font-semibold text-white md:text-4xl">
+          <h2 id="kdp-opportunity-title" className="v3-serif mt-4 text-3xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
             Amazon verse chaque mois des millions d’euros de royalties aux auteurs
           </h2>
           <p className="mt-3 text-base font-semibold md:text-lg" style={{ color: 'var(--v3-gold)' }}>
@@ -59,16 +59,16 @@ export default function V3KdpOpportunity() {
             </span>
           </div>
 
-          <div className="text-white">
-            <p className="text-base leading-7 text-white/85 md:text-lg">
+          <div>
+            <p className="text-base leading-7 md:text-lg" style={{ color: 'var(--v3-joy-muted)' }}>
               Enseignants, parents, indépendants, passionnés ou parfaits débutants : chacun peut transformer une expérience, une idée ou une passion en un livre qui lui ressemble.
             </p>
-            <p className="mt-5 text-base leading-7 text-white/85 md:text-lg">
+            <p className="mt-5 text-base leading-7 md:text-lg" style={{ color: 'var(--v3-joy-muted)' }}>
               EbookStudio vous guide de la première idée jusqu’à la publication : structure, rédaction, correction, couverture, mise en page et préparation de votre fiche Amazon KDP.
             </p>
             <div className="mt-6 flex items-start gap-3 border-l-4 pl-4" style={{ borderColor: 'var(--v3-joy-orange)' }}>
               <Sparkles className="mt-1 h-5 w-5 shrink-0" style={{ color: 'var(--v3-gold)' }} />
-              <p className="v3-serif text-xl font-semibold leading-8 md:text-2xl">
+              <p className="v3-serif text-xl font-semibold leading-8 md:text-2xl" style={{ color: 'var(--v3-joy-ink)' }}>
                 Votre expérience mérite de devenir un livre : EbookStudio vous aide à lui donner une forme professionnelle, prête à rencontrer ses lecteurs.
               </p>
             </div>
