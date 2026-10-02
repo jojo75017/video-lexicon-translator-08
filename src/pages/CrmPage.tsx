@@ -170,7 +170,7 @@ const CrmPage: React.FC = () => {
     const existingEmails = new Set(contacts.map(c => c.email.toLowerCase()));
 
     // Get email opens data
-    const { data: opens } = await supabase.from('email_opens').select('*');
+    const { data: opens } = await supabase.from('email_opens').select('prospect_email, email_step, opened_at').order('opened_at', { ascending: false }).limit(3000);
     const opensByEmail = new Map<string, number>();
     opens?.forEach(o => {
       const count = opensByEmail.get(o.prospect_email) || 0;

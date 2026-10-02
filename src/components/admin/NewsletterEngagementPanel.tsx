@@ -28,17 +28,17 @@ export function NewsletterEngagementPanel() {
         .from('email_opens')
         .select('prospect_email, email_step')
         .like('template_name', `${NEWSLETTER_TRACK_PREFIX}%`)
-        .limit(20000),
+        .limit(3000),
       supabase
         .from('email_clicks')
         .select('prospect_email, email_step')
         .like('template_name', `${NEWSLETTER_TRACK_PREFIX}%`)
-        .limit(20000),
+        .limit(3000),
       supabase
         .from('sales_prospects')
         .select('email, unsubscribed, status')
         .eq('unsubscribed', false)
-        .limit(20000),
+        .limit(3000),
     ]);
     setLoading(false);
     const err = o.error || c.error || p.error;

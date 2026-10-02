@@ -239,7 +239,7 @@ function EssaiFunnelPanel() {
         .from('capture_events')
         .select('event_type')
         .eq('surface', 'essai')
-        .limit(10000);
+        .limit(3000);
       if (error) {
         setCounts({});
         return;

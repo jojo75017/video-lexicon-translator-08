@@ -54,8 +54,8 @@ export const CrmAcquisition: React.FC = () => {
     setLoading(true);
     try {
       const since = periodToDate(period);
-      let evQ = supabase.from('capture_events').select('*').order('created_at', { ascending: false }).limit(20000);
-      let ldQ = supabase.from('funnel_leads').select('*').order('created_at', { ascending: false }).limit(20000);
+      let evQ = supabase.from('capture_events').select('*').order('created_at', { ascending: false }).limit(2000);
+      let ldQ = supabase.from('funnel_leads').select('*').order('created_at', { ascending: false }).limit(2000);
       if (since) {
         evQ = evQ.gte('created_at', since.toISOString());
         ldQ = ldQ.gte('created_at', since.toISOString());

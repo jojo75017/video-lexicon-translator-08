@@ -39,7 +39,7 @@ export function FunnelConversionPanel() {
         .from('capture_events')
         .select('event_type, surface, page_path, utm_source, locale')
         .gte('created_at', since)
-        .limit(10000),
+        .limit(3000),
       supabase.from('free_trials').select('id', { count: 'exact', head: true }).gte('started_at', since),
       supabase
         .from('funnel_orders')
