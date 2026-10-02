@@ -1,7 +1,7 @@
 # Nouveau bloc Amazon KDP sous l’aide Zoom
 
 ## Objectif
-Ajouter sur l’accueil `/v3`, uniquement pour les abonnés connectés, une section inspirée de la référence fournie et placée immédiatement sous le bloc d’aide Zoom. Les visiteurs non connectés ne verront jamais cette section.
+Ajouter sur l’accueil `/v3`, uniquement pour les abonnés connectés, une section inspirée de la référence fournie et placée immédiatement sous le bloc d’aide Zoom.
 
 ## Message proposé
 - Grand titre : « Amazon verse chaque mois des millions d’euros de royalties aux auteurs — construisez votre place avec EbookStudio ».
@@ -23,8 +23,7 @@ Ajouter sur l’accueil `/v3`, uniquement pour les abonnés connectés, une sect
 - Assurer une transition naturelle avec le bloc Zoom précédent et la suite actuelle de la page.
 
 ## Vérifications
-- Vérifier avec une session abonnée que la section apparaît au bon endroit.
-- Vérifier sans connexion que la section est totalement absente.
+- Vérifier que la section est visible uniquement pour les abonnés connectés.
 - Contrôler le rendu sur ordinateur et téléphone, la lisibilité et l’absence de débordement.
 - Vérifier la validation automatique du projet.
 - Ne pas publier.
