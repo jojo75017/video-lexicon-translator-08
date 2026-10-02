@@ -33,11 +33,11 @@ export default function V3UpsellRotator() {
         <div>
           <p
             className="text-[10px] font-bold uppercase tracking-[0.24em]"
-            style={{ color: 'var(--v3-gold-600)' }}
+            style={{ color: 'var(--v3-joy-orange-600)' }}
           >
             Ils ont boosté leur livre
           </p>
-          <h2 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+          <h2 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-joy-ink)' }}>
             Un complément, un cas d'usage
           </h2>
         </div>
