@@ -1,0 +1,172 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import {
+  ArrowRight, PenLine, Compass, Lightbulb, Feather, Palette, LayoutTemplate, Rocket,
+  BookOpen, BookMarked, Image as ImageIcon, AudioLines, Tags, Gift, Target, Sparkles,
+} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useV3Entitlement } from '@/hooks/useV3Entitlement';
+import { V3_AGENTS } from '@/data/v3Agents';
+import AgentPortrait from './AgentPortrait';
+
+const STEPS = [
+  { n: 1, title: 'Idée et niche', icon: Lightbulb, to: '/v3/kdp/radar-niches' },
+  { n: 2, title: 'Écriture', icon: Feather, to: '/v3/create' },
+  { n: 3, title: 'Couverture', icon: Palette, to: '/v3/mes-couvertures' },
+  { n: 4, title: 'Mise en page Kindle et broché', icon: LayoutTemplate, to: '/v3/outils/editeur' },
+  { n: 5, title: 'Publication sur Amazon KDP', icon: Rocket, to: '/v3/kdp/lancement' },
+];
+
+const PILLS = [
+  { label: 'Kindle', icon: BookOpen, to: '/v3/outils/editeur' },
+  { label: 'Livre broché', icon: BookMarked, to: '/v3/outils/editeur' },
+  { label: 'Couverture', icon: ImageIcon, to: '/v3/mes-couvertures' },
+  { label: 'Livre audio', icon: AudioLines, to: '/v3/outils/audiobook' },
+  { label: 'Métadonnées', icon: Tags, to: '/v3/kdp/fiche-audit' },
+];
+
+const SHORTCUTS = [
+  { label: 'Kit de démarrage', icon: Gift, to: '/v3/kit-demarrage' },
+  { label: '10 niches rentables', icon: Target, to: '/10-niches-offertes' },
+  { label: 'Nouveautés', icon: Sparkles, to: '/v3/nouveautes' },
+];
+
+type Book = { id: string; title: string | null; updated_at: string };
+
+const card = 'rounded-3xl bg-white p-5 md:p-6';
+const cardStyle = { border: '2px solid var(--v3-joy-orange-soft)' };
+
+export default function V3SubscriberHome({ user }: { user: any }) {
+  const { hasBase, hasFull, isAdmin } = useV3Entitlement() as any;
+  const [books, setBooks] = useState<Book[] | null>(null);
+
+  const meta = user?.user_metadata ?? {};
+  const fullName: string = meta.first_name || meta.full_name || meta.name || '';
+  const prenom = fullName.trim().split(/\s+/)[0] || (user?.email ?? '').split('@')[0];
+  const niveau = isAdmin ? 'Administrateur' : hasFull ? 'Édition' : hasBase ? 'Plume' : 'Abonné';
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from('ebook_projects')
+      .select('id,title,updated_at')
+      .eq('user_id', user.id)
+      .order('updated_at', { ascending: false })
+      .limit(3)
+      .then(({ data }) => { if (!cancelled) setBooks((data as Book[]) ?? []); });
+    return () => { cancelled = true; };
+  }, [user.id]);
+
+  return (
+    <section style={{ background: 'var(--v3-joy-cream)', borderBottom: '1px solid var(--v3-joy-orange-soft)' }}>
+      <div className="v3-shell space-y-8 py-8 md:py-12">
+        {/* a) Bienvenue */}
+        <div className="text-center">
+          <span
+            className="inline-flex items-center rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]"
+            style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
+          >
+            Niveau {niveau}
+          </span>
+          <h1 className="v3-serif mt-3 text-2xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
+            Bienvenue dans votre maison d'édition IA{prenom ? `, ${prenom}` : ''}
+          </h1>
+        </div>
+
+        {/* b) Deux boutons + robots */}
+        <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row">
+          <Link to="/v3/create" className="v3-btn v3-joy-cta justify-center px-6 py-3 text-base">
+            <PenLine className="h-5 w-5" /> Créer un nouveau livre
+          </Link>
+          <Link to="/v3/commence-ici" className="v3-btn v3-btn-gold justify-center px-6 py-3 text-base">
+            <Compass className="h-5 w-5" /> Commence ici
+          </Link>
+        </div>
+
+        <div className="-mx-4 overflow-x-auto px-4 pb-2">
+          <ul className="flex gap-3">
+            {V3_AGENTS.map((a) => (
+              <li key={a.id} className="w-24 shrink-0 sm:w-28">
+                <Link to={a.route} className="group block text-center" title={a.role}>
+                  <div className="aspect-square overflow-hidden rounded-2xl bg-white transition-transform group-hover:-translate-y-1" style={cardStyle}>
+                    <AgentPortrait id={a.id} name={a.name} />
+                  </div>
+                  <p className="mt-1.5 truncate text-xs font-bold" style={{ color: 'var(--v3-joy-ink)' }}>{a.name}</p>
+                  <p className="truncate text-[11px]" style={{ color: 'var(--v3-joy-muted)' }}>{a.role}</p>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
+          {/* c) Reprendre */}
+          <div className={card} style={cardStyle}>
+            <h2 className="v3-serif text-xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>Reprendre où j'en étais</h2>
+            {books === null ? (
+              <p className="mt-3 text-sm" style={{ color: 'var(--v3-joy-muted)' }}>Chargement…</p>
+            ) : books.length === 0 ? (
+              <div className="mt-3 text-sm" style={{ color: 'var(--v3-joy-muted)' }}>
+                Vous n'avez pas encore de livre en cours. Lancez votre premier livre dès maintenant !
+                <div className="mt-3">
+                  <Link to="/v3/create" className="v3-btn v3-joy-cta">Créer mon premier livre <ArrowRight className="h-4 w-4" /></Link>
+                </div>
+              </div>
+            ) : (
+              <ul className="mt-3 divide-y" style={{ borderColor: 'var(--v3-joy-orange-soft)' }}>
+                {books.map((b) => (
+                  <li key={b.id} className="flex items-center justify-between gap-3 py-3">
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{b.title || 'Livre sans titre'}</p>
+                      <p className="text-xs" style={{ color: 'var(--v3-joy-muted)' }}>
+                        Modifié le {new Date(b.updated_at).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                    <Link to={`/v3/book/${b.id}`} className="v3-btn v3-joy-cta shrink-0 px-3 py-1.5 text-sm">
+                      Continuer <ArrowRight className="h-4 w-4" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* d) Parcours */}
+          <div className={card} style={cardStyle}>
+            <h2 className="v3-serif text-xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>Votre parcours en 5 étapes</h2>
+            <ol className="mt-3 space-y-2">
+              {STEPS.map(({ n, title, icon: Icon, to }) => (
+                <li key={n}>
+                  <Link to={to} className="group flex items-center gap-3 rounded-2xl p-2 transition-colors hover:bg-[var(--v3-joy-cream)]">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-black text-white" style={{ background: n % 2 ? 'var(--v3-joy-orange)' : 'var(--v3-joy-yellow)' }}>{n}</span>
+                    <Icon className="h-4 w-4 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />
+                    <span className="flex-1 text-sm font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{title}</span>
+                    <ArrowRight className="h-4 w-4 opacity-40 transition-opacity group-hover:opacity-100" />
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+
+        {/* Pastilles + e) Raccourcis */}
+        <div className="flex flex-wrap justify-center gap-2">
+          {PILLS.map(({ label, icon: Icon, to }) => (
+            <Link key={label} to={to} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold" style={{ ...cardStyle, color: 'var(--v3-joy-ink)' }}>
+              <Icon className="h-3.5 w-3.5" style={{ color: 'var(--v3-joy-orange-600)' }} /> {label}
+            </Link>
+          ))}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {SHORTCUTS.map(({ label, icon: Icon, to }) => (
+            <Link key={label} to={to} className={`${card} flex items-center gap-3 transition-transform hover:-translate-y-0.5`} style={cardStyle}>
+              <Icon className="h-5 w-5" style={{ color: 'var(--v3-joy-orange-600)' }} />
+              <span className="flex-1 font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{label}</span>
+              <ArrowRight className="h-4 w-4 opacity-50" />
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}

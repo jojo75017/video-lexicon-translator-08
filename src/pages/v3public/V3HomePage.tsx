@@ -1,4 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
 import {
   ArrowRight,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
@@ -60,19 +62,32 @@ export default function V3HomePage() {
     void trackCaptureEvent('v3', 'page_view');
   }, []);
 
+  // Abonné connecté : tableau de bord à la place du contenu de vente d'avant lancement.
+  const [user, setUser] = useState<any>(undefined);
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setUser(data.user ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setUser(session?.user ?? null));
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="v3-home pb-4">
       {/* 1. LANCEMENT — bande fine */}
-      <V3LaunchBanner />
-
-      {/* 2. PROMESSE PRINCIPALE */}
-      <V3HeroBanner />
+      {user ? (
+        <V3SubscriberHome user={user} />
+      ) : user === null ? (
+        <>
+          <V3LaunchBanner />
+          {/* 2. PROMESSE PRINCIPALE */}
+          <V3HeroBanner />
+        </>
+      ) : null}
 
       {/* BANDEAUX DÉFILANTS — tout ce qu'on peut créer */}
       <V3FormatsMarquee />
 
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
-      <V3StartHereHomeBanner />
+      {!user && <V3StartHereHomeBanner />}
 
       {/* SURPRISE V4 — précommande Studio Micro-Séries */}
       <V3MicroSeriesSurpriseBanner />
