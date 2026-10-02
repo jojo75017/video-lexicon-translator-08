@@ -55,7 +55,7 @@ export default function V3KdpHeroBanner() {
                 style={{ background: 'color-mix(in srgb, var(--v3-joy-orange) 25%, transparent)', color: 'var(--v3-joy-orange)' }}
                 aria-hidden="true"
               >
-                <Icon className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
               </span>
               <span className="text-[12px] font-semibold leading-tight text-white sm:text-sm">{label}</span>
             </li>

@@ -36,6 +36,7 @@ import V3FormatsMarquee from '@/components/v3public/V3FormatsMarquee';
 import V3SubscriberZoomHelp from '@/components/v3public/V3SubscriberZoomHelp';
 import V3KdpOpportunity from '@/components/v3public/V3KdpOpportunity';
 import V3KdpChangeAll from '@/components/v3public/V3KdpChangeAll';
+import V3KdpHeroBanner from '@/components/v3public/V3KdpHeroBanner';
 
 const FEATURED_TOOLS = [
   { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', badge: 'Commencer ici' },
@@ -94,6 +95,9 @@ export default function V3HomePage() {
 
       {/* OPPORTUNITÉ KDP — visible uniquement pour les abonnés connectés */}
       {user && <V3KdpOpportunity />}
+
+      {/* Bannière KDP style BookPilot — visible uniquement pour les abonnés connectés */}
+      {user && <V3KdpHeroBanner />}
 
       {/* EbookStudio change tout — visible uniquement pour les abonnés connectés */}
       {user && <V3KdpChangeAll />}
