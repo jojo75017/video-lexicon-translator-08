@@ -59,12 +59,12 @@ export default function V3KdpFeatureShowcase() {
               >
                 Caractéristique 01 <Search className="h-3.5 w-3.5" aria-hidden="true" />
               </span>
-              <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight text-white md:text-3xl">
+              <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
                 Moteur de recherche de niches et de mots-clés
               </h3>
               <ul className="mt-5 space-y-3">
                 {BENEFITS.map((benefit) => (
-                  <li key={benefit} className="flex items-start gap-3 text-[14px] leading-6 text-white/90 md:text-[15px]">
+                  <li key={benefit} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>
                     <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full" style={{ background: 'var(--v3-joy-orange)' }} />
                     {benefit}
                   </li>
@@ -77,12 +77,12 @@ export default function V3KdpFeatureShowcase() {
               style={{ background: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange)' }}
               aria-label="Aperçu du Radar de niches EbookStudio"
             >
-              <div className="overflow-hidden rounded-xl bg-white shadow-xl">
+              <div className="overflow-hidden rounded-xl shadow-xl" style={{ background: 'var(--v3-paper)' }}>
                 <div className="flex h-10 items-center gap-2 px-4" style={{ background: 'var(--v3-joy-ink)' }}>
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--v3-joy-orange)' }} />
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--v3-joy-yellow)' }} />
                   <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--v3-emerald-600)' }} />
-                  <span className="ml-auto text-[10px] font-semibold text-white/80">EbookStudio · Espace KDP</span>
+                  <span className="ml-auto text-[10px] font-semibold" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 80%, transparent)' }}>EbookStudio · Espace KDP</span>
                 </div>
 
                 <div className="p-4 sm:p-5">
