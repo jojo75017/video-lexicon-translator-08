@@ -1,4 +1,5 @@
-import { BarChart3, BookOpenCheck, Search, Sparkles, Target, TrendingUp } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
+import nicheResearchImg from '@/assets/v3-kdp-niche-research.jpg';
 
 const BENEFITS = [
   'Explorez des niches de livres à partir d’un thème précis.',
@@ -9,11 +10,7 @@ const BENEFITS = [
   'Conservez vos dernières recherches pour comparer vos pistes.',
 ];
 
-const NICHE_RESULTS = [
-  { name: 'Journal guidé du sommeil', demand: 'Forte', competition: 'Modérée', width: '78%' },
-  { name: 'Routine du soir familiale', demand: 'Moyenne', competition: 'Faible', width: '62%' },
-  { name: 'Carnet anti-écrans', demand: 'Forte', competition: 'Modérée', width: '72%' },
-];
+
 
 export default function V3KdpFeatureShowcase() {
   return (
@@ -73,57 +70,17 @@ export default function V3KdpFeatureShowcase() {
             </div>
 
             <div
-              className="overflow-hidden rounded-2xl p-2.5 sm:p-3"
+              className="overflow-hidden rounded-2xl p-2"
               style={{ background: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange)' }}
-              aria-label="Aperçu du Radar de niches EbookStudio"
             >
-              <div className="overflow-hidden rounded-xl shadow-xl" style={{ background: 'var(--v3-paper)' }}>
-                <div className="flex h-10 items-center gap-2 px-4" style={{ background: 'var(--v3-joy-ink)' }}>
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--v3-joy-orange)' }} />
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--v3-joy-yellow)' }} />
-                  <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--v3-emerald-600)' }} />
-                  <span className="ml-auto text-[10px] font-semibold" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 80%, transparent)' }}>EbookStudio · Espace KDP</span>
-                </div>
-
-                <div className="p-4 sm:p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[9px] font-bold uppercase" style={{ color: 'var(--v3-joy-orange-600)' }}>Radar de niches</p>
-                      <p className="mt-1 text-[15px] font-bold" style={{ color: 'var(--v3-joy-ink)' }}>Trouvez votre prochaine idée de livre</p>
-                    </div>
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg" style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}>
-                      <Target className="h-4 w-4" aria-hidden="true" />
-                    </span>
-                  </div>
-
-                  <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
-                    <div className="rounded-lg border px-3 py-2 text-[11px]" style={{ borderColor: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-muted)' }}>
-                      Bien-être et sommeil
-                    </div>
-                    <div className="grid place-items-center rounded-lg px-3" style={{ background: 'var(--v3-joy-orange)', color: 'var(--v3-joy-ink)' }}>
-                      <Search className="h-4 w-4" aria-hidden="true" />
-                    </div>
-                  </div>
-
-                  <div className="mt-4 space-y-2.5">
-                    {NICHE_RESULTS.map((item) => (
-                      <div key={item.name} className="rounded-lg border p-3" style={{ borderColor: 'var(--v3-joy-orange-soft)', background: 'var(--v3-joy-cream)' }}>
-                        <div className="flex items-center justify-between gap-3">
-                          <span className="text-[11px] font-bold" style={{ color: 'var(--v3-joy-ink)' }}>{item.name}</span>
-                          <BookOpenCheck className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-emerald)' }} aria-hidden="true" />
-                        </div>
-                        <div className="mt-2 h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--v3-joy-orange-soft)' }}>
-                          <div className="h-full rounded-full" style={{ width: item.width, background: 'var(--v3-joy-orange)' }} />
-                        </div>
-                        <div className="mt-2 flex gap-2 text-[9px] font-semibold" style={{ color: 'var(--v3-joy-muted)' }}>
-                          <span className="inline-flex items-center gap-1"><TrendingUp className="h-3 w-3" /> Demande {item.demand.toLowerCase()}</span>
-                          <span className="inline-flex items-center gap-1"><BarChart3 className="h-3 w-3" /> Concurrence {item.competition.toLowerCase()}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <img
+                src={nicheResearchImg}
+                alt="Ordinateur portable affichant des graphiques de recherche de niches, carnet de notes et livres sur un bureau en bois"
+                width={1024}
+                height={1024}
+                loading="lazy"
+                className="h-40 w-full rounded-xl object-cover sm:h-48 lg:h-56"
+              />
             </div>
           </div>
         </article>
