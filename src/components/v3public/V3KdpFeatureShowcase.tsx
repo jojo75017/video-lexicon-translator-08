@@ -82,7 +82,6 @@ export default function V3KdpFeatureShowcase() {
                 className="h-40 w-full rounded-xl object-cover sm:h-48 lg:h-56"
               />
             </div>
-            </div>
           </div>
         </article>
       </div>
