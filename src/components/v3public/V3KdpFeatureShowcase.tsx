@@ -1,4 +1,5 @@
-import { BarChart3, BookOpenCheck, Search, Sparkles, Target, TrendingUp } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
+import nicheResearchImg from '@/assets/v3-kdp-niche-research.jpg';
 
 const BENEFITS = [
   'Explorez des niches de livres à partir d’un thème précis.',
