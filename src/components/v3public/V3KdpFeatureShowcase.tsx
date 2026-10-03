@@ -10,11 +10,7 @@ const BENEFITS = [
   'Conservez vos dernières recherches pour comparer vos pistes.',
 ];
 
-const NICHE_RESULTS = [
-  { name: 'Journal guidé du sommeil', demand: 'Forte', competition: 'Modérée', width: '78%' },
-  { name: 'Routine du soir familiale', demand: 'Moyenne', competition: 'Faible', width: '62%' },
-  { name: 'Carnet anti-écrans', demand: 'Forte', competition: 'Modérée', width: '72%' },
-];
+
 
 export default function V3KdpFeatureShowcase() {
   return (
