@@ -50,7 +50,7 @@ export default function V3KdpFeatureShowcase2() {
             </ul>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-1">
             <div
               className="overflow-hidden rounded-2xl p-2"
               style={{ background: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange)' }}
@@ -61,7 +61,7 @@ export default function V3KdpFeatureShowcase2() {
                 width={1024}
                 height={1024}
                 loading="lazy"
-                className="h-40 w-full rounded-xl object-cover sm:h-36 lg:h-44"
+                className="h-32 w-full rounded-xl object-cover sm:h-36 lg:h-44"
               />
             </div>
             <div
@@ -74,7 +74,7 @@ export default function V3KdpFeatureShowcase2() {
                 width={1024}
                 height={1024}
                 loading="lazy"
-                className="h-40 w-full rounded-xl object-cover sm:h-36 lg:h-44"
+                className="h-32 w-full rounded-xl object-cover sm:h-36 lg:h-44"
               />
             </div>
           </div>
