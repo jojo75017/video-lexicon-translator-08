@@ -110,6 +110,7 @@ export default function V3HomePage() {
       {user && <V3KdpFeatureShowcase />}
       {user && <V3KdpFeatureShowcase2 />}
       {user && <V3KdpFeatureShowcase3 />}
+      {user && <V3KdpFeatureShowcase4 />}
 
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
       {!user && <V3StartHereHomeBanner />}
