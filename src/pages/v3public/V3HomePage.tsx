@@ -39,6 +39,7 @@ import V3KdpChangeAll from '@/components/v3public/V3KdpChangeAll';
 import V3KdpHeroBanner from '@/components/v3public/V3KdpHeroBanner';
 import V3KdpFeatureShowcase from '@/components/v3public/V3KdpFeatureShowcase';
 import V3KdpFeatureShowcase2 from '@/components/v3public/V3KdpFeatureShowcase2';
+import V3KdpFeatureShowcase3 from '@/components/v3public/V3KdpFeatureShowcase3';
 
 const FEATURED_TOOLS = [
   { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', badge: 'Commencer ici' },
@@ -107,6 +108,7 @@ export default function V3HomePage() {
       {/* Fonctionnalités KDP détaillées — visible uniquement pour les abonnés connectés */}
       {user && <V3KdpFeatureShowcase />}
       {user && <V3KdpFeatureShowcase2 />}
+      {user && <V3KdpFeatureShowcase3 />}
 
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
       {!user && <V3StartHereHomeBanner />}
