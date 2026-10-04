@@ -18,12 +18,13 @@ const corsHeaders = {
 const TRANCHE = 500;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CTA_URL = "https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/de-vente";
+const V3_PREVIEW_PDF_URL = "https://drive.google.com/file/d/106hJ-9E_ZQNL_Oib6X0XXt_Ef2UNbaEg/view?usp=sharing";
 const FIN_ISO = "2026-10-15T23:59:59+02:00";
 const PAUSE_KEY = "offre_lancement_sequence";
 const CTA = "Je réserve ma place à 47 €";
 const SIGN = "Georges Boubet";
 
-type Ctx = { prenom: string | null; places: string };
+type Ctx = { prenom: string | null; places: string; showPreviewPdf?: boolean };
 type Step = {
   n: number;
   emailId: string;
@@ -132,6 +133,7 @@ function buildHtml(step: Step, email: string, ctx: Ctx, baseUrl: string): string
   const fn = `${baseUrl}/functions/v1`;
   const s = 46 + step.n; // 47 = email 1 (inchangé), 48..53 = emails 2..7
   const click = `${fn}/track-email-click?e=${e}&s=${s}&t=${step.emailId}&u=${encodeURIComponent(CTA_URL)}`;
+  const pdfClick = `${fn}/track-email-click?e=${e}&s=${s}&t=offre-lancement-v3-pdf&u=${encodeURIComponent(V3_PREVIEW_PDF_URL)}`;
   const pixel = `${fn}/track-email-open?e=${e}&s=${s}&t=${step.emailId}`;
   const unsub = `${fn}/unsubscribe?email=${e}`;
   const hello = ctx.prenom ? `Bonjour ${esc(ctx.prenom)},` : "Bonjour,";
@@ -143,6 +145,7 @@ function buildHtml(step: Step, email: string, ctx: Ctx, baseUrl: string): string
 <tr><td style="padding:26px;font-size:16px">
 ${p(hello)}
 ${step.paras(ctx).map(p).join("\n")}
+${ctx.showPreviewPdf ? `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 20px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px"><tr><td style="padding:16px"><p style="margin:0 0 10px;line-height:1.55"><b>Découvrez EbookStudio V3 avant de vous décider.</b><br>J'ai préparé un aperçu PDF de la plateforme : vous pouvez le consulter sans vous connecter et sans pouvoir cliquer dans l'espace abonné.</p><a href="${pdfClick}" style="color:#c2410c;font:700 15px Arial,Helvetica,sans-serif">Voir EbookStudio V3 en PDF →</a></td></tr></table>` : ""}
 <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:10px 0 22px"><tr>
 <td style="background:#c2410c;border-radius:8px"><a href="${click}" style="display:inline-block;padding:15px 28px;color:#ffffff;text-decoration:none;font:700 16px Arial,Helvetica,sans-serif">${CTA}</a></td>
 </tr></table>
@@ -163,6 +166,15 @@ async function sentEmails(db: any, emailId: string): Promise<Set<string>> {
   return new Set((data ?? []).map((r: { email: string }) => String(r.email).toLowerCase()));
 }
 
+// Le PDF reste proposé dans les emails suivants jusqu'à son premier clic.
+// deno-lint-ignore no-explicit-any
+async function pdfViewers(db: any): Promise<Set<string>> {
+  const { data, error } = await db.from("email_clicks").select("prospect_email")
+    .eq("clicked_url", V3_PREVIEW_PDF_URL).limit(20000);
+  if (error) throw new Error(error.message);
+  return new Set((data ?? []).map((r: { prospect_email: string }) => String(r.prospect_email).trim().toLowerCase()));
+}
+
 // deno-lint-ignore no-explicit-any
 async function buildPending(db: any, step: Step) {
   const { data: prospects, error } = await db.from("sales_prospects")
@@ -179,7 +191,8 @@ async function buildPending(db: any, step: Step) {
     for (const r of [...(buyers ?? []), ...(subs ?? [])]) excluded.add(String(r.email ?? "").trim().toLowerCase());
   }
   const seen = new Set<string>();
-  const pending: { email: string; first_name: string | null }[] = [];
+  const viewedPdf = await pdfViewers(db);
+  const pending: { email: string; first_name: string | null; showPreviewPdf: boolean }[] = [];
   let excludedCount = 0;
   for (const r of prospects ?? []) {
     const e = String(r.email ?? "").trim().toLowerCase();
@@ -188,7 +201,7 @@ async function buildPending(db: any, step: Step) {
     if (required && !required.has(e)) continue;
     if (excluded.has(e)) { excludedCount++; continue; }
     const n = String(r.first_name ?? "").trim();
-    pending.push({ email: e, first_name: n || null });
+    pending.push({ email: e, first_name: n || null, showPreviewPdf: !viewedPdf.has(e) });
   }
   return { pending, alreadySent: already.size, excludedCount };
 }
@@ -230,7 +243,7 @@ Deno.serve(async (req) => {
 
     if (mode === "test") {
       if (!EMAIL_RE.test(adminEmail)) return respond({ error: "Adresse admin introuvable" }, 400);
-      const ctx = { prenom: "Georges", places: placesLabel(Math.max(places, 0)) };
+      const ctx = { prenom: "Georges", places: placesLabel(Math.max(places, 0)), showPreviewPdf: true };
       const res = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN, to: adminEmail, reply_to: REPLY_TO,
         subject: `[TEST] ${step.subject(ctx)}`,
@@ -281,7 +294,7 @@ Deno.serve(async (req) => {
     const ctxPlaces = placesLabel(Math.max(places, 0));
     let sentCount = 0, failedCount = 0, quotaStopped = false;
     for (const person of batch) {
-      const ctx = { prenom: person.first_name, places: ctxPlaces };
+      const ctx = { prenom: person.first_name, places: ctxPlaces, showPreviewPdf: person.showPreviewPdf };
       const res = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN, to: person.email, reply_to: REPLY_TO,
         subject: target.subject(ctx),
