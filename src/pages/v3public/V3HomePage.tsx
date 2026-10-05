@@ -99,6 +99,9 @@ export default function V3HomePage() {
       {/* BANDEAUX DÉFILANTS — tout ce qu'on peut créer */}
       <V3FormatsMarquee />
 
+      {/* VIDÉO DE PRÉSENTATION — juste au-dessus du bloc d'aide Zoom (écrin prêt pour une future vidéo plus grande) */}
+      <V3PresentationVideo />
+
       {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
       {user && <V3SubscriberZoomHelp />}
 
