@@ -1,6 +1,3 @@
-import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
-import { V3_SIDEBAR_LABELS } from './V3Sidebar';
-
 const BOOK_FORMATS: string[][] = [
   ['Roman policier', 'Thriller psychologique', 'Polar noir', 'Cozy mystery', 'Romance contemporaine', 'Comédie romantique', 'Dark romance', 'Science-fiction', 'Space opera', 'Dystopie', 'Fantasy urbaine', 'Heroic fantasy', 'Roman historique', 'Thriller médical', 'Micro-série en épisodes', 'Recueil de nouvelles', "Roman d'aventure", 'Conte philosophique', 'Drame familial', 'Roman feel-good', 'Récit de voyage initiatique', 'Épopée mythologique', 'Roman fantastique', 'Roman épistolaire', 'Saga familiale'],
   ['Album illustré 3–6 ans', 'Contes du soir', 'Histoire avec morale', 'Bande dessinée', 'Webtoon', 'Fable animalière', 'Premières lectures 7–9 ans', 'Aventure 9–12 ans', 'Livre des émotions', 'Roman ado', 'Biographie', 'Récit de vie', 'Livre de transmission familiale', 'Roman témoignage', 'Journal intime romancé', 'Album de souvenirs', 'Mythologie pour enfants', 'Lecture parents-enfants', 'Comptines & poèmes', 'Parentalité bienveillante', 'Album nature & animaux', 'Roman graphique', 'Mémoires de famille', 'Livre hommage', 'Histoire personnalisée'],
@@ -8,19 +5,8 @@ const BOOK_FORMATS: string[][] = [
   ['Carnet de gratitude', 'Suivi d’habitudes', 'Journal guidé', "Cahier d'exercices", 'Jeux & énigmes', 'Escape game papier', "Cahier d'activités", 'Carnet de projet', 'Journal de lecture', 'Carnet de recettes', 'Planificateur 90 jours', 'Citations inspirantes', 'Poésie contemporaine', 'Jardinage & potager', 'Herboristerie', 'Livre audio MP3', 'Couverture rigide KDP', 'Couverture brochée KDP', 'Ebook Kindle', 'Grand format illustré', 'Export Word', 'Export EPUB', 'Export PDF', 'Traduction du livre', 'Audit KDP Pilot'],
 ];
 
-const cleanLabel = (label: string) => label.replace(/^[^\p{L}\p{N}]+/u, '').trim();
-
-const navigationLabels = [
-  ...V3_HEADER_MENU.flatMap((category) => [category.label, ...category.links.map((link) => link.label)]),
-  ...V3_SIDEBAR_LABELS,
-].map(cleanLabel);
-
 const bookFormats = BOOK_FORMATS.flat();
-const interleavedLabels = Array.from(
-  { length: Math.max(bookFormats.length, navigationLabels.length) },
-  (_, index) => [bookFormats[index], navigationLabels[index]],
-).flat().filter((label): label is string => Boolean(label));
-const allPossibilities = Array.from(new Set(interleavedLabels));
+const allPossibilities = Array.from(new Set(bookFormats));
 const ROW_COUNT = 6;
 const ROWS = Array.from({ length: ROW_COUNT }, (_, rowIndex) =>
   allPossibilities.filter((_, itemIndex) => itemIndex % ROW_COUNT === rowIndex),
@@ -35,7 +21,6 @@ const pillStyle = (index: number) =>
     : { border: '2px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-ink)' };
 
 export default function V3FormatsMarquee() {
-  const total = ROWS.reduce((n, r) => n + r.length, 0);
   return (
     <section className="v3-shell py-10">
       <style>{`
@@ -50,7 +35,7 @@ export default function V3FormatsMarquee() {
           className="inline-block rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em]"
           style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
         >
-          {total} possibilités EbookStudio V3
+          Formats, outils et accompagnements EbookStudio V3
         </div>
         <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
           EbookStudio V3 vous permet de{' '}

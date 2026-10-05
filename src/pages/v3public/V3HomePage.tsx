@@ -9,7 +9,6 @@ import { trackCaptureEvent } from '@/lib/captureTracking';
 
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
-
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
@@ -34,9 +33,6 @@ import ReadingGate from '@/components/marketing/ReadingGate';
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import V3FormatsMarquee from '@/components/v3public/V3FormatsMarquee';
 import V3SubscriberZoomHelp from '@/components/v3public/V3SubscriberZoomHelp';
-import V3KdpOpportunity from '@/components/v3public/V3KdpOpportunity';
-import V3KdpChangeAll from '@/components/v3public/V3KdpChangeAll';
-import V3KdpHeroBanner from '@/components/v3public/V3KdpHeroBanner';
 import V3KdpFeatureShowcase from '@/components/v3public/V3KdpFeatureShowcase';
 import V3KdpFeatureShowcase2 from '@/components/v3public/V3KdpFeatureShowcase2';
 import V3KdpFeatureShowcase3 from '@/components/v3public/V3KdpFeatureShowcase3';
@@ -101,19 +97,10 @@ export default function V3HomePage() {
       <V3FormatsMarquee />
 
       {/* VIDÉO DE PRÉSENTATION — juste au-dessus du bloc d'aide Zoom (écrin prêt pour une future vidéo plus grande) */}
-      <V3PresentationVideo />
+      {user && <V3PresentationVideo userId={user.id} />}
 
       {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
       {user && <V3SubscriberZoomHelp />}
-
-      {/* OPPORTUNITÉ KDP — visible uniquement pour les abonnés connectés */}
-      {user && <V3KdpOpportunity />}
-
-      {/* Bannière KDP style BookPilot — visible uniquement pour les abonnés connectés */}
-      {user && <V3KdpHeroBanner />}
-
-      {/* EbookStudio change tout — visible uniquement pour les abonnés connectés */}
-      {user && <V3KdpChangeAll />}
 
       {/* Fonctionnalités KDP détaillées — visible uniquement pour les abonnés connectés */}
       {user && <V3KdpFeatureShowcase />}
@@ -214,40 +201,39 @@ export default function V3HomePage() {
       <V3WhatsNewPanel />
       <V3EngineStrip />
       <V3EngineGrid />
-      <V3ClosingRecallPanel />
+      {!user && <V3ClosingRecallPanel />}
 
-      {/* RAPPEL DE RÉSERVATION — milieu de page */}
-      <V3ReserveCtaBand />
+      {!user && <V3ReserveCtaBand />}
 
       {/* 8. POUR ALLER PLUS LOIN — agents, workflow, KDP Pilot */}
       <V3GoFurtherPanel />
 
       {/* 9. PRÉSENTATION LONGUE — comprendre la V3 */}
-      <V3AnchorNav />
+      {!user && <V3AnchorNav />}
       <V3WhatIsPanel />
 
       {/* La suite est offerte contre l'email pour les visiteurs inconnus. */}
       <ReadingGate surface="v3" title="La suite de la visite est offerte">
         <div className="v3-home">
           <V3HowItWorksSteps />
-          <V3BenefitsPanel />
-          <V3DifferenceTable />
+          {!user && <V3BenefitsPanel />}
+          {!user && <V3DifferenceTable />}
 
           {/* Pack de 10 niches, inclus dans l'accès */}
           <div className="v3-shell">
             <Niches10Offer surface="inline" hook="v3" variant="compact" source="v3-reservation" />
           </div>
 
-          {/* Ce que l'outil produit */}
-          <div className="v3-shell">
-            <V3CapabilitiesPanel />
-          </div>
-
           <V3UpsellRotator />
 
-          {/* Preuve et garantie */}
-          <V3MarketProofPanel />
-          <V3GuaranteePanel />
+          {!user && (
+            <div className="v3-shell">
+              <V3CapabilitiesPanel />
+            </div>
+          )}
+
+          {!user && <V3MarketProofPanel />}
+          {!user && <V3GuaranteePanel />}
 
           {/* OUTILS VEDETTES */}
           <section className="v3-shell">
@@ -328,10 +314,11 @@ export default function V3HomePage() {
             </a>
           </section>
 
-          {/* CTA final — réservation */}
-          <div className="pb-12">
-            <V3ReserveCtaBand />
-          </div>
+          {!user && (
+            <div className="pb-12">
+              <V3ReserveCtaBand />
+            </div>
+          )}
         </div>
       </ReadingGate>
     </div>

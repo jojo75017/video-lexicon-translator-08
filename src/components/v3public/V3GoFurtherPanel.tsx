@@ -29,7 +29,7 @@ export default function V3GoFurtherPanel() {
         </h2>
 
         <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {/* 25 agents par type de livre */}
+          {/* 26 agents spécialisés par type de livre */}
           <div className={card} style={{ borderColor: 'var(--v3-joy-orange-soft)' }}>
             <span className={iconWrap} style={iconStyle}>
               <Users className="h-4 w-4" />
@@ -38,7 +38,7 @@ export default function V3GoFurtherPanel() {
               Un agent par type de livre
             </p>
             <p className="mt-1 flex-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-joy-muted)' }}>
-              Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda : 25 agents,
+              Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda : 26 agents,
               chacun spécialiste de son format.
             </p>
             <span className="mt-3 flex items-center -space-x-2">
@@ -57,7 +57,7 @@ export default function V3GoFurtherPanel() {
               <Workflow className="h-4 w-4" />
             </span>
             <p className="mt-3 text-[14.5px] font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
-              Écrire mon livre avec les 15 agents
+              Écrire mon livre avec le pipeline de 15 agents P1 → P15
             </p>
             <p className="mt-1 flex-1 text-[12.5px] leading-snug" style={{ color: 'var(--v3-joy-muted)' }}>
               Niche, structure, rédaction, humanisation, correction, métadonnées KDP, verdict final.

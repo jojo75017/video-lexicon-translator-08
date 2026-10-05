@@ -113,7 +113,7 @@ export default function V3MainTabs() {
             }}
           >
             <span aria-hidden>✨</span>
-            <span>Offre 1er oct.</span>
+            <span>Offre à vie · 15 oct.</span>
           </NavLink>
           <NavLink
             to="/v3/upsells"
