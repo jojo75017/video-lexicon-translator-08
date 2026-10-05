@@ -167,20 +167,30 @@ export default function V3SubscriberHome({ user }: { user: any }) {
 
         {/* Pastilles + e) Raccourcis */}
         <div className="flex flex-wrap justify-center gap-2">
-          {PILLS.map(({ label, icon: Icon, to }) => (
-            <Link key={label} to={to} className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold" style={{ ...cardStyle, color: 'var(--v3-joy-ink)' }}>
-              <Icon className="h-3.5 w-3.5" style={{ color: 'var(--v3-joy-orange-600)' }} /> {label}
-            </Link>
-          ))}
+          {PILLS.map(({ label, icon: Icon, to }, i) => {
+            const c = ['#0F766E', '#1D4ED8', '#EC4899', '#0891B2', '#9333EA'][i % 5];
+            return (
+              <Link key={label} to={to} className="inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-transform hover:-translate-y-0.5" style={{ background: c, border: `1px solid ${c}`, color: '#ffffff' }}>
+                <Icon className="h-3.5 w-3.5" style={{ color: '#ffffff' }} /> <span style={{ color: '#ffffff' }}>{label}</span>
+              </Link>
+            );
+          })}
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
-          {SHORTCUTS.map(({ label, icon: Icon, to }) => (
-            <Link key={label} to={to} className={`${card} flex items-center gap-3 transition-transform hover:-translate-y-0.5`} style={cardStyle}>
-              <Icon className="h-5 w-5" style={{ color: 'var(--v3-joy-orange-600)' }} />
-              <span className="flex-1 font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{label}</span>
-              <ArrowRight className="h-4 w-4 opacity-50" />
-            </Link>
-          ))}
+          {SHORTCUTS.map(({ label, icon: Icon, to }, i) => {
+            const t = [
+              { bg: '#1D4ED8', fg: '#ffffff', bd: '#1D4ED8' },
+              { bg: '#ffffff', fg: '#1e3a8a', bd: '#1e3a8a' },
+              { bg: '#DC2626', fg: '#ffffff', bd: '#DC2626' },
+            ][i % 3];
+            return (
+              <Link key={label} to={to} className={`${card} flex items-center gap-3 transition-transform hover:-translate-y-0.5`} style={{ background: t.bg, border: `2px solid ${t.bd}`, color: t.fg }}>
+                <Icon className="h-5 w-5" style={{ color: t.fg }} />
+                <span className="flex-1 font-semibold" style={{ color: t.fg }}>{label}</span>
+                <ArrowRight className="h-4 w-4" style={{ color: t.fg }} />
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
