@@ -130,7 +130,7 @@ export default function V3SubscriberHome({ user }: { user: any }) {
                     </div>
                     <Link
                       to={`/v3/book/${b.id}`}
-                      className="v3-btn shrink-0 px-3 py-1.5 text-sm"
+                      className="inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-transform hover:-translate-y-0.5"
                       style={{ background: t.btn, border: `1.5px solid ${t.bd}`, color: t.btnFg }}
                     >
                       <span style={{ color: t.btnFg }}>Continuer</span> <ArrowRight className="h-4 w-4" style={{ color: t.btnFg }} />
