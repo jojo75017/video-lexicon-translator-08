@@ -75,10 +75,18 @@ export default function V3SubscriberHome({ user }: { user: any }) {
 
         {/* b) Deux boutons + robots */}
         <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row">
-          <Link to="/v3/create" className="v3-btn v3-joy-cta justify-center px-6 py-3 text-base">
+          <Link
+            to="/v3/create"
+            className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition-transform hover:-translate-y-0.5"
+            style={{ background: '#1C1C1C', color: '#FFFFFF', border: '2px solid #1C1C1C' }}
+          >
             <PenLine className="h-5 w-5" /> Créer un nouveau livre
           </Link>
-          <Link to="/v3/commence-ici" className="v3-btn v3-btn-gold justify-center px-6 py-3 text-base">
+          <Link
+            to="/v3/commence-ici"
+            className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition-transform hover:-translate-y-0.5"
+            style={{ background: '#FFFFFF', color: '#1C1C1C', border: '2px solid #1C1C1C' }}
+          >
             <Compass className="h-5 w-5" /> Commence ici
           </Link>
         </div>
