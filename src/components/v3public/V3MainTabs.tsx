@@ -141,20 +141,26 @@ export default function V3MainTabs() {
                   }
                 : undefined
             }
-            className="v3-btn h-9 rounded-full text-[12px] shrink-0"
+            className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
             style={({ isActive }) => ({
-              background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
-              color: 'var(--v3-emerald)',
-              border: '1px solid var(--v3-gold)',
+              background: '#DC2626',
+              color: '#ffffff',
+              border: '1px solid #b91c1c',
               fontWeight: 700,
               textShadow: 'none',
               padding: '8px 10px',
               gap: 6,
+              ...(isActive ? { boxShadow: '0 0 0 2px rgba(220,38,38,0.35)' } : {}),
             })}
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>UPSELLS</span>
-            <span className="v3-badge hidden min-[1440px]:inline">6</span>
+            <span
+              className="hidden min-[1440px]:inline text-[10px] font-bold rounded-full px-1.5 py-0.5"
+              style={{ background: '#ffffff', color: '#b91c1c' }}
+            >
+              6
+            </span>
           </NavLink>
 
 
