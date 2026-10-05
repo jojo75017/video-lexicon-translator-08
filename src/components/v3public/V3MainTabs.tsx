@@ -6,6 +6,19 @@ import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 import useV3Open from '@/hooks/useV3Open';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
+import AgentPortrait from '@/components/v3public/AgentPortrait';
+
+/** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
+const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
+  creer: { color: '#0F766E', agent: 'camille', name: 'Camille', role: 'Lance votre livre et son sommaire' },
+  ecrire: { color: '#1D4ED8', agent: 'victor', name: 'Victor', role: 'Rédige chapitre par chapitre' },
+  habiller: { color: '#BE123C', agent: 'iris', name: 'Iris', role: 'Signe vos couvertures' },
+  kdp: { color: '#059669', agent: 'gaspard', name: 'Gaspard', role: 'Repère les niches Amazon' },
+  publier: { color: '#0891B2', agent: 'timothee', name: 'Timothée', role: 'Traduit et prépare la voix' },
+  vendre: { color: '#B45309', agent: 'solene', name: 'Solène', role: 'Optimise votre fiche KDP' },
+  livres: { color: '#9333EA', agent: 'prune', name: 'Prune', role: 'Crée les livres spéciaux' },
+  plans: { color: '#D97706', agent: 'aurele', name: 'Aurèle', role: 'Vous guide vers la bonne formule' },
+};
 
 /**
  * Ligne 2 du header — mega-menu premium.
