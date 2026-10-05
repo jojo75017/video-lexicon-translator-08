@@ -116,12 +116,12 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3/offre"
             className={({ isActive }) =>
-              `v3-btn h-9 rounded-full text-[12px] shrink-0 ${isActive ? 'v3-btn-gold' : ''}`
+              `v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform ${isActive ? 'ring-2 ring-offset-1' : ''}`
             }
             style={{
-              background: 'linear-gradient(135deg,#FF9E2D 0%,#fbbf24 100%)',
-              color: '#1f2937',
-              border: '1px solid #f59e0b',
+              background: '#ffffff',
+              color: '#1e3a8a',
+              border: '1px solid #94a3b8',
               fontWeight: 700,
               textShadow: 'none',
               padding: '8px 10px',
