@@ -159,6 +159,21 @@ const NAV: NavSection[] = [
   },
 ];
 
+/** Couleur « robot » par section, en harmonie avec les onglets du menu principal. */
+const SECTION_COLORS: Record<string, string> = {
+  'Admin — Lancement': '#DC2626',
+  Lancement: '#FF9E2D',
+  Démarrer: '#0F766E',
+  'Créer un livre': '#1D4ED8',
+  'Recherche KDP': '#059669',
+  'Habiller & exporter': '#EC4899',
+  'Mes livres': '#9333EA',
+  Vendre: '#CA8A04',
+  Apprendre: '#0891B2',
+  'Mon compte': '#D97706',
+  Support: '#64748B',
+};
+
 /** Libellés publics affichés dans la navigation, réutilisés sur l'accueil. */
 export const V3_SIDEBAR_LABELS = NAV.flatMap((group) => group.items.map((item) => item.label));
 
@@ -286,6 +301,7 @@ export default function V3Sidebar() {
       <nav className="p-2 space-y-2">
         {sections.map((group) => {
           const isOpen = collapsed || !!open[group.section];
+          const secColor = SECTION_COLORS[group.section] ?? 'var(--v3-gold)';
           return (
             <div key={group.section}>
               {!collapsed && (
@@ -294,11 +310,11 @@ export default function V3Sidebar() {
                   onClick={() => setOpen((prev) => ({ ...prev, [group.section]: !prev[group.section] }))}
                   aria-expanded={isOpen}
                   className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-[0.22em] hover:bg-black/[0.04]"
-                  style={{ color: 'var(--v3-emerald)' }}
+                  style={{ color: secColor }}
                 >
                   <span
-                    className="inline-block w-1 h-1 rounded-full shrink-0"
-                    style={{ background: 'var(--v3-gold)' }}
+                    className="inline-block w-2 h-2 rounded-full shrink-0"
+                    style={{ background: secColor, boxShadow: `0 0 6px ${secColor}` }}
                   />
                   <span className="flex-1 text-left">{group.section}</span>
                   <ChevronDown
@@ -379,7 +395,7 @@ export default function V3Sidebar() {
                               <span
                                 aria-hidden
                                 className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r"
-                                style={{ background: 'var(--v3-gold)' }}
+                                style={{ background: secColor }}
                               />
                             )}
                             <Icon className="w-4 h-4 shrink-0" />
