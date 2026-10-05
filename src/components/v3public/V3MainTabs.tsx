@@ -175,10 +175,22 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap"
-                  style={{ padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
+                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1.5 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap transition-colors"
+                  style={(() => {
+                    const c = ROBOT_THEME[cat.key]?.color ?? '#0F766E';
+                    return {
+                      padding: window.innerWidth < 1440 ? '8px 7px' : '8px 11px',
+                      color: active ? c : 'var(--v3-ink)',
+                      borderColor: active ? c : `${c}55`,
+                      background: active ? `${c}1F` : `${c}0D`,
+                    };
+                  })()}
                 >
-                  <span aria-hidden className="text-[15px] hidden min-[1700px]:inline">{cat.emoji}</span>
+                  <span
+                    aria-hidden
+                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ background: ROBOT_THEME[cat.key]?.color, boxShadow: `0 0 6px ${ROBOT_THEME[cat.key]?.color}` }}
+                  />
                   <span>{cat.label}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-60" />
                 </button>
