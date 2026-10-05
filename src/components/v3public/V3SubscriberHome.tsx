@@ -113,20 +113,31 @@ export default function V3SubscriberHome({ user }: { user: any }) {
                 </div>
               </div>
             ) : (
-              <ul className="mt-3 divide-y" style={{ borderColor: 'var(--v3-joy-orange-soft)' }}>
-                {books.map((b) => (
-                  <li key={b.id} className="flex items-center justify-between gap-3 py-3">
+              <ul className="mt-3 space-y-2">
+                {books.map((b, i) => {
+                  const t = [
+                    { bg: 'rgba(29,78,216,0.07)', bd: '#1D4ED8', btn: '#1D4ED8', btnFg: '#ffffff' },
+                    { bg: '#ffffff', bd: '#1e3a8a', btn: '#ffffff', btnFg: '#1e3a8a' },
+                    { bg: 'rgba(220,38,38,0.07)', bd: '#DC2626', btn: '#DC2626', btnFg: '#ffffff' },
+                  ][i % 3];
+                  return (
+                  <li key={b.id} className="flex items-center justify-between gap-3 rounded-2xl border px-3 py-3" style={{ background: t.bg, borderColor: `${t.bd}66` }}>
                     <div className="min-w-0">
                       <p className="truncate font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{b.title || 'Livre sans titre'}</p>
                       <p className="text-xs" style={{ color: 'var(--v3-joy-muted)' }}>
                         Modifié le {new Date(b.updated_at).toLocaleDateString('fr-FR')}
                       </p>
                     </div>
-                    <Link to={`/v3/book/${b.id}`} className="v3-btn v3-joy-cta shrink-0 px-3 py-1.5 text-sm">
-                      Continuer <ArrowRight className="h-4 w-4" />
+                    <Link
+                      to={`/v3/book/${b.id}`}
+                      className="v3-btn shrink-0 px-3 py-1.5 text-sm"
+                      style={{ background: t.btn, border: `1.5px solid ${t.bd}`, color: t.btnFg }}
+                    >
+                      <span style={{ color: t.btnFg }}>Continuer</span> <ArrowRight className="h-4 w-4" style={{ color: t.btnFg }} />
                     </Link>
                   </li>
-                ))}
+                  );
+                })}
               </ul>
             )}
           </div>
