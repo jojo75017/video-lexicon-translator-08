@@ -77,7 +77,7 @@ export default function V3MainTabs() {
 
 
   return (
-    <div
+    <div data-v3-nav=""
       className="sticky top-16 z-30 relative overflow-x-clip"
       style={{
         background: 'var(--v3-paper)',
