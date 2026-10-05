@@ -159,6 +159,21 @@ const NAV: NavSection[] = [
   },
 ];
 
+/** Couleur « robot » par section, en harmonie avec les onglets du menu principal. */
+const SECTION_COLORS: Record<string, string> = {
+  'Admin — Lancement': '#DC2626',
+  Lancement: '#FF9E2D',
+  Démarrer: '#0F766E',
+  'Créer un livre': '#1D4ED8',
+  'Recherche KDP': '#059669',
+  'Habiller & exporter': '#EC4899',
+  'Mes livres': '#9333EA',
+  Vendre: '#CA8A04',
+  Apprendre: '#0891B2',
+  'Mon compte': '#D97706',
+  Support: '#64748B',
+};
+
 /** Libellés publics affichés dans la navigation, réutilisés sur l'accueil. */
 export const V3_SIDEBAR_LABELS = NAV.flatMap((group) => group.items.map((item) => item.label));
 
