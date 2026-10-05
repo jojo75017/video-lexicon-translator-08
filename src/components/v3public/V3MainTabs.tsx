@@ -248,13 +248,28 @@ export default function V3MainTabs() {
               border: '1px solid var(--v3-line)',
             }}
           >
-            <div className="v3-gold-rule" />
-            <div className="px-5 pt-4 pb-2">
-              <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
-                {openCatData.tagline ?? openCatData.label}
-              </div>
-              <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
-                {openCatData.emoji} {openCatData.label}
+            <div style={{ height: 3, background: ROBOT_THEME[openCatData.key]?.color ?? 'var(--v3-gold)' }} />
+            <div className="px-5 pt-4 pb-2 flex items-center gap-3">
+              {ROBOT_THEME[openCatData.key] && (
+                <div
+                  className="w-11 h-11 rounded-full overflow-hidden shrink-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover"
+                  style={{ boxShadow: `0 0 0 2px ${ROBOT_THEME[openCatData.key].color}` }}
+                >
+                  <AgentPortrait id={ROBOT_THEME[openCatData.key].agent} name={ROBOT_THEME[openCatData.key].name} />
+                </div>
+              )}
+              <div className="min-w-0">
+                <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: ROBOT_THEME[openCatData.key]?.color ?? 'var(--v3-gold-600)' }}>
+                  {openCatData.tagline ?? openCatData.label}
+                </div>
+                <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
+                  {openCatData.emoji} {openCatData.label}
+                </div>
+                {ROBOT_THEME[openCatData.key] && (
+                  <div className="text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                    Avec {ROBOT_THEME[openCatData.key].name} · {ROBOT_THEME[openCatData.key].role}
+                  </div>
+                )}
               </div>
             </div>
             <div className="px-3 pb-3 grid gap-1" style={{ gridTemplateColumns: `repeat(${openCols}, minmax(0, 1fr))` }}>
