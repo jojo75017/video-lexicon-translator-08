@@ -469,30 +469,30 @@
 /* ============================================================
    Boutons lisibles partout : fond orange, texte blanc
    ============================================================ */
-.v3pub button:not(:disabled),
-.v3pub [role="button"]:not([aria-disabled="true"]),
-.v3pub a.v3-btn,
-.v3pub .v3-btn,
-.v3pub .v3-btn-primary,
-.v3pub .v3-btn-gold,
-.v3pub .v3-btn-action-orange,
-.v3pub .v3-btn-outline,
-.v3pub .v3-btn-ghost,
-.v3pub .v3-btn-on-dark {
+.v3pub button:not(:disabled):not([data-v3-nav] *),
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *),
+.v3pub a.v3-btn:not([data-v3-nav] *),
+.v3pub .v3-btn:not([data-v3-nav] *),
+.v3pub .v3-btn-primary:not([data-v3-nav] *),
+.v3pub .v3-btn-gold:not([data-v3-nav] *),
+.v3pub .v3-btn-action-orange:not([data-v3-nav] *),
+.v3pub .v3-btn-outline:not([data-v3-nav] *),
+.v3pub .v3-btn-ghost:not([data-v3-nav] *),
+.v3pub .v3-btn-on-dark:not([data-v3-nav] *) {
   background: #6a9e7d !important;
   color: #ffffff !important;
   border-color: #6a9e7d !important;
 }
-.v3pub button:not(:disabled):hover,
-.v3pub [role="button"]:not([aria-disabled="true"]):hover,
-.v3pub a.v3-btn:hover,
-.v3pub .v3-btn:hover,
-.v3pub .v3-btn-primary:hover,
-.v3pub .v3-btn-gold:hover,
-.v3pub .v3-btn-action-orange:hover,
-.v3pub .v3-btn-outline:hover,
-.v3pub .v3-btn-ghost:hover,
-.v3pub .v3-btn-on-dark:hover {
+.v3pub button:not(:disabled):not([data-v3-nav] *):hover,
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):hover,
+.v3pub a.v3-btn:not([data-v3-nav] *):hover,
+.v3pub .v3-btn:not([data-v3-nav] *):hover,
+.v3pub .v3-btn-primary:not([data-v3-nav] *):hover,
+.v3pub .v3-btn-gold:not([data-v3-nav] *):hover,
+.v3pub .v3-btn-action-orange:not([data-v3-nav] *):hover,
+.v3pub .v3-btn-outline:not([data-v3-nav] *):hover,
+.v3pub .v3-btn-ghost:not([data-v3-nav] *):hover,
+.v3pub .v3-btn-on-dark:not([data-v3-nav] *):hover {
   background: #e9a46f !important;
   color: #ffffff !important;
   border-color: #e9a46f !important;
@@ -520,9 +520,9 @@
   color: #ffffff !important;
   border-color: var(--v3-emerald, #2d3e33) !important;
 }
-.v3pub button:not(:disabled) *,
-.v3pub [role="button"]:not([aria-disabled="true"]) *,
-.v3pub .v3-btn * {
+.v3pub button:not(:disabled):not([data-v3-nav] *) *,
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *) *,
+.v3pub .v3-btn:not([data-v3-nav] *) * {
   color: #ffffff !important;
 }
 .v3pub button:disabled,
