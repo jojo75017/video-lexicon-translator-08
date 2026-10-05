@@ -12,7 +12,7 @@ type Item = {
   badge?: string;
 };
 
-/** Les deux nouveautés qui mènent tout : le Sommaire IA et les 25 agents. */
+/** Les deux nouveautés qui mènent tout : le Sommaire IA et les 26 agents spécialisés. */
 const HEADLINE: Item[] = [
   {
     emoji: '✨',
@@ -24,11 +24,11 @@ const HEADLINE: Item[] = [
   },
   {
     emoji: '🤖',
-    title: '25 agents — un par type de livre',
+    title: '26 agents — un par type de livre',
     desc: "Roman, cuisine, voyage, enfants, coloriage, BD, atlas, jeux, agenda, biographie… Chaque agent connaît les codes de sa catégorie, son format KDP et son style : vous choisissez votre agent, il écrit avec vous.",
     to: '/v3/commence-ici',
     cta: 'Choisir mon agent',
-    badge: '25 agents',
+    badge: '26 agents',
   },
 ];
 
@@ -103,7 +103,7 @@ export default function V3WhatsNewPanel() {
           <p className="mt-2 max-w-3xl text-[14px]" style={{ color: 'var(--v3-joy-muted)' }}>
             Le studio a beaucoup évolué. Deux nouveautés changent tout : le{' '}
             <strong style={{ color: 'var(--v3-joy-ink)' }}>Sommaire IA</strong>, qui mène le livre du début à la fin,
-            et les <strong style={{ color: 'var(--v3-joy-ink)' }}>25 agents spécialisés</strong>, un par type de livre.
+            et les <strong style={{ color: 'var(--v3-joy-ink)' }}>26 agents spécialisés par type de livre</strong>.
           </p>
         </div>
 

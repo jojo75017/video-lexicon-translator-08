@@ -31,8 +31,8 @@ const ICONS: Record<string, typeof Search> = {
 };
 
 const BENEFITS = [
-  'Chaque module travaille en 2 temps : Gemini analyse, ChatGPT rédige.',
-  'Vous relisez le brief du temps 1 avant que le texte soit écrit.',
+  'Le Studio Pro rédige en 2 temps : Gemini prépare, puis ChatGPT écrit.',
+  'Les autres modules restent accessibles avec leur fonctionnement actuel.',
   'Vos clés Gemini et OpenRouter restent les vôtres, dans votre navigateur.',
 ];
 
@@ -67,7 +67,7 @@ export function V3EngineStrip({ className = '' }: { className?: string }) {
   );
 }
 
-/** Section détaillée — les modules de la V3, tous en 2 temps. */
+/** Section détaillée — les huit modules et leur fonctionnement disponible. */
 export function V3EngineGrid({ className = '' }: { className?: string }) {
   return (
     <section id="moteurs-ia-v3" className={`v3-shell py-8 ${className}`}>
@@ -77,12 +77,11 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
             Sous le capot
           </div>
           <h2 className="v3-serif mt-2 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: INK }}>
-            Chaque module travaille en 2 temps
+            8 modules au cœur de votre espace V3
           </h2>
           <p className="mt-2.5 text-[14px] leading-relaxed" style={{ color: MUTED }}>
-            <strong style={{ color: ORANGE }}>Temps 1 : Gemini analyse</strong> et prépare le travail.{' '}
-            <strong style={{ color: ORANGE }}>Temps 2 : ChatGPT rédige</strong> à partir de cette préparation. Vous voyez les deux
-            temps, et vous pouvez relire le brief avant que le texte soit écrit.
+            La rédaction du manuscrit associe réellement <strong style={{ color: ORANGE }}>Gemini pour préparer</strong> puis{' '}
+            <strong style={{ color: ORANGE }}>ChatGPT pour écrire</strong>. Les autres cartes décrivent uniquement ce que leur module fait aujourd’hui.
           </p>
         </div>
 
@@ -107,27 +106,21 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 space-y-1.5">
-                  <div className="text-[11.5px] leading-snug" style={{ color: MUTED }}>
-                    <strong style={{ color: ORANGE }}>Temps 1 · {e.temps1.label}</strong>
-                    <br />
-                    {e.temps1.output}
+                {e.live && (
+                  <div className="mt-3 space-y-1.5">
+                    <div className="text-[11.5px] leading-snug" style={{ color: MUTED }}>
+                      <strong style={{ color: ORANGE }}>Temps 1 · {e.temps1.label}</strong>
+                      <br />
+                      {e.temps1.output}
+                    </div>
+                    <div className="text-[11.5px] leading-snug" style={{ color: MUTED }}>
+                      <strong style={{ color: ORANGE }}>Temps 2 · {e.temps2.label}</strong>
+                      <br />
+                      {e.temps2.output}
+                    </div>
                   </div>
-                  <div className="text-[11.5px] leading-snug" style={{ color: MUTED }}>
-                    <strong style={{ color: ORANGE }}>Temps 2 · {e.temps2.label}</strong>
-                    <br />
-                    {e.temps2.output}
-                  </div>
-                </div>
-                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: MUTED }}>{e.desc}</p>
-                {!e.live && (
-                  <span
-                    className="mt-2 inline-block text-[11px] font-semibold rounded-full px-2 py-0.5"
-                    style={{ color: ORANGE, background: ORANGE_SOFT }}
-                  >
-                    2 temps en cours de branchement
-                  </span>
                 )}
+                <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: MUTED }}>{e.desc}</p>
                 {e.route && (
                   <span className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-semibold" style={{ color: ORANGE }}>
                     Ouvrir le module <ArrowRight className="w-3.5 h-3.5" />

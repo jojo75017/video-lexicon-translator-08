@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Play, Subtitles, CheckCircle2, ArrowRight } from 'lucide-react';
 import videoAsset from '@/assets/ebookstudio-v3-video.mp4.asset.json';
+import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Vidéo de présentation V3 (5 min 12, voix française, sous-titrée).
@@ -22,9 +24,32 @@ const POINTS_CLES = [
   'Couverture, mise en page et fiche Amazon générés pour vous',
 ];
 
-export default function V3PresentationVideo() {
+export default function V3PresentationVideo({ userId }: { userId: string }) {
+  const [videoReady, setVideoReady] = useState(false);
+  const [videoFailed, setVideoFailed] = useState(false);
+  const [hasBooks, setHasBooks] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    supabase
+      .from('ebook_projects')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .then(({ count }) => {
+        if (!cancelled) setHasBooks((count ?? 0) > 0);
+      });
+    return () => { cancelled = true; };
+  }, [userId]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setVideoFailed(true), 12_000);
+    return () => window.clearTimeout(timeout);
+  }, []);
+
+  if (videoFailed) return null;
+
   return (
-    <section id="video-v3" className="v3-shell py-8 scroll-mt-24">
+    <section id="video-v3" className={`v3-shell py-8 scroll-mt-24 ${videoReady ? '' : 'hidden'}`}>
       <div
         className="overflow-hidden rounded-3xl bg-white"
         style={{
@@ -80,6 +105,8 @@ export default function V3PresentationVideo() {
               playsInline
               preload="metadata"
               className="aspect-video w-full"
+              onLoadedMetadata={() => setVideoReady(true)}
+              onError={() => setVideoFailed(true)}
             >
               Votre navigateur ne supporte pas la lecture vidéo.
             </video>
@@ -91,7 +118,7 @@ export default function V3PresentationVideo() {
               className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02]"
               style={{ background: 'var(--v3-joy-orange-600)', boxShadow: '0 10px 24px -12px rgba(234, 88, 12, 0.6)' }}
             >
-              Créer mon premier livre <ArrowRight className="h-4 w-4" />
+              {hasBooks ? 'Créer un nouveau livre' : 'Créer mon premier livre'} <ArrowRight className="h-4 w-4" />
             </Link>
             <span className="text-[11px]" style={{ color: 'var(--v3-joy-muted)' }}>
               Vous venez de voir le parcours ? Lancez-vous tout de suite, étape par étape.

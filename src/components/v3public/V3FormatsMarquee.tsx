@@ -35,7 +35,6 @@ const pillStyle = (index: number) =>
     : { border: '2px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-ink)' };
 
 export default function V3FormatsMarquee() {
-  const total = ROWS.reduce((n, r) => n + r.length, 0);
   return (
     <section className="v3-shell py-10">
       <style>{`
@@ -50,7 +49,7 @@ export default function V3FormatsMarquee() {
           className="inline-block rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em]"
           style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}
         >
-          {total} possibilités EbookStudio V3
+          Formats, outils et accompagnements EbookStudio V3
         </div>
         <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
           EbookStudio V3 vous permet de{' '}
