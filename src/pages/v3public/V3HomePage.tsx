@@ -274,21 +274,31 @@ export default function V3HomePage() {
 
           {/* Tous les compléments payants sont regroupés après les blocs utiles. */}
           {user && (
-            <div className="mt-8 border-y py-8" style={{ background: 'var(--v3-joy-cream)', borderColor: 'var(--v3-joy-orange-soft)' }}>
-              <div className="v3-shell pb-2">
-                <p className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
+            <section
+              id="v3-upsells"
+              className="mt-10 scroll-mt-24 py-14 md:py-20"
+              style={{ background: 'var(--v3-joy-ink)', borderTop: '4px solid var(--v3-joy-orange)' }}
+            >
+              <div className="v3-shell pb-6 text-center">
+                <span
+                  className="inline-flex items-center rounded-full px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.24em] text-white"
+                  style={{ background: 'var(--v3-joy-orange)' }}
+                >
                   Studios et compléments
-                </p>
-                <h2 className="v3-serif mt-2 text-3xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
+                </span>
+                <h2 className="v3-serif mt-4 text-4xl font-semibold leading-tight md:text-5xl" style={{ color: '#fffdf9' }}>
                   Aller plus loin avec votre maison d'édition
                 </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-[15px]" style={{ color: 'rgba(255, 253, 249, 0.78)' }}>
+                  Des studios et services en option, à ajouter quand vous en avez besoin.
+                </p>
               </div>
               <BdComicNewsBanner />
               <V3CoverStudioBanner />
               <V3MicroSeriesSurpriseBanner />
               <V3UpsellRotator />
               <V3PricingOverview />
-            </div>
+            </section>
           )}
 
           {/* BLOG */}

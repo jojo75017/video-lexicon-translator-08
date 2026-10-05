@@ -149,6 +149,21 @@ export default function V3SubscriberHome({ user }: { user: any }) {
           </div>
         </div>
 
+        {/* Bande fine — raccourci vers les studios et compléments */}
+        <a
+          href="#v3-upsells"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById('v3-upsells')?.scrollIntoView({ behavior: 'smooth' });
+          }}
+          className="mx-auto flex max-w-3xl items-center justify-center gap-2 rounded-full px-5 py-2.5 text-center text-[13px] font-semibold transition-transform hover:-translate-y-0.5"
+          style={{ background: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange)', color: 'var(--v3-joy-orange-600)' }}
+        >
+          <span aria-hidden>✨</span>
+          <span>Studios et compléments : BD &amp; Jeunesse, Couvertures, Micro-séries, Audio…</span>
+          <span aria-hidden>→ Voir les options</span>
+        </a>
+
         {/* Pastilles + e) Raccourcis */}
         <div className="flex flex-wrap justify-center gap-2">
           {PILLS.map(({ label, icon: Icon, to }) => (

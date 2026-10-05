@@ -116,7 +116,15 @@ export default function V3MainTabs() {
             <span>Offre à vie · 15 oct.</span>
           </NavLink>
           <NavLink
-            to="/v3/upsells"
+            to={pathname === '/v3' ? '/v3#v3-upsells' : '/v3/upsells'}
+            onClick={
+              pathname === '/v3'
+                ? (e) => {
+                    e.preventDefault();
+                    document.getElementById('v3-upsells')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                : undefined
+            }
             className="v3-btn h-9 rounded-full text-[12px] shrink-0"
             style={({ isActive }) => ({
               background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
