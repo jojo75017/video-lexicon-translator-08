@@ -552,3 +552,14 @@
 .v3pub .v3-launch-sage h2, .v3pub .v3-launch-sage h2 *, .v3pub .v3-launch-sage a, .v3pub .v3-launch-sage span { color:#3f6b52 !important; }
 .v3pub .v3-launch-sage strong { color:#c97a45 !important; }
 .v3pub .v3-header-sage .v3-mobile-panel { background:#e4f0e8 !important; }
+
+/* Onglets du menu principal : couleur « voyant robot » par catégorie */
+.v3pub .v3-robot-tab { border: 1px solid; }
+.v3pub .v3-robot-tab:hover,
+.v3pub .v3-robot-tab[data-active="true"] {
+  background: var(--robot) !important;
+  border-color: var(--robot) !important;
+  color: #ffffff !important;
+}
+.v3pub .v3-robot-tab:hover > span:first-child,
+.v3pub .v3-robot-tab[data-active="true"] > span:first-child { background: #ffffff !important; }
