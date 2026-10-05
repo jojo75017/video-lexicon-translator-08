@@ -324,7 +324,8 @@ export default function V3MainTabs() {
               to="/v3"
               end
               onClick={() => setMobileOpen(false)}
-              className="v3-btn v3-btn-gold h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              style={{ background: '#1D4ED8', color: '#ffffff', border: '1px solid #1e40af', fontWeight: 700, textShadow: 'none' }}
             >
               <span aria-hidden className="text-[15px]">🏠</span> Accueil
             </NavLink>
@@ -333,9 +334,9 @@ export default function V3MainTabs() {
               onClick={() => setMobileOpen(false)}
               className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
-                background: 'linear-gradient(135deg,#FF9E2D,#fbbf24)',
-                color: '#1f2937',
-                border: '1px solid #f59e0b',
+                background: '#ffffff',
+                color: '#1e3a8a',
+                border: '1px solid #94a3b8',
                 fontWeight: 700,
                 textShadow: 'none',
               }}
@@ -347,9 +348,9 @@ export default function V3MainTabs() {
               onClick={() => setMobileOpen(false)}
               className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
-                background: 'var(--v3-gold-soft)',
-                color: 'var(--v3-emerald)',
-                border: '1px solid var(--v3-gold)',
+                background: '#DC2626',
+                color: '#ffffff',
+                border: '1px solid #b91c1c',
                 fontWeight: 700,
                 textShadow: 'none',
               }}
