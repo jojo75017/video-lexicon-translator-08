@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { trackCaptureEvent } from '@/lib/captureTracking';
 
+import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
+import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
@@ -17,11 +19,15 @@ import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3StartHereHomeBanner from '@/components/v3public/V3StartHereHomeBanner';
 import V3MicroSeriesSurpriseBanner from '@/components/v3public/V3MicroSeriesSurpriseBanner';
 import V3PresentationVideo from '@/components/v3public/V3PresentationVideo';
+import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
+import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
 import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
 import V3AnchorNav from '@/components/v3public/V3AnchorNav';
 import V3WhatIsPanel from '@/components/v3public/V3WhatIsPanel';
 import V3WhatsNewPanel from '@/components/v3public/V3WhatsNewPanel';
 import V3HowItWorksSteps from '@/components/v3public/V3HowItWorksSteps';
+import V3BenefitsPanel from '@/components/v3public/V3BenefitsPanel';
+import V3DifferenceTable from '@/components/v3public/V3DifferenceTable';
 import V3GoFurtherPanel from '@/components/v3public/V3GoFurtherPanel';
 import ReadingGate from '@/components/marketing/ReadingGate';
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
@@ -208,6 +214,8 @@ export default function V3HomePage() {
       <ReadingGate surface="v3" title="La suite de la visite est offerte">
         <div className="v3-home">
           <V3HowItWorksSteps />
+          {!user && <V3BenefitsPanel />}
+          {!user && <V3DifferenceTable />}
 
           {/* Pack de 10 niches, inclus dans l'accès */}
           <div className="v3-shell">
@@ -215,6 +223,15 @@ export default function V3HomePage() {
           </div>
 
           <V3UpsellRotator />
+
+          {!user && (
+            <div className="v3-shell">
+              <V3CapabilitiesPanel />
+            </div>
+          )}
+
+          {!user && <V3MarketProofPanel />}
+          {!user && <V3GuaranteePanel />}
 
           {/* OUTILS VEDETTES */}
           <section className="v3-shell">
@@ -295,7 +312,11 @@ export default function V3HomePage() {
             </a>
           </section>
 
-          <div className="pb-12" />
+          {!user && (
+            <div className="pb-12">
+              <V3ReserveCtaBand />
+            </div>
+          )}
         </div>
       </ReadingGate>
     </div>
