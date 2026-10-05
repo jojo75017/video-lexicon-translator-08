@@ -571,3 +571,8 @@
 .v3pub button.v3-robot-tab:not(:disabled) *,
 .v3pub button.v3-robot-tab:not(:disabled):hover *,
 .v3pub button.v3-robot-tab[data-active="true"]:not(:disabled) * { color: #ffffff !important; }
+
+/* Les libellés des boutons de la rangée d'onglets héritent de la couleur du bouton.
+   (La règle globale « p, span, li » d'index.css les repeignait en #333 par-dessus le blanc.) */
+.v3pub [data-v3-nav] nav .v3-btn span,
+.v3pub [data-v3-nav] nav .v3-btn span:hover { color: inherit; }
