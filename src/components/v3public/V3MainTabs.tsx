@@ -99,12 +99,15 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3"
             end
-            className={({ isActive }) =>
-              `v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 transition-colors hover:bg-[var(--v3-gold-soft)] ${isActive ? 'v3-btn-gold' : ''}`
-            }
+            className="v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 transition-transform"
             style={({ isActive }) => ({
               padding: '8px 10px', gap: 6,
-              ...(isActive ? {} : { border: '1px solid var(--v3-gold)', color: 'var(--v3-ink)' }),
+              background: '#1D4ED8',
+              color: '#ffffff',
+              border: '1px solid #1e40af',
+              fontWeight: 700,
+              textShadow: 'none',
+              ...(isActive ? { boxShadow: '0 0 0 2px rgba(29,78,216,0.35)' } : {}),
             })}
           >
             <span aria-hidden className="text-[15px] hidden min-[1440px]:inline">🏠</span>
