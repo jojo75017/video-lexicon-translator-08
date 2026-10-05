@@ -80,7 +80,7 @@ export default function V3MainTabs() {
           🔒 Aperçu de la V3 — les onglets s'ouvrent le 1ᵉʳ octobre 2026
         </div>
       )}
-      <div className={`max-w-[1440px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
+      <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
         <nav className="hidden xl:flex items-center gap-1 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
           <NavLink
@@ -162,10 +162,10 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full px-3 text-[12px] font-sans font-semibold whitespace-nowrap"
-                  style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
+                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[12px] font-sans font-semibold whitespace-nowrap"
+                  style={{ padding: '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
                 >
-                  <span aria-hidden className="text-[15px]">{cat.emoji}</span>
+                  <span aria-hidden className="text-[15px] hidden min-[1700px]:inline">{cat.emoji}</span>
                   <span>{cat.label}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-60" />
                 </button>
