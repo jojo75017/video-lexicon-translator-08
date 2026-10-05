@@ -108,6 +108,13 @@ export function installChunkErrorRecovery(): void {
     if (isChunkError(msg)) recover(msg);
   });
 
+  // Événement Vite dédié : échec de préchargement d'un chunk après redéploiement.
+  window.addEventListener("vite:preloadError", (event) => {
+    event.preventDefault();
+    const payload = (event as unknown as { payload?: { message?: string } }).payload;
+    recover(payload?.message || "Failed to fetch dynamically imported module");
+  });
+
   // Promesses rejetées (cas le plus fréquent pour les imports dynamiques)
   window.addEventListener("unhandledrejection", (event) => {
     const reason = event?.reason;
