@@ -203,6 +203,8 @@ export default function V3HomePage() {
       <V3EngineGrid />
       {!user && <V3ClosingRecallPanel />}
 
+      {!user && <V3ReserveCtaBand />}
+
       {/* 8. POUR ALLER PLUS LOIN — agents, workflow, KDP Pilot */}
       <V3GoFurtherPanel />
 
