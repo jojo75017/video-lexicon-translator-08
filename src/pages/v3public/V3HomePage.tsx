@@ -44,6 +44,7 @@ import V3KdpFeatureShowcase4 from '@/components/v3public/V3KdpFeatureShowcase4';
 import V3KdpFeatureShowcase5 from '@/components/v3public/V3KdpFeatureShowcase5';
 import V3KdpFeatureShowcase6 from '@/components/v3public/V3KdpFeatureShowcase6';
 import V3KdpFeatureShowcase7 from '@/components/v3public/V3KdpFeatureShowcase7';
+import V3KdpFeatureShowcase8 from '@/components/v3public/V3KdpFeatureShowcase8';
 
 const FEATURED_TOOLS = [
   { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', badge: 'Commencer ici' },
