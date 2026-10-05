@@ -42,6 +42,7 @@ import V3KdpFeatureShowcase2 from '@/components/v3public/V3KdpFeatureShowcase2';
 import V3KdpFeatureShowcase3 from '@/components/v3public/V3KdpFeatureShowcase3';
 import V3KdpFeatureShowcase4 from '@/components/v3public/V3KdpFeatureShowcase4';
 import V3KdpFeatureShowcase5 from '@/components/v3public/V3KdpFeatureShowcase5';
+import V3KdpFeatureShowcase6 from '@/components/v3public/V3KdpFeatureShowcase6';
 
 const FEATURED_TOOLS = [
   { icon: Wand2, title: 'Sommaire IA — le meneur', desc: 'Dialogue avec l’IA : vos idées sont corrigées et deviennent le plan qui guide tout le livre.', badge: 'Commencer ici' },
@@ -113,6 +114,7 @@ export default function V3HomePage() {
       {user && <V3KdpFeatureShowcase3 />}
       {user && <V3KdpFeatureShowcase4 />}
       {user && <V3KdpFeatureShowcase5 />}
+      {user && <V3KdpFeatureShowcase6 />}
 
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
       {!user && <V3StartHereHomeBanner />}
