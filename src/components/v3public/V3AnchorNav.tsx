@@ -1,12 +1,19 @@
-const LINKS = [
+const PUBLIC_LINKS = [
   { id: 'v3-quoi', label: "Qu'est-ce que la V3" },
   { id: 'v3-etapes', label: 'Comment ça marche' },
   { id: 'v3-benefices', label: 'Ce que ça vous apporte' },
   { id: 'v3-difference', label: 'Pourquoi c’est différent' },
 ];
 
+const SUBSCRIBER_LINKS = [
+  { id: 'v3-etapes', label: 'Comment ça marche' },
+  { id: 'v3-outils-coeur', label: 'Les outils au cœur du studio' },
+];
+
 /** Sommaire ancré : permet de naviguer dans la page longue de présentation. */
-export default function V3AnchorNav() {
+export default function V3AnchorNav({ subscriber = false }: { subscriber?: boolean }) {
+  const links = subscriber ? SUBSCRIBER_LINKS : PUBLIC_LINKS;
+
   return (
     <nav aria-label="Découvrir la V3" className="v3-shell pt-6">
       <div
@@ -20,7 +27,7 @@ export default function V3AnchorNav() {
           Découvrir la V3
         </span>
         <div className="flex flex-wrap gap-2">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <a
               key={l.id}
               href={`#${l.id}`}

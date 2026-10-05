@@ -18,7 +18,6 @@ import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3StartHereHomeBanner from '@/components/v3public/V3StartHereHomeBanner';
 import V3MicroSeriesSurpriseBanner from '@/components/v3public/V3MicroSeriesSurpriseBanner';
-import V3PresentationVideo from '@/components/v3public/V3PresentationVideo';
 import V3MarketProofPanel from '@/components/v3public/V3MarketProofPanel';
 import V3GuaranteePanel from '@/components/v3public/V3GuaranteePanel';
 import V3ClosingRecallPanel from '@/components/v3public/V3ClosingRecallPanel';
@@ -96,9 +95,6 @@ export default function V3HomePage() {
       {/* BANDEAUX DÉFILANTS — tout ce qu'on peut créer */}
       <V3FormatsMarquee />
 
-      {/* VIDÉO DE PRÉSENTATION — juste au-dessus du bloc d'aide Zoom (écrin prêt pour une future vidéo plus grande) */}
-      {user && <V3PresentationVideo userId={user.id} />}
-
       {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
       {user && <V3SubscriberZoomHelp />}
 
@@ -117,8 +113,8 @@ export default function V3HomePage() {
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
       {!user && <V3StartHereHomeBanner />}
 
-      {/* SURPRISE V4 — précommande Studio Micro-Séries */}
-      <V3MicroSeriesSurpriseBanner />
+      {/* Le parcours public conserve ses offres aux emplacements historiques. */}
+      {!user && <V3MicroSeriesSurpriseBanner />}
 
       {/* PREUVE AUTEUR — livres publiés + nom d'auteur, avant les offres */}
       <section className="v3-shell py-8">
@@ -181,21 +177,22 @@ export default function V3HomePage() {
         </div>
       </section>
 
-      {/* Trois offres — aperçu discret, détail sur /v3/forfaits */}
-      <V3PricingOverview />
+      {!user && <V3PricingOverview />}
 
-
-      {/* 4. LES DEUX NOUVEAUTÉS — couvertures puis Studio BD & Jeunesse */}
-      <section className="v3-shell">
-        <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
-          Les nouveautés
-        </div>
-        <h2 className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
-          Deux ateliers qui viennent d’ouvrir
-        </h2>
-      </section>
-      <V3CoverStudioBanner />
-      <BdComicNewsBanner />
+      {!user && (
+        <>
+          <section className="v3-shell">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
+              Les nouveautés
+            </div>
+            <h2 className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
+              Deux ateliers qui viennent d’ouvrir
+            </h2>
+          </section>
+          <V3CoverStudioBanner />
+          <BdComicNewsBanner />
+        </>
+      )}
 
       {/* 6. CE QUI A CHANGÉ + MOTEURS IA */}
       <V3WhatsNewPanel />
@@ -209,8 +206,8 @@ export default function V3HomePage() {
       <V3GoFurtherPanel />
 
       {/* 9. PRÉSENTATION LONGUE — comprendre la V3 */}
-      {!user && <V3AnchorNav />}
-      <V3WhatIsPanel />
+      <V3AnchorNav subscriber={Boolean(user)} />
+      {!user && <V3WhatIsPanel />}
 
       {/* La suite est offerte contre l'email pour les visiteurs inconnus. */}
       <ReadingGate surface="v3" title="La suite de la visite est offerte">
@@ -224,8 +221,6 @@ export default function V3HomePage() {
             <Niches10Offer surface="inline" hook="v3" variant="compact" source="v3-reservation" />
           </div>
 
-          <V3UpsellRotator />
-
           {!user && (
             <div className="v3-shell">
               <V3CapabilitiesPanel />
@@ -236,7 +231,7 @@ export default function V3HomePage() {
           {!user && <V3GuaranteePanel />}
 
           {/* OUTILS VEDETTES */}
-          <section className="v3-shell">
+          <section id="v3-outils-coeur" className="v3-shell scroll-mt-24">
             <div className="rounded-3xl p-8" style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}>
               <div className="mb-8 text-center">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
@@ -274,6 +269,27 @@ export default function V3HomePage() {
               </div>
             </div>
           </section>
+
+          {!user && <V3UpsellRotator />}
+
+          {/* Tous les compléments payants sont regroupés après les blocs utiles. */}
+          {user && (
+            <div className="mt-8 border-y py-8" style={{ background: 'var(--v3-joy-cream)', borderColor: 'var(--v3-joy-orange-soft)' }}>
+              <div className="v3-shell pb-2">
+                <p className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
+                  Studios et compléments
+                </p>
+                <h2 className="v3-serif mt-2 text-3xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
+                  Aller plus loin avec votre maison d'édition
+                </h2>
+              </div>
+              <BdComicNewsBanner />
+              <V3CoverStudioBanner />
+              <V3MicroSeriesSurpriseBanner />
+              <V3UpsellRotator />
+              <V3PricingOverview />
+            </div>
+          )}
 
           {/* BLOG */}
           <section className="v3-shell">
