@@ -82,7 +82,7 @@ export default function V3MainTabs() {
       )}
       <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
-        <nav className="hidden xl:flex items-center gap-1 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
+        <nav className="hidden xl:flex items-center gap-0.5 min-[1440px]:gap-1 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
           <NavLink
             to="/v3"
             end
@@ -94,7 +94,7 @@ export default function V3MainTabs() {
               ...(isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }),
             })}
           >
-            <span aria-hidden className="text-[15px]">🏠</span>
+            <span aria-hidden className="text-[15px] hidden min-[1440px]:inline">🏠</span>
             <span>Accueil</span>
           </NavLink>
           <NavLink
@@ -138,7 +138,7 @@ export default function V3MainTabs() {
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>UPSELLS</span>
-            <span className="v3-badge">6</span>
+            <span className="v3-badge hidden min-[1440px]:inline">6</span>
           </NavLink>
 
 
@@ -163,7 +163,7 @@ export default function V3MainTabs() {
                   }}
                   data-active={active ? 'true' : 'false'}
                   className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[12px] font-sans font-semibold whitespace-nowrap"
-                  style={{ padding: '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
+                  style={{ padding: window.innerWidth < 1440 ? '8px 7px' : '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
                 >
                   <span aria-hidden className="text-[15px] hidden min-[1700px]:inline">{cat.emoji}</span>
                   <span>{cat.label}</span>
