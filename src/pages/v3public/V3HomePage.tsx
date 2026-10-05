@@ -133,26 +133,34 @@ export default function V3HomePage() {
       {/* SURPRISE V4 — précommande Studio Micro-Séries */}
       <V3MicroSeriesSurpriseBanner />
 
-      {/* PREUVE AUTEUR — visible avant les offres */}
+      {/* PREUVE AUTEUR — livres publiés + nom d'auteur, avant les offres */}
       <section className="v3-shell py-8">
         <div
-          className="grid items-center gap-6 rounded-3xl bg-white p-6 md:p-8 lg:grid-cols-[minmax(220px,0.75fr)_minmax(0,1.8fr)_auto]"
+          className="rounded-3xl bg-white p-6 md:p-10"
           style={{ border: '1px solid var(--v3-joy-orange-soft)', boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)' }}
         >
-          <div>
-            <span
-              className="v3-chip"
-              style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)', borderColor: 'transparent' }}
-            >
-              Auteur invité
-            </span>
-            <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>Mr Georges Boubet</h2>
-            <p className="mt-1 text-sm" style={{ color: 'var(--v3-joy-muted)' }}>
-              71 livres publiés sur Amazon.
-            </p>
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="max-w-xl">
+              <span
+                className="v3-chip"
+                style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)', borderColor: 'transparent' }}
+              >
+                L'auteur derrière EbookStudio
+              </span>
+              <h2 className="v3-serif mt-3 text-2xl font-semibold md:text-3xl" style={{ color: 'var(--v3-joy-ink)' }}>
+                Georges Boubet — 71 livres publiés sur Amazon
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>
+                Chaque livre ci-dessous a été écrit et publié avec la méthode EbookStudio.
+                Cliquez sur une couverture pour voir la fiche Amazon réelle.
+              </p>
+            </div>
+            <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-joy-cta shrink-0">
+              Voir la page auteur Amazon <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
 
-          <div className="grid grid-cols-6 gap-2 sm:gap-3">
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
             {AUTHOR_BOOKS.map((b) => (
               <a
                 key={b.asin}
@@ -163,8 +171,8 @@ export default function V3HomePage() {
                 title={b.title}
               >
                 <div
-                  className="aspect-[2/3] overflow-hidden rounded-md shadow-md ring-1 transition-transform group-hover:-translate-y-1"
-                  style={{ background: 'var(--v3-joy-cream)', borderColor: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange-soft)' }}
+                  className="aspect-[2/3] overflow-hidden rounded-xl shadow-md transition-transform group-hover:-translate-y-1 group-hover:shadow-xl"
+                  style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}
                 >
                   <img
                     src={coverUrl(b.asin)}
@@ -177,13 +185,12 @@ export default function V3HomePage() {
                     className="h-full w-full object-cover"
                   />
                 </div>
+                <p className="mt-2 line-clamp-2 text-center text-xs font-semibold leading-snug" style={{ color: 'var(--v3-joy-ink)' }}>
+                  {b.title}
+                </p>
               </a>
             ))}
           </div>
-
-          <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="v3-btn v3-joy-cta justify-self-start lg:justify-self-end">
-            Voir sur Amazon <ArrowRight className="h-4 w-4" />
-          </a>
         </div>
       </section>
 
