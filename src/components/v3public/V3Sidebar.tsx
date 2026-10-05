@@ -301,6 +301,7 @@ export default function V3Sidebar() {
       <nav className="p-2 space-y-2">
         {sections.map((group) => {
           const isOpen = collapsed || !!open[group.section];
+          const secColor = SECTION_COLORS[group.section] ?? 'var(--v3-gold)';
           return (
             <div key={group.section}>
               {!collapsed && (
@@ -309,11 +310,11 @@ export default function V3Sidebar() {
                   onClick={() => setOpen((prev) => ({ ...prev, [group.section]: !prev[group.section] }))}
                   aria-expanded={isOpen}
                   className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-[0.22em] hover:bg-black/[0.04]"
-                  style={{ color: 'var(--v3-emerald)' }}
+                  style={{ color: secColor }}
                 >
                   <span
-                    className="inline-block w-1 h-1 rounded-full shrink-0"
-                    style={{ background: 'var(--v3-gold)' }}
+                    className="inline-block w-2 h-2 rounded-full shrink-0"
+                    style={{ background: secColor, boxShadow: `0 0 6px ${secColor}` }}
                   />
                   <span className="flex-1 text-left">{group.section}</span>
                   <ChevronDown
