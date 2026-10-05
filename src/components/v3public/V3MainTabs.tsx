@@ -190,19 +190,20 @@ export default function V3MainTabs() {
                     return {
                       ['--robot' as string]: c,
                       padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px',
-                      color: active ? c : 'var(--v3-ink)',
-                      borderColor: active ? c : `${c}55`,
-                      background: active ? `${c}1F` : `${c}0D`,
+                      color: '#ffffff',
+                      textShadow: 'none',
+                      borderColor: active ? c : `${c}cc`,
+                      background: active ? c : `${c}E6`,
                     };
                   })()}
                 >
                   <span
                     aria-hidden
                     className="hidden min-[1440px]:inline-block w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{ background: ROBOT_THEME[cat.key]?.color, boxShadow: `0 0 6px ${ROBOT_THEME[cat.key]?.color}` }}
+                    style={{ background: '#ffffff', boxShadow: '0 0 6px rgba(255,255,255,0.8)' }}
                   />
                   <span>{cat.label}</span>
-                  <ChevronDown className="w-3.5 h-3.5 opacity-60" />
+                  <ChevronDown className="w-3.5 h-3.5 opacity-90" style={{ color: '#ffffff' }} />
                 </button>
               </div>
             );
