@@ -6,6 +6,19 @@ import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 import useV3Open from '@/hooks/useV3Open';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
+import AgentPortrait from '@/components/v3public/AgentPortrait';
+
+/** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
+const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
+  creer: { color: '#0F766E', agent: 'camille', name: 'Camille', role: 'Lance votre livre et son sommaire' },
+  ecrire: { color: '#1D4ED8', agent: 'victor', name: 'Victor', role: 'Rédige chapitre par chapitre' },
+  habiller: { color: '#BE123C', agent: 'iris', name: 'Iris', role: 'Signe vos couvertures' },
+  kdp: { color: '#059669', agent: 'gaspard', name: 'Gaspard', role: 'Repère les niches Amazon' },
+  publier: { color: '#0891B2', agent: 'timothee', name: 'Timothée', role: 'Traduit et prépare la voix' },
+  vendre: { color: '#B45309', agent: 'solene', name: 'Solène', role: 'Optimise votre fiche KDP' },
+  livres: { color: '#9333EA', agent: 'prune', name: 'Prune', role: 'Crée les livres spéciaux' },
+  plans: { color: '#D97706', agent: 'aurele', name: 'Aurèle', role: 'Vous guide vers la bonne formule' },
+};
 
 /**
  * Ligne 2 du header — mega-menu premium.
@@ -162,10 +175,23 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap"
-                  style={{ padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
+                  className="v3-btn v3-robot-tab flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap transition-colors"
+                  style={(() => {
+                    const c = ROBOT_THEME[cat.key]?.color ?? '#0F766E';
+                    return {
+                      ['--robot' as string]: c,
+                      padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px',
+                      color: active ? c : 'var(--v3-ink)',
+                      borderColor: active ? c : `${c}55`,
+                      background: active ? `${c}1F` : `${c}0D`,
+                    };
+                  })()}
                 >
-                  <span aria-hidden className="text-[15px] hidden min-[1700px]:inline">{cat.emoji}</span>
+                  <span
+                    aria-hidden
+                    className="hidden min-[1440px]:inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    style={{ background: ROBOT_THEME[cat.key]?.color, boxShadow: `0 0 6px ${ROBOT_THEME[cat.key]?.color}` }}
+                  />
                   <span>{cat.label}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-60" />
                 </button>
@@ -223,13 +249,28 @@ export default function V3MainTabs() {
               border: '1px solid var(--v3-line)',
             }}
           >
-            <div className="v3-gold-rule" />
-            <div className="px-5 pt-4 pb-2">
-              <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: 'var(--v3-gold-600)' }}>
-                {openCatData.tagline ?? openCatData.label}
-              </div>
-              <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
-                {openCatData.emoji} {openCatData.label}
+            <div style={{ height: 3, background: ROBOT_THEME[openCatData.key]?.color ?? 'var(--v3-gold)' }} />
+            <div className="px-5 pt-4 pb-2 flex items-center gap-3">
+              {ROBOT_THEME[openCatData.key] && (
+                <div
+                  className="w-11 h-11 rounded-full overflow-hidden shrink-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover"
+                  style={{ boxShadow: `0 0 0 2px ${ROBOT_THEME[openCatData.key].color}` }}
+                >
+                  <AgentPortrait id={ROBOT_THEME[openCatData.key].agent} name={ROBOT_THEME[openCatData.key].name} />
+                </div>
+              )}
+              <div className="min-w-0">
+                <div className="text-[10px] uppercase tracking-[0.22em] font-semibold" style={{ color: ROBOT_THEME[openCatData.key]?.color ?? 'var(--v3-gold-600)' }}>
+                  {openCatData.tagline ?? openCatData.label}
+                </div>
+                <div className="v3-serif text-[18px] font-semibold mt-0.5" style={{ color: 'var(--v3-emerald)' }}>
+                  {openCatData.emoji} {openCatData.label}
+                </div>
+                {ROBOT_THEME[openCatData.key] && (
+                  <div className="text-[11.5px]" style={{ color: 'var(--v3-muted)' }}>
+                    Avec {ROBOT_THEME[openCatData.key].name} · {ROBOT_THEME[openCatData.key].role}
+                  </div>
+                )}
               </div>
             </div>
             <div className="px-3 pb-3 grid gap-1" style={{ gridTemplateColumns: `repeat(${openCols}, minmax(0, 1fr))` }}>

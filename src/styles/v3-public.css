@@ -552,3 +552,21 @@
 .v3pub .v3-launch-sage h2, .v3pub .v3-launch-sage h2 *, .v3pub .v3-launch-sage a, .v3pub .v3-launch-sage span { color:#3f6b52 !important; }
 .v3pub .v3-launch-sage strong { color:#c97a45 !important; }
 .v3pub .v3-header-sage .v3-mobile-panel { background:#e4f0e8 !important; }
+
+/* Onglets du menu principal : couleur « voyant robot » par catégorie */
+.v3pub button.v3-robot-tab:not(:disabled) {
+  background: color-mix(in srgb, var(--robot) 9%, #ffffff) !important;
+  border: 1px solid color-mix(in srgb, var(--robot) 40%, transparent) !important;
+  color: #232F3E !important;
+}
+.v3pub button.v3-robot-tab:not(:disabled):hover,
+.v3pub button.v3-robot-tab[data-active="true"]:not(:disabled) {
+  background: var(--robot) !important;
+  border-color: var(--robot) !important;
+  color: #ffffff !important;
+}
+.v3pub button.v3-robot-tab:hover > span:first-of-type,
+.v3pub button.v3-robot-tab[data-active="true"] > span:first-of-type { background: #ffffff !important; }
+.v3pub button.v3-robot-tab:not(:disabled) * { color: #232F3E !important; }
+.v3pub button.v3-robot-tab:not(:disabled):hover *,
+.v3pub button.v3-robot-tab[data-active="true"]:not(:disabled) * { color: #ffffff !important; }
