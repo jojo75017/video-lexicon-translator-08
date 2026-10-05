@@ -10,3 +10,6 @@
 - [x] Actualiser `/lancement` et basculer `/lancement/offres` entre offre à vie et abonnements après échéance.
 - [x] Créer et autoriser le paiement unique, puis accorder l’accès Édition à vie après confirmation.
 - [x] Vérifier l’absence des anciens textes, le paiement test et les rendus 375/768/1280 px.
+
+## En attente
+- [ ] Remplacer la vidéo de présentation /v3 par une nouvelle vidéo réalisée avec HeyGen — garder l\u2019écrin actuel, remplacer uniquement le fichier vidéo (le bloc est actuellement masqué proprement).
