@@ -15,9 +15,9 @@
 - [ ] Remplacer la vidéo de présentation /v3 par une nouvelle vidéo réalisée avec HeyGen — garder l\u2019écrin actuel, remplacer uniquement le fichier vidéo (le bloc est actuellement masqué proprement).
 
 ## Finition accueil abonnés
-- [ ] Retirer tout chargement vidéo de `/v3` connecté.
-- [ ] Mémoriser par compte la fermeture du bandeau de clé IA.
-- [ ] Uniformiser le menu principal sur ordinateur et mobile.
-- [ ] Retirer le doublon de présentation et nettoyer les ancres abonnés.
-- [ ] Regrouper tous les upsells dans l’ordre demandé sans modifier leurs offres.
-- [ ] Vérifier `/v3` connecté sur ordinateur et mobile, puis contrôler le build.
+- [x] Retirer tout chargement vidéo de `/v3` connecté.
+- [x] Mémoriser par compte la fermeture du bandeau de clé IA.
+- [x] Uniformiser le menu principal sur ordinateur et mobile.
+- [x] Retirer le doublon de présentation et nettoyer les ancres abonnés.
+- [x] Regrouper tous les upsells dans l’ordre demandé sans modifier leurs offres.
+- [x] Vérifier `/v3` connecté sur ordinateur et mobile, puis contrôler le build.
