@@ -4,7 +4,7 @@ import { LayoutGrid, Wrench, LifeBuoy, ArrowRight } from 'lucide-react';
 const TABS = ['Plan', 'Écrire', 'Habiller', 'Publier', 'Vendre', 'Livres spéciaux'];
 
 const LINKS = [
-  { to: '/v3/fonctionnalites', label: 'Voir les 14 modules', icon: LayoutGrid },
+  { to: '/v3/fonctionnalites', label: 'Voir les 12 modules', icon: LayoutGrid },
   { to: '/v3/outils', label: 'Tous les outils', icon: Wrench },
   { to: '/v3/contact', label: 'Support', icon: LifeBuoy },
 ];
