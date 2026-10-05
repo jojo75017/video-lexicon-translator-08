@@ -567,3 +567,6 @@
 }
 .v3pub button.v3-robot-tab:hover > span:first-child,
 .v3pub button.v3-robot-tab[data-active="true"] > span:first-child { background: #ffffff !important; }
+.v3pub button.v3-robot-tab:not(:disabled) * { color: #232F3E !important; }
+.v3pub button.v3-robot-tab:not(:disabled):hover *,
+.v3pub button.v3-robot-tab[data-active="true"]:not(:disabled) * { color: #ffffff !important; }
