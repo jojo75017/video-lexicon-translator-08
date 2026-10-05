@@ -160,7 +160,8 @@ export default function V3SubscriberHome({ user }: { user: any }) {
           style={{ background: 'var(--v3-joy-orange-soft)', border: '1px solid var(--v3-joy-orange)', color: 'var(--v3-joy-orange-600)' }}
         >
           <span aria-hidden>✨</span>
-          <span>Studios et compléments : BD &amp; Jeunesse, Couvertures, Micro-séries, Audio…</span>
+          <span className="hidden sm:inline">Studios et compléments : BD &amp; Jeunesse, Couvertures, Micro-séries, Audio…</span>
+          <span className="sm:hidden font-bold">Studios et compléments</span>
           <span aria-hidden>→ Voir les options</span>
         </a>
 
