@@ -1,4 +1,5 @@
-import { Play, Subtitles, CheckCircle2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Play, Subtitles, CheckCircle2, ArrowRight } from 'lucide-react';
 import videoAsset from '@/assets/ebookstudio-v3-video.mp4.asset.json';
 
 /**
@@ -82,6 +83,19 @@ export default function V3PresentationVideo() {
             >
               Votre navigateur ne supporte pas la lecture vidéo.
             </video>
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/v3/create"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-sm font-bold text-white transition-transform hover:scale-[1.02]"
+              style={{ background: 'var(--v3-joy-orange-600)', boxShadow: '0 10px 24px -12px rgba(234, 88, 12, 0.6)' }}
+            >
+              Créer mon premier livre <ArrowRight className="h-4 w-4" />
+            </Link>
+            <span className="text-[11px]" style={{ color: 'var(--v3-joy-muted)' }}>
+              Vous venez de voir le parcours ? Lancez-vous tout de suite, étape par étape.
+            </span>
           </div>
         </div>
       </div>
