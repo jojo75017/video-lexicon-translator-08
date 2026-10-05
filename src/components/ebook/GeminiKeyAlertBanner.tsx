@@ -4,7 +4,7 @@ import { AlertTriangle, X, ExternalLink } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey, validateKeyFormat } from '@/services/aiWritingService';
 
-const DISMISS_KEY = 'gemini_alert_dismissed_at';
+const DISMISS_KEY_PREFIX = 'gemini_alert_dismissed';
 const VISIBLE_PREFIXES = [
   '/ebook', '/kdp', '/audit-pilot', '/practical-sheets', '/word-count',
   '/ai-chat', '/bd-studio', '/audiobook', '/espace', '/saas',
@@ -18,18 +18,17 @@ const VISIBLE_PREFIXES = [
  */
 const GeminiKeyAlertBanner = () => {
   const location = useLocation();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [dismissed, setDismissed] = useState(false);
   const [, setTick] = useState(0);
 
   useEffect(() => {
-    const raw = localStorage.getItem(DISMISS_KEY);
-    if (raw) {
-      const ts = Number(raw);
-      if (Date.now() - ts < 24 * 60 * 60 * 1000) setDismissed(true);
-    }
-    supabase.auth.getSession().then(({ data }) => setIsAuthenticated(!!data.session));
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setIsAuthenticated(!!s));
+    const syncUser = (id: string | null) => {
+      setUserId(id);
+      setDismissed(Boolean(id && localStorage.getItem(`${DISMISS_KEY_PREFIX}:${id}`)));
+    };
+    supabase.auth.getSession().then(({ data }) => syncUser(data.session?.user.id ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => syncUser(s?.user.id ?? null));
     const id = window.setInterval(() => setTick((n) => n + 1), 3000);
     return () => {
       window.clearInterval(id);
@@ -37,7 +36,7 @@ const GeminiKeyAlertBanner = () => {
     };
   }, []);
 
-  if (!isAuthenticated || dismissed) return null;
+  if (!userId || dismissed) return null;
   if (!VISIBLE_PREFIXES.some((p) => location.pathname.startsWith(p))) return null;
 
   const provider = getProvider();
@@ -47,7 +46,7 @@ const GeminiKeyAlertBanner = () => {
 
   const openKeys = () => window.dispatchEvent(new CustomEvent('open-api-keys'));
   const close = () => {
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
+    localStorage.setItem(`${DISMISS_KEY_PREFIX}:${userId}`, 'dismissed');
     setDismissed(true);
   };
 

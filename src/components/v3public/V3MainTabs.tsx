@@ -82,12 +82,12 @@ export default function V3MainTabs() {
       )}
       <div className={`max-w-[1440px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
-        <nav className="hidden xl:flex items-center gap-0.5 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar">
+        <nav className="hidden xl:flex items-center gap-1 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
           <NavLink
             to="/v3"
             end
             className={({ isActive }) =>
-              `v3-btn text-[12px] ml-1 mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
+              `v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
             }
             style={({ isActive }) => ({
               padding: '8px 13px', gap: 6,
@@ -100,7 +100,7 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3/offre"
             className={({ isActive }) =>
-              `v3-btn text-[12px] mr-1 shrink-0 ${isActive ? 'v3-btn-gold' : ''}`
+              `v3-btn h-9 rounded-full text-[12px] shrink-0 ${isActive ? 'v3-btn-gold' : ''}`
             }
             style={{
               background: 'linear-gradient(135deg,#FF9E2D 0%,#fbbf24 100%)',
@@ -117,7 +117,7 @@ export default function V3MainTabs() {
           </NavLink>
           <NavLink
             to="/v3/upsells"
-            className="v3-btn text-[12px] mr-1 shrink-0"
+            className="v3-btn h-9 rounded-full text-[12px] shrink-0"
             style={({ isActive }) => ({
               background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
               color: 'var(--v3-emerald)',
@@ -154,8 +154,8 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-nav-item flex items-center gap-1 px-1 py-2 text-[12.5px] v3-serif font-semibold whitespace-nowrap"
-                  style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)' }}
+                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full px-3 text-[12px] font-sans font-semibold whitespace-nowrap"
+                  style={{ color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
                 >
                   <span aria-hidden className="text-[15px]">{cat.emoji}</span>
                   <span>{cat.label}</span>
@@ -170,7 +170,7 @@ export default function V3MainTabs() {
         <div className="hidden xl:block shrink-0 pl-2 ml-1" style={{ borderLeft: '1px solid var(--v3-line)' }}>
           <Link
             to="/v3/outils"
-            className="v3-btn v3-btn-primary text-[12.5px] whitespace-nowrap"
+            className="v3-btn v3-btn-primary h-9 rounded-full text-[12px] whitespace-nowrap"
             style={{ padding: '8px 16px' }}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -182,7 +182,7 @@ export default function V3MainTabs() {
         <div className="xl:hidden flex items-center gap-2 flex-1">
           <button
             onClick={() => setMobileOpen((o) => !o)}
-            className="flex items-center gap-2 px-3 py-2 rounded-md text-[13px] font-semibold"
+            className="flex h-9 items-center gap-2 rounded-full px-3 py-2 font-sans text-[13px] font-semibold"
             style={{ color: 'var(--v3-emerald)' }}
             aria-label="Ouvrir le menu des catégories"
           >
@@ -191,7 +191,7 @@ export default function V3MainTabs() {
           </button>
           <Link
             to="/v3/outils"
-            className="ml-auto v3-btn v3-btn-primary text-[12px] whitespace-nowrap"
+            className="ml-auto v3-btn v3-btn-primary h-9 rounded-full text-[12px] whitespace-nowrap"
             style={{ padding: '7px 14px' }}
           >
             <LayoutGrid className="w-3.5 h-3.5" /> Tous les outils
@@ -266,14 +266,14 @@ export default function V3MainTabs() {
               to="/v3"
               end
               onClick={() => setMobileOpen(false)}
-              className="v3-btn v3-btn-gold w-full justify-center text-[13px]"
+              className="v3-btn v3-btn-gold h-10 w-full justify-center rounded-full font-sans text-[13px]"
             >
               <span aria-hidden className="text-[15px]">🏠</span> Accueil
             </NavLink>
             <NavLink
               to="/v3/offre"
               onClick={() => setMobileOpen(false)}
-              className="v3-btn w-full justify-center text-[13px]"
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
                 background: 'linear-gradient(135deg,#FF9E2D,#fbbf24)',
                 color: '#1f2937',
@@ -282,12 +282,12 @@ export default function V3MainTabs() {
                 textShadow: 'none',
               }}
             >
-              ✨ Offre V3 · 1er octobre
+              ✨ Offre à vie · 15 oct.
             </NavLink>
             <NavLink
               to="/v3/upsells"
               onClick={() => setMobileOpen(false)}
-              className="v3-btn w-full justify-center text-[13px]"
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
                 background: 'var(--v3-gold-soft)',
                 color: 'var(--v3-emerald)',
@@ -301,9 +301,9 @@ export default function V3MainTabs() {
 
 
             {V3_HEADER_MENU.map((cat) => (
-              <details key={cat.key} className="rounded-xl" style={{ border: '1px solid var(--v3-line)' }}>
+              <details key={cat.key} className="rounded-2xl" style={{ border: '1px solid var(--v3-line)' }}>
                 <summary
-                  className="flex items-center gap-2 px-3 py-2.5 cursor-pointer v3-serif text-[14px] font-semibold"
+                  className="flex items-center gap-2 px-3 py-2.5 cursor-pointer font-sans text-[14px] font-semibold"
                   style={{ color: 'var(--v3-emerald)' }}
                 >
                   <span>{cat.emoji}</span>

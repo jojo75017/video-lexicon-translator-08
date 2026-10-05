@@ -1,31 +1,12 @@
-import { useEffect, useState } from 'react';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import { V3_ADDON_LIST } from '@/data/v3Pricing';
 
-/**
- * Bandeau rotatif « Ils ont boosté leur livre » : un encart upsell personnifié
- * affiché en alternance sous le panneau capacités de la page d'accueil V3.
- * Rotation toutes les ~6 s, 3 encarts visibles à la fois parmi le catalogue.
- */
-const VISIBLE = 3;
-const ROTATION_MS = 6000;
+const HOME_ADDON_KEYS = ['audio_single', 'publishers', 'serenity'];
 
 export default function V3UpsellRotator() {
-  const [offset, setOffset] = useState(0);
-
-  useEffect(() => {
-    if (V3_ADDON_LIST.length <= VISIBLE) return;
-    const id = window.setInterval(() => {
-      setOffset((o) => (o + VISIBLE) % V3_ADDON_LIST.length);
-    }, ROTATION_MS);
-    return () => window.clearInterval(id);
-  }, []);
-
-  // Fenêtre glissante sur le catalogue (boucle circulaire).
-  const picks = Array.from({ length: VISIBLE }, (_, i) => {
-    const idx = (offset + i) % V3_ADDON_LIST.length;
-    return V3_ADDON_LIST[idx];
-  });
+  const picks = HOME_ADDON_KEYS
+    .map((key) => V3_ADDON_LIST.find((addon) => addon.key === key))
+    .filter((addon): addon is (typeof V3_ADDON_LIST)[number] => Boolean(addon));
 
   return (
     <section className="v3-shell pt-8">
