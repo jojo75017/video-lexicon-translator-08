@@ -165,7 +165,7 @@ const SECTION_COLORS: Record<string, string> = {
   Lancement: '#FF9E2D',
   Démarrer: '#0F766E',
   'Créer un livre': '#1D4ED8',
-  'Recherche KDP': '#059669',
+  'Recherche KDP': '#4D7C5B',
   'Habiller & exporter': '#EC4899',
   'Mes livres': '#9333EA',
   Vendre: '#CA8A04',
