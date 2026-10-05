@@ -90,7 +90,7 @@ export default function V3MainTabs() {
               `v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
             }
             style={({ isActive }) => ({
-              padding: '8px 13px', gap: 6,
+              padding: '8px 10px', gap: 6,
               ...(isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }),
             })}
           >
@@ -108,7 +108,7 @@ export default function V3MainTabs() {
               border: '1px solid #f59e0b',
               fontWeight: 700,
               textShadow: 'none',
-              padding: '8px 13px',
+              padding: '8px 10px',
               gap: 6,
             }}
           >
@@ -132,7 +132,7 @@ export default function V3MainTabs() {
               border: '1px solid var(--v3-gold)',
               fontWeight: 700,
               textShadow: 'none',
-              padding: '8px 13px',
+              padding: '8px 10px',
               gap: 6,
             })}
           >
@@ -162,7 +162,7 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[12px] font-sans font-semibold whitespace-nowrap"
+                  className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap"
                   style={{ padding: window.innerWidth < 1440 ? '8px 7px' : '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
                 >
                   <span aria-hidden className="text-[15px] hidden min-[1700px]:inline">{cat.emoji}</span>
