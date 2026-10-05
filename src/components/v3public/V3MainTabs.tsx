@@ -175,12 +175,12 @@ export default function V3MainTabs() {
                     else openCat(cat.key, e.currentTarget);
                   }}
                   data-active={active ? 'true' : 'false'}
-                  className="v3-btn v3-robot-tab flex h-9 items-center gap-1.5 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap transition-colors"
+                  className="v3-btn v3-robot-tab flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap transition-colors"
                   style={(() => {
                     const c = ROBOT_THEME[cat.key]?.color ?? '#0F766E';
                     return {
                       ['--robot' as string]: c,
-                      padding: window.innerWidth < 1440 ? '8px 7px' : '8px 11px',
+                      padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px',
                       color: active ? c : 'var(--v3-ink)',
                       borderColor: active ? c : `${c}55`,
                       background: active ? `${c}1F` : `${c}0D`,
