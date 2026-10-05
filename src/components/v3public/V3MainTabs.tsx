@@ -13,7 +13,7 @@ const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; 
   creer: { color: '#0F766E', agent: 'camille', name: 'Camille', role: 'Lance votre livre et son sommaire' },
   ecrire: { color: '#1D4ED8', agent: 'victor', name: 'Victor', role: 'Rédige chapitre par chapitre' },
   habiller: { color: '#EC4899', agent: 'iris', name: 'Iris', role: 'Signe vos couvertures' },
-  kdp: { color: '#059669', agent: 'gaspard', name: 'Gaspard', role: 'Repère les niches Amazon' },
+  kdp: { color: '#4D7C5B', agent: 'gaspard', name: 'Gaspard', role: 'Repère les niches Amazon' },
   publier: { color: '#0891B2', agent: 'timothee', name: 'Timothée', role: 'Traduit et prépare la voix' },
   vendre: { color: '#CA8A04', agent: 'solene', name: 'Solène', role: 'Optimise votre fiche KDP' },
   livres: { color: '#9333EA', agent: 'prune', name: 'Prune', role: 'Crée les livres spéciaux' },
@@ -100,11 +100,11 @@ export default function V3MainTabs() {
             to="/v3"
             end
             className={({ isActive }) =>
-              `v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 ${isActive ? 'v3-btn-gold' : 'v3-btn-outline'}`
+              `v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 transition-colors hover:bg-[var(--v3-gold-soft)] ${isActive ? 'v3-btn-gold' : ''}`
             }
             style={({ isActive }) => ({
               padding: '8px 10px', gap: 6,
-              ...(isActive ? {} : { borderColor: 'var(--v3-gold)', color: 'var(--v3-emerald)' }),
+              ...(isActive ? {} : { border: '1px solid var(--v3-gold)', color: 'var(--v3-ink)' }),
             })}
           >
             <span aria-hidden className="text-[15px] hidden min-[1440px]:inline">🏠</span>
@@ -204,8 +204,8 @@ export default function V3MainTabs() {
         <div className="hidden xl:block shrink-0 pl-2 ml-1" style={{ borderLeft: '1px solid var(--v3-line)' }}>
           <Link
             to="/v3/outils"
-            className="v3-btn v3-btn-primary h-9 rounded-full text-[12px] whitespace-nowrap"
-            style={{ padding: '8px 16px' }}
+            className="v3-btn h-9 rounded-full text-[12px] whitespace-nowrap font-semibold transition-colors hover:opacity-90"
+            style={{ padding: '8px 16px', background: '#1E2536', color: '#F8F5EE', border: '1px solid #1E2536' }}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
             Tous les outils
