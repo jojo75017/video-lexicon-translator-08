@@ -189,7 +189,7 @@ export default function V3MainTabs() {
                 >
                   <span
                     aria-hidden
-                    className="inline-block w-1.5 h-1.5 rounded-full shrink-0"
+                    className="hidden min-[1440px]:inline-block w-1.5 h-1.5 rounded-full shrink-0"
                     style={{ background: ROBOT_THEME[cat.key]?.color, boxShadow: `0 0 6px ${ROBOT_THEME[cat.key]?.color}` }}
                   />
                   <span>{cat.label}</span>
