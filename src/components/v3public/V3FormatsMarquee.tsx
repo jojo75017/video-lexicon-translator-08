@@ -14,11 +14,13 @@ const ROWS = Array.from({ length: ROW_COUNT }, (_, rowIndex) =>
 
 const SPEEDS = ['120s', '135s', '125s', '145s', '130s', '150s'];
 
-/** Pastille joviale : alternance orange / jaune soleil. */
-const pillStyle = (index: number) =>
-  index % 2
-    ? { border: '2px solid var(--v3-joy-yellow-soft)', color: 'var(--v3-joy-ink)' }
-    : { border: '2px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-ink)' };
+/** Pastilles aux couleurs des robots (mêmes teintes que le menu V3). */
+const ROBOT_COLORS = ['#0F766E', '#1D4ED8', '#EC4899', '#4D7C5B', '#0891B2', '#CA8A04', '#9333EA', '#D97706'];
+const pillStyle = (index: number) => ({
+  background: ROBOT_COLORS[index % ROBOT_COLORS.length],
+  color: '#ffffff',
+  border: `2px solid ${ROBOT_COLORS[index % ROBOT_COLORS.length]}`,
+});
 
 export default function V3FormatsMarquee() {
   return (
