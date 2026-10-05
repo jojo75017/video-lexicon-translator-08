@@ -41,6 +41,7 @@ import useV3Open from '@/hooks/useV3Open';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
 import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
+import V3PublicLayout from './components/v3public/V3PublicLayout';
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -104,7 +105,6 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
-const V3PublicLayout = lazy(() => import('./components/v3public/V3PublicLayout'));
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const EbookLongFormOfferPage = lazy(() => import('./pages/v3public/EbookLongFormOfferPage'));
 const StudioMicroSeriesOfferPage = lazy(() => import('./pages/v3public/StudioMicroSeriesOfferPage'));
