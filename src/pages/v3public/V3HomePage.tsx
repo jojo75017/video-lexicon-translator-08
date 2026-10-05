@@ -113,6 +113,9 @@ export default function V3HomePage() {
       {/* POINT DE DÉPART ABONNÉ — accès direct au choix des spécialistes */}
       {!user && <V3StartHereHomeBanner />}
 
+      {/* Le parcours public conserve ses offres aux emplacements historiques. */}
+      {!user && <V3MicroSeriesSurpriseBanner />}
+
       {/* PREUVE AUTEUR — livres publiés + nom d'auteur, avant les offres */}
       <section className="v3-shell py-8">
         <div
@@ -174,6 +177,23 @@ export default function V3HomePage() {
         </div>
       </section>
 
+      {!user && <V3PricingOverview />}
+
+      {!user && (
+        <>
+          <section className="v3-shell">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
+              Les nouveautés
+            </div>
+            <h2 className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
+              Deux ateliers qui viennent d’ouvrir
+            </h2>
+          </section>
+          <V3CoverStudioBanner />
+          <BdComicNewsBanner />
+        </>
+      )}
+
       {/* 6. CE QUI A CHANGÉ + MOTEURS IA */}
       <V3WhatsNewPanel />
       <V3EngineStrip />
@@ -211,7 +231,7 @@ export default function V3HomePage() {
           {!user && <V3GuaranteePanel />}
 
           {/* OUTILS VEDETTES */}
-          <section className="v3-shell">
+          <section id="v3-outils-coeur" className="v3-shell scroll-mt-24">
             <div className="rounded-3xl p-8" style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}>
               <div className="mb-8 text-center">
                 <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
@@ -249,6 +269,8 @@ export default function V3HomePage() {
               </div>
             </div>
           </section>
+
+          {!user && <V3UpsellRotator />}
 
           {/* Tous les compléments payants sont regroupés après les blocs utiles. */}
           {user && (
