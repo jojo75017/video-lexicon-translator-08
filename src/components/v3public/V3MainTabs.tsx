@@ -99,12 +99,15 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3"
             end
-            className={({ isActive }) =>
-              `v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 transition-colors hover:bg-[var(--v3-gold-soft)] ${isActive ? 'v3-btn-gold' : ''}`
-            }
+            className="v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 transition-transform"
             style={({ isActive }) => ({
               padding: '8px 10px', gap: 6,
-              ...(isActive ? {} : { border: '1px solid var(--v3-gold)', color: 'var(--v3-ink)' }),
+              background: '#1D4ED8',
+              color: '#ffffff',
+              border: '1px solid #1e40af',
+              fontWeight: 700,
+              textShadow: 'none',
+              ...(isActive ? { boxShadow: '0 0 0 2px rgba(29,78,216,0.35)' } : {}),
             })}
           >
             <span aria-hidden className="text-[15px] hidden min-[1440px]:inline">🏠</span>
@@ -113,12 +116,12 @@ export default function V3MainTabs() {
           <NavLink
             to="/v3/offre"
             className={({ isActive }) =>
-              `v3-btn h-9 rounded-full text-[12px] shrink-0 ${isActive ? 'v3-btn-gold' : ''}`
+              `v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform ${isActive ? 'ring-2 ring-offset-1' : ''}`
             }
             style={{
-              background: 'linear-gradient(135deg,#FF9E2D 0%,#fbbf24 100%)',
-              color: '#1f2937',
-              border: '1px solid #f59e0b',
+              background: '#ffffff',
+              color: '#1e3a8a',
+              border: '1px solid #94a3b8',
               fontWeight: 700,
               textShadow: 'none',
               padding: '8px 10px',
@@ -138,20 +141,26 @@ export default function V3MainTabs() {
                   }
                 : undefined
             }
-            className="v3-btn h-9 rounded-full text-[12px] shrink-0"
+            className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
             style={({ isActive }) => ({
-              background: isActive ? 'var(--v3-gold)' : 'var(--v3-gold-soft)',
-              color: 'var(--v3-emerald)',
-              border: '1px solid var(--v3-gold)',
+              background: '#DC2626',
+              color: '#ffffff',
+              border: '1px solid #b91c1c',
               fontWeight: 700,
               textShadow: 'none',
               padding: '8px 10px',
               gap: 6,
+              ...(isActive ? { boxShadow: '0 0 0 2px rgba(220,38,38,0.35)' } : {}),
             })}
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>UPSELLS</span>
-            <span className="v3-badge hidden min-[1440px]:inline">6</span>
+            <span
+              className="hidden min-[1440px]:inline text-[10px] font-bold rounded-full px-1.5 py-0.5"
+              style={{ background: '#ffffff', color: '#b91c1c' }}
+            >
+              6
+            </span>
           </NavLink>
 
 
@@ -315,7 +324,8 @@ export default function V3MainTabs() {
               to="/v3"
               end
               onClick={() => setMobileOpen(false)}
-              className="v3-btn v3-btn-gold h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              style={{ background: '#1D4ED8', color: '#ffffff', border: '1px solid #1e40af', fontWeight: 700, textShadow: 'none' }}
             >
               <span aria-hidden className="text-[15px]">🏠</span> Accueil
             </NavLink>
@@ -324,9 +334,9 @@ export default function V3MainTabs() {
               onClick={() => setMobileOpen(false)}
               className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
-                background: 'linear-gradient(135deg,#FF9E2D,#fbbf24)',
-                color: '#1f2937',
-                border: '1px solid #f59e0b',
+                background: '#ffffff',
+                color: '#1e3a8a',
+                border: '1px solid #94a3b8',
                 fontWeight: 700,
                 textShadow: 'none',
               }}
@@ -338,9 +348,9 @@ export default function V3MainTabs() {
               onClick={() => setMobileOpen(false)}
               className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
-                background: 'var(--v3-gold-soft)',
-                color: 'var(--v3-emerald)',
-                border: '1px solid var(--v3-gold)',
+                background: '#DC2626',
+                color: '#ffffff',
+                border: '1px solid #b91c1c',
                 fontWeight: 700,
                 textShadow: 'none',
               }}
