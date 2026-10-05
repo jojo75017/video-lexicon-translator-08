@@ -395,7 +395,7 @@ export default function V3Sidebar() {
                               <span
                                 aria-hidden
                                 className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r"
-                                style={{ background: 'var(--v3-gold)' }}
+                                style={{ background: secColor }}
                               />
                             )}
                             <Icon className="w-4 h-4 shrink-0" />
