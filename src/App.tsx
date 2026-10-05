@@ -44,6 +44,14 @@ import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
 import V3PublicLayout from './components/v3public/V3PublicLayout';
 
+/** Redirection externe (hors routeur) sans flash : remplace l'entrée d'historique. */
+function ExternalRedirect({ url }: { url: string }) {
+  useEffect(() => {
+    window.location.replace(url);
+  }, [url]);
+  return <PageLoader />;
+}
+
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
 const EbookPlannerPage = lazy(() => import('./pages/EbookPlannerPage'));
