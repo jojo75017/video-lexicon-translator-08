@@ -189,9 +189,6 @@ export default function V3HomePage() {
       <V3PricingOverview />
 
 
-      {/* 3. VIDÉO DE PRÉSENTATION */}
-      <V3PresentationVideo />
-
       {/* 4. LES DEUX NOUVEAUTÉS — couvertures puis Studio BD & Jeunesse */}
       <section className="v3-shell">
         <div className="text-[10px] font-semibold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-joy-orange-600)' }}>
