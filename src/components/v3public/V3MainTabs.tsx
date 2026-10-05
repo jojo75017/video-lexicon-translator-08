@@ -163,7 +163,7 @@ export default function V3MainTabs() {
                   }}
                   data-active={active ? 'true' : 'false'}
                   className="v3-btn v3-btn-outline flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap"
-                  style={{ padding: window.innerWidth < 1440 ? '8px 7px' : '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
+                  style={{ padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px', color: active ? 'var(--v3-emerald)' : 'var(--v3-ink)', borderColor: active ? 'var(--v3-gold)' : 'var(--v3-line)' }}
                 >
                   <span aria-hidden className="text-[15px] hidden min-[1700px]:inline">{cat.emoji}</span>
                   <span>{cat.label}</span>
