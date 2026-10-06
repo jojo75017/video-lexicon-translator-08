@@ -1,4 +1,5 @@
 # Architecture
+- Wrap layout templates transform existing text elements locally and preview through the export renderer, preserving content, private images, image adjustments and KDP geometry.
 
 - Full-wrap illustrations use an optional persisted imageCoverage field and the same placement calculation in previews and exports, preserving legacy front-only covers.
 

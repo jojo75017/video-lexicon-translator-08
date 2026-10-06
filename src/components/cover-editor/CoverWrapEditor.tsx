@@ -39,6 +39,8 @@ import {
 
 import { Button } from '@/components/ui/button';
 import IllustrationGeneratorPanel from './IllustrationGeneratorPanel';
+import WrapTemplateGallery from './WrapTemplateGallery';
+import { applyWrapTemplate } from '@/lib/cover-editor/wrapTemplates';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -658,6 +660,17 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           </Button>
         </div>
       </div>
+
+      <WrapTemplateGallery
+        composition={composition}
+        geometry={geometry}
+        imageUrl={bgUrl}
+        onApply={(template) => {
+          commit((prev) => applyWrapTemplate(prev, geometry, template));
+          setSelectedId(null);
+          toast.success(`Modèle « ${template.label} » appliqué.`);
+        }}
+      />
 
       <div className="grid gap-4 xl:grid-cols-[1fr_340px]">
         {/* canevas complet */}
