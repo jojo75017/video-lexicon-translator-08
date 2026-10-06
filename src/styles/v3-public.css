@@ -467,35 +467,36 @@
 }
 
 /* ============================================================
-   Boutons lisibles partout : fond orange, texte blanc
+   Boutons lisibles partout : fond bleu robot, texte blanc
+   (harmonisé avec les onglets « Écrire » bleu #1D4ED8)
    ============================================================ */
-.v3pub button:not(:disabled):not([data-v3-nav] *),
-.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *),
-.v3pub a.v3-btn:not([data-v3-nav] *),
-.v3pub .v3-btn:not([data-v3-nav] *),
-.v3pub .v3-btn-primary:not([data-v3-nav] *),
-.v3pub .v3-btn-gold:not([data-v3-nav] *),
-.v3pub .v3-btn-action-orange:not([data-v3-nav] *),
-.v3pub .v3-btn-outline:not([data-v3-nav] *),
-.v3pub .v3-btn-ghost:not([data-v3-nav] *),
-.v3pub .v3-btn-on-dark:not([data-v3-nav] *) {
-  background: #6a9e7d !important;
+.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub a.v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn-primary:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn-gold:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn-action-orange:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn-outline:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn-ghost:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
+.v3pub .v3-btn-on-dark:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn) {
+  background: #1D4ED8 !important;
   color: #ffffff !important;
-  border-color: #6a9e7d !important;
+  border-color: #1D4ED8 !important;
 }
-.v3pub button:not(:disabled):not([data-v3-nav] *):hover,
-.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):hover,
-.v3pub a.v3-btn:not([data-v3-nav] *):hover,
-.v3pub .v3-btn:not([data-v3-nav] *):hover,
-.v3pub .v3-btn-primary:not([data-v3-nav] *):hover,
-.v3pub .v3-btn-gold:not([data-v3-nav] *):hover,
-.v3pub .v3-btn-action-orange:not([data-v3-nav] *):hover,
-.v3pub .v3-btn-outline:not([data-v3-nav] *):hover,
-.v3pub .v3-btn-ghost:not([data-v3-nav] *):hover,
-.v3pub .v3-btn-on-dark:not([data-v3-nav] *):hover {
-  background: #e9a46f !important;
+.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub a.v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn-primary:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn-gold:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn-action-orange:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn-outline:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn-ghost:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
+.v3pub .v3-btn-on-dark:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover {
+  background: #1e40af !important;
   color: #ffffff !important;
-  border-color: #e9a46f !important;
+  border-color: #1e40af !important;
 }
 /* Exception : boutons « Jovial Premium Gold » de l'accueil (héro, Commencez ici). */
 .v3pub button.v3-joy-cta:not(:disabled),
