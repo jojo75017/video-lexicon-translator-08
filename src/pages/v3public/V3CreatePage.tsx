@@ -498,6 +498,14 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               )}
 
               <div className="mt-4 flex flex-wrap justify-center gap-2">
+                <Link
+                  to="/v3/create?ecrire=1"
+                  onClick={() => { setShowWizard(true); setDesk(3); }}
+                  className="v3-btn text-xs"
+                  style={{ background: '#1D4ED8', color: '#ffffff', border: '1px solid #1e40af', fontWeight: 700 }}
+                >
+                  <Sparkles className="w-3.5 h-3.5" /> Écrire un livre
+                </Link>
                 <Link to="/v3/create" onClick={() => startFreshStory('book')} className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
                   <BookOpen className="w-3.5 h-3.5" /> Je raconte un livre
                 </Link>

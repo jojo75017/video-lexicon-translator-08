@@ -197,11 +197,15 @@ export default function V3MainTabs() {
                     };
                   })()}
                 >
-                  <span
-                    aria-hidden
-                    className="hidden min-[1440px]:inline-block w-1.5 h-1.5 rounded-full shrink-0"
-                    style={{ background: '#ffffff', boxShadow: '0 0 6px rgba(255,255,255,0.8)' }}
-                  />
+                  {ROBOT_THEME[cat.key] && (
+                    <span
+                      aria-hidden
+                      className="inline-block w-6 h-6 -ml-1 rounded-full overflow-hidden shrink-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover"
+                      style={{ boxShadow: '0 0 0 1.5px #ffffff' }}
+                    >
+                      <AgentPortrait id={ROBOT_THEME[cat.key].agent} name={ROBOT_THEME[cat.key].name} />
+                    </span>
+                  )}
                   <span>{cat.label}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-90" style={{ color: '#ffffff' }} />
                 </button>
