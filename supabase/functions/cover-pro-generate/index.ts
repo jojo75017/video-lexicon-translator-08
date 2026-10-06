@@ -74,14 +74,16 @@ const LIGHTING_DIRECTIONS: Record<string, string> = {
 };
 
 /** Construit le prompt : illustration éditoriale STRICTEMENT sans aucun texte. */
-function buildPrompt(b: Brief): string {
+function buildPrompt(b: Brief, panoramic = false): string {
   const direction =
     (b.artStyle && ART_DIRECTIONS[b.artStyle]) ?? ART_DIRECTIONS["illustration-editoriale"];
   const lighting =
     (b.lighting && LIGHTING_DIRECTIONS[b.lighting]) ?? LIGHTING_DIRECTIONS["bright"];
   const visual = (b.visualPrompt ?? "").trim();
   const lines = [
-    "Illustration de couverture de livre professionnelle destinée à une publication réelle (niveau best-seller Amazon KDP), cadrage portrait vertical, qualité maximale.",
+    panoramic
+      ? "Illustration panoramique horizontale professionnelle pour une couverture de livre ouverte à plat : quatrième à gauche, tranche au centre et première à droite. UNE SEULE scène photographique continue jusqu'aux bords, jamais deux images, jamais un collage, aucun raccord ni séparation. Sujet principal et point focal dans la moitié DROITE, éléments secondaires du même décor à gauche ; aucun visage ni objet essentiel sur la tranche centrale. Pas de livre en perspective ni de mockup. Qualité de maison d'édition, composition spectaculaire et cohérente."
+      : "Illustration de couverture de livre professionnelle destinée à une publication réelle (niveau best-seller Amazon KDP), cadrage portrait vertical, qualité maximale.",
     visual
       ? `SUJET IMPOSÉ — l'image doit représenter exactement ceci, sans y ajouter d'autre sujet : ${visual}`
       : "",
@@ -139,13 +141,14 @@ Deno.serve(async (req) => {
     // Le projet doit appartenir à l'utilisateur (vérification serveur, pas seulement RLS).
     const { data: project } = await service
       .from("cover_projects")
-      .select("id,user_id,book_title")
+      .select("id,user_id,book_title,cover_type,fabric_json")
       .eq("id", projectId)
       .maybeSingle();
     if (!project || project.user_id !== user.id) {
       return json({ error: "Projet introuvable ou non autorisé." }, 403);
     }
 
+    const panoramic = project.cover_type !== 'ebook' && body?.imageCoverage !== 'front';
     const brief: Brief = {
       genre: body?.genre, summary: body?.summary, mood: body?.mood, scene: body?.scene,
       palette: body?.palette, style: body?.style, include: body?.include, avoid: body?.avoid,
@@ -182,7 +185,7 @@ Deno.serve(async (req) => {
         })) ?? undefined;
     }
 
-    const prompt = buildPrompt(brief);
+    const prompt = buildPrompt(brief, panoramic);
 
     // --- Choix du financement ---------------------------------------------
     const { data: creditRow } = await service
@@ -236,7 +239,7 @@ Deno.serve(async (req) => {
     const res = await fetch("https://api.openai.com/v1/images/generations", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ model: MODEL, prompt, size: SIZE, quality: QUALITY, n: 1 }),
+      body: JSON.stringify({ model: MODEL, prompt, size: panoramic ? "3072x2048" : SIZE, quality: QUALITY, n: 1 }),
     });
 
     if (!res.ok) {
@@ -277,7 +280,14 @@ Deno.serve(async (req) => {
       if (up2.error) throw new Error(`Enregistrement de la miniature impossible : ${up2.error.message}`);
     }
 
+    // Preserve the latest text edits if the editor saved during generation.
+    const { data: latest } = await service.from("cover_projects").select("fabric_json").eq("id", projectId).eq("user_id", user.id).single();
+    const currentComposition = latest?.fabric_json;
+    const compositionPatch = currentComposition?.documentType === 'paperback_wrap'
+      ? { fabric_json: { ...currentComposition, illustrationPath: imagePath, imageCoverage: panoramic ? 'wrap' : 'front', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false } }
+      : {};
     const { error: updErr } = await service.from("cover_projects").update({
+      ...compositionPatch,
       illustration_path: imagePath,
       thumbnail_path: thumbBytes ? thumbPath : null,
       ai_generated: true,
@@ -314,6 +324,7 @@ Deno.serve(async (req) => {
       width,
       height,
       illustrationPath: imagePath,
+      imageCoverage: panoramic ? 'wrap' : 'front',
       thumbnailPath: thumbBytes ? thumbPath : null,
       credits: {
         granted: after?.granted ?? 0,

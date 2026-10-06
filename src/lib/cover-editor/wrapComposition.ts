@@ -137,6 +137,14 @@ export function wrapImageFilter(composition: WrapComposition): string {
   return `brightness(${clampBrightness(composition.imageBrightness)}) contrast(${clampImageContrast(composition.imageContrast)}) saturate(${clampImageSaturation(composition.imageSaturation)})${warmthFilter}`;
 }
 
+/** Shared object-cover positioning for screen and print, without distortion. */
+export function wrapImagePlacement(composition: WrapComposition, targetWidth: number, targetHeight: number, sourceWidth: number, sourceHeight: number) {
+  const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight) * clampImageScale(composition.imageScale);
+  const width = sourceWidth * scale;
+  const height = sourceHeight * scale;
+  return { width, height, x: (targetWidth - width) / 2 + clampImageOffset(composition.imageOffsetX) * Math.max(0, width - targetWidth) / 2, y: (targetHeight - height) / 2 + clampImageOffset(composition.imageOffsetY) * Math.max(0, height - targetHeight) / 2 };
+}
+
 export const ROLE_LABEL_WRAP: Record<WrapRole, string> = {
   title: 'Titre',
   subtitle: 'Sous-titre',
