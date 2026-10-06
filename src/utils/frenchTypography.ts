@@ -35,13 +35,61 @@ export function isDialogueLine(rest: string): boolean {
  */
 export function restoreDialogueLayout(text: string): string {
   if (!text) return text || '';
-  return text
+  const laidOut = text
     // Numéro de chapitre soudé au titre
     .replace(/^(CHAPITRE\s+\d+)(?=[A-ZÀ-Ü«"])/gim, '$1\n')
     // Tiret cadratin collé après une ponctuation de fin de phrase : nouvelle réplique
     .replace(/([.!?…»:])[ \t\u00A0\u202F]*—[ \t\u00A0\u202F]*(?=[«"“…A-ZÀ-Ü])/g, '$1\n—\u00A0')
     // Tiret cadratin en début de ligne : espace insécable normalisée
     .replace(/^[ \t]*—[ \t\u00A0\u202F]*(?=\S)/gm, '—\u00A0');
+  return spaceGuillemets(repairBrokenParagraphs(laidOut));
+}
+
+/**
+ * Guillemets soudés au récit : « …le monde.« Vous » → « …le monde. « Vous »,
+ * « …dessus. »Claire » → « …dessus. » Claire ».
+ */
+export function spaceGuillemets(text: string): string {
+  if (!text) return text || '';
+  return text
+    .replace(/([^\s\n(\[{«'’*—])«/g, '$1 «')
+    .replace(/»(\*{1,3})(?=[\p{L}\d—«])/gu, '»$1 ')
+    .replace(/»(?=[\p{L}\d—«])/gu, '» ');
+}
+
+/**
+ * Recolle les paragraphes coupés au milieu d'une phrase :
+ *  - un paragraphe qui commence par une minuscule prolonge le précédent
+ *    (« ce matin ?\n\ndemanda-t-elle ») ;
+ *  - une réplique ouverte par « et coupée avant son » se poursuit dans le
+ *    paragraphe suivant quand celui-ci referme le guillemet.
+ */
+export function repairBrokenParagraphs(text: string): string {
+  if (!text || !text.includes('\n\n')) return text || '';
+  const paras = text.split(/\n[ \t]*\n/);
+  const out: string[] = [];
+  for (const raw of paras) {
+    const p = raw.trim();
+    if (!p) continue;
+    const prev = out[out.length - 1];
+    if (prev !== undefined) {
+      const startsLower = /^[a-zàâäéèêëîïôöùûüç]/.test(p);
+      const prevEndsSentence = /[.!?…»"”]\*{0,3}$/.test(prev);
+      const unclosedQuote = (prev.match(/«/g) || []).length > (prev.match(/»/g) || []).length;
+      const nextCloses = (p.match(/»/g) || []).length > (p.match(/«/g) || []).length;
+      // Coupure sans ponctuation finale, ou incise de dialogue (« ? demanda-t-elle »).
+      if (startsLower && (!prevEndsSentence || /[?!…]\*{0,3}$/.test(prev) || unclosedQuote)) {
+        out[out.length - 1] = `${prev} ${p}`;
+        continue;
+      }
+      if (unclosedQuote && nextCloses && !/^—/.test(p)) {
+        out[out.length - 1] = `${prev} ${p}`;
+        continue;
+      }
+    }
+    out.push(p);
+  }
+  return out.join('\n\n');
 }
 
 /**
@@ -148,7 +196,10 @@ export function applyFrenchTypography(text: string): string {
     // Corriger les espaces multiples
     .replace(/  +/g, ' ');
 
-  return result;
+  // Heures : « 23h12 » → « 23 h 12 » (espaces insécables, norme française)
+  result = result.replace(/\b([01]?\d|2[0-3])h([0-5]\d)\b/g, `$1${NBSP}h${NBSP}$2`);
+
+  return spaceGuillemets(result);
 }
 
 /**
