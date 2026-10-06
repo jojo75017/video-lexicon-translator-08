@@ -137,7 +137,9 @@ export default function V3MainTabs() {
               pathname === '/v3'
                 ? (e) => {
                     e.preventDefault();
-                    document.getElementById('v3-upsells')?.scrollIntoView({ behavior: 'smooth' });
+                    const el = document.getElementById('v3-upsells');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    else navigate('/v3/upsells');
                   }
                 : undefined
             }
