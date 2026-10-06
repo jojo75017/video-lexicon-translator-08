@@ -512,18 +512,18 @@
   color: #ffffff !important;
 }
 
-/* Exception : le bouton « Nouveau livre (remettre à zéro) » reste vert. */
+/* Exception : le bouton « Nouveau livre (remettre à zéro) » suit le bleu robot. */
 .v3pub button.v3-btn-reset-green:not(:disabled),
 .v3pub button.v3-btn-reset-green:not(:disabled):hover,
 .v3pub .v3-btn.v3-btn-reset-green,
 .v3pub .v3-btn.v3-btn-reset-green:not(:disabled):hover {
-  background: var(--v3-emerald, #2d3e33) !important;
+  background: #1D4ED8 !important;
   color: #ffffff !important;
-  border-color: var(--v3-emerald, #2d3e33) !important;
+  border-color: #1D4ED8 !important;
 }
-.v3pub button:not(:disabled):not([data-v3-nav] *) *,
-.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *) *,
-.v3pub .v3-btn:not([data-v3-nav] *) * {
+.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn) *,
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn) *,
+.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn) * {
   color: #ffffff !important;
 }
 .v3pub button:disabled,
