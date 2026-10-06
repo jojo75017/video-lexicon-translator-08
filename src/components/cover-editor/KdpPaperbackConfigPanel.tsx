@@ -6,7 +6,12 @@
  * aucun code-barres réel, aucun appel IA, aucun crédit.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Check, Info, Loader2, TriangleAlert } from 'lucide-react';
+import { Check, FileUp, Info, Loader2, TriangleAlert, Wand2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { Button } from '@/components/ui/button';
+import { detectFromFile, detectFromSavedBook, type DetectedDimensions } from '@/lib/cover-editor/bookDimensions';
+
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -117,6 +122,67 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
 
   const trimIsCustom = config.trimId === 'custom';
 
+  /* Reconnaissance automatique : titre du livre enregistré ou manuscrit importé. */
+  const [detecting, setDetecting] = useState(false);
+  const [detected, setDetected] = useState<DetectedDimensions | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const autoTried = useRef(false);
+
+  const applyDetected = useCallback(
+    (d: DetectedDimensions) => {
+      const trimOk = d.trimId && trimOptions.some((t) => t.id === d.trimId) ? d.trimId : undefined;
+      let pages = d.pageCount;
+      if (isHardcover) pages = Math.min(HARDCOVER_MAX_PAGES, Math.max(HARDCOVER_MIN_PAGES, pages));
+      patch(trimOk ? { pageCount: pages, trimId: trimOk } : { pageCount: pages });
+      setDetected(d);
+    },
+    [isHardcover, patch, trimOptions],
+  );
+
+  const detectFromTitle = useCallback(
+    async (silent: boolean) => {
+      const title = project.book_title || project.project_name.replace(/^Couverture\s*[—-]\s*/i, '');
+      setDetecting(true);
+      try {
+        const d = await detectFromSavedBook(title, config.trimId);
+        if (d) {
+          applyDetected(d);
+          if (!silent) toast.success(`Dimensions reconnues : ${d.pageCount} pages.`);
+        } else if (!silent) {
+          toast.info('Aucun livre rédigé trouvé avec ce titre : importez votre manuscrit (PDF ou Word).');
+        }
+      } catch {
+        if (!silent) toast.error('Reconnaissance impossible pour le moment.');
+      } finally {
+        setDetecting(false);
+      }
+    },
+    [applyDetected, config.trimId, project.book_title, project.project_name],
+  );
+
+  useEffect(() => {
+    if (autoTried.current) return;
+    autoTried.current = true;
+    const pc = project.page_count;
+    if (pc == null || pc === 120 || pc === 150) void detectFromTitle(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onManuscript = async (file?: File) => {
+    if (!file) return;
+    setDetecting(true);
+    try {
+      const d = await detectFromFile(file, config.trimId);
+      applyDetected(d);
+      toast.success(`Dimensions reconnues : ${d.pageCount} pages.`);
+    } catch {
+      toast.error('Ce fichier n’a pas pu être lu. Essayez un PDF ou un Word (.docx).');
+    } finally {
+      setDetecting(false);
+      if (fileRef.current) fileRef.current.value = '';
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-3">
@@ -132,6 +198,41 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
       </CardHeader>
 
       <CardContent className="space-y-6">
+        {/* Reconnaissance automatique des dimensions */}
+        <div className="rounded-lg border border-[#1D4ED8]/30 bg-[#1D4ED8]/5 p-3 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <Wand2 className="h-4 w-4 text-[#1D4ED8]" />
+            <span className="text-sm font-semibold text-foreground">Dimensions reconnues automatiquement</span>
+          </div>
+          {detected ? (
+            <p className="text-xs text-foreground">
+              {detected.pageCount} pages{detected.words ? ` (≈ ${detected.words.toLocaleString('fr-FR')} mots)` : ''} —
+              d’après le {detected.source}.{' '}
+              {detected.exact ? 'Nombre exact.' : 'Estimation : remplacez-la par le nombre définitif de votre PDF intérieur si besoin.'}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Le nombre de pages et le format sont repris de votre livre ou de votre manuscrit.
+            </p>
+          )}
+          <div className="flex flex-wrap gap-2">
+            <Button size="sm" variant="outline" disabled={detecting} onClick={() => void detectFromTitle(false)} className="gap-2">
+              {detecting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+              Reconnaître depuis mon livre
+            </Button>
+            <Button size="sm" variant="outline" disabled={detecting} onClick={() => fileRef.current?.click()} className="gap-2">
+              <FileUp className="h-4 w-4" /> Importer mon manuscrit (PDF, Word)
+            </Button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept=".pdf,.docx,.txt,.md"
+              className="hidden"
+              onChange={(e) => void onManuscript(e.target.files?.[0])}
+            />
+          </div>
+        </div>
+
         {/* Paramètres */}
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
