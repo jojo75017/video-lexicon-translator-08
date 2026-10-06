@@ -57,6 +57,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { listMyBooks } from '@/lib/cover-editor/myBooks';
 import {
   downloadExport,
   exportWrapFrontJpeg,
@@ -290,6 +291,37 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     },
     [commit],
   );
+
+  /** Recopie les vrais textes du livre enregistré, sans rien inventer. */
+  const loadBookTexts = useCallback(async () => {
+    const norm = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+    const books = await listMyBooks().catch(() => []);
+    const book = books.find((b) => norm(b.title) === norm(project.book_title ?? ''));
+    if (!book) {
+      toast.error('Aucun livre enregistré ne porte ce titre. Remplissez les textes à la main.');
+      return;
+    }
+    const values: Partial<Record<WrapRole, string>> = {
+      subtitle: book.subtitle,
+      author: book.author,
+      'spine-author': book.author,
+      'back-blurb': book.backCover || book.synopsis,
+      'back-about': book.authorBio,
+    };
+    commit((prev) => {
+      let elements = [...prev.elements];
+      (Object.keys(values) as WrapRole[]).forEach((role) => {
+        const text = (values[role] ?? '').trim();
+        if (!text) return;
+        const i = elements.findIndex((e) => e.role === role);
+        if (i >= 0) elements[i] = { ...elements[i], text };
+        else elements = [...elements, { ...defaultElement(role), text }];
+      });
+      return { ...prev, elements };
+    });
+    const found = [book.subtitle && 'sous-titre', book.author && 'auteur', (book.backCover || book.synopsis) && '4ᵉ de couverture'].filter(Boolean);
+    toast.success(found.length ? `Repris depuis votre livre : ${found.join(', ')}.` : 'Ce livre ne contient pas encore ces textes.');
+  }, [commit, project.book_title]);
 
   const lastProjectImage = useRef(project.illustration_path);
   // React only to a new project image, not to undo/redo of the composition.
@@ -960,6 +992,9 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               <p className="text-sm font-semibold text-foreground">
                 Textes · {ZONE_LABEL[activeZone]}
               </p>
+              <Button type="button" variant="outline" size="sm" className="h-auto min-h-9 w-full whitespace-normal" onClick={() => void loadBookTexts()}>
+                Récupérer les textes de mon livre (sous-titre, auteur, 4ᵉ de couverture)
+              </Button>
               {composition.elements
                 .filter((e) => e.zone === activeZone)
                 .map((el) => (
