@@ -537,12 +537,12 @@
   color: var(--v3-ink) !important;
   border-color: var(--v3-border) !important;
 }
-.v3pub button.v3-choice-pill:not(:disabled):hover { border-color: #15803D !important; color: #15803D !important; }
+.v3pub button.v3-choice-pill:not(:disabled):hover { border-color: #1D4ED8 !important; color: #1D4ED8 !important; }
 .v3pub button.v3-choice-pill.is-active:not(:disabled),
 .v3pub button.v3-choice-pill.is-active:not(:disabled):hover {
-  background: #15803D !important;
+  background: #1D4ED8 !important;
   color: #fff !important;
-  border-color: #15803D !important;
+  border-color: #1D4ED8 !important;
 }
 
 /* Palette vert sauge & orange : bandeaux clairs */
