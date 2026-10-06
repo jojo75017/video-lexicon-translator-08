@@ -2,7 +2,8 @@
 
 ## Illustration dans l’éditeur broché
 - [x] Remonter génération, import privé et aperçu avant les textes, sans modifier le circuit IA.
-- [ ] Vérifier l’ouverture de la génération et l’aperçu conservé après rechargement, sans génération payante.
+- [x] Vérifier la compilation : aucune erreur.
+- [ ] Vérifier l’ouverture de la génération et l’aperçu conservé après rechargement — contrôle bloqué par la redirection vers la connexion malgré une session de test renouvelée ; aucune génération consommée.
 
 ## Couverture complète
 - [x] Appliquer une première illustrée avec dos et quatrième sur fond uni au projet actuel et aux prochaines illustrations ; choix conservé après rechargement, contrôlé ordinateur/mobile.
