@@ -18,6 +18,7 @@ import {
   clampImageScale,
   clampOverlay,
   wrapImageFilter,
+  wrapImagePlacement,
   zoneBox,
   type WrapComposition,
 } from '@/lib/cover-editor/wrapComposition';
@@ -96,16 +97,12 @@ export async function renderWrapCanvas(
   }
 
   // 2. illustration sur la première + son fond perdu extérieur
-  const frontX = px(geometry.zones.front.xIn);
-  const frontW = px(geometry.trimWidthIn + geometry.bleedIn);
+  const frontX = composition.imageCoverage === 'wrap' ? 0 : px(geometry.zones.front.xIn);
+  const frontW = composition.imageCoverage === 'wrap' ? canvas.width : px(geometry.trimWidthIn + geometry.bleedIn);
   if (backgroundUrl) {
     try {
       const img = await loadImage(backgroundUrl);
-       const cover = Math.max(frontW / img.width, canvas.height / img.height) * clampImageScale(composition.imageScale);
-      const w = img.width * cover;
-      const h = img.height * cover;
-       const offsetX = clampImageOffset(composition.imageOffsetX) * Math.max(0, w - frontW) * 0.5;
-       const offsetY = clampImageOffset(composition.imageOffsetY) * Math.max(0, h - canvas.height) * 0.5;
+      const placement = wrapImagePlacement(composition, frontW, canvas.height, img.width, img.height);
       ctx.save();
       ctx.beginPath();
       ctx.rect(frontX, 0, frontW, canvas.height);
@@ -114,13 +111,13 @@ export async function renderWrapCanvas(
        if (composition.imageFlipX) {
          ctx.translate(frontX + frontW, 0);
          ctx.scale(-1, 1);
-         ctx.drawImage(img, (frontW - w) / 2 - offsetX, (canvas.height - h) / 2 + offsetY, w, h);
+         ctx.drawImage(img, frontW - placement.x - placement.width, placement.y, placement.width, placement.height);
        } else {
-         ctx.drawImage(img, frontX + (frontW - w) / 2 + offsetX, (canvas.height - h) / 2 + offsetY, w, h);
+         ctx.drawImage(img, frontX + placement.x, placement.y, placement.width, placement.height);
        }
       ctx.restore();
     } catch {
-      /* fond uni conservé */
+      throw new Error('Illustration inaccessible : téléchargement interrompu pour éviter une couverture incomplète.');
     }
   }
 

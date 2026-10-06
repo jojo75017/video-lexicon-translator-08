@@ -94,6 +94,7 @@ export interface WrapComposition {
   documentType: typeof WRAP_DOCUMENT_TYPE;
   /** Chemin privé stable du bucket `covers` — JAMAIS une URL. */
   illustrationPath: string | null;
+  imageCoverage?: 'front' | 'wrap';
   background: WrapBackground;
   elements: WrapTextElement[];
   /** Luminosité appliquée à l'illustration (1 = original), réversible. */
@@ -134,6 +135,14 @@ export function wrapImageFilter(composition: WrapComposition): string {
   const warmth = clampImageWarmth(composition.imageWarmth);
   const warmthFilter = warmth > 0 ? ` sepia(${(warmth / 60).toFixed(3)})` : warmth < 0 ? ` hue-rotate(${warmth}deg)` : '';
   return `brightness(${clampBrightness(composition.imageBrightness)}) contrast(${clampImageContrast(composition.imageContrast)}) saturate(${clampImageSaturation(composition.imageSaturation)})${warmthFilter}`;
+}
+
+/** Shared object-cover positioning for screen and print, without distortion. */
+export function wrapImagePlacement(composition: WrapComposition, targetWidth: number, targetHeight: number, sourceWidth: number, sourceHeight: number) {
+  const scale = Math.max(targetWidth / sourceWidth, targetHeight / sourceHeight) * clampImageScale(composition.imageScale);
+  const width = sourceWidth * scale;
+  const height = sourceHeight * scale;
+  return { width, height, x: (targetWidth - width) / 2 + clampImageOffset(composition.imageOffsetX) * Math.max(0, width - targetWidth) / 2, y: (targetHeight - height) / 2 + clampImageOffset(composition.imageOffsetY) * Math.max(0, height - targetHeight) / 2 };
 }
 
 export const ROLE_LABEL_WRAP: Record<WrapRole, string> = {
@@ -501,6 +510,7 @@ export function parseWrapComposition(
     version: WRAP_COMPOSITION_VERSION,
     documentType: WRAP_DOCUMENT_TYPE,
     illustrationPath,
+    imageCoverage: o.imageCoverage === 'wrap' ? 'wrap' : 'front',
     background,
     elements: elements.length ? elements : fresh.elements,
     imageBrightness: clampBrightness(o.imageBrightness),
@@ -526,6 +536,7 @@ export function serializeWrapComposition(
     illustrationPath:
       illustrationPath && !containsUrl(illustrationPath) ? illustrationPath : null,
     background: { ...composition.background },
+    imageCoverage: composition.imageCoverage === 'wrap' ? 'wrap' : 'front',
     elements: composition.elements.map((e) => ({
       ...e,
       text: containsUrl(e.text) ? '' : e.text,
@@ -766,7 +777,7 @@ export function computeWrapWarnings(
         : el.zone === 'back'
           ? composition.background.backColor
           : composition.background.fullColor;
-    if (!(el.zone === 'front' && composition.illustrationPath)) {
+    if (!(composition.illustrationPath && (el.zone === 'front' || composition.imageCoverage === 'wrap'))) {
       const ratio = contrastRatio(el.color, bg);
       if (ratio < 3) {
         warnings.push({
@@ -781,13 +792,13 @@ export function computeWrapWarnings(
 
   // Résolution de l'illustration pour la zone d'impression de la première.
   if (illustration && illustration.width > 0) {
-    const neededWidthIn = geometry.trimWidthIn + geometry.bleedIn;
-    const dpi = illustration.width / neededWidthIn;
+    const neededWidthIn = composition.imageCoverage === 'wrap' ? geometry.fullWidthIn : geometry.trimWidthIn + geometry.bleedIn;
+    const dpi = Math.min(illustration.width / neededWidthIn, illustration.height / geometry.fullHeightIn) / clampImageScale(composition.imageScale);
     if (dpi < 300) {
       warnings.push({
         id: 'illustration-dpi',
         level: 'warning',
-        message: `Illustration à ${Math.round(dpi)} DPI pour la première : KDP recommande 300 DPI.`,
+        message: `Illustration à ${Math.round(dpi)} DPI : KDP recommande 300 DPI.`,
       });
     }
   }

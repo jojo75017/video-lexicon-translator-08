@@ -63,6 +63,7 @@ interface Props {
   hasIllustration?: boolean;
   className?: string;
   size?: 'sm' | 'default';
+  fullWrap?: boolean;
 }
 
 interface BookOption {
@@ -82,6 +83,7 @@ export default function IllustrationGeneratorPanel({
   hasIllustration = false,
   className,
   size = 'default',
+  fullWrap = false,
 }: Props) {
   const { hasAccess, credits, key, loading, refresh } = useCoverProAccess();
   const [open, setOpen] = useState(false);
@@ -212,14 +214,6 @@ export default function IllustrationGeneratorPanel({
 
   /* ---- génération d'illustration(s) ------------------------------------- */
   const generate = async () => {
-    if (!visualPrompt.trim()) {
-      setError('Faites d’abord préparer la direction visuelle à partir du synopsis.');
-      return;
-    }
-    if (!directionConfirmed) {
-      setError('Confirmez que la direction visuelle correspond bien à votre livre.');
-      return;
-    }
     setBusy(true);
     setError(null);
     const created: Proposal[] = [];
@@ -229,6 +223,7 @@ export default function IllustrationGeneratorPanel({
         const { data, error: fnError } = await supabase.functions.invoke('cover-pro-generate', {
           body: {
             projectId,
+            imageCoverage: fullWrap ? 'wrap' : 'front',
             genre,
             mood,
             palette,
@@ -298,16 +293,15 @@ export default function IllustrationGeneratorPanel({
       <DialogTrigger asChild>
         <Button size={size} className={className}>
           <Sparkles className="mr-2 h-4 w-4" />
-          {hasIllustration ? 'Régénérer l’illustration' : 'Générer l’illustration'}
+          {fullWrap ? (hasIllustration ? 'Recréer la couverture panoramique' : 'Créer la couverture panoramique') : (hasIllustration ? 'Régénérer l’illustration' : 'Générer l’illustration')}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Illustration IA guidée (sans aucun texte)</DialogTitle>
+          <DialogTitle>{fullWrap ? 'Première, dos et quatrième — une seule illustration' : 'Illustration IA guidée (sans aucun texte)'}</DialogTitle>
           <DialogDescription>
-            L’image est générée en portrait haute résolution et enregistrée dans votre espace
-            privé. Vos titres restent des calques modifiables par-dessus.
+            {fullWrap ? 'Une scène continue : quatrième à gauche, dos au centre, première à droite. Le sujet principal reste sur la première, sans raccord visible.' : 'L’image est générée en portrait haute résolution.'} Enregistrée dans votre espace privé, sans texte intégré.
           </DialogDescription>
         </DialogHeader>
 
@@ -623,7 +617,7 @@ export default function IllustrationGeneratorPanel({
               <Button variant="ghost" onClick={() => setOpen(false)} disabled={busy}>
                 Fermer et continuer l’édition
               </Button>
-              <Button onClick={() => void generate()} disabled={busy || noFunding || !visualPrompt.trim() || !directionConfirmed}>
+              <Button onClick={() => void generate()} disabled={busy || loading || noFunding}>
                 {busy ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -633,7 +627,7 @@ export default function IllustrationGeneratorPanel({
                   <>
                     <Sparkles className="mr-2 h-4 w-4" />
                     <CheckCircle2 className="mr-2 h-4 w-4" />
-                    {count > 1 ? `Générer ${count} propositions validées` : 'Générer l’image validée'}
+                    {count > 1 ? `Générer ${count} propositions` : fullWrap ? 'Générer la couverture complète' : 'Générer l’illustration'}
                   </>
                 )}
               </Button>
