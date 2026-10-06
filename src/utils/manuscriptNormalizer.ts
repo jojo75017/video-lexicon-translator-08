@@ -67,7 +67,6 @@ function stripDecorations(rawTitle: string, bookTitle?: string): string {
  */
 export function stripLeadingHeading(content: string, num: number, title?: string): string {
   let text = String(content || '').replace(/^\s+/, '');
-  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const head = new RegExp(`^\\**\\s*(?:chapitre|chapter)\\s+0*${num}\\b\\s*[:.–—-]?\\s*`, 'i');
   const m = text.match(head);
   if (!m) return text;
@@ -81,7 +80,6 @@ export function stripLeadingHeading(content: string, num: number, title?: string
     if (nl >= 0 && nl <= 120) rest = rest.slice(nl);
     else return text;
   }
-  void esc;
   return rest.replace(/^[\s*:.–—-]+/, '').trimStart();
 }
 
