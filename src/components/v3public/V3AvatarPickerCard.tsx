@@ -130,7 +130,7 @@ export default function V3AvatarPickerCard({ category, value, onChange, personal
               key={avatar.id}
               type="button"
               onClick={() => applyAvatar(avatar)}
-              className="rounded-2xl border p-4 text-left transition"
+              className="v3-avatar-card rounded-2xl border p-4 text-left transition"
               style={{
                 borderColor: active ? 'var(--v3-orange-600)' : 'var(--v3-border)',
                 background: active ? 'var(--v3-orange-50)' : 'var(--v3-paper)',
