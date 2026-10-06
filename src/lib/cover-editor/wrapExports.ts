@@ -96,8 +96,8 @@ export async function renderWrapCanvas(
   }
 
   // 2. illustration sur la première + son fond perdu extérieur
-  const frontX = px(geometry.zones.front.xIn);
-  const frontW = px(geometry.trimWidthIn + geometry.bleedIn);
+  const frontX = composition.imageCoverage === 'wrap' ? 0 : px(geometry.zones.front.xIn);
+  const frontW = composition.imageCoverage === 'wrap' ? canvas.width : px(geometry.trimWidthIn + geometry.bleedIn);
   if (backgroundUrl) {
     try {
       const img = await loadImage(backgroundUrl);
