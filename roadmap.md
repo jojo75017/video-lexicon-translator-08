@@ -1,5 +1,9 @@
 # Roadmap
 
+## Illustration dans l’éditeur broché
+- [x] Remonter génération, import privé et aperçu avant les textes, sans modifier le circuit IA.
+- [ ] Vérifier l’ouverture de la génération et l’aperçu conservé après rechargement, sans génération payante.
+
 ## Couverture complète
 - [x] Appliquer une première illustrée avec dos et quatrième sur fond uni au projet actuel et aux prochaines illustrations ; choix conservé après rechargement, contrôlé ordinateur/mobile.
 - [x] Permettre une illustration panoramique continue première, dos et quatrième, génération/import visibles, aperçu et exports cohérents.

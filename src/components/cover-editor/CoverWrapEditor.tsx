@@ -911,6 +911,23 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
         {/* panneaux latéraux */}
         <div className="space-y-4">
+          <Card>
+            <CardContent className="space-y-3 p-4">
+              <p className="text-sm font-semibold text-foreground">Illustration de couverture</p>
+              <IllustrationGeneratorPanel projectId={project.id} hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { void importIllustration(event.target.files?.[0]); event.target.value = ''; }} />
+              <Button variant="outline" className="h-auto min-h-10 w-full gap-2 whitespace-normal" disabled={importing} onClick={() => fileRef.current?.click()}>
+                {importing ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Upload className="h-4 w-4 shrink-0" />} Importer une illustration
+              </Button>
+              <div className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-md border bg-muted/30" aria-label="Aperçu de l’illustration">
+                {bgUrl ? (
+                  <img src={bgUrl} alt="Illustration de la première de couverture" className="h-full w-full object-contain" />
+                ) : (
+                  <p className="px-3 text-center text-xs text-muted-foreground">Aucune illustration</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
           {/* textes de la zone, toujours visibles */}
           <Card>
             <CardContent className="space-y-3 p-4">
@@ -943,13 +960,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           {/* réglages de l'illustration */}
           <Card>
             <CardContent className="space-y-4 p-4">
-              <p className="text-sm font-semibold text-foreground">Illustration de couverture</p>
-              <IllustrationGeneratorPanel projectId={project.id} hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
-              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { void importIllustration(event.target.files?.[0]); event.target.value = ''; }} />
-              <Button variant="outline" className="w-full gap-2" disabled={importing} onClick={() => fileRef.current?.click()}>
-                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Importer une illustration
-              </Button>
-              {bgUrl && <img src={bgUrl} alt="Illustration complète de la couverture" className="max-h-36 w-full rounded-md object-contain" />}
               <Select value={composition.imageCoverage ?? 'front'} onValueChange={(value) => commit((prev) => ({ ...prev, imageCoverage: value === 'wrap' ? 'wrap' : 'front' }))}>
                 <SelectTrigger aria-label="Emplacement de l’illustration"><SelectValue /></SelectTrigger>
                 <SelectContent><SelectItem value="wrap">Première + dos + quatrième</SelectItem><SelectItem value="front">Première illustrée · dos et quatrième unis</SelectItem></SelectContent>
