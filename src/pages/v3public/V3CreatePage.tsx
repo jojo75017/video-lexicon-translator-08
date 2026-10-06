@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check, MessagesSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
