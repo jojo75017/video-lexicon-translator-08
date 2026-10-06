@@ -17,6 +17,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { BookOpen, CheckCircle2, Download, History, Loader2, Sparkles, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { listMyBooks } from '@/lib/cover-editor/myBooks';
 
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
