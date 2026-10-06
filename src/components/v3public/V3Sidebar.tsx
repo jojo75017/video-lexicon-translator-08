@@ -298,7 +298,7 @@ export default function V3Sidebar() {
         </div>
       )}
 
-      <nav className="p-2 space-y-2">
+      <nav className="p-2 space-y-2" data-v3-nav>
         {sections.map((group) => {
           const isOpen = collapsed || !!open[group.section];
           const secColor = SECTION_COLORS[group.section] ?? 'var(--v3-gold)';
