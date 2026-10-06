@@ -57,6 +57,7 @@ import {
 } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { listMyBooks } from '@/lib/cover-editor/myBooks';
 import {
   downloadExport,
   exportWrapFrontJpeg,
