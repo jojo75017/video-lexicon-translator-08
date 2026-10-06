@@ -26,10 +26,24 @@ interface AssistantChatProps {
  * qui ouvrent directement le bon onglet de la plateforme.
  */
 const AssistantChat = ({ variant = 'page', className }: AssistantChatProps) => {
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>(() => {
+    try {
+      const raw = localStorage.getItem('ebs_assistant_history_v1');
+      const parsed = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('ebs_assistant_history_v1', JSON.stringify(messages.slice(-60)));
+    } catch { /* stockage plein : on ignore */ }
+  }, [messages]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;

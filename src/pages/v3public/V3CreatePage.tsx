@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check } from 'lucide-react';
+import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check, MessagesSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
@@ -554,6 +554,32 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                   );
                 })}
               </div>
+
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
+                <span className="text-xs font-semibold" style={{ color: '#475569' }}>Besoin d’en parler d’abord ?</span>
+                {(
+                  [
+                    { key: 'assistant', to: '/assistant', robot: 'noemie', robotName: 'Noémie', label: 'Parler avec l’IA (assistant)', bg: '#0891B2', border: '#0E7490' },
+                    { key: 'byok', to: '/v3/discuter-ia', robot: 'iris', robotName: 'Iris', label: 'Parler avec ChatGPT ou Gemini', bg: '#DC2626', border: '#B91C1C' },
+                  ] as const
+                ).map((b) => (
+                  <Link
+                    key={b.key}
+                    to={b.to}
+                    className="inline-flex min-h-11 items-center gap-2.5 rounded-full px-4 text-sm transition hover:brightness-110"
+                    style={{ background: b.bg, border: `1.5px solid ${b.border}`, color: '#ffffff', boxShadow: '0 4px 14px -6px rgba(0,0,0,0.35)' }}
+                  >
+                    <span aria-hidden="true" className="h-7 w-7 shrink-0 overflow-hidden rounded-full" style={{ boxShadow: '0 0 0 2px rgba(255,255,255,0.75)' }}>
+                      <AgentPortrait id={b.robot} name={b.robotName} />
+                    </span>
+                    <span className="font-bold text-white">{b.label}</span>
+                    <MessagesSquare className="w-3.5 h-3.5" />
+                  </Link>
+                ))}
+              </div>
+              <p className="mt-2 text-center text-xs" style={{ color: '#64748B' }}>
+                Vos conversations sont gardées sur cet appareil : vous les retrouvez en revenant.
+              </p>
           </>
         </div>
         )}
