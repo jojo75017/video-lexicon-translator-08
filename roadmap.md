@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Couverture complète
-- [ ] Permettre une illustration panoramique continue première, dos et quatrième, génération/import visibles, aperçu et exports cohérents.
-- [ ] Vérifier les commandes et le rendu ordinateur/mobile sans publier.
+- [x] Permettre une illustration panoramique continue première, dos et quatrième, génération/import visibles, aperçu et exports cohérents.
+- [x] Vérifier les commandes et le rendu ordinateur/mobile sans publier.
+- [ ] Valider la qualité d’une génération panoramique réelle — nécessite une génération payante avec la clé du compte ; aucune génération consommée pendant les contrôles.
 
 - [x] Nettoyer l’accueil `/v3` des abonnés sans toucher au tunnel, au paiement ni aux visiteurs.
 - [x] Masquer la vidéo si sa source reste inaccessible et adapter son bouton aux livres existants.

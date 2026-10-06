@@ -382,7 +382,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
       let finalProject = updated;
       try {
         // Miniature de bibliothèque = PREMIÈRE uniquement, sans repères.
-        const blob = await renderWrapFrontThumbnail(composition, geometry, bgUrl);
+        const { blob } = await exportWrapFrontJpeg(composition, geometry, bgUrl);
         const path = await uploadCoverFile({ projectId: project.id, kind: 'thumbnail', blob });
         const withThumb = await updateCoverProject(project.id, { thumbnail_path: path });
         const oldPath = thumbPathRef.current;
@@ -1014,7 +1014,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                   onValueChange={([v]) => setOverlayOpacity(v)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Assombrit légèrement la première pour que le titre reste bien lisible.
+                  Assombrit légèrement l’illustration pour garder les textes lisibles.
                 </p>
               </div>
               <Button variant="outline" size="sm" className="w-full gap-1" onClick={resetImageLook}>
@@ -1072,8 +1072,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                 )}
               </div>
               <p className="text-xs text-muted-foreground">
-                L’illustration privée reste réservée à la première de couverture. Aucune image n’est
-                générée ici et aucun crédit n’est débité.
+                Les réglages de couleur et de retouche sont gratuits et réversibles.
               </p>
             </CardContent>
           </Card>
