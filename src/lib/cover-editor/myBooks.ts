@@ -53,7 +53,7 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
   const [ebooks, projects] = await Promise.all([
     supabase
       .from('ebook_projects')
-      .select('id, title, author_name, book_summary, kdp_description, kdp_categories, draft_state, updated_at')
+      .select('id, title, author_name, book_summary, kdp_description, kdp_categories, draft_state, back_cover_data, updated_at')
       .order('updated_at', { ascending: false })
       .limit(limit),
     supabase
@@ -80,6 +80,11 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
         clean(row.kdp_description) ||
         firstOf(brief, ['synopsis', 'hook', 'description', 'pitch', 'resume', 'summary']),
       genre: clean(row.kdp_categories) || firstOf(brief, ['genre', 'category', 'categorie']),
+      backCover: (() => {
+        const bc = ((row as Record<string, unknown>).back_cover_data ?? {}) as Record<string, unknown>;
+        return clean(bc.selectedText) || clean(bc.shortVersion) || clean(row.kdp_description) || clean(row.book_summary);
+      })(),
+      authorBio: clean((((row as Record<string, unknown>).back_cover_data ?? {}) as Record<string, unknown>).authorBio),
       updatedAt: clean(row.updated_at) || null,
     };
   });
