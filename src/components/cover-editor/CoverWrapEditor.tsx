@@ -921,11 +921,24 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               </Button>
               <div className="flex aspect-[4/3] w-full items-center justify-center overflow-hidden rounded-md border bg-muted/30" aria-label="Aperçu de l’illustration">
                 {bgUrl ? (
-                  <img src={bgUrl} alt="Illustration de la première de couverture" className="h-full w-full object-contain" />
+                  <img src={bgUrl} alt="Illustration de la première de couverture" className="h-full w-full object-contain" style={{ filter: wrapImageFilter(composition) }} />
                 ) : (
                   <p className="px-3 text-center text-xs text-muted-foreground">Aucune illustration</p>
                 )}
               </div>
+              {bgUrl && (
+                <div className="space-y-3 rounded-md border bg-muted/20 p-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Luminosité · {Math.round(clampBrightness(composition.imageBrightness) * 100)} %</Label>
+                    <Slider aria-label="Luminosité" min={0.6} max={1.6} step={0.02} value={[clampBrightness(composition.imageBrightness)]} onValueChange={([v]) => setImageBrightness(v)} />
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs">Contraste · {Math.round(clampImageContrast(composition.imageContrast) * 100)} %</Label>
+                    <Slider aria-label="Contraste" min={0.7} max={1.4} step={0.02} value={[clampImageContrast(composition.imageContrast)]} onValueChange={([v]) => commit((prev) => ({ ...prev, imageContrast: v }), false)} />
+                  </div>
+                  <Button variant="ghost" size="sm" className="w-full" onClick={() => commit((prev) => ({ ...prev, imageBrightness: 1, imageContrast: 1 }))}>Remettre à zéro</Button>
+                </div>
+              )}
             </CardContent>
           </Card>
           {/* textes de la zone, toujours visibles */}
