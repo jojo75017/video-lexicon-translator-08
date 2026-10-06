@@ -952,6 +952,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
             <div className="space-y-2 border-t border-border pt-3">
               <IllustrationGeneratorPanel
                 projectId={project.id}
+                bookTitle={project.book_title}
                 hasIllustration={Boolean(composition.illustrationPath ?? project.illustration_path)}
                 className="w-full gap-2"
                 onGenerated={(path) => {

@@ -64,6 +64,8 @@ interface Props {
   className?: string;
   size?: 'sm' | 'default';
   fullWrap?: boolean;
+  /** Titre du livre : sert à retrouver automatiquement le livre et sa description. */
+  bookTitle?: string | null;
 }
 
 interface BookOption {
@@ -84,6 +86,7 @@ export default function IllustrationGeneratorPanel({
   className,
   size = 'default',
   fullWrap = false,
+  bookTitle = null,
 }: Props) {
   const { hasAccess, credits, key, loading, refresh } = useCoverProAccess();
   const [open, setOpen] = useState(false);
@@ -110,6 +113,9 @@ export default function IllustrationGeneratorPanel({
   const [emotion, setEmotion] = useState('');
   const [symbol, setSymbol] = useState('');
   const [include, setInclude] = useState('');
+  /** Retouche : corrections à apporter à la prochaine version. */
+  const [retouch, setRetouch] = useState('');
+  const [autoBusy, setAutoBusy] = useState(false);
 
 
   const [books, setBooks] = useState<BookOption[]>([]);
@@ -129,12 +135,21 @@ export default function IllustrationGeneratorPanel({
       ...(projects.data ?? []).map((b) => ({ id: b.id as string, title: (b.title as string) || 'Sans titre', kind: 'book' as const })),
     ];
     setBooks(options);
+    return options;
   }, []);
 
   useEffect(() => {
     if (!open) return;
-    void loadBooks();
     const saved = window.localStorage.getItem(`cover-creative-brief:${projectId}`);
+    let hasSavedPrompt = false;
+    if (saved) { try { const b = JSON.parse(saved) as Record<string, string>; hasSavedPrompt = Boolean(b.visualPrompt?.trim() || b.summary?.trim()); } catch { /* ignoré */ } }
+    void loadBooks().then((options) => {
+      const norm = (t: string) => t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+      const match = bookTitle ? options.find((b) => norm(b.title) === norm(bookTitle)) : undefined;
+      if (match) setBookId(match.id);
+      // Remplissage automatique pour tous les livres : description + consigne visuelle.
+      if (!hasSavedPrompt && match) void autoFill(match);
+    });
     if (saved) {
       try {
         const brief = JSON.parse(saved) as Record<string, string>;
@@ -147,7 +162,8 @@ export default function IllustrationGeneratorPanel({
       } catch { /* ancienne donnée locale illisible : ignorée */ }
     }
     void listCoverIllustrationHistory(projectId).then((items) => setProposals(items));
-  }, [open, loadBooks, projectId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, loadBooks, projectId, bookTitle]);
 
   useEffect(() => {
     if (!open) return;
@@ -158,8 +174,8 @@ export default function IllustrationGeneratorPanel({
   }, [open, projectId, genre, mood, palette, avoid, summary, artStyle, lighting, visualPrompt, targetAudience, era, location, focalSubject, emotion, symbol, include]);
 
   /* ---- brief proposé par IA (aucun crédit image) ------------------------ */
-  const proposeBrief = async () => {
-    const selected = books.find((b) => b.id === bookId);
+  const proposeBrief = async (forced?: BookOption): Promise<Record<string, string> | null> => {
+    const selected = forced ?? books.find((b) => b.id === bookId);
     setBriefBusy(true);
     setError(null);
     try {
@@ -177,23 +193,26 @@ export default function IllustrationGeneratorPanel({
       if (brief.avoid) setAvoid(brief.avoid);
       const scene = [brief.scene, brief.style, brief.include].filter(Boolean).join(' — ');
       if (scene) setSummary(scene);
-      toast.success('Brief proposé : modifiez-le librement avant de générer.');
+      if (!forced) toast.success('Brief proposé : modifiez-le librement avant de générer.');
+      return { ...brief, summary: scene };
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Brief indisponible pour le moment.';
       setError(message);
       toast.error(message);
+      return null;
     } finally {
       setBriefBusy(false);
     }
   };
 
   /* ---- consigne visuelle depuis la description (aucun crédit image) ----- */
-  const proposeVisualPrompt = async () => {
+  const proposeVisualPrompt = async (override?: Record<string, string>) => {
     setVisualBusy(true);
     setError(null);
     try {
+      const base = { summary, genre, mood, palette, targetAudience, era, location, focalSubject, emotion, symbol, include, avoid };
       const { data, error: fnError } = await supabase.functions.invoke('cover-visual-prompt', {
-        body: { summary, genre, mood, palette, targetAudience, era, location, focalSubject, emotion, symbol, include, avoid },
+        body: override ? { ...base, ...override } : base,
       });
       if (fnError) throw fnError;
       if (data?.error) throw new Error(data.error);
@@ -209,6 +228,17 @@ export default function IllustrationGeneratorPanel({
       toast.error(message);
     } finally {
       setVisualBusy(false);
+    }
+  };
+
+  /** Lit le livre puis rédige la consigne visuelle, sans aucune génération d'image. */
+  const autoFill = async (book: BookOption) => {
+    setAutoBusy(true);
+    try {
+      const brief = await proposeBrief(book);
+      if (brief?.summary && brief.summary.trim().length >= 12) await proposeVisualPrompt(brief);
+    } finally {
+      setAutoBusy(false);
     }
   };
 
@@ -232,7 +262,8 @@ export default function IllustrationGeneratorPanel({
             summary,
             artStyle,
             lighting,
-            visualPrompt: visualPrompt.trim() || undefined,
+            visualPrompt: [visualPrompt.trim(), retouch.trim() ? `CORRECTIONS DEMANDÉES PAR L'AUTEUR (prioritaires) : ${retouch.trim()}` : '']
+              .filter(Boolean).join('\n\n') || undefined,
             targetAudience,
             era,
             location,
@@ -523,6 +554,14 @@ export default function IllustrationGeneratorPanel({
                 Si vous la laissez vide, elle est déduite automatiquement de votre description.
                 Cette étape ne consomme aucune génération.
               </p>
+              {autoBusy && (
+                <p className="flex items-center gap-2 text-xs text-primary"><Loader2 className="h-3 w-3 animate-spin" /> Lecture de votre livre et rédaction de la consigne…</p>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-retouch">Retoucher l’image (corrections pour la prochaine version)</Label>
+                <Textarea id="ill-retouch" rows={2} value={retouch} onChange={(e) => setRetouch(e.target.value)} placeholder="Ex. : plus lumineux, maison au centre, silhouette plus visible, ciel moins rouge…" />
+                <p className="text-xs text-muted-foreground">Vos anciennes versions restent disponibles ci-dessous en un clic.</p>
+              </div>
               <div className="flex items-start gap-2 rounded-md border border-primary/30 bg-primary/5 p-3">
                 <Checkbox id="ill-confirm-direction" checked={directionConfirmed} onCheckedChange={(value) => setDirectionConfirmed(value === true)} />
                 <Label htmlFor="ill-confirm-direction" className="cursor-pointer leading-5">

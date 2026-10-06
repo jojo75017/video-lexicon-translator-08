@@ -171,6 +171,7 @@ export default function CouvertureProjetPage() {
           <span id="etape-illustration" className="inline-flex">
           <IllustrationGeneratorPanel
             projectId={project.id}
+            bookTitle={project.book_title}
             size="sm"
             className="gap-2"
             hasIllustration={Boolean(project.illustration_path)}
