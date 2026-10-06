@@ -43,6 +43,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#0d7a5f',
     tagline: 'Le moteur d’écriture',
     links: [
+      { label: 'Écrire un livre', to: '/v3/create?ecrire=1', badge: 'Direct', desc: 'Ouvrez tout de suite la fiche du livre et lancez la rédaction' },
       { label: 'Ebook Planner V2 — 22 agents', to: '/ebook-planner', badge: 'Populaire', desc: 'Le pipeline P1–P15 éprouvé, en production' },
       { label: 'Parcours 30 agents', to: '/v3/hub?tab=parcours', badge: 'V3', desc: 'Le nouveau workflow enrichi' },
       { label: 'Corriger mon livre', to: '/v3/corriger', badge: 'Nouveau', desc: 'Importez un manuscrit terminé : correction intégrale chapitre par chapitre, relecture et export KDP' },
