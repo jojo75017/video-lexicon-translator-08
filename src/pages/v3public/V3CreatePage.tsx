@@ -7,6 +7,7 @@ import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
 import V3AmbiancePicker from '@/components/v3public/V3AmbiancePicker';
 import V3KeyHint from '@/components/v3public/V3KeyHint';
+import AgentPortrait from '@/components/v3public/AgentPortrait';
 import V3PipelinePanel from '@/components/v3public/V3PipelinePanel';
 
 import V3GenieDialog from '@/components/v3public/V3GenieDialog';
@@ -497,29 +498,61 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </p>
               )}
 
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Link
-                  to="/v3/create?ecrire=1"
-                  onClick={() => { setShowWizard(true); setDesk(3); }}
-                  className="v3-btn text-xs"
-                  style={{ background: '#1D4ED8', color: '#ffffff', border: '1px solid #1e40af', fontWeight: 700 }}
-                >
-                  <Sparkles className="w-3.5 h-3.5" /> Écrire un livre
-                </Link>
-                <Link to="/v3/create" onClick={() => startFreshStory('book')} className={`v3-btn text-xs ${biography ? 'v3-btn-outline' : 'v3-btn-primary'}`}>
-                  <BookOpen className="w-3.5 h-3.5" /> Je raconte un livre
-                </Link>
-                <Link to="/v3/biographie" onClick={() => startFreshStory('biography')} className={`v3-btn text-xs ${biography ? 'v3-btn-primary' : 'v3-btn-outline'}`}>
-                  <Sparkles className="w-3.5 h-3.5" /> Je raconte ma vie
-                </Link>
-                <button
-                  type="button"
-                  onClick={startExistingOutline}
-                  className="v3-btn v3-btn-action-orange min-h-12 px-6 text-sm font-bold"
-                >
-                  <BookOpen className="w-3.5 h-3.5" /> J’ai déjà mon sommaire
-
-                </button>
+              <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+                {(
+                  [
+                    {
+                      key: 'ecrire', to: '/v3/create?ecrire=1', onClick: () => { setShowWizard(true); setDesk(3); },
+                      robot: 'victor', robotName: 'Victor', label: 'Écrire un livre', icon: <Sparkles className="w-3.5 h-3.5" />,
+                      bg: '#1D4ED8', border: '#1e40af',
+                    },
+                    {
+                      key: 'raconter', to: '/v3/create', onClick: () => startFreshStory('book'),
+                      robot: 'camille', robotName: 'Camille', label: 'Je raconte un livre', icon: <BookOpen className="w-3.5 h-3.5" />,
+                      bg: '#0F766E', border: '#0B5D56',
+                    },
+                    {
+                      key: 'vie', to: '/v3/biographie', onClick: () => startFreshStory('biography'),
+                      robot: 'margaux', robotName: 'Margaux', label: 'Je raconte ma vie', icon: <Sparkles className="w-3.5 h-3.5" />,
+                      bg: '#9333EA', border: '#7E22CE',
+                    },
+                    {
+                      key: 'sommaire', to: undefined, onClick: startExistingOutline,
+                      robot: 'basile', robotName: 'Basile', label: 'J’ai déjà mon sommaire', icon: <BookOpen className="w-3.5 h-3.5" />,
+                      bg: '#D97706', border: '#B45309',
+                    },
+                  ] as const
+                ).map((b) => {
+                  const inner = (
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className="h-7 w-7 shrink-0 overflow-hidden rounded-full"
+                        style={{ boxShadow: '0 0 0 2px rgba(255,255,255,0.75)' }}
+                      >
+                        <AgentPortrait id={b.robot} name={b.robotName} />
+                      </span>
+                      <span className="font-bold text-white">{b.label}</span>
+                      {b.icon}
+                    </>
+                  );
+                  const style = {
+                    background: b.bg,
+                    border: `1.5px solid ${b.border}`,
+                    color: '#ffffff',
+                    boxShadow: '0 4px 14px -6px rgba(0,0,0,0.35)',
+                  } as const;
+                  const cls = 'inline-flex min-h-12 items-center gap-2.5 rounded-full px-5 text-sm transition hover:brightness-110';
+                  return b.to ? (
+                    <Link key={b.key} to={b.to} onClick={b.onClick} className={cls} style={style}>
+                      {inner}
+                    </Link>
+                  ) : (
+                    <button key={b.key} type="button" onClick={b.onClick} className={cls} style={style}>
+                      {inner}
+                    </button>
+                  );
+                })}
               </div>
           </>
         </div>
