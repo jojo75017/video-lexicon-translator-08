@@ -18,6 +18,7 @@ export function applyWrapTemplate(composition: WrapComposition, geometry: KdpPap
     elements: composition.elements.map((element) => {
       if (element.zone === 'spine') return { ...element, fontFamily: template.font };
       if (element.zone === 'back') return { ...element, fontFamily: template.font, align: template.align };
+      if (!['title', 'subtitle', 'author'].includes(element.role)) return element;
       const isTitle = element.role === 'title';
       const fontPt = isTitle
         ? Math.min(template.titlePt, element.text.length > 55 ? 28 : element.text.length > 35 ? 34 : template.titlePt)

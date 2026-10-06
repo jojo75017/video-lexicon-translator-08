@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Cinq modèles brochés
-- [ ] Ajouter cinq mises en page avec aperçus de la couverture actuelle, application et annulation sans génération IA.
-- [ ] Vérifier le rendu et la conservation des textes, de l’image et des réglages.
+- [x] Ajouter cinq mises en page avec aperçus de la couverture actuelle, application et annulation sans génération IA.
+- [x] Vérifier les cinq aperçus et sélections dans une vue isolée sur ordinateur/mobile ; textes, image, réglages et payload conservés, aucune erreur.
+- [ ] Vérifier l’enregistrement/rechargement dans le compte abonné — accès à l’éditeur connecté bloqué par la redirection vers la connexion.
 
 ## Illustration dans l’éditeur broché
 - [x] Remonter génération, import privé et aperçu avant les textes, sans modifier le circuit IA.
