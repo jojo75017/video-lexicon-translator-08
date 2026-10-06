@@ -8,6 +8,8 @@
  *  - aucun titre répété avec un suffixe « 2 » ni collé au titre du livre.
  */
 
+import { ensureCompleteEnding, restoreDialogueLayout } from './frenchTypography';
+
 export interface NormalizedChapter {
   number: number;
   title: string;
@@ -122,7 +124,8 @@ export function normalizeManuscript(
     if (title && usedTitles.has(key)) title = '';
     if (title) usedTitles.add(key);
 
-    const content = entry?.content || '';
+    // Dialogues détachés + dernière phrase complète (aucun mot après le point final).
+    const content = entry?.content ? ensureCompleteEnding(restoreDialogueLayout(entry.content)) : '';
     const incomplete = content.length === 0;
 
     out.push({

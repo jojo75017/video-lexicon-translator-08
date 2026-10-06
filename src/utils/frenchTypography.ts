@@ -39,9 +39,27 @@ export function restoreDialogueLayout(text: string): string {
     // Numéro de chapitre soudé au titre
     .replace(/^(CHAPITRE\s+\d+)(?=[A-ZÀ-Ü«"])/gim, '$1\n')
     // Tiret cadratin collé après une ponctuation de fin de phrase : nouvelle réplique
-    .replace(/([.!?…»])[ \t\u00A0\u202F]*—[ \t\u00A0\u202F]*(?=[«"“…A-ZÀ-Ü])/g, '$1\n—\u00A0')
+    .replace(/([.!?…»:])[ \t\u00A0\u202F]*—[ \t\u00A0\u202F]*(?=[«"“…A-ZÀ-Ü])/g, '$1\n—\u00A0')
     // Tiret cadratin en début de ligne : espace insécable normalisée
     .replace(/^[ \t]*—[ \t\u00A0\u202F]*(?=\S)/gm, '—\u00A0');
+}
+
+/**
+ * Un chapitre doit se terminer par une phrase complète : si le texte est coupé
+ * en plein mot (génération interrompue), on retire la phrase inachevée pour
+ * finir sur le dernier point (ou « ! », « ? », « … », éventuellement suivi de « »).
+ */
+export function ensureCompleteEnding(text: string): string {
+  if (!text) return text || '';
+  const t = text.replace(/[\s\\*_#`|-]+$/u, '');
+  if (/[.!?…][\u00A0\u202F\s]*[»"”]?$/.test(t)) return t;
+  const re = /[.!?…](?:[\u00A0\u202F\s]*[»"”])?(?=\s)/g;
+  let last = -1;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(t))) last = m.index + m[0].length;
+  // Ne coupe jamais plus d'un tiers du chapitre
+  if (last < 0 || last < t.length * 0.66) return t;
+  return t.slice(0, last).trimEnd();
 }
 
 /** Reconvertit en puces les faux tirets de dialogue d'un texte déjà généré. */
