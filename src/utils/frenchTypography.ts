@@ -196,7 +196,10 @@ export function applyFrenchTypography(text: string): string {
     // Corriger les espaces multiples
     .replace(/  +/g, ' ');
 
-  return result;
+  // Heures : « 23h12 » → « 23 h 12 » (espaces insécables, norme française)
+  result = result.replace(/\b([01]?\d|2[0-3])h([0-5]\d)\b/g, `$1${NBSP}h${NBSP}$2`);
+
+  return spaceGuillemets(result);
 }
 
 /**
