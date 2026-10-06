@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown, LayoutGrid, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
 import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
@@ -30,6 +30,7 @@ export default function V3MainTabs() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const closeTimer = useRef<number | null>(null);
   const { pathname, search } = useLocation();
+  const navigate = useNavigate();
   const { open: v3Open } = useV3Open();
   const { isAdmin } = useIsAdmin();
   // Avant l'ouverture, un visiteur (non admin) contemple la V3 sans pouvoir

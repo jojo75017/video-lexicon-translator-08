@@ -74,7 +74,7 @@ export async function grantV3SubscriptionAccess(
     {
       email: clean,
       access_code: code,
-      status: info?.lifetime ? "lifetime" : "active",
+      status: "active",
       plan_type: info?.lifetime ? "lifetime" : "subscription",
       plan_tier: info?.plan ?? "plume",
       expires_at: null,

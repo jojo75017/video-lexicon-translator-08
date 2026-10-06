@@ -577,3 +577,7 @@
    (La règle globale « p, span, li » d'index.css les repeignait en #333 par-dessus le blanc.) */
 .v3pub [data-v3-nav] nav .v3-btn span,
 .v3pub [data-v3-nav] nav .v3-btn span:hover { color: inherit; }
+
+/* Sections "dark" devenues claires : forcer un texte lisible sur les classes primary-foreground */
+.v3pub .v3-section-dark [class*='text-primary-foreground'] { color: #2f4a3a !important; }
+.dark .v3pub .v3-section-dark [class*='text-primary-foreground'] { color: var(--v3-ink) !important; }
