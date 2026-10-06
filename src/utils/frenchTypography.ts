@@ -21,11 +21,27 @@ export function isDialogueLine(rest: string): boolean {
   if (/[:;]$/.test(t)) return false;
   // Une réplique se termine par une ponctuation de phrase
   if (!/[.!?…»"]$/.test(t)) return false;
-  // Trop courte pour être une réplique crédible
-  if (t.split(/\s+/).filter(Boolean).length < 3) return false;
-  // Commence par une majuscule, un guillemet ou des points de suspension
+  // Commence par une majuscule, un guillemet ou des points de suspension.
+  // Les répliques courtes (« — Oui. », « — Non ! ») restent des dialogues.
   if (!/^[«"“…A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ]/.test(t)) return false;
   return true;
+}
+
+/**
+ * Rétablit la mise en page d'un roman dont les dialogues sont collés au récit
+ * (« Cette nuit ?— Le temps… ») ou dont le titre est soudé au numéro
+ * (« CHAPITRE 1L'APPEL »). Chaque réplique repart sur sa propre ligne avec un
+ * tiret cadratin suivi d'une espace insécable.
+ */
+export function restoreDialogueLayout(text: string): string {
+  if (!text) return text || '';
+  return text
+    // Numéro de chapitre soudé au titre
+    .replace(/^(CHAPITRE\s+\d+)(?=[A-ZÀ-Ü«"])/gim, '$1\n')
+    // Tiret cadratin collé après une ponctuation de fin de phrase : nouvelle réplique
+    .replace(/([.!?…»])[ \t\u00A0\u202F]*—[ \t\u00A0\u202F]*(?=[«"“…A-ZÀ-Ü])/g, '$1\n—\u00A0')
+    // Tiret cadratin en début de ligne : espace insécable normalisée
+    .replace(/^[ \t]*—[ \t\u00A0\u202F]*(?=\S)/gm, '—\u00A0');
 }
 
 /** Reconvertit en puces les faux tirets de dialogue d'un texte déjà généré. */
@@ -41,6 +57,8 @@ export function dashesToBullets(text: string): string {
  */
 
 export function applyFrenchTypography(text: string): string {
+  if (!text || typeof text !== 'string') return text || '';
+  text = restoreDialogueLayout(text);
   if (!text || typeof text !== 'string') return text || '';
 
   let result = text
