@@ -44,6 +44,24 @@ export function restoreDialogueLayout(text: string): string {
     .replace(/^[ \t]*—[ \t\u00A0\u202F]*(?=\S)/gm, '—\u00A0');
 }
 
+/**
+ * Un chapitre doit se terminer par une phrase complète : si le texte est coupé
+ * en plein mot (génération interrompue), on retire la phrase inachevée pour
+ * finir sur le dernier point (ou « ! », « ? », « … », éventuellement suivi de « »).
+ */
+export function ensureCompleteEnding(text: string): string {
+  if (!text) return text || '';
+  const t = text.replace(/[\s\\*_#`|-]+$/u, '');
+  if (/[.!?…][\u00A0\u202F\s]*[»"”]?$/.test(t)) return t;
+  const re = /[.!?…](?:[\u00A0\u202F\s]*[»"”])?(?=\s)/g;
+  let last = -1;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(t))) last = m.index + m[0].length;
+  // Ne coupe jamais plus d'un tiers du chapitre
+  if (last < 0 || last < t.length * 0.66) return t;
+  return t.slice(0, last).trimEnd();
+}
+
 /** Reconvertit en puces les faux tirets de dialogue d'un texte déjà généré. */
 export function dashesToBullets(text: string): string {
   if (!text) return text || '';
