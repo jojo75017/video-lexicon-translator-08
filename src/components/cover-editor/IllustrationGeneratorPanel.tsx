@@ -554,6 +554,14 @@ export default function IllustrationGeneratorPanel({
                 Si vous la laissez vide, elle est déduite automatiquement de votre description.
                 Cette étape ne consomme aucune génération.
               </p>
+              {autoBusy && (
+                <p className="flex items-center gap-2 text-xs text-primary"><Loader2 className="h-3 w-3 animate-spin" /> Lecture de votre livre et rédaction de la consigne…</p>
+              )}
+              <div className="space-y-1.5">
+                <Label htmlFor="ill-retouch">Retoucher l’image (corrections pour la prochaine version)</Label>
+                <Textarea id="ill-retouch" rows={2} value={retouch} onChange={(e) => setRetouch(e.target.value)} placeholder="Ex. : plus lumineux, maison au centre, silhouette plus visible, ciel moins rouge…" />
+                <p className="text-xs text-muted-foreground">Vos anciennes versions restent disponibles ci-dessous en un clic.</p>
+              </div>
               <div className="flex items-start gap-2 rounded-md border border-primary/30 bg-primary/5 p-3">
                 <Checkbox id="ill-confirm-direction" checked={directionConfirmed} onCheckedChange={(value) => setDirectionConfirmed(value === true)} />
                 <Label htmlFor="ill-confirm-direction" className="cursor-pointer leading-5">

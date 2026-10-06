@@ -914,7 +914,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           <Card>
             <CardContent className="space-y-3 p-4">
               <p className="text-sm font-semibold text-foreground">Illustration de couverture</p>
-              <IllustrationGeneratorPanel projectId={project.id} hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
+              <IllustrationGeneratorPanel projectId={project.id} bookTitle={project.book_title} hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { void importIllustration(event.target.files?.[0]); event.target.value = ''; }} />
               <Button variant="outline" className="h-auto min-h-10 w-full gap-2 whitespace-normal" disabled={importing} onClick={() => fileRef.current?.click()}>
                 {importing ? <Loader2 className="h-4 w-4 shrink-0 animate-spin" /> : <Upload className="h-4 w-4 shrink-0" />} Importer une illustration
