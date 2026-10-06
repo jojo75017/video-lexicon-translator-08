@@ -236,7 +236,16 @@ export default function IllustrationGeneratorPanel({
     setAutoBusy(true);
     try {
       const brief = await proposeBrief(book);
-      if (brief?.summary && brief.summary.trim().length >= 12) await proposeVisualPrompt(brief);
+      if (brief?.summary && brief.summary.trim().length >= 12) {
+        // Enrichit la consigne avec le sous-titre, l'auteur et la 4ᵉ de couverture réels.
+        const mine = (await listMyBooks().catch(() => [])).find((b) => b.id === book.id);
+        const extra = [
+          mine?.subtitle ? `Sous-titre : ${mine.subtitle}.` : '',
+          mine?.genre ? `Genre : ${mine.genre}.` : '',
+          mine?.backCover ? `Quatrième de couverture : ${mine.backCover.slice(0, 1200)}` : '',
+        ].filter(Boolean).join(' ');
+        await proposeVisualPrompt(extra ? { ...brief, summary: `${brief.summary}\n${extra}` } : brief);
+      }
     } finally {
       setAutoBusy(false);
     }

@@ -14,6 +14,10 @@ export interface MyBookOption {
   author: string;
   synopsis: string;
   genre: string;
+  /** Texte de 4ᵉ de couverture enregistré (vide si absent). */
+  backCover?: string;
+  /** Biographie d'auteur enregistrée (vide si absente). */
+  authorBio?: string;
   updatedAt: string | null;
 }
 
