@@ -93,6 +93,7 @@ import {
   clampImageWarmth,
   clampOverlay,
   wrapImageFilter,
+  wrapImagePlacement,
   computeWrapWarnings,
   createWrapComposition,
   defaultElement,
@@ -288,13 +289,15 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     [commit],
   );
 
-  // A new server image must replace the old composition path immediately.
+  const lastProjectImage = useRef(project.illustration_path);
+  // React only to a new project image, not to undo/redo of the composition.
   useEffect(() => {
+    if (lastProjectImage.current === project.illustration_path) return;
+    lastProjectImage.current = project.illustration_path;
     if (!project.illustration_path) return;
-    if (project.illustration_path === composition.illustrationPath) return;
     const stored = project.fabric_json as Record<string, unknown> | null;
     commit((prev) => ({ ...prev, illustrationPath: project.illustration_path, imageCoverage: stored?.imageCoverage === 'wrap' ? 'wrap' : 'front', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false }));
-  }, [project.illustration_path, project.fabric_json, composition.illustrationPath, commit]);
+  }, [project.illustration_path, project.fabric_json, commit]);
 
   const applyIllustration = async (path: string) => {
     const next = serializeWrapComposition({ ...composition, illustrationPath: path, imageCoverage: 'wrap', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false }, path);
@@ -567,6 +570,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const inPx = (inches: number) => inches * pxPerIn;
   const imageX = composition.imageCoverage === 'wrap' ? 0 : inPx(geometry.zones.front.xIn);
   const imageW = composition.imageCoverage === 'wrap' ? canvasW : inPx(geometry.trimWidthIn + geometry.bleedIn);
+  const placement = bgSize ? wrapImagePlacement(composition, imageW, canvasH, bgSize.width, bgSize.height) : { x: 0, y: 0, width: imageW, height: canvasH };
   const missingRoles = ADDABLE_ROLES.filter(
     (r) => !composition.elements.some((e) => e.role === r),
   );
@@ -692,21 +696,23 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
               {/* illustration : première + son fond perdu extérieur, sans déformation */}
               {bgUrl && (
+                <div className="absolute overflow-hidden" style={{ left: imageX, top: 0, width: imageW, height: canvasH }}>
                 <img
                   src={bgUrl}
                   alt=""
                   aria-hidden
                   draggable={false}
-                  className="absolute h-full object-cover"
+                  className="absolute max-w-none"
                   style={{
-                    left: imageX,
-                    top: 0,
-                    width: imageW,
-                    height: canvasH,
+                    left: placement.x,
+                    top: placement.y,
+                    width: placement.width,
+                    height: placement.height,
                     filter: wrapImageFilter(composition),
-                    transform: `translate(${clampImageOffset(composition.imageOffsetX) * 12}%, ${clampImageOffset(composition.imageOffsetY) * 12}%) scale(${clampImageScale(composition.imageScale)}) scaleX(${composition.imageFlipX ? -1 : 1})`,
+                    transform: composition.imageFlipX ? 'scaleX(-1)' : undefined,
                   }}
                 />
+                </div>
               )}
 
               {/* voile de contraste sur la première (lisibilité des textes) */}
