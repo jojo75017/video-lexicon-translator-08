@@ -61,6 +61,30 @@ function stripDecorations(rawTitle: string, bookTitle?: string): string {
   return title;
 }
 
+/**
+ * Retire l'intitulé « Chapitre N — Titre » répété en tête du texte, y compris
+ * quand il est soudé à la première phrase (« …La promesse briséeLe cliquetis »).
+ */
+export function stripLeadingHeading(content: string, num: number, title?: string): string {
+  let text = String(content || '').replace(/^\s+/, '');
+  const esc = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const head = new RegExp(`^\\**\\s*(?:chapitre|chapter)\\s+0*${num}\\b\\s*[:.–—-]?\\s*`, 'i');
+  const m = text.match(head);
+  if (!m) return text;
+  let rest = text.slice(m[0].length);
+  const t = cleanChapterHeading(title);
+  if (t && rest.toLowerCase().startsWith(t.toLowerCase())) {
+    rest = rest.slice(t.length);
+  } else {
+    // Sans titre connu : l'intitulé s'arrête à la fin de ligne.
+    const nl = rest.indexOf('\n');
+    if (nl >= 0 && nl <= 120) rest = rest.slice(nl);
+    else return text;
+  }
+  void esc;
+  return rest.replace(/^[\s*:.–—-]+/, '').trimStart();
+}
+
 interface NormalizeOptions {
   expectedCount?: number;
   outline?: OutlineLike[];
@@ -125,7 +149,8 @@ export function normalizeManuscript(
     if (title) usedTitles.add(key);
 
     // Dialogues détachés + dernière phrase complète (aucun mot après le point final).
-    const content = entry?.content ? ensureCompleteEnding(restoreDialogueLayout(entry.content)) : '';
+    const body = entry?.content ? stripLeadingHeading(entry.content, num, title) : '';
+    const content = body ? ensureCompleteEnding(restoreDialogueLayout(body)) : '';
     const incomplete = content.length === 0;
 
     out.push({
