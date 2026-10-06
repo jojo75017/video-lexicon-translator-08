@@ -39,7 +39,7 @@ export function restoreDialogueLayout(text: string): string {
     // Numéro de chapitre soudé au titre
     .replace(/^(CHAPITRE\s+\d+)(?=[A-ZÀ-Ü«"])/gim, '$1\n')
     // Tiret cadratin collé après une ponctuation de fin de phrase : nouvelle réplique
-    .replace(/([.!?…»])[ \t\u00A0\u202F]*—[ \t\u00A0\u202F]*(?=[«"“…A-ZÀ-Ü])/g, '$1\n—\u00A0')
+    .replace(/([.!?…»:])[ \t\u00A0\u202F]*—[ \t\u00A0\u202F]*(?=[«"“…A-ZÀ-Ü])/g, '$1\n—\u00A0')
     // Tiret cadratin en début de ligne : espace insécable normalisée
     .replace(/^[ \t]*—[ \t\u00A0\u202F]*(?=\S)/gm, '—\u00A0');
 }
