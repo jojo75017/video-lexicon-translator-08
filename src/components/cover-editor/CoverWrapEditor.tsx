@@ -34,9 +34,11 @@ import {
   ZoomIn,
   ZoomOut,
   FlipHorizontal2,
+  Upload,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import IllustrationGeneratorPanel from './IllustrationGeneratorPanel';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -191,6 +193,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const [status, setStatus] = useState<SaveStatus>('idle');
   const [saveError, setSaveError] = useState<string | null>(null);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
+  const [importing, setImporting] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
   const [exporting, setExporting] = useState<null | 'pdf' | 'png' | 'front' | 'mockup'>(null);
   const [bgSize, setBgSize] = useState<{ width: number; height: number } | null>(null);
   const [showGuides, setShowGuides] = useState(true);
@@ -284,6 +288,39 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     [commit],
   );
 
+  // A new server image must replace the old composition path immediately.
+  useEffect(() => {
+    if (!project.illustration_path) return;
+    if (project.illustration_path === composition.illustrationPath) return;
+    const stored = project.fabric_json as Record<string, unknown> | null;
+    commit((prev) => ({ ...prev, illustrationPath: project.illustration_path, imageCoverage: stored?.imageCoverage === 'wrap' ? 'wrap' : 'front', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false }));
+  }, [project.illustration_path, project.fabric_json, composition.illustrationPath, commit]);
+
+  const applyIllustration = async (path: string) => {
+    const next = serializeWrapComposition({ ...composition, illustrationPath: path, imageCoverage: 'wrap', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false }, path);
+    const updated = await updateCoverProject(project.id, { illustration_path: path, fabric_json: next });
+    commit(() => next);
+    onProjectUpdated?.(updated);
+  };
+
+  const importIllustration = async (file: File | undefined) => {
+    if (!file) return;
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 20 * 1024 * 1024) {
+      toast.error('Choisissez une image JPG, PNG ou WebP de moins de 20 Mo.');
+      return;
+    }
+    setImporting(true);
+    let path: string | null = null;
+    try {
+      path = await uploadCoverFile({ projectId: project.id, kind: 'illustration', blob: file });
+      await applyIllustration(path);
+      toast.success('Illustration panoramique importée.');
+    } catch (error) {
+      if (path) await removeCoverFile(path);
+      toast.error(error instanceof Error ? error.message : 'Import impossible.');
+    } finally { setImporting(false); }
+  };
+
   const undo = () => {
     setPast((p) => {
       if (!p.length) return p;
@@ -336,6 +373,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
       const updated = await updateCoverProject(project.id, {
         fabric_json: payload as unknown as Record<string, unknown>,
+        illustration_path: illustrationPath,
       });
 
       let finalProject = updated;
@@ -527,6 +565,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const canvasW = geometry.fullWidthIn * pxPerIn;
   const canvasH = geometry.fullHeightIn * pxPerIn;
   const inPx = (inches: number) => inches * pxPerIn;
+  const imageX = composition.imageCoverage === 'wrap' ? 0 : inPx(geometry.zones.front.xIn);
+  const imageW = composition.imageCoverage === 'wrap' ? canvasW : inPx(geometry.trimWidthIn + geometry.bleedIn);
   const missingRoles = ADDABLE_ROLES.filter(
     (r) => !composition.elements.some((e) => e.role === r),
   );
@@ -659,9 +699,9 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                   draggable={false}
                   className="absolute h-full object-cover"
                   style={{
-                    left: inPx(geometry.zones.front.xIn),
+                    left: imageX,
                     top: 0,
-                    width: inPx(geometry.trimWidthIn + geometry.bleedIn),
+                    width: imageW,
                     height: canvasH,
                     filter: wrapImageFilter(composition),
                     transform: `translate(${clampImageOffset(composition.imageOffsetX) * 12}%, ${clampImageOffset(composition.imageOffsetY) * 12}%) scale(${clampImageScale(composition.imageScale)}) scaleX(${composition.imageFlipX ? -1 : 1})`,
@@ -674,8 +714,8 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                 <div
                   className="pointer-events-none absolute top-0"
                   style={{
-                    left: inPx(geometry.zones.front.xIn),
-                    width: inPx(geometry.trimWidthIn + geometry.bleedIn),
+                    left: imageX,
+                    width: imageW,
                     height: canvasH,
                     backgroundColor: `rgba(0,0,0,${clampOverlay(composition.overlayOpacity)})`,
                   }}
@@ -897,6 +937,18 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           {/* réglages de l'illustration */}
           <Card>
             <CardContent className="space-y-4 p-4">
+              <p className="text-sm font-semibold text-foreground">Illustration de couverture</p>
+              <IllustrationGeneratorPanel projectId={project.id} fullWrap hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
+              <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { void importIllustration(event.target.files?.[0]); event.target.value = ''; }} />
+              <Button variant="outline" className="w-full gap-2" disabled={importing} onClick={() => fileRef.current?.click()}>
+                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Importer une image panoramique
+              </Button>
+              {bgUrl && <img src={bgUrl} alt="Illustration complète de la couverture" className="max-h-36 w-full rounded-md object-contain" />}
+              <Select value={composition.imageCoverage ?? 'front'} onValueChange={(value) => commit((prev) => ({ ...prev, imageCoverage: value === 'wrap' ? 'wrap' : 'front' }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="wrap">Première + dos + quatrième</SelectItem><SelectItem value="front">Première seule</SelectItem></SelectContent>
+              </Select>
+              <fieldset disabled={!bgUrl} className="space-y-4 disabled:opacity-50">
               <p className="text-sm font-semibold text-foreground">Réglages de l’illustration</p>
               <div className="space-y-1.5">
                 <Label className="text-xs">Zoom · {Math.round(clampImageScale(composition.imageScale) * 100)} %</Label>
@@ -962,6 +1014,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               <Button variant="outline" size="sm" className="w-full gap-1" onClick={resetImageLook}>
                 <RotateCcw className="h-4 w-4" /> Revenir à l’image d’origine
               </Button>
+              </fieldset>
             </CardContent>
           </Card>
 
