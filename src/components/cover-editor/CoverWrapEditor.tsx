@@ -300,7 +300,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   }, [project.illustration_path, project.fabric_json, commit]);
 
   const applyIllustration = async (path: string) => {
-    const next = serializeWrapComposition({ ...composition, illustrationPath: path, imageCoverage: 'wrap', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false }, path);
+    const next = serializeWrapComposition({ ...composition, illustrationPath: path, imageCoverage: 'front', imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, imageFlipX: false }, path);
     const updated = await updateCoverProject(project.id, { illustration_path: path, fabric_json: next });
     commit(() => next);
     onProjectUpdated?.(updated);
@@ -317,7 +317,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
     try {
       path = await uploadCoverFile({ projectId: project.id, kind: 'illustration', blob: file });
       await applyIllustration(path);
-      toast.success('Illustration panoramique importée.');
+      toast.success('Illustration de première de couverture importée.');
     } catch (error) {
       if (path) await removeCoverFile(path);
       toast.error(error instanceof Error ? error.message : 'Import impossible.');
@@ -944,15 +944,15 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
           <Card>
             <CardContent className="space-y-4 p-4">
               <p className="text-sm font-semibold text-foreground">Illustration de couverture</p>
-              <IllustrationGeneratorPanel projectId={project.id} fullWrap hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
+              <IllustrationGeneratorPanel projectId={project.id} hasIllustration={Boolean(bgUrl)} onGenerated={applyIllustration} className="h-auto min-h-10 w-full whitespace-normal" />
               <input ref={fileRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(event) => { void importIllustration(event.target.files?.[0]); event.target.value = ''; }} />
               <Button variant="outline" className="w-full gap-2" disabled={importing} onClick={() => fileRef.current?.click()}>
-                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Importer une image panoramique
+                {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />} Importer une illustration
               </Button>
               {bgUrl && <img src={bgUrl} alt="Illustration complète de la couverture" className="max-h-36 w-full rounded-md object-contain" />}
               <Select value={composition.imageCoverage ?? 'front'} onValueChange={(value) => commit((prev) => ({ ...prev, imageCoverage: value === 'wrap' ? 'wrap' : 'front' }))}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent><SelectItem value="wrap">Première + dos + quatrième</SelectItem><SelectItem value="front">Première seule</SelectItem></SelectContent>
+                <SelectTrigger aria-label="Emplacement de l’illustration"><SelectValue /></SelectTrigger>
+                <SelectContent><SelectItem value="wrap">Première + dos + quatrième</SelectItem><SelectItem value="front">Première illustrée · dos et quatrième unis</SelectItem></SelectContent>
               </Select>
               <fieldset disabled={!bgUrl} className="space-y-4 disabled:opacity-50">
               <p className="text-sm font-semibold text-foreground">Réglages de l’illustration</p>

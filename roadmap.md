@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Couverture complète
+- [ ] Appliquer une première illustrée avec dos et quatrième sur fond uni au projet actuel et aux prochaines illustrations.
 - [x] Permettre une illustration panoramique continue première, dos et quatrième, génération/import visibles, aperçu et exports cohérents.
 - [x] Vérifier les commandes et le rendu ordinateur/mobile sans publier.
 - [ ] Valider la qualité d’une génération panoramique réelle — nécessite une génération payante avec la clé du compte ; aucune génération consommée pendant les contrôles.
