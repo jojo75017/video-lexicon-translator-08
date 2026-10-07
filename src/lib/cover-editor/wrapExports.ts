@@ -42,28 +42,6 @@ const toBlob = (canvas: HTMLCanvasElement, type: string, quality?: number): Prom
     );
   });
 
-const wrapLines = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
-  const lines: string[] = [];
-  for (const paragraph of text.split('\n')) {
-    const words = paragraph.split(/\s+/).filter(Boolean);
-    if (!words.length) {
-      lines.push('');
-      continue;
-    }
-    let current = words[0];
-    for (let i = 1; i < words.length; i += 1) {
-      const candidate = `${current} ${words[i]}`;
-      if (ctx.measureText(candidate).width <= maxWidth) current = candidate;
-      else {
-        lines.push(current);
-        current = words[i];
-      }
-    }
-    lines.push(current);
-  }
-  return lines;
-};
-
 /**
  * Dessine la couverture complète : fonds, illustration (première + fond perdu
  * extérieur), luminosité, voile de contraste, puis tous les textes.

@@ -1300,43 +1300,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                         onChange={(e) => patchElement(selected.id, { color: e.target.value })}
                       />
                     </div>
-                    <div className="flex gap-1">
-                      {(
-                        [
-                          ['left', AlignLeft],
-                          ['center', AlignCenter],
-                          ['right', AlignRight],
-                        ] as [TextAlign, typeof AlignLeft][]
-                      ).map(([value, Icon]) => (
-                        <Button
-                          key={value}
-                          variant={selected.align === value ? 'default' : 'outline'}
-                          size="icon"
-                          onClick={() => patchElement(selected.id, { align: value })}
-                          aria-label={`Aligner ${value}`}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </Button>
-                      ))}
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant={selected.bold ? 'default' : 'outline'}
-                        size="icon"
-                        onClick={() => patchElement(selected.id, { bold: !selected.bold })}
-                        aria-label="Gras"
-                      >
-                        <Bold className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={selected.italic ? 'default' : 'outline'}
-                        size="icon"
-                        onClick={() => patchElement(selected.id, { italic: !selected.italic })}
-                        aria-label="Italique"
-                      >
-                        <Italic className="h-4 w-4" />
-                      </Button>
-                    </div>
                   </div>
 
                   <Button variant="outline" className="w-full" onClick={() => centerElement(selected)}>

@@ -912,9 +912,6 @@ export async function renderWrapFrontThumbnail(
 
     const boxX = el.nx * canvas.width;
     const boxWidth = el.nWidth * canvas.width;
-    const anchorX =
-      el.align === 'center' ? boxX + boxWidth / 2 : el.align === 'right' ? boxX + boxWidth : boxX;
-
     drawCoverText(ctx, el.text, boxX, el.ny * canvas.height, boxWidth, fontPx, el);
   }
 
