@@ -148,6 +148,13 @@ export default function V3SubscriberHome({ user }: { user: any }) {
                 })}
               </ul>
             )}
+            {books !== null && books.length > 0 && (
+              <p className="mt-3 flex items-center gap-1.5 text-xs font-medium" style={{ color: 'var(--v3-joy-muted)' }}>
+                <AudioLines className="h-3.5 w-3.5" style={{ color: 'var(--v3-joy-orange-600)' }} />
+                Bon à savoir : une fois terminé, vous pouvez aussi le faire en{' '}
+                <Link to="/v3/version-audio" className="font-semibold underline underline-offset-2" style={{ color: 'var(--v3-joy-orange-600)' }}>version audio</Link>.
+              </p>
+            )}
           </div>
 
           {/* d) Parcours */}
