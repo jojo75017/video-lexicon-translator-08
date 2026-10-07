@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check, MessagesSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,7 +87,16 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     if ((b.outline?.length ?? 0) > 0) return 2;
     return 1;
   });
+  const routeLocation = useLocation();
   useEffect(() => { if (showWizard) setDesk(3); }, [showWizard]);
+  // « Retour aux choix » : ramène sur les 4 boutons de parcours.
+  useEffect(() => {
+    const go = () => {
+      if (window.location.hash !== '#choix-parcours') return;
+      setTimeout(() => document.getElementById('choix-parcours')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
+    };
+    go();
+  }, [routeLocation.key]);
 
   // L'explication d'accueil reste ouverte tant que rien n'est écrit, puis s'efface.
   const [hasStory, setHasStory] = useState(() => Boolean((readBookBrief()?.sourceText || '').trim()));
@@ -410,7 +420,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <BackButton />
+          <BackButton to="/v3/create#choix-parcours" label="Retour aux choix" />
           <V3ResetBookButton />
         </div>
         <div className="mt-3 flex flex-wrap">
@@ -499,7 +509,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               </p>
               )}
 
-              <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+              <div id="choix-parcours" className="mt-4 flex flex-wrap justify-center gap-2.5 scroll-mt-28">
                 {(
                   [
                     {
