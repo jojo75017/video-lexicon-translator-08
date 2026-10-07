@@ -22,6 +22,7 @@ import {
   wrapImagePlacement,
   zoneBox,
   type WrapComposition,
+  type WrapTextElement,
 } from '@/lib/cover-editor/wrapComposition';
 
 const loadImage = (url: string): Promise<HTMLImageElement> =>
@@ -138,22 +139,24 @@ export async function renderWrapCanvas(
   return canvas;
 }
 
-/** Découpe la PREMIÈRE de couverture (format fini, sans fond perdu). */
-async function renderFrontOnlyCanvas(
+/** Découpe une face au format fini, sans repères ni fond perdu. */
+async function renderZoneCanvas(
   composition: WrapComposition,
   geometry: KdpPaperbackGeometry,
   backgroundUrl: string | null,
   dpi = 300,
+  zone: WrapTextElement['zone'] = 'front',
 ): Promise<HTMLCanvasElement> {
   const full = await renderWrapCanvas(composition, geometry, backgroundUrl, dpi);
   const canvas = document.createElement('canvas');
-  canvas.width = Math.round(geometry.trimWidthIn * dpi);
+  const box = zoneBox(geometry, zone);
+  canvas.width = Math.max(1, Math.round(box.widthIn * dpi));
   canvas.height = Math.round(geometry.trimHeightIn * dpi);
   const ctx = canvas.getContext('2d', { alpha: false });
   if (!ctx) throw new Error('Canevas indisponible dans ce navigateur.');
   ctx.drawImage(
     full,
-    Math.round(geometry.zones.front.xIn * dpi),
+    Math.round(box.xIn * dpi),
     Math.round(geometry.bleedIn * dpi),
     canvas.width,
     canvas.height,
@@ -175,7 +178,7 @@ export async function exportWrapPdf(
   const canvas = await renderWrapCanvas(composition, geometry, backgroundUrl, 300);
   const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
   const pdf = new jsPDF({
-    orientation: 'landscape',
+    orientation: geometry.fullWidthIn >= geometry.fullHeightIn ? 'landscape' : 'portrait',
     unit: 'in',
     format: [geometry.fullWidthIn, geometry.fullHeightIn],
     compress: true,
@@ -216,11 +219,31 @@ export async function exportWrapFrontJpeg(
   backgroundUrl: string | null,
   bookTitle?: string | null,
 ): Promise<CoverExportResult> {
-  const canvas = await renderFrontOnlyCanvas(composition, geometry, backgroundUrl, 300);
+  const canvas = await renderZoneCanvas(composition, geometry, backgroundUrl, 300);
   const blob = await toBlob(canvas, 'image/jpeg', 0.92);
   return {
     blob,
     fileName: safeFileName(bookTitle, 'premiere-de-couverture', 'jpg'),
+    width: canvas.width,
+    height: canvas.height,
+    bytes: blob.size,
+  };
+}
+
+/** PNG d’une face séparée, au format fini et rendu à 300 pixels par pouce. */
+export async function exportWrapZonePng(
+  composition: WrapComposition,
+  geometry: KdpPaperbackGeometry,
+  backgroundUrl: string | null,
+  zone: WrapTextElement['zone'],
+  bookTitle?: string | null,
+): Promise<CoverExportResult> {
+  const canvas = await renderZoneCanvas(composition, geometry, backgroundUrl, 300, zone);
+  const blob = await toBlob(canvas, 'image/png');
+  const names = { front: 'premiere', spine: 'dos', back: 'quatrieme' };
+  return {
+    blob,
+    fileName: safeFileName(bookTitle, `${names[zone]}-300dpi`, 'png'),
     width: canvas.width,
     height: canvas.height,
     bytes: blob.size,
@@ -234,7 +257,7 @@ export async function exportWrapMockup(
   backgroundUrl: string | null,
   bookTitle?: string | null,
 ): Promise<CoverExportResult> {
-  const source = await renderFrontOnlyCanvas(composition, geometry, backgroundUrl, 150);
+  const source = await renderZoneCanvas(composition, geometry, backgroundUrl, 150);
 
   const W = 1600;
   const H = 1200;

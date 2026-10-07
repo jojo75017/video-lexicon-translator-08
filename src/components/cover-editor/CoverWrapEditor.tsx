@@ -60,6 +60,7 @@ import {
   exportWrapMockup,
   exportWrapPdf,
   exportWrapPng,
+  exportWrapZonePng,
 } from '@/lib/cover-editor/wrapExports';
 import {
   getSignedCoverUrl,
@@ -195,7 +196,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const [exporting, setExporting] = useState<null | 'pdf' | 'png' | 'front' | 'mockup'>(null);
+  const [exporting, setExporting] = useState<null | 'pdf' | 'png' | 'front' | 'mockup' | 'front-png' | 'spine' | 'back'>(null);
   const [bgSize, setBgSize] = useState<{ width: number; height: number } | null>(null);
   const [showGuides, setShowGuides] = useState(true);
   const [past, setPast] = useState<WrapComposition[]>([]);
@@ -550,7 +551,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
    * Téléchargements : rendu local dans le navigateur, aucun appel IA,
    * aucun crédit débité, aucune copie publique du fichier.
    */
-  const runExport = async (kind: 'pdf' | 'png' | 'front' | 'mockup') => {
+  const runExport = async (kind: 'pdf' | 'png' | 'front' | 'mockup' | 'front-png' | 'spine' | 'back') => {
     if (!geometry) return;
     if (warnings.length > 0) {
       const confirmed = window.confirm(
@@ -568,7 +569,9 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
             ? await exportWrapPng(composition, geometry, bgUrl, title)
             : kind === 'front'
               ? await exportWrapFrontJpeg(composition, geometry, bgUrl, title)
-              : await exportWrapMockup(composition, geometry, bgUrl, title);
+               : kind === 'mockup'
+                 ? await exportWrapMockup(composition, geometry, bgUrl, title)
+                 : await exportWrapZonePng(composition, geometry, bgUrl, kind === 'front-png' ? 'front' : kind, title);
       downloadExport(result);
       toast.success(`Téléchargé : ${result.fileName}`);
     } catch (err) {
@@ -663,12 +666,12 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
         <div className="flex flex-wrap items-center gap-2">
           <Button
             size="sm"
-            className="gap-1 bg-[#FF9E2D] text-[#232F3E] hover:bg-[#f59021]"
+            className="gap-1"
             onClick={() => void runExport('pdf')}
             disabled={exporting !== null}
           >
             {exporting === 'pdf' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
-            PDF couverture complète (300 DPI)
+            PDF complet pour KDP (300 DPI)
           </Button>
           <Button variant="outline" size="sm" className="gap-1" onClick={() => void runExport('front')} disabled={exporting !== null}>
             {exporting === 'front' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
@@ -682,6 +685,12 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
             {exporting === 'mockup' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
             Visuel de présentation
           </Button>
+          {(['front-png', 'spine', 'back'] as const).map((kind) => (
+            <Button key={kind} variant="outline" size="sm" className="gap-1" onClick={() => void runExport(kind)} disabled={exporting !== null}>
+              {exporting === kind ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
+              {kind === 'front-png' ? 'Première' : kind === 'spine' ? 'Dos' : 'Quatrième'} (PNG · 300 DPI)
+            </Button>
+          ))}
           <StatusPill status={status} error={saveError} />
           <Button size="sm" className="gap-1" onClick={() => void save()} disabled={status === 'saving'}>
             <Save className="h-4 w-4" /> Enregistrer

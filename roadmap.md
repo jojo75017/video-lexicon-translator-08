@@ -1,5 +1,8 @@
 # Roadmap
 
+## Exports séparés du broché
+- [ ] Vérifier le PDF complet KDP et télécharger première, dos et quatrième séparément à 300 DPI, sans repères.
+
 ## Mise en forme des textes brochés
 - [x] Afficher les commandes de justification, gras, italique et soulignement au-dessus des champs, même sans image.
 - [x] Vérifier les commandes dans l’éditeur connecté, le rendu canvas et la sérialisation sans image ; exports utilisant le même rendu à 300 DPI.
