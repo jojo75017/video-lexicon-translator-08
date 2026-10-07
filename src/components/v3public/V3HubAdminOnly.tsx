@@ -6,7 +6,7 @@ import { useIsAdmin } from '@/hooks/useIsAdmin';
 function targetFor(search: string): string {
   const p = new URLSearchParams(search);
   const tab = p.get('tab');
-  if (p.get('module') === 'cover-studio-pro' || tab === 'cover-pro') return '/v3/cover-pro';
+  if (p.get('module') === 'cover-studio-pro' || tab === 'cover-pro') return '/v3/mes-couvertures';
   if (tab === 'export') return '/v3/library';
   if (tab === 'outils' || tab === 'documentation') return '/v3/outils';
   return '/v3';
