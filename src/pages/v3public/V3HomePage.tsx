@@ -98,6 +98,9 @@ export default function V3HomePage() {
       {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
       {user && <V3SubscriberZoomHelp />}
 
+      {/* RACCOURCI RAPIDE — robots et liens directs */}
+      {user && <V3QuickShortcuts />}
+
       {/* Fonctionnalités KDP détaillées — visible uniquement pour les abonnés connectés */}
       {user && <V3KdpFeatureShowcase />}
       {user && <V3KdpFeatureShowcase2 />}
