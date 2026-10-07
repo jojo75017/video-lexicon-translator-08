@@ -986,38 +986,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               )}
             </CardContent>
           </Card>
-          {/* textes de la zone, toujours visibles */}
-          <Card>
-            <CardContent className="space-y-3 p-4">
-              <p className="text-sm font-semibold text-foreground">
-                Textes · {ZONE_LABEL[activeZone]}
-              </p>
-              <Button type="button" variant="outline" size="sm" className="h-auto min-h-9 w-full whitespace-normal" onClick={() => void loadBookTexts()}>
-                Récupérer les textes de mon livre (sous-titre, auteur, 4ᵉ de couverture)
-              </Button>
-              {composition.elements
-                .filter((e) => e.zone === activeZone)
-                .map((el) => (
-                  <div key={el.id} className="space-y-1.5">
-                    <Label htmlFor={`zone-text-${el.id}`} className="text-xs">
-                      {ROLE_LABEL_WRAP[el.role]}
-                    </Label>
-                    <Textarea
-                      id={`zone-text-${el.id}`}
-                      rows={activeZone === 'back' ? 4 : 2}
-                      value={el.text}
-                      onFocus={() => setSelectedId(el.id)}
-                      onChange={(e) => patchElement(el.id, { text: e.target.value })}
-                    />
-                  </div>
-                ))}
-              {composition.elements.filter((e) => e.zone === activeZone).length === 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Aucun texte dans cette zone : ajoutez-en dans « Éléments ».
-                </p>
-              )}
-            </CardContent>
-          </Card>
           {/* réglages de l'illustration */}
           <Card>
             <CardContent className="space-y-4 p-4">
@@ -1094,7 +1062,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               </fieldset>
             </CardContent>
           </Card>
-
           {/* fonds */}
           <Card>
             <CardContent className="space-y-3 p-4">
@@ -1145,6 +1112,38 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
               <p className="text-xs text-muted-foreground">
                 Les réglages de couleur et de retouche sont gratuits et réversibles.
               </p>
+            </CardContent>
+          </Card>
+          {/* textes de la zone, toujours visibles */}
+          <Card>
+            <CardContent className="space-y-3 p-4">
+              <p className="text-sm font-semibold text-foreground">
+                Textes · {ZONE_LABEL[activeZone]}
+              </p>
+              <Button type="button" variant="outline" size="sm" className="h-auto min-h-9 w-full whitespace-normal" onClick={() => void loadBookTexts()}>
+                Récupérer les textes de mon livre (sous-titre, auteur, 4ᵉ de couverture)
+              </Button>
+              {composition.elements
+                .filter((e) => e.zone === activeZone)
+                .map((el) => (
+                  <div key={el.id} className="space-y-1.5">
+                    <Label htmlFor={`zone-text-${el.id}`} className="text-xs">
+                      {ROLE_LABEL_WRAP[el.role]}
+                    </Label>
+                    <Textarea
+                      id={`zone-text-${el.id}`}
+                      rows={activeZone === 'back' ? 4 : 2}
+                      value={el.text}
+                      onFocus={() => setSelectedId(el.id)}
+                      onChange={(e) => patchElement(el.id, { text: e.target.value })}
+                    />
+                  </div>
+                ))}
+              {composition.elements.filter((e) => e.zone === activeZone).length === 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Aucun texte dans cette zone : ajoutez-en dans « Éléments ».
+                </p>
+              )}
             </CardContent>
           </Card>
 
