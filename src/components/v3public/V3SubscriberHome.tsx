@@ -46,6 +46,11 @@ export default function V3SubscriberHome({ user }: { user: any }) {
   const niveau = isAdmin ? 'Administrateur' : hasFull ? 'Édition' : hasBase ? 'Plume' : 'Abonné';
 
   useEffect(() => {
+    if (window.location.hash !== '#nouveau-livre') return;
+    const t = setTimeout(() => document.getElementById('nouveau-livre')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
     let cancelled = false;
     supabase
       .from('ebook_projects')
