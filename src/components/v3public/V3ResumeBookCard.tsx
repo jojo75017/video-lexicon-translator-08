@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ArrowRight, History, MessageSquare, ListOrdered } from 'lucide-react';
+import { BookOpen, ArrowRight, History, MessageSquare, ListOrdered, Headphones } from 'lucide-react';
 import { readBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { loadOutlineVersions, loadRemoteThread } from '@/lib/v3/genieThread';
 
