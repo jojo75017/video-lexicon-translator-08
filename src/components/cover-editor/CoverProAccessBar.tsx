@@ -48,14 +48,14 @@ export default function CoverProAccessBar({ className }: Props) {
         </span>
       ) : !hasAccess ? (
         <>
-          <Sparkles className="h-4 w-4 text-primary" />
+          <ShieldCheck className="h-4 w-4 text-emerald-700" />
           <span>
-            La génération d’illustration fait partie de Cover Studio KDP Pro. Les modèles, les
-            textes et les exports restent utilisables.
+            Importez votre image ou utilisez un modèle : tout le reste est inclus (textes, dos,
+            quatrième, exports KDP 300 DPI).
           </span>
-          <Button asChild size="sm" variant="outline" className="ml-auto">
-            <a href="/v3/cover-pro">Débloquer</a>
-          </Button>
+          <a href="/v3/forfaits" className="ml-auto text-xs text-muted-foreground underline">
+            <Sparkles className="mr-1 inline h-3 w-3" />Option : illustration IA
+          </a>
         </>
       ) : (
         <>

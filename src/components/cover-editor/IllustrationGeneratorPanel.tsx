@@ -349,12 +349,13 @@ export default function IllustrationGeneratorPanel({
         {!hasAccess && !loading ? (
           <div className="space-y-3 text-sm">
             <p className="rounded-lg border border-border bg-muted/40 p-3">
-              La génération d’illustration fait partie de Cover Studio KDP Pro (67 €, paiement
-              unique). Les modèles, les textes et les exports restent utilisables sans achat.
+              Importez votre image ou utilisez un modèle : les textes, le dos, la quatrième et les
+              exports PDF KDP / PNG 300 DPI sont inclus dans votre formule.
             </p>
-            <Button asChild variant="outline" className="w-full">
-              <a href="/v3/cover-pro">Débloquer Cover Studio KDP Pro</a>
-            </Button>
+            <p className="text-xs text-muted-foreground">
+              Option : illustration IA, incluse dans Édition ou à l'unité{' '}
+              <a href="/v3/forfaits" className="underline">voir les forfaits</a>.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">

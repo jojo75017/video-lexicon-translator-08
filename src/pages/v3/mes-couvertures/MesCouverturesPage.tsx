@@ -321,9 +321,9 @@ export default function MesCouverturesPage() {
   };
 
   const showPageCount = useMemo(() => newType !== 'ebook', [newType]);
-  // Tous les projets du studio éditable relèvent de l'offre à 67 € :
-  // visibles uniquement pour un acheteur ou l'admin.
-  const paidProjects = useMemo(() => (coverPro.hasAccess ? projects : []), [projects, coverPro.hasAccess]);
+  // L'éditeur de couverture est inclus dans toutes les formules : chaque abonné
+  // voit toutes ses couvertures (seule l'illustration IA reste une option).
+  const paidProjects = projects;
   const classicProjects: CoverProject[] = [];
   const allClassic = useMemo(() => {
     const seen = new Set<string>();
