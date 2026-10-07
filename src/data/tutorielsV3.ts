@@ -120,7 +120,7 @@ export const TUTORIELS_V3: TutorielV3[] = [
     'Cliquez sur un livre pour le reprendre.',
     'Utilisez les boutons Corriger ou Correction éditoriale.',
   ]),
-  t(20, 'Habiller', 'La couverture KDP', '/v3/cover-pro', [
+  t(20, 'Habiller', 'La couverture KDP', '/v3/studio-v4', [
     'Le brief artistique est créé depuis le résumé du livre.',
     'Modifiez-le si besoin, puis générez l’image.',
     'Ajoutez titre et sous-titre dans l’éditeur.',

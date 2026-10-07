@@ -212,6 +212,7 @@ const V3VersionAudioPage = lazy(() => import('./pages/v3public/V3VersionAudioPag
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CoverOfferPage = lazy(() => import('./pages/v3public/V3CoverOfferPage'));
+const V3StudioV4Page = lazy(() => import('./pages/v3public/V3StudioV4Page'));
 const PrestationKdpPage = lazy(() => import('./pages/PrestationKdpPage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
 const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
@@ -713,6 +714,7 @@ const App = () => {
             <Route path="/v3/cover-studio-pro" element={<Navigate to="/v3/mes-couvertures" replace />} />
             <Route path="/v3/cover-studio-pro/edit" element={<Navigate to="/v3/mes-couvertures" replace />} />
             <Route path="/v3/couverture-express" element={gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)} />
+            <Route path="/v3/studio-v4" element={gated(<TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate>)} />
             <Route path="/v3/mes-couvertures" element={gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)} />
             <Route path="/v3/mes-couvertures/:id" element={gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)} />
             {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}

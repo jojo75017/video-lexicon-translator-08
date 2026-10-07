@@ -272,7 +272,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Oui : votre titre, votre genre et votre synopsis servent à produire une illustration, sans texte incrusté pour rester modifiable.',
     theme: 'Couverture & illustrations',
-    action: { label: 'Générer une illustration', route: '/v3/cover-pro' },
+    action: { label: 'Générer une illustration', route: '/v3/studio-v4' },
   },
   {
     id: 'x-cov-04',
@@ -336,7 +336,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Oui, jusqu’à trois propositions par demande, et l’historique de vos images reste privé dans le projet.',
     theme: 'Couverture & illustrations',
-    action: { label: 'Générer des propositions', route: '/v3/cover-pro' },
+    action: { label: 'Générer des propositions', route: '/v3/studio-v4' },
   },
   {
     id: 'x-cov-12',
@@ -368,7 +368,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Écrivez la scène en une ou deux phrases : décor, ambiance, couleurs. La description devient la consigne visuelle.',
     theme: 'Couverture & illustrations',
-    action: { label: 'Décrire mon image', route: '/v3/cover-pro' },
+    action: { label: 'Décrire mon image', route: '/v3/studio-v4' },
   },
 
   // ── Publier sur Amazon KDP ───────────────────────────────────────
