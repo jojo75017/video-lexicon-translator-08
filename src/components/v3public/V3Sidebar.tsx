@@ -101,8 +101,8 @@ const NAV: NavSection[] = [
   {
     section: 'Habiller & exporter',
     items: [
-      { to: '/v3/mes-couvertures', label: 'Studio de couverture', icon: ImageIcon, badge: 'V4' },
-      { to: '/v3/mes-couvertures', label: 'Mes couvertures', icon: ImageIcon },
+      { to: '/v3/studio-v4', label: 'Studio de couverture', icon: ImageIcon, badge: 'V4' },
+      { to: '/v3/studio-v4', label: 'Mes couvertures', icon: ImageIcon },
       { to: '/v3/outils/mockup-3d', label: 'Mockups 3D', icon: ImageIcon },
       { to: '/v3/outils/audiobook', label: 'Audiobook TTS', icon: Video },
       { to: '/v3/version-audio', label: 'Version audio · 9,99 €', icon: Video },
@@ -257,7 +257,7 @@ export default function V3Sidebar() {
       {/* Accès prioritaire : reste visible au-dessus des longues rubriques. */}
       <div className="sticky top-[49px] z-10 bg-background px-2 py-2">
         <NavLink
-          to="/v3/mes-couvertures"
+          to="/v3/studio-v4"
           title="Créer ma couverture — Cover Studio Pro"
           aria-label="Créer ma couverture — Cover Studio Pro"
           style={{ background: '#EC4899', color: '#ffffff' }}

@@ -354,7 +354,7 @@ export default function MesCouverturesPage() {
             <Link to="/v3/paiements">Mes paiements</Link>
           </Button>
           <Button asChild className="gap-2 bg-primary font-semibold text-primary-foreground hover:bg-primary/90">
-            <Link to="/v3/couverture-express">
+            <Link to="/v3/studio-v4">
               <ImageIcon className="h-4 w-4" /> Ouvrir le Studio V4
             </Link>
           </Button>
@@ -416,7 +416,7 @@ export default function MesCouverturesPage() {
               Créez votre première couverture : vous pourrez la retrouver et la modifier ici.
             </p>
             <Button asChild className="gap-2">
-              <Link to="/v3/couverture-express">
+              <Link to="/v3/studio-v4">
                 <Plus className="h-4 w-4" /> Ouvrir le Studio V4
               </Link>
             </Button>

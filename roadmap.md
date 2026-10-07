@@ -71,3 +71,4 @@
 
 ## Hub V3 masqué aux clients
 - [x] /v3/hub réservé aux admins, clients redirigés ; liens remplacés
+- [x] Studio V4 abonnés sur /v3/studio-v4, boutons couverture reliés

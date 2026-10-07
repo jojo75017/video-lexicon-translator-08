@@ -11,14 +11,14 @@ const ACTIONS = [
     primary: true,
   },
   {
-    to: '/v3/mes-couvertures',
+    to: '/v3/studio-v4',
     title: 'Mes couvertures',
     description: 'Retrouvez, modifiez ou téléchargez un projet existant.',
     icon: FolderOpen,
     primary: false,
   },
   {
-    to: '/v3/mes-couvertures',
+    to: '/v3/studio-v4',
     title: 'Ouvrir le Studio V4',
     description: 'Titres, styles, images et variantes : le studio complet de votre maison d’édition.',
     icon: ShoppingBag,
