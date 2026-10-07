@@ -1027,7 +1027,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                 <div className="space-y-3 rounded-md border bg-muted/20 p-3">
                   <div className="space-y-1.5">
                     <Label className="text-xs">Luminosité · {Math.round(clampBrightness(composition.imageBrightness) * 100)} %</Label>
-                    <Slider aria-label="Luminosité" min={0.6} max={1.6} step={0.02} value={[clampBrightness(composition.imageBrightness)]} onValueChange={([v]) => setImageBrightness(v)} />
+                    <Slider aria-label="Luminosité" min={0.6} max={3} step={0.02} value={[clampBrightness(composition.imageBrightness)]} onValueChange={([v]) => setImageBrightness(v)} />
                   </div>
                   <div className="space-y-1.5">
                     <Label className="text-xs">Contraste · {Math.round(clampImageContrast(composition.imageContrast) * 100)} %</Label>
@@ -1072,7 +1072,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                 </Label>
                 <Slider
                   min={0.6}
-                  max={1.6}
+                  max={3}
                   step={0.02}
                   value={[clampBrightness(composition.imageBrightness)]}
                   onValueChange={([v]) => setImageBrightness(v)}

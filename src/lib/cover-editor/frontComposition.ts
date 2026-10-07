@@ -137,7 +137,7 @@ export interface FrontComposition {
   canvas: { width: number; height: number };
   /** Couleur de fond visible sous l'illustration (ou seule si aucune image). */
   backgroundColor: string;
-  /** Réglage local de l'illustration : 1 = original, 1.5 = plus claire. */
+  /** Réglage local de l'illustration : 1 = original, jusqu'à 3 pour éclaircir. */
   imageBrightness?: number;
   /** Contraste local : 1 = original (0.7 → 1.4). */
   imageContrast?: number;
@@ -307,7 +307,7 @@ const clampRange = (v: unknown, min: number, max: number, fallback: number) =>
 
 /** Bornes des réglages locaux de l'image (aucune IA, aucun crédit). */
 export const IMAGE_ADJUST_LIMITS = {
-  brightness: { min: 0.7, max: 1.5, default: 1 },
+  brightness: { min: 0.7, max: 3, default: 1 },
   contrast: { min: 0.7, max: 1.4, default: 1 },
   saturation: { min: 0, max: 1.6, default: 1 },
   warmth: { min: -20, max: 20, default: 0 },
@@ -315,7 +315,7 @@ export const IMAGE_ADJUST_LIMITS = {
 
 /** Filtre canvas/CSS correspondant aux réglages locaux de l'illustration. */
 export function imageAdjustFilter(composition: FrontComposition): string {
-  const b = clampRange(composition.imageBrightness, 0.7, 1.5, 1);
+  const b = clampRange(composition.imageBrightness, IMAGE_ADJUST_LIMITS.brightness.min, IMAGE_ADJUST_LIMITS.brightness.max, 1);
   const c = clampRange(composition.imageContrast, 0.7, 1.4, 1);
   const s = clampRange(composition.imageSaturation, 0, 1.6, 1);
   const w = clampRange(composition.imageWarmth, -20, 20, 0);
@@ -492,7 +492,7 @@ export function parseComposition(
       typeof obj.backgroundColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(obj.backgroundColor)
         ? obj.backgroundColor
         : DEFAULT_FRONT_BACKGROUND,
-    imageBrightness: clampRange(obj.imageBrightness, 0.7, 1.5, 1),
+    imageBrightness: clampRange(obj.imageBrightness, IMAGE_ADJUST_LIMITS.brightness.min, IMAGE_ADJUST_LIMITS.brightness.max, 1),
     imageContrast: clampRange(obj.imageContrast, 0.7, 1.4, 1),
     imageSaturation: clampRange(obj.imageSaturation, 0, 1.6, 1),
     imageWarmth: clampRange(obj.imageWarmth, -20, 20, 0),
@@ -521,7 +521,7 @@ export function serializeComposition(
     backgroundColor: /^#[0-9a-fA-F]{6}$/.test(composition.backgroundColor ?? '')
       ? composition.backgroundColor
       : DEFAULT_FRONT_BACKGROUND,
-    imageBrightness: clampRange(composition.imageBrightness, 0.7, 1.5, 1),
+    imageBrightness: clampRange(composition.imageBrightness, IMAGE_ADJUST_LIMITS.brightness.min, IMAGE_ADJUST_LIMITS.brightness.max, 1),
     imageContrast: clampRange(composition.imageContrast, 0.7, 1.4, 1),
     imageSaturation: clampRange(composition.imageSaturation, 0, 1.6, 1),
     imageWarmth: clampRange(composition.imageWarmth, -20, 20, 0),
