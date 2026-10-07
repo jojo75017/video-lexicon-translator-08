@@ -1,5 +1,8 @@
 # Roadmap
 
+## Exports séparés du broché
+- [x] Vérifier les quatre téléchargements dans l’éditeur connecté : PDF complet sans repères, première/quatrième 1800 × 2700 px, dos 114 × 2700 px au format fini à 300 pixels par pouce.
+
 ## Mise en forme des textes brochés
 - [x] Afficher les commandes de justification, gras, italique et soulignement au-dessus des champs, même sans image.
 - [x] Vérifier les commandes dans l’éditeur connecté, le rendu canvas et la sérialisation sans image ; exports utilisant le même rendu à 300 DPI.
