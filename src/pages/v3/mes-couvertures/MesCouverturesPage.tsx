@@ -355,6 +355,14 @@ export default function MesCouverturesPage() {
               <Link to="/v3/paiements">Mes paiements</Link>
             </Button>
           )}
+          <div className="max-w-[230px]">
+            <Button asChild className="w-full gap-2 font-semibold">
+              <Link to="/v3/couverture-express">
+                <ImageIcon className="h-4 w-4" /> Générer l’illustration
+              </Link>
+            </Button>
+            <p className="mt-1 text-xs text-muted-foreground">Inclus dans votre formule. Ou ouvrez une couverture ci-dessous.</p>
+          </div>
           <Button asChild className="gap-2 bg-primary font-semibold text-primary-foreground hover:bg-primary/90">
             <Link to="/v3/studio-v4">
               <ImageIcon className="h-4 w-4" /> Ouvrir le Studio V4
