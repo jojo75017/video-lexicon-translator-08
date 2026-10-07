@@ -14,6 +14,7 @@ import {
   type StudioCover,
 } from '@/lib/studioCovers';
 import { getSignedCoverUrl } from '@/lib/coverProjects';
+import { Button } from '@/components/ui/button';
 
 type Row = {
   id: string;
@@ -21,7 +22,7 @@ type Row = {
   author_name?: string | null;
   kdp_categories?: string | null;
   updated_at: string;
-  chapters?: any[] | null;
+  chapter_count: number;
   ebook_images?: any[] | null;
   cover_concepts?: any | null;
   project_type?: string | null;
@@ -39,6 +40,7 @@ export default function V3LibraryPage() {
   const [audioModal, setAudioModal] = useState<{ id: string; title: string } | null>(null);
   const [dedup, setDedup] = useState<boolean>(() => localStorage.getItem('v3_lib_dedup') !== '0');
   const [rawRows, setRawRows] = useState<Row[]>([]);
+  const [loadError, setLoadError] = useState(false);
   const [studioCovers, setStudioCovers] = useState<StudioCover[]>([]);
   const [pickerFor, setPickerFor] = useState<Row | null>(null);
 
@@ -58,18 +60,19 @@ export default function V3LibraryPage() {
     let cancelled = false;
     (async () => {
       setLoading(true);
+      setLoadError(false);
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) { nav('/v3/auth'); return; }
       if (cancelled) return;
       setEmail(auth.user.email || null);
-      const { data, error } = await supabase
-        .from('ebook_projects')
-        .select('id,title,author_name,kdp_categories,updated_at,chapters,ebook_images,cover_concepts,project_type')
-        .eq('user_id', auth.user.id)
-        .order('updated_at', { ascending: false });
+      const { data, error } = await supabase.rpc('list_my_library_books');
       if (cancelled) return;
-      if (error) toast.error(`Rafraîchissement impossible : ${error.message}`);
-      setRawRows((data as Row[]) || []);
+      if (error) {
+        setLoadError(true);
+        toast.error('Vos livres ne peuvent pas être chargés pour le moment. Réessayez.');
+      } else {
+        setRawRows((data as Row[]) || []);
+      }
       setLoading(false);
       if (refreshTick > 0 && !error) toast.success(`Bibliothèque à jour · ${(data || []).length} livre(s)`);
     })();
@@ -85,18 +88,19 @@ export default function V3LibraryPage() {
     const groups = new Map<string, Row[]>();
     for (const r of rawRows) {
       const key = (r.title || '').trim().toLowerCase().replace(/\s+/g, ' ') || r.id;
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(r);
+      const group = groups.get(key);
+      if (group) group.push(r);
+      else groups.set(key, [r]);
     }
     const kept: Row[] = [];
     for (const list of groups.values()) {
       list.sort((a, b) => {
-        const ca = Array.isArray(a.chapters) ? a.chapters.length : 0;
-        const cb = Array.isArray(b.chapters) ? b.chapters.length : 0;
+        const ca = a.chapter_count;
+        const cb = b.chapter_count;
         if (cb !== ca) return cb - ca;
         return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
       });
-      kept.push(list[0]);
+      if (list[0]) kept.push(list[0]);
     }
     kept.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
     return kept;
@@ -148,14 +152,14 @@ export default function V3LibraryPage() {
       if (!Array.isArray(chapters) || chapters.length === 0) return null;
       const localProjectId = localStorage.getItem(PROJECT_ID_KEY);
       const cloudMatch = rows.find((r) => r.id === localProjectId);
-      const cloudHasChapters = Array.isArray(cloudMatch?.chapters) && (cloudMatch!.chapters!.length || 0) > 0;
+      const cloudHasChapters = (cloudMatch?.chapter_count ?? 0) > 0;
       if (cloudHasChapters) return null;
       return { chapters: chapters.length, title: parsed?.title || parsed?.book?.title || 'Livre en attente' };
     } catch { return null; }
   }, [rows]);
 
-  const started = rows.filter((r) => !r.chapters || (Array.isArray(r.chapters) && r.chapters.length === 0));
-  const done = rows.filter((r) => Array.isArray(r.chapters) && r.chapters.length > 0);
+  const started = rows.filter((r) => r.chapter_count === 0);
+  const done = rows.filter((r) => r.chapter_count > 0);
 
   return (
     <section className="max-w-6xl mx-auto px-5 md:px-8 py-14">
@@ -203,6 +207,15 @@ export default function V3LibraryPage() {
 
       {loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
+      ) : loadError ? (
+        <div className="mt-10 text-center py-12" role="alert">
+          <AlertCircle className="w-8 h-8 text-[var(--v3-orange)] mx-auto" />
+          <h2 className="v3-serif text-2xl font-bold mt-4">Chargement des livres indisponible</h2>
+          <p className="text-sm text-[var(--v3-muted)] mt-2">Vos livres restent enregistrés. Réessayez dans un instant.</p>
+          <Button onClick={() => setRefreshTick((t) => t + 1)} className="v3-btn v3-btn-primary mt-6">
+            <RefreshCw className="w-4 h-4" /> Réessayer
+          </Button>
+        </div>
       ) : rows.length === 0 ? (
         <div className="v3-card mt-10 text-center py-16">
           <BookOpen className="w-10 h-10 text-[var(--v3-orange)] mx-auto" />
@@ -301,7 +314,7 @@ function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio,
     if (!ownImage && studioCover?.thumbUrl) setCover(studioCover.thumbUrl);
   }, [ownImage, studioCover?.thumbUrl]);
   const [genLoading, setGenLoading] = useState(false);
-  const nbChap = Array.isArray(r.chapters) ? r.chapters.length : 0;
+  const nbChap = r.chapter_count;
   const date = new Date(r.updated_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' });
   const author = (r.author_name || '').trim() || 'Auteur Ebookstudio';
 
