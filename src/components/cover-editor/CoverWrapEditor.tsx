@@ -706,7 +706,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
       <div className="grid gap-4 xl:grid-cols-[1fr_340px]">
         {/* canevas complet */}
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-2 self-start xl:sticky xl:top-2">
           <div ref={wrapRef} className="min-w-0 overflow-auto rounded-lg border border-border bg-muted/40 p-1">
             <div
               className="relative shadow-sm"
@@ -938,6 +938,58 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
             Couverture complète {formatIn(geometry.fullWidthIn)} × {formatIn(geometry.fullHeightIn)} ·
             dos {formatIn(geometry.spineWidthIn)} · {geometry.px300.fullWidth} × {geometry.px300.fullHeight} px à 300 DPI
           </p>
+          {/* fonds */}
+          <Card>
+            <CardContent className="space-y-3 p-4">
+              <p className="text-sm font-semibold text-foreground">Fond de la couverture</p>
+              <Select
+                value={composition.background.mode}
+                onValueChange={(v) => setBackground({ mode: v as WrapComposition['background']['mode'] })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="full-color">Couleur unie sur toute la couverture</SelectItem>
+                  <SelectItem value="back-spine-color">Couleurs distinctes quatrième et dos</SelectItem>
+                </SelectContent>
+              </Select>
+              <div className="flex flex-wrap gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs">Couverture</Label>
+                  <Input
+                    type="color"
+                    className="h-9 w-16 p-1"
+                    value={composition.background.fullColor}
+                    onChange={(e) => setBackground({ fullColor: e.target.value })}
+                  />
+                </div>
+                {composition.background.mode === 'back-spine-color' && (
+                  <>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Quatrième</Label>
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={composition.background.backColor}
+                        onChange={(e) => setBackground({ backColor: e.target.value })}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Dos</Label>
+                      <Input
+                        type="color"
+                        className="h-9 w-16 p-1"
+                        value={composition.background.spineColor}
+                        onChange={(e) => setBackground({ spineColor: e.target.value })}
+                      />
+                    </div>
+                  </>
+                )}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Les réglages de couleur et de retouche sont gratuits et réversibles.
+              </p>
+            </CardContent>
+          </Card>
 
           {/* avertissements non bloquants */}
           {warnings.length > 0 && (
@@ -1060,58 +1112,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                 <RotateCcw className="h-4 w-4" /> Revenir à l’image d’origine
               </Button>
               </fieldset>
-            </CardContent>
-          </Card>
-          {/* fonds */}
-          <Card>
-            <CardContent className="space-y-3 p-4">
-              <p className="text-sm font-semibold text-foreground">Fond de la couverture</p>
-              <Select
-                value={composition.background.mode}
-                onValueChange={(v) => setBackground({ mode: v as WrapComposition['background']['mode'] })}
-              >
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="full-color">Couleur unie sur toute la couverture</SelectItem>
-                  <SelectItem value="back-spine-color">Couleurs distinctes quatrième et dos</SelectItem>
-                </SelectContent>
-              </Select>
-              <div className="flex flex-wrap gap-3">
-                <div className="space-y-1">
-                  <Label className="text-xs">Couverture</Label>
-                  <Input
-                    type="color"
-                    className="h-9 w-16 p-1"
-                    value={composition.background.fullColor}
-                    onChange={(e) => setBackground({ fullColor: e.target.value })}
-                  />
-                </div>
-                {composition.background.mode === 'back-spine-color' && (
-                  <>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Quatrième</Label>
-                      <Input
-                        type="color"
-                        className="h-9 w-16 p-1"
-                        value={composition.background.backColor}
-                        onChange={(e) => setBackground({ backColor: e.target.value })}
-                      />
-                    </div>
-                    <div className="space-y-1">
-                      <Label className="text-xs">Dos</Label>
-                      <Input
-                        type="color"
-                        className="h-9 w-16 p-1"
-                        value={composition.background.spineColor}
-                        onChange={(e) => setBackground({ spineColor: e.target.value })}
-                      />
-                    </div>
-                  </>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Les réglages de couleur et de retouche sont gratuits et réversibles.
-              </p>
             </CardContent>
           </Card>
           {/* textes de la zone, toujours visibles */}
