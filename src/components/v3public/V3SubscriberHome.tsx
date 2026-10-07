@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  ArrowRight, PenLine, Compass, Lightbulb, Feather, Palette, LayoutTemplate, Rocket,
-  BookOpen, BookMarked, Image as ImageIcon, AudioLines, Tags, Gift, Target, Sparkles,
+  ArrowRight, PenLine, Compass, Lightbulb, Feather, Palette, LayoutTemplate, LayoutGrid,
+  BookOpen, BookMarked, Image as ImageIcon, AudioLines, Tags, Gift, Target, Sparkles, Info,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useV3Entitlement } from '@/hooks/useV3Entitlement';
@@ -14,7 +14,7 @@ const STEPS = [
   { n: 2, title: 'Écriture', icon: Feather, to: '/v3/create' },
   { n: 3, title: 'Couverture', icon: Palette, to: '/v3/mes-couvertures' },
   { n: 4, title: 'Mise en page Kindle et broché', icon: LayoutTemplate, to: '/v3/outils/editeur' },
-  { n: 5, title: 'Publication sur Amazon KDP', icon: Rocket, to: '/v3/kdp/lancement' },
+  { n: 5, title: 'Voir tous les outils', icon: LayoutGrid, to: '/v3/outils' },
 ];
 
 const PILLS = [
