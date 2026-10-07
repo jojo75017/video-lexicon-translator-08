@@ -22,7 +22,7 @@ import {
 import { buildVisualPrompt } from "../_shared/visualPrompt.ts";
 
 const MODEL = "gpt-image-2";
-const SIZE = "1024x1536"; // plus grand format portrait accepté par l'API images
+const SIZE = "2048x3072"; // portrait haute définition : ≈ 330 DPI sur une première 6 × 9 po
 const QUALITY = "high";
 
 interface Brief {
