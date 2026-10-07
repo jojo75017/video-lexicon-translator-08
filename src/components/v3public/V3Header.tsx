@@ -93,7 +93,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
               <Link to="/v3/library" className="v3-btn v3-btn-on-dark">
                 <User className="w-4 h-4" /> Ma bibliothèque
               </Link>
-              <Link to="/v3/create" className="v3-btn v3-btn-gold">
+              <Link to="/v3/lancer" className="v3-btn v3-btn-gold">
                 Écrire un livre
               </Link>
             </>
@@ -112,7 +112,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
         {/* CTA rapide + trigger mobile & tablette (< lg) */}
         <div className="xl:hidden ml-auto flex items-center gap-2">
           <Link
-            to={isAuthed ? '/v3/create' : '/cadeau'}
+            to={isAuthed ? '/v3/lancer' : '/cadeau'}
             className="v3-btn v3-btn-gold text-[12px] whitespace-nowrap"
             style={{ padding: '7px 14px' }}
           >
@@ -146,7 +146,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
                 style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(201,168,76,0.25)' }}
               />
             </form>
-            <Link to="/v3/create" onClick={() => setOpen(false)} className="v3-btn v3-btn-gold w-full justify-center">
+            <Link to="/v3/lancer" onClick={() => setOpen(false)} className="v3-btn v3-btn-gold w-full justify-center">
               Écrire un livre
             </Link>
             <Link to={isAuthed ? '/v3/library' : '/v3/auth'} onClick={() => setOpen(false)} className="v3-btn v3-btn-on-dark w-full justify-center">

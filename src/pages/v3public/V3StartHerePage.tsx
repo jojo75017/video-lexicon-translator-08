@@ -30,7 +30,7 @@ export default function V3StartHerePage() {
         </p>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
           <Link
-            to="/v3/create?ecrire=1"
+            to="/v3/lancer"
             className="group flex flex-col justify-between gap-4 rounded-xl border-2 border-primary bg-primary/5 p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
             <span>
