@@ -46,6 +46,11 @@ export default function V3SubscriberHome({ user }: { user: any }) {
   const niveau = isAdmin ? 'Administrateur' : hasFull ? 'Édition' : hasBase ? 'Plume' : 'Abonné';
 
   useEffect(() => {
+    if (window.location.hash !== '#nouveau-livre') return;
+    const t = setTimeout(() => document.getElementById('nouveau-livre')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300);
+    return () => clearTimeout(t);
+  }, []);
+  useEffect(() => {
     let cancelled = false;
     supabase
       .from('ebook_projects')
@@ -74,7 +79,7 @@ export default function V3SubscriberHome({ user }: { user: any }) {
         </div>
 
         {/* b) Deux boutons + robots */}
-        <div className="flex flex-col items-stretch justify-center gap-3 sm:flex-row">
+        <div id="nouveau-livre" className="flex flex-col items-stretch justify-center gap-3 sm:flex-row scroll-mt-28">
           <Link
             to="/v3/create"
             className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-base font-semibold transition-transform hover:-translate-y-0.5"
