@@ -47,7 +47,7 @@ function seedHubConfig(idea: string | null, genre: string | null, type: string |
 
 /** Trois étapes seulement : on raconte, le sommaire se déduit, le livre se monte. */
 const DESKS = [
-  { id: 1 as const, label: 'J’écris', hint: 'Vous racontez comme vous parlez. Le Génie corrige chaque texte sans jamais le résumer. Aucun plan à faire.' },
+  { id: 1 as const, label: 'Je raconte mon livre', hint: 'Vous racontez l’histoire, les personnages, les scènes et les idées de votre livre. Camille vous répond et pose des questions uniquement sur votre récit.' },
   { id: 2 as const, label: 'Mon sommaire', hint: 'Le sommaire est déduit de ce que vous avez vraiment écrit : le nombre de chapitres suit votre volume de texte.' },
   { id: 3 as const, label: 'Mon livre', hint: 'Rédaction chapitre par chapitre, relecture, export Word ou PDF, couverture, KDP, traduction et audio.' },
 ];
@@ -456,8 +456,9 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               {biography ? 'Racontez votre vie, nous en faisons un livre' : 'Ici, vous racontez. Nous fabriquons le livre.'}
             </h1>
             <p className="mt-3 text-sm md:text-base" style={{ color: 'var(--v3-muted)' }}>
-              Vous n’avez ni plan à préparer, ni mise en page à faire, ni peur de mal écrire.
-              Vous écrivez comme vous parlez, et tout le reste se fabrique ici.
+              {biography
+                ? 'Vous racontez vos souvenirs comme ils viennent. Camille vous aide à les transformer en récit sans les dénaturer.'
+                : 'Parlez à Camille de votre histoire, de vos personnages et de chaque scène. Elle reste centrée sur votre livre et le construit avec vous.'}
             </p>
           </div>
 
@@ -618,7 +619,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
         <div className="mt-5">
           <div className="min-w-0 v3-ambiance">
-            {/* ① J'écris : à gauche je parle, à droite mon livre se remplit. */}
+            {/* ① Je raconte mon livre : à gauche je raconte, à droite mon livre se remplit. */}
             {desk === 1 && (
               <>
                 {biography && (
