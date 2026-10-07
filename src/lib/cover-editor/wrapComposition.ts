@@ -110,10 +110,11 @@ export interface WrapComposition {
   imageFlipX?: boolean;
 }
 
-/** Luminosité bornée : jamais de valeur extrême qui détruirait l'image. */
+/** Bornes communes au curseur, à la sauvegarde et au rendu imprimé. */
+export const WRAP_BRIGHTNESS_LIMITS = { min: 0.6, max: 3 } as const;
 export const clampBrightness = (value: unknown): number => {
   const n = typeof value === 'number' && Number.isFinite(value) ? value : 1;
-  return Math.min(1.6, Math.max(0.6, n));
+  return Math.min(WRAP_BRIGHTNESS_LIMITS.max, Math.max(WRAP_BRIGHTNESS_LIMITS.min, n));
 };
 
 /** Voile de contraste borné. */

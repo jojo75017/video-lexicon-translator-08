@@ -242,7 +242,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
     value: number,
   ) => {
     const limits = {
-      imageBrightness: [0.7, 1.5],
+      imageBrightness: [0.7, 3],
       imageContrast: [0.7, 1.4],
       imageSaturation: [0, 1.6],
       imageWarmth: [-20, 20],
@@ -1128,7 +1128,7 @@ export default function CoverFrontEditor({ project, onProjectUpdated }: Props) {
                   <Slider
                     className="mt-1"
                     min={0.7}
-                    max={1.5}
+                    max={3}
                     step={0.02}
                     value={[frontBrightness]}
                     onValueChange={([v]) => setImageAdjust('imageBrightness', v)}
