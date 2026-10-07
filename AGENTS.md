@@ -17,3 +17,4 @@
 - The header library loads ownership-filtered metadata through a security-invoker function, excluding manuscript bodies and embedded image blobs to prevent timeouts without weakening RLS.
 - The legacy /v3/hub page is admin-only via V3HubAdminOnly, redirecting clients to the equivalent current page so old links never expose the technical workshop.
 - The subscriber cover studio (Studio V4) lives at /v3/studio-v4 as a standalone page reusing CoverStudioPro, so subscribers reach it without the legacy hub or the paid /v3/cover-pro offer.
+- Cover Studio Pro access is decided server-side in hasCoverProRight (purchase or active Édition/Maison subscription), so UI gates never diverge from paid rights.
