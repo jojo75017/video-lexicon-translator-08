@@ -42,6 +42,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
+import { generateIncludedIllustration } from '@/lib/cover-editor/includedCoverEngine';
 import {
   createCoverProject,
   getSignedCoverUrl,
@@ -94,7 +95,7 @@ const FORMAT_ID: Record<FormatChoice, string> = {
 export default function CouvertureExpressPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { credits, key, refresh } = useCoverProAccess();
+  const { hasAccess, credits, key, refresh } = useCoverProAccess();
 
   const [step, setStep] = useState<Step>(1);
   const [title, setTitle] = useState('');
@@ -377,6 +378,28 @@ export default function CouvertureExpressPage() {
     const genre = getExpressGenre(genreId);
     setGenerating(true);
     try {
+      if (!hasAccess) {
+        // Formule sans Cover Studio Pro : moteur inclus (qualité V2), sans paiement.
+        const includedPath = await generateIncludedIllustration({
+          projectId,
+          title: title.trim() || 'Couverture',
+          subtitle: subtitle.trim(),
+          author: author.trim(),
+          genre: genre.brief.genre,
+          mood: genre.brief.mood,
+          palette: genre.brief.palette,
+          summary: synopsis.trim(),
+          visualPrompt,
+          include: mustInclude,
+          avoid: mustAvoid,
+          lighting,
+          wrap: format === 'paperback',
+        });
+        setIllustrationPath(includedPath);
+        setIllustrationUrl(await getSignedCoverUrl(includedPath));
+        toast.success('Nouvelle image appliquée à vos trois propositions.');
+        return;
+      }
       const { data, error } = await supabase.functions.invoke('cover-pro-generate', {
         body: {
           projectId,
@@ -800,9 +823,13 @@ export default function CouvertureExpressPage() {
               </CardContent>
             </Card>
             <div className="flex flex-wrap items-center gap-2 rounded-lg border bg-white p-3 text-sm">
-              <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
-                {credits.remaining} image(s) incluse(s) restante(s)
-              </Badge>
+              {hasAccess ? (
+                <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
+                  {credits.remaining} image(s) incluse(s) restante(s)
+                </Badge>
+              ) : (
+                <Badge variant="default">Illustration incluse dans votre formule</Badge>
+              )}
               {generating && (
                 <span className="flex items-center gap-2 text-[#232F3E]">
                   <Loader2 className="h-4 w-4 animate-spin" /> Votre illustration est en cours de
@@ -814,18 +841,15 @@ export default function CouvertureExpressPage() {
                   Illustration appliquée aux trois propositions.
                 </span>
               )}
-              {!generating && !illustrationPath && credits.remaining > 0 && (
+              {!generating && !illustrationPath && (!hasAccess || credits.remaining > 0) && (
                 <span className="text-muted-foreground">
                   Aucune illustration pour l’instant : cliquez sur « Créer mon illustration ».
                 </span>
               )}
-              {!generating && !illustrationPath && credits.remaining <= 0 && !key && (
+              {hasAccess && !generating && !illustrationPath && credits.remaining <= 0 && !key && (
                 <span className="text-muted-foreground">
-                  Vous n’avez plus d’image incluse. Ajoutez votre clé personnelle depuis{' '}
-                  <Link to="/v3/cover-pro" className="underline">
-                    cette page
-                  </Link>{' '}
-                  pour obtenir une illustration.
+                  Vous n’avez plus d’image Pro incluse : ajoutez votre clé personnelle depuis le
+                  bandeau de l’éditeur pour continuer.
                 </span>
               )}
             </div>
