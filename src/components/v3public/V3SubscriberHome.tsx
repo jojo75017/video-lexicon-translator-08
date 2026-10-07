@@ -172,6 +172,11 @@ export default function V3SubscriberHome({ user }: { user: any }) {
                 </li>
               ))}
             </ol>
+            <p className="mt-3 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px] font-medium" style={{ color: 'var(--v3-joy-muted)' }}>
+              <Info className="h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />
+              <span>Pour les nouveaux : ils seront mis au fur et à mesure.</span>
+              <Link to="/v3/tutoriels-v3" className="font-semibold underline underline-offset-2" style={{ color: 'var(--v3-joy-orange-600)' }}>Voir les tutoriels</Link>
+            </p>
           </div>
         </div>
 
