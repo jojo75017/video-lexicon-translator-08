@@ -13,15 +13,10 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
   Check,
   Download,
   Eye,
   EyeOff,
-  Italic,
   Loader2,
   Maximize,
   Plus,
@@ -73,7 +68,7 @@ import {
   removeCoverFile,
   type CoverProject,
 } from '@/lib/coverProjects';
-import { FRONT_FONTS, parseComposition, type TextAlign } from '@/lib/cover-editor/frontComposition';
+import { FRONT_FONTS, parseComposition } from '@/lib/cover-editor/frontComposition';
 import {
   defaultPaperbackConfig,
   formatIn,
@@ -1133,6 +1128,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                     <Label htmlFor={`zone-text-${el.id}`} className="text-xs">
                       {ROLE_LABEL_WRAP[el.role]}
                     </Label>
+                    <WrapTextToolbar element={el} onChange={(patch) => { setSelectedId(el.id); patchElement(el.id, patch); }} />
                     <Textarea
                       id={`zone-text-${el.id}`}
                       rows={activeZone === 'back' ? 4 : 2}
@@ -1140,7 +1136,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                       onFocus={() => setSelectedId(el.id)}
                       onChange={(e) => patchElement(el.id, { text: e.target.value })}
                     />
-                    <WrapTextToolbar element={el} onChange={(patch) => { setSelectedId(el.id); patchElement(el.id, patch); }} />
                   </div>
                 ))}
               {composition.elements.filter((e) => e.zone === activeZone).length === 0 && (

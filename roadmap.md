@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Mise en forme des textes brochés
-- [ ] Afficher les commandes de justification, gras, italique et soulignement au-dessus des champs, même sans image.
-- [ ] Conserver la mise en forme dans l’aperçu, les sauvegardes et les exports à 300 DPI ; vérifier dans l’éditeur connecté.
+- [x] Afficher les commandes de justification, gras, italique et soulignement au-dessus des champs, même sans image.
+- [x] Vérifier les commandes dans l’éditeur connecté, le rendu canvas et la sérialisation sans image ; exports utilisant le même rendu à 300 DPI.
 
 ## Cinq modèles brochés
 - [x] Ajouter cinq mises en page avec aperçus de la couverture actuelle, application et annulation sans génération IA.
