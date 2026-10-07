@@ -8,3 +8,5 @@ type: feature
 - **Studio Jeunesse — 47 €**, paiement unique, option pour tous les forfaits.
 
 Mise en œuvre : vérification serveur dans `hasCoverProRight` (coverPro.ts) : admin → achat module_entitlements → abonnement Édition/Maison actif.
+
+- **Plume et anciens V2 : illustration IA incluse (qualité V2)** via `generate-ai-cover`, sans crédit ni paiement, dans « 3 étapes » et l'éditeur. Jamais de lien vers la page 67 € dans leur parcours couverture.

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 
 export interface CoverProCredits {
   granted: number;
@@ -69,5 +70,17 @@ export default function useCoverProAccess() {
 
   useEffect(() => { void refresh(); }, [refresh]);
 
-  return { ...status, loading, error, refresh };
+  // Admin en « Voir comme un abonné » : on montre exactement ce que voit un
+  // abonné sans le Pro (le droit admin n'est pas affiché).
+  const [preview, setPreview] = useState(isPreviewingAsSubscriber);
+  useEffect(() => {
+    const sync = () => setPreview(isPreviewingAsSubscriber());
+    window.addEventListener('v3-admin-preview-change', sync);
+    return () => window.removeEventListener('v3-admin-preview-change', sync);
+  }, []);
+  const view = preview && status.reason === 'admin'
+    ? { ...EMPTY, isAdmin: status.isAdmin }
+    : status;
+
+  return { ...view, loading, error, refresh };
 }
