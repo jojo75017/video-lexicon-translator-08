@@ -28,6 +28,7 @@ import {
   type FrontComposition,
   type TextAlign,
 } from './frontComposition';
+import { drawCoverText } from './wrapTextRenderer';
 
 export const WRAP_COMPOSITION_VERSION = 2 as const;
 export const WRAP_DOCUMENT_TYPE = 'paperback_wrap' as const;
@@ -71,9 +72,10 @@ export interface WrapTextElement {
   fontSizeIn: number;
   fontFamily: string;
   color: string;
-  align: TextAlign;
+  align: TextAlign | 'justify';
   bold: boolean;
   italic: boolean;
+  underline?: boolean;
   lineHeight: number;
   hidden: boolean;
 }
@@ -441,7 +443,7 @@ const ROLES: WrapRole[] = [
   'back-blurb', 'back-about', 'back-extra',
 ];
 const ZONES: WrapZone[] = ['front', 'spine', 'back'];
-const ALIGNS: TextAlign[] = ['left', 'center', 'right'];
+const ALIGNS: WrapTextElement['align'][] = ['left', 'center', 'right', 'justify'];
 
 const num = (v: unknown, fb: number) => (typeof v === 'number' && Number.isFinite(v) ? v : fb);
 const clamp01 = (v: number) => Math.min(1.5, Math.max(-0.5, v));
@@ -494,9 +496,10 @@ export function parseWrapComposition(
         fontSizeIn: Math.min(6, Math.max(0.01, num(e.fontSizeIn, base.fontSizeIn))),
         fontFamily: typeof e.fontFamily === 'string' && e.fontFamily.length ? e.fontFamily : base.fontFamily,
         color: color(e.color, base.color),
-        align: ALIGNS.includes(e.align as TextAlign) ? (e.align as TextAlign) : base.align,
+        align: ALIGNS.includes(e.align as WrapTextElement['align']) ? (e.align as WrapTextElement['align']) : base.align,
         bold: Boolean(e.bold),
         italic: Boolean(e.italic),
+        underline: Boolean(e.underline),
         lineHeight: Math.min(3, Math.max(0.8, num(e.lineHeight, base.lineHeight))),
         hidden: Boolean(e.hidden),
       };
@@ -912,11 +915,7 @@ export async function renderWrapFrontThumbnail(
     const anchorX =
       el.align === 'center' ? boxX + boxWidth / 2 : el.align === 'right' ? boxX + boxWidth : boxX;
 
-    let y = el.ny * canvas.height;
-    for (const line of wrapLines(ctx, el.text, boxWidth)) {
-      ctx.fillText(line, anchorX, y);
-      y += fontPx * el.lineHeight;
-    }
+    drawCoverText(ctx, el.text, boxX, el.ny * canvas.height, boxWidth, fontPx, el);
   }
 
   return new Promise<Blob>((resolve, reject) => {

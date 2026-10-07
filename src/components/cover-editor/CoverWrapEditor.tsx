@@ -40,6 +40,7 @@ import {
 import { Button } from '@/components/ui/button';
 import IllustrationGeneratorPanel from './IllustrationGeneratorPanel';
 import WrapTemplateGallery from './WrapTemplateGallery';
+import WrapTextToolbar from './WrapTextToolbar';
 import { applyWrapTemplate } from '@/lib/cover-editor/wrapTemplates';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -879,6 +880,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                         textAlign: el.align,
                         fontWeight: el.bold ? 700 : 400,
                         fontStyle: el.italic ? 'italic' : 'normal',
+                        textDecoration: el.underline ? 'underline' : 'none',
                       }}
                       data-wrap-element={el.role}
                     >
@@ -915,6 +917,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                       textAlign: el.align,
                       fontWeight: el.bold ? 700 : 400,
                       fontStyle: el.italic ? 'italic' : 'normal',
+                      textDecoration: el.underline ? 'underline' : 'none',
                       whiteSpace: 'pre-wrap',
                       wordBreak: 'break-word',
                     }}
@@ -1137,6 +1140,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                       onFocus={() => setSelectedId(el.id)}
                       onChange={(e) => patchElement(el.id, { text: e.target.value })}
                     />
+                    <WrapTextToolbar element={el} onChange={(patch) => { setSelectedId(el.id); patchElement(el.id, patch); }} />
                   </div>
                 ))}
               {composition.elements.filter((e) => e.zone === activeZone).length === 0 && (
@@ -1247,6 +1251,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
                   <div className="space-y-1.5">
                     <Label htmlFor="wrap-text">Texte</Label>
+                    <WrapTextToolbar element={selected} onChange={(patch) => patchElement(selected.id, patch)} />
                     <Textarea
                       id="wrap-text"
                       value={selected.text}
@@ -1284,7 +1289,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                     />
                   </div>
 
-                  <div className="flex items-end gap-3">
+                  <div className="flex flex-wrap items-end gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="wrap-color">Couleur</Label>
                       <Input
