@@ -8,6 +8,7 @@
  *  - la géométrie provient exclusivement du moteur KDP déjà validé.
  */
 import { jsPDF } from 'jspdf';
+import { drawCoverText } from './wrapTextRenderer';
 
 import { ensureFontsReady } from '@/lib/cover-editor/coverFonts';
 import { safeFileName, type CoverExportResult } from '@/lib/cover-editor/coverExports';
@@ -40,28 +41,6 @@ const toBlob = (canvas: HTMLCanvasElement, type: string, quality?: number): Prom
       quality,
     );
   });
-
-const wrapLines = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
-  const lines: string[] = [];
-  for (const paragraph of text.split('\n')) {
-    const words = paragraph.split(/\s+/).filter(Boolean);
-    if (!words.length) {
-      lines.push('');
-      continue;
-    }
-    let current = words[0];
-    for (let i = 1; i < words.length; i += 1) {
-      const candidate = `${current} ${words[i]}`;
-      if (ctx.measureText(candidate).width <= maxWidth) current = candidate;
-      else {
-        lines.push(current);
-        current = words[i];
-      }
-    }
-    lines.push(current);
-  }
-  return lines;
-};
 
 /**
  * Dessine la couverture complète : fonds, illustration (première + fond perdu
@@ -146,22 +125,14 @@ export async function renderWrapCanvas(
       ctx.save();
       ctx.translate(cx, cy);
       ctx.rotate(-Math.PI / 2);
-      const anchorX =
-        el.align === 'center' ? 0 : el.align === 'right' ? lengthPx / 2 : -lengthPx / 2;
-      ctx.fillText(el.text.replace(/\n/g, ' '), anchorX, -fontPx / 2);
+      drawCoverText(ctx, el.text.replace(/\n/g, ' '), -lengthPx / 2, -fontPx / 2, lengthPx, fontPx, el);
       ctx.restore();
       continue;
     }
 
     const boxX = px(box.xIn + el.nx * box.widthIn);
     const boxWidth = px(el.nWidth * box.widthIn);
-    const anchorX =
-      el.align === 'center' ? boxX + boxWidth / 2 : el.align === 'right' ? boxX + boxWidth : boxX;
-    let y = px(box.yIn + el.ny * box.heightIn);
-    for (const line of wrapLines(ctx, el.text, boxWidth)) {
-      ctx.fillText(line, anchorX, y);
-      y += fontPx * el.lineHeight;
-    }
+    drawCoverText(ctx, el.text, boxX, px(box.yIn + el.ny * box.heightIn), boxWidth, fontPx, el);
   }
 
   return canvas;

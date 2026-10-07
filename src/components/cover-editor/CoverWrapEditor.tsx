@@ -13,15 +13,10 @@
  */
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  Bold,
   Check,
   Download,
   Eye,
   EyeOff,
-  Italic,
   Loader2,
   Maximize,
   Plus,
@@ -40,6 +35,7 @@ import {
 import { Button } from '@/components/ui/button';
 import IllustrationGeneratorPanel from './IllustrationGeneratorPanel';
 import WrapTemplateGallery from './WrapTemplateGallery';
+import WrapTextToolbar from './WrapTextToolbar';
 import { applyWrapTemplate } from '@/lib/cover-editor/wrapTemplates';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
@@ -72,7 +68,7 @@ import {
   removeCoverFile,
   type CoverProject,
 } from '@/lib/coverProjects';
-import { FRONT_FONTS, parseComposition, type TextAlign } from '@/lib/cover-editor/frontComposition';
+import { FRONT_FONTS, parseComposition } from '@/lib/cover-editor/frontComposition';
 import {
   defaultPaperbackConfig,
   formatIn,
@@ -879,6 +875,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                         textAlign: el.align,
                         fontWeight: el.bold ? 700 : 400,
                         fontStyle: el.italic ? 'italic' : 'normal',
+                        textDecoration: el.underline ? 'underline' : 'none',
                       }}
                       data-wrap-element={el.role}
                     >
@@ -915,6 +912,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                       textAlign: el.align,
                       fontWeight: el.bold ? 700 : 400,
                       fontStyle: el.italic ? 'italic' : 'normal',
+                      textDecoration: el.underline ? 'underline' : 'none',
                       whiteSpace: 'pre-wrap',
                       wordBreak: 'break-word',
                     }}
@@ -1130,6 +1128,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                     <Label htmlFor={`zone-text-${el.id}`} className="text-xs">
                       {ROLE_LABEL_WRAP[el.role]}
                     </Label>
+                    <WrapTextToolbar element={el} onChange={(patch) => { setSelectedId(el.id); patchElement(el.id, patch); }} />
                     <Textarea
                       id={`zone-text-${el.id}`}
                       rows={activeZone === 'back' ? 4 : 2}
@@ -1247,6 +1246,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
 
                   <div className="space-y-1.5">
                     <Label htmlFor="wrap-text">Texte</Label>
+                    <WrapTextToolbar element={selected} onChange={(patch) => patchElement(selected.id, patch)} />
                     <Textarea
                       id="wrap-text"
                       value={selected.text}
@@ -1284,7 +1284,7 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                     />
                   </div>
 
-                  <div className="flex items-end gap-3">
+                  <div className="flex flex-wrap items-end gap-3">
                     <div className="space-y-1.5">
                       <Label htmlFor="wrap-color">Couleur</Label>
                       <Input
@@ -1294,43 +1294,6 @@ export default function CoverWrapEditor({ project, onProjectUpdated }: Props) {
                         value={selected.color}
                         onChange={(e) => patchElement(selected.id, { color: e.target.value })}
                       />
-                    </div>
-                    <div className="flex gap-1">
-                      {(
-                        [
-                          ['left', AlignLeft],
-                          ['center', AlignCenter],
-                          ['right', AlignRight],
-                        ] as [TextAlign, typeof AlignLeft][]
-                      ).map(([value, Icon]) => (
-                        <Button
-                          key={value}
-                          variant={selected.align === value ? 'default' : 'outline'}
-                          size="icon"
-                          onClick={() => patchElement(selected.id, { align: value })}
-                          aria-label={`Aligner ${value}`}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </Button>
-                      ))}
-                    </div>
-                    <div className="flex gap-1">
-                      <Button
-                        variant={selected.bold ? 'default' : 'outline'}
-                        size="icon"
-                        onClick={() => patchElement(selected.id, { bold: !selected.bold })}
-                        aria-label="Gras"
-                      >
-                        <Bold className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant={selected.italic ? 'default' : 'outline'}
-                        size="icon"
-                        onClick={() => patchElement(selected.id, { italic: !selected.italic })}
-                        aria-label="Italique"
-                      >
-                        <Italic className="h-4 w-4" />
-                      </Button>
                     </div>
                   </div>
 
