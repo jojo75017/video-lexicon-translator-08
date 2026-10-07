@@ -137,12 +137,20 @@ export default function V3ForfaitsPage() {
                 </p>
 
                 <ul className="mb-5 flex-1 space-y-2.5">
-                  {plan.features.map((feat, i) => (
-                    <li key={i} className="flex gap-2 text-sm">
-                      <Check size={16} className="mt-0.5 shrink-0" style={{ color: "var(--v3-emerald)" }} />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
+                  {plan.features.map((feat, i) => {
+                    const cover = feat.includes("Cover Studio KDP Pro");
+                    return cover ? (
+                      <li key={i} className="flex gap-2 rounded-lg px-3 py-2 text-sm font-bold" style={{ background: "var(--v3-joy-orange, #FF9E2D)", color: "#fff", boxShadow: "0 4px 14px rgba(255,158,45,.35)" }}>
+                        <span aria-hidden>🎨</span>
+                        <span>{feat}</span>
+                      </li>
+                    ) : (
+                      <li key={i} className="flex gap-2 text-sm">
+                        <Check size={16} className="mt-0.5 shrink-0" style={{ color: "var(--v3-emerald)" }} />
+                        <span>{feat}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
 
                 <div className="mb-4 rounded-md p-3 text-xs" style={{ background: "var(--v3-cream)", color: "var(--v3-muted)" }}><strong style={{ color: "var(--v3-ink)" }}>Idéal pour :</strong> {plan.idealFor}</div>

@@ -88,7 +88,9 @@ export default function V3PricingOverview() {
               <p className="text-xs font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>{card.note}</p>
               <p className="mt-3 min-h-12 text-xs leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>{card.description}</p>
               <ul className="mt-3 space-y-1.5">
-                {card.items.map((item) => <li key={item} className="flex gap-2 text-xs"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />{item}</li>)}
+                {card.items.map((item) => item.includes('Cover Studio KDP Pro')
+                  ? <li key={item} className="flex gap-2 rounded-md px-2 py-1.5 text-xs font-bold text-white" style={{ background: 'var(--v3-joy-orange)' }}><span aria-hidden>🎨</span>{item}</li>
+                  : <li key={item} className="flex gap-2 text-xs"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />{item}</li>)}
               </ul>
               <Link to={card.to} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>
                 Voir cette offre <ArrowRight className="h-3.5 w-3.5" />
