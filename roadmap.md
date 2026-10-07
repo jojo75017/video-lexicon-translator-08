@@ -58,4 +58,4 @@
 
 ## Séparation « Écrire » / « Je raconte »
 - [x] Envoyer tous les boutons « Écrire un livre » vers son parcours direct dédié, sans afficher les trois bureaux du parcours « Je raconte un livre ».
-- [ ] Vérifier les deux parcours séparément dans le compte connecté et contrôler la compilation.
+- [x] Vérifier les deux parcours séparément dans le compte connecté et contrôler la compilation.
