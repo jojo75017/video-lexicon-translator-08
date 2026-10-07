@@ -45,7 +45,7 @@ const MORE: Item[] = [
     emoji: '🎨',
     title: 'Couvertures aux formats exacts',
     desc: 'Kindle et broché normalisés automatiquement (recto/verso, dos calculé) — plus de ratio bancal.',
-    to: '/v3/cover-pro',
+    to: '/v3/mes-couvertures',
     cta: 'Ouvrir Cover Studio',
   },
   {
