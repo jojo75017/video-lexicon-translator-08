@@ -39,7 +39,13 @@ const CATEGORIES = [
 ];
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
 
-const EXAMPLES = [
+const BOOK_EXAMPLES = [
+  'Mon livre raconte l’histoire de Léa, qui revient dans son village après vingt ans et découvre une lettre cachée par sa mère.',
+  'Dans le premier chapitre, mon personnage principal perd son travail et décide de reprendre le restaurant abandonné de son grand-père.',
+  'Je veux raconter comment une famille se déchire autour d’un héritage, puis dévoiler progressivement le secret qui les relie.',
+];
+
+const BIOGRAPHY_EXAMPLES = [
   'Je suis né en 1952 à Berck-sur-Mer. Je veux raconter mon enfance au bord de la mer à mes petits-enfants.',
   'Je veux retracer l’histoire de ma famille, de mes grands-parents à aujourd’hui, avec les noms, les lieux et les dates.',
   'Je veux transmettre à mes enfants les moments forts de ma vie : mon métier, mes rencontres et ce que j’ai appris.',
@@ -297,7 +303,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       <p className="mt-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
         {mode === 'biography'
           ? 'Racontez votre vie dans l’ordre qui vous vient. Le Génie lit ce que vous écrivez, le corrige sans jamais le résumer, puis vous pose une question née de vos propres phrases.'
-          : 'Écrivez ou collez votre texte. Le Génie le corrige sans jamais le résumer, puis vous pose une question née de vos propres phrases.'}
+          : 'Racontez votre livre à Camille : l’histoire, les personnages, les scènes ou les idées que vous voulez y mettre. Elle parle avec vous uniquement de votre livre, puis vous pose des questions précises pour l’enrichir.'}
       </p>
 
 
@@ -393,13 +399,17 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
           onKeyDown={(e) => { if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { e.preventDefault(); ask(input); } }}
           rows={3}
           disabled={loading}
-          placeholder="Parlez-moi de vous et de ce sur quoi vous aimeriez écrire…"
+          placeholder={mode === 'biography'
+            ? 'Racontez-moi un souvenir, une personne, un lieu ou une période de votre vie…'
+            : 'Racontez-moi votre livre : que se passe-t-il, qui sont les personnages, quelle scène voulez-vous raconter…'}
           className="w-full resize-none bg-transparent px-2 py-2 text-sm outline-none"
           style={{ color: 'var(--v3-ink)' }}
         />
         <div className="flex items-center justify-between gap-2 px-1 pt-1">
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
-            <Mic className="mr-1 inline h-3 w-3" /> Écrivez librement : sujet, lecteur, promesse.
+            <Mic className="mr-1 inline h-3 w-3" /> {mode === 'biography'
+              ? 'Écrivez librement : vos souvenirs deviennent la matière de votre récit.'
+              : 'Écrivez librement : tout ce que vous racontez sert à construire votre livre.'}
           </span>
           <button type="button" onClick={() => ask(input)} disabled={loading || input.trim().length < 10}
             className="v3-btn v3-btn-primary disabled:opacity-50">
@@ -454,7 +464,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
 
       {!ready && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {EXAMPLES.map((ex) => (
+          {(mode === 'biography' ? BIOGRAPHY_EXAMPLES : BOOK_EXAMPLES).map((ex) => (
             <button key={ex} type="button" onClick={() => setInput(ex)}
               className="rounded-full border bg-white/80 px-3 py-1.5 text-[11px] transition hover:opacity-80"
               style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
