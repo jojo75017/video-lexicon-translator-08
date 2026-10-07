@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Headphones, X, Check } from 'lucide-react';
 
 type Props = {
@@ -115,28 +116,13 @@ export default function AudiobookOfferCard({ bookId, bookTitle, compact = false 
               ))}
             </ul>
 
-            <div className="mt-5 p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900">
-              La conversion arrive bientôt. Cliquez sur <strong>M'avertir</strong> pour être prévenu·e
-              par email dès qu'elle sera disponible sur ce livre.
-            </div>
-
             <div className="mt-5 flex gap-2 justify-end">
               <button onClick={() => setOpen(false)} className="v3-btn v3-btn-outline">
                 Plus tard
               </button>
-              <button
-                onClick={() => {
-                  try {
-                    const list = JSON.parse(localStorage.getItem('v3_audio_waitlist') || '[]');
-                    if (bookId && !list.includes(bookId)) list.push(bookId);
-                    localStorage.setItem('v3_audio_waitlist', JSON.stringify(list));
-                  } catch {}
-                  setOpen(false);
-                }}
-                className="v3-btn v3-btn-primary"
-              >
-                <Headphones className="w-4 h-4" /> M'avertir
-              </button>
+              <Link to="/v3/version-audio" onClick={() => setOpen(false)} className="v3-btn v3-btn-primary">
+                <Headphones className="w-4 h-4" /> Découvrir la version audio
+              </Link>
             </div>
           </div>
         </div>

@@ -207,6 +207,7 @@ const V3HumanizerPage = lazy(() => import('./pages/v3public/V3HumanizerPage'));
 const V3TutorielsPage = lazy(() => import('./pages/v3public/V3TutorielsPage'));
 const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
 const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
+const V3VersionAudioPage = lazy(() => import('./pages/v3public/V3VersionAudioPage'));
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CoverOfferPage = lazy(() => import('./pages/v3public/V3CoverOfferPage'));
@@ -846,6 +847,7 @@ const App = () => {
               <Route path="outils/royalties" element={<V3PaidModuleRoute><V3RoyaltiesPage /></V3PaidModuleRoute>} />
               <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="HumanizeAI"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
               <Route path="outils/mockup-3d" element={<V3LockedGate><TrialGate label="Mockup 3D"><V3MockupPage /></TrialGate></V3LockedGate>} />
+              <Route path="version-audio" element={<V3LockedGate><V3VersionAudioPage /></V3LockedGate>} />
               <Route path="outils/audiobook" element={<V3PaidModuleRoute><V3AudiobookPage /></V3PaidModuleRoute>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
 

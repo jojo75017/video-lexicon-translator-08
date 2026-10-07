@@ -27,7 +27,7 @@ const STEPS = [
   {
     t: 'Coller dans EbookStudio',
     d: 'Ouvrez « Choisir mon IA · Clés API », collez la clé Azure Speech et la région, puis enregistrez. Votre clé reste privée.',
-    to: '/v3/cles-api',
+    to: '/v3/fonctionnalites/cles',
   },
 ];
 
