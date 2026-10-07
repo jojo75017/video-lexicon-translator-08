@@ -64,7 +64,7 @@ export default function V3SubscribeCheckout({
         <div className="flex items-center justify-between px-5 py-4 border-b border-black/5">
           <div>
             <div className="text-xs uppercase tracking-wider text-[var(--v3-orange-600,#C97A14)] font-semibold">
-              {priceId === 'v3_edition_lifetime' ? 'Offre de lancement V3' : 'Abonnement V3'}
+              {priceId === 'v3_edition_lifetime' ? 'Offre de lancement V3' : priceId === 'v3_audio_single' ? 'Paiement unique' : 'Abonnement V3'}
             </div>
             <div className="v3-serif text-xl font-bold text-[var(--v3-ink,#2A2118)]">
               {priceId === 'v3_edition_lifetime' ? 'Édition à vie — 47 € une seule fois' : planName}
