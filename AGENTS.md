@@ -16,3 +16,4 @@
 - The authenticated V3 home excludes acquisition content and groups every paid add-on after the useful studio sections, so subscribers see a workspace overview before optional purchases.
 - The header library loads ownership-filtered metadata through a security-invoker function, excluding manuscript bodies and embedded image blobs to prevent timeouts without weakening RLS.
 - The legacy /v3/hub page is admin-only via V3HubAdminOnly, redirecting clients to the equivalent current page so old links never expose the technical workshop.
+- The subscriber cover studio (Studio V4) lives at /v3/studio-v4 as a standalone page reusing CoverStudioPro, so subscribers reach it without the legacy hub or the paid /v3/cover-pro offer.
