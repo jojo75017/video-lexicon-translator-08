@@ -20,8 +20,8 @@ const PDF_GIFTS: PdfGift[] = [
   {
     id: 'apercu-accueil-v3',
     title: 'Aperçu complet de l’accueil EbookStudio V3',
-    description: 'Présentation figée de toute la page d’accueil abonné, prête à être jointe à un email. Aucun bouton ni lien n’est actif dans le document.',
-    path: '/apercu-accueil-ebookstudio-v3.pdf',
+    description: 'Version actualisée du 7 octobre 2026 : 12 pages avec les robots, les couleurs et les studios de l’accueil abonné. Aucun bouton ni lien n’est actif dans le document.',
+    path: '/apercu-accueil-ebookstudio-v3-2026-10-07.pdf',
     category: 'formation',
     internal: true,
   },
