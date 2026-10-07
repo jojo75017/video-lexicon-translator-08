@@ -67,4 +67,4 @@
 - [x] Afficher directement « Créer un nouveau livre » sur le livre ouvert, sans imposer un retour par l’accueil, tout en conservant les livres enregistrés.
 
 ## Bibliothèque du menu
-- [ ] Alléger le chargement des livres sans manuscrits ni images incorporées volumineuses, conserver les droits privés et vérifier les livres à l’écran.
+- [x] Alléger le chargement des livres sans manuscrits ni images incorporées volumineuses, conserver les droits privés et vérifier les livres à l’écran : 28 livres avec chapitres et 2 brouillons affichés, réponse 200, aucune erreur de page.
