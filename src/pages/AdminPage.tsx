@@ -344,7 +344,7 @@ export const AdminPage = () => {
             </div>
           </div>
           <div className="flex gap-2 flex-wrap items-center">
-            <Button onClick={() => navigate('/v3/hub')} size="lg">
+            <Button onClick={() => navigate('/v3')} size="lg">
               Ouvrir la V3
             </Button>
             <Button onClick={() => navigate('/v3/create')} size="lg" variant="outline">
