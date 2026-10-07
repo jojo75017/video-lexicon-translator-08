@@ -22,7 +22,7 @@ export default function V3LaunchBookPage() {
     <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <BackButton to="/v3#nouveau-livre" label="Retour à l’accueil" />
+          <BackButton to="/v3/create#choix-parcours" label="Retour aux choix" />
           <V3ResetBookButton />
         </div>
         <div className="mt-3 flex flex-wrap">
