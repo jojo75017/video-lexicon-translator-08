@@ -8,6 +8,20 @@
       "when": 1790945892158,
       "tag": "0000_segment_lancement_and_sends",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791379696044,
+      "tag": "0001_lightweight_private_book_library",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791379783640,
+      "tag": "0002_library_cover_text_compatibility",
+      "breakpoints": true
     }
   ]
 }

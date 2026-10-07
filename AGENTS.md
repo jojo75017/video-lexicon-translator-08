@@ -14,3 +14,4 @@
 - “Écrire un livre” uses the dedicated `/v3/lancer` direct-writing flow, while “Je raconte un livre” uses `/v3/create`, so their steps never appear identical.
 - The launch email sequence tracks the V3 preview PDF click and repeats the PDF only until each recipient has clicked it, so follow-ups stay relevant without repeatedly showing an already-viewed document.
 - The authenticated V3 home excludes acquisition content and groups every paid add-on after the useful studio sections, so subscribers see a workspace overview before optional purchases.
+- The header library loads ownership-filtered metadata through a security-invoker function, excluding manuscript bodies and embedded image blobs to prevent timeouts without weakening RLS.

@@ -65,3 +65,6 @@
 
 ## Navigation depuis un livre ouvert
 - [x] Afficher directement « Créer un nouveau livre » sur le livre ouvert, sans imposer un retour par l’accueil, tout en conservant les livres enregistrés.
+
+## Bibliothèque du menu
+- [ ] Alléger le chargement des livres sans manuscrits ni images incorporées volumineuses, conserver les droits privés et vérifier les livres à l’écran.

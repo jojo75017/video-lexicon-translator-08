@@ -3310,6 +3310,20 @@ export type Database = {
         Returns: boolean
       }
       lancement_places_restantes: { Args: { _env?: string }; Returns: number }
+      list_my_library_books: {
+        Args: never
+        Returns: {
+          author_name: string
+          chapter_count: number
+          cover_concepts: string
+          ebook_images: Json
+          id: string
+          kdp_categories: string
+          project_type: string
+          title: string
+          updated_at: string
+        }[]
+      }
       vip_days_remaining: { Args: never; Returns: number }
     }
     Enums: {
