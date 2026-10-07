@@ -47,3 +47,7 @@
 - [x] Retirer le doublon de présentation et nettoyer les ancres abonnés.
 - [x] Regrouper tous les upsells dans l’ordre demandé sans modifier leurs offres.
 - [x] Vérifier `/v3` connecté sur ordinateur et mobile, puis contrôler le build.
+
+## Parcours en 5 étapes
+- [x] Remplacer l'étape « Publication sur Amazon KDP » par « Voir tous les outils » et ajouter la note discrète « Pour les nouveaux : ils seront mis au fur et à mesure. » avec lien « Voir les tutoriels ».
+- [x] Vérifier dans le navigateur connecté les deux destinations (/v3/outils et /v3/tutoriels-v3) et le build.
