@@ -94,5 +94,6 @@ ABSOLUTELY NO TEXT: no letters, no title, no words, no logo, no watermark, no ba
   if (!imageUrl) throw new Error('Aucune image reçue.');
 
   const blob = await (await fetch(imageUrl)).blob();
-  return uploadCoverFile({ projectId: input.projectId, kind: 'illustration', blob });
+  const printBlob = await upscaleToPrintSize(blob, Boolean(input.wrap));
+  return uploadCoverFile({ projectId: input.projectId, kind: 'illustration', blob: printBlob });
 }
