@@ -626,7 +626,7 @@ const V3HubPage: React.FC = () => {
           </p>
           <div className="mt-5 grid gap-4 md:grid-cols-2">
             <button
-              onClick={() => navigate('/v3/create?ecrire=1')}
+              onClick={() => navigate('/v3/lancer')}
               className="group flex flex-col justify-between gap-4 rounded-2xl border-2 p-5 text-left transition-all hover:-translate-y-0.5 hover:shadow-lg"
               style={{ background: AMBER_SOFT, borderColor: AMBER }}
             >
@@ -679,7 +679,7 @@ const V3HubPage: React.FC = () => {
               Renseignez votre projet, puis comparez plusieurs titres, angles et synopsis élaborés depuis vos propres informations. La rédaction ne démarre qu’après votre choix.
             </p>
             <button
-              onClick={() => navigate('/v3/create?ecrire=1')}
+              onClick={() => navigate('/v3/lancer')}
               className="mt-6 inline-flex items-center gap-2 rounded-full px-8 py-4 text-base font-bold text-white transition-all hover:-translate-y-0.5"
               style={{ background: `linear-gradient(90deg, ${AMBER}, #FFB44D)` }}
             >

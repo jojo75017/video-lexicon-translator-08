@@ -502,7 +502,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 {(
                   [
                     {
-                      key: 'ecrire', to: '/v3/create?ecrire=1', onClick: () => { setShowWizard(true); setDesk(3); },
+                      key: 'ecrire', to: '/v3/lancer', onClick: () => undefined,
                       robot: 'victor', robotName: 'Victor', label: 'Écrire un livre', icon: <Sparkles className="w-3.5 h-3.5" />,
                       bg: '#1D4ED8', border: '#1e40af',
                     },

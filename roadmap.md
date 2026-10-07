@@ -55,3 +55,7 @@
 ## Bouton « Nouveau livre (remettre à zéro) »
 - [x] Agrandir le bouton et lui donner un impact visuel avec la tête de robot de Camille (portrait en médaillon, titre en gras, mention « remettre à zéro », halo animé).
 - [x] Réaligner l'en-tête de /v3/create et /v3/lancer (Retour à gauche, Nouveau livre à droite, rangée d'actions en dessous) et vérifier dans le navigateur connecté.
+
+## Séparation « Écrire » / « Je raconte »
+- [x] Envoyer tous les boutons « Écrire un livre » vers son parcours direct dédié, sans afficher les trois bureaux du parcours « Je raconte un livre ».
+- [ ] Vérifier les deux parcours séparément dans le compte connecté et contrôler la compilation.
