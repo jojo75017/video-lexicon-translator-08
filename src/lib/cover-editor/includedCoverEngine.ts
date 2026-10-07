@@ -24,6 +24,50 @@ export interface IncludedIllustrationInput {
   wrap?: boolean;
 }
 
+/**
+ * Dimensions minimales pour une impression 300 DPI :
+ *  - Kindle 6×9" : 1800×2700 px (on vise 2048×3072 pour la marge) ;
+ *  - Broché wrap complet : ~3900 px de large.
+ * Si le modèle renvoie plus petit, l'image est agrandie proprement sur canevas
+ * avant enregistrement, pour que l'export PDF reste en 300 DPI.
+ */
+const PRINT_TARGET = {
+  kindle: { width: 2048, height: 3072 },
+  wrap: { width: 3900, height: 2600 },
+} as const;
+
+async function upscaleToPrintSize(blob: Blob, wrap: boolean): Promise<Blob> {
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image();
+      el.onload = () => resolve(el);
+      el.onerror = () => reject(new Error('illustration illisible'));
+      el.src = url;
+    });
+    const target = wrap ? PRINT_TARGET.wrap : PRINT_TARGET.kindle;
+    if (img.naturalWidth >= target.width && img.naturalHeight >= target.height) return blob;
+
+    const scale = Math.max(target.width / img.naturalWidth, target.height / img.naturalHeight);
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(img.naturalWidth * scale);
+    canvas.height = Math.round(img.naturalHeight * scale);
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) return blob;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    return await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob(
+        (out) => (out ? resolve(out) : reject(new Error('agrandissement impossible'))),
+        'image/png',
+      );
+    });
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 export async function generateIncludedIllustration(input: IncludedIllustrationInput): Promise<string> {
   const scene = [input.visualPrompt, input.summary].map((s) => (s ?? '').trim()).filter(Boolean).join('\n\n');
   const bright = input.lighting === 'dark' ? 'dramatic but readable lighting' : 'bright, luminous, well-exposed lighting (never dark or muddy)';
@@ -50,5 +94,6 @@ ABSOLUTELY NO TEXT: no letters, no title, no words, no logo, no watermark, no ba
   if (!imageUrl) throw new Error('Aucune image reçue.');
 
   const blob = await (await fetch(imageUrl)).blob();
-  return uploadCoverFile({ projectId: input.projectId, kind: 'illustration', blob });
+  const printBlob = await upscaleToPrintSize(blob, Boolean(input.wrap));
+  return uploadCoverFile({ projectId: input.projectId, kind: 'illustration', blob: printBlob });
 }
