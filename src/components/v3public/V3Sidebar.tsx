@@ -105,6 +105,7 @@ const NAV: NavSection[] = [
       { to: '/v3/mes-couvertures', label: 'Mes couvertures', icon: ImageIcon },
       { to: '/v3/outils/mockup-3d', label: 'Mockups 3D', icon: ImageIcon },
       { to: '/v3/outils/audiobook', label: 'Audiobook TTS', icon: Video },
+      { to: '/v3/version-audio', label: 'Version audio · 9,99 €', icon: Video },
       { to: '/v3/outils/royalties', label: 'Calculateur royalties', icon: BarChart3 },
       { to: '/v3/outils/offerts', label: '🎁 Outils offerts', icon: Search, badge: 'Offert' },
       { to: '/v3/outils', label: 'Tous les outils', icon: ListTree },
