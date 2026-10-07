@@ -50,12 +50,10 @@ export default function CoverProAccessBar({ className }: Props) {
         <>
           <ShieldCheck className="h-4 w-4 text-emerald-700" />
           <span>
-            Importez votre image ou utilisez un modèle : tout le reste est inclus (textes, dos,
-            quatrième, exports KDP 300 DPI).
+            <Sparkles className="mr-1 inline h-4 w-4 text-primary" />
+            Tout est inclus dans votre formule : illustration IA (qualité V2), import de votre
+            image, modèles, textes, dos, quatrième et exports KDP 300 DPI.
           </span>
-          <a href="/v3/forfaits" className="ml-auto text-xs text-muted-foreground underline">
-            <Sparkles className="mr-1 inline h-3 w-3" />Option : illustration IA
-          </a>
         </>
       ) : (
         <>

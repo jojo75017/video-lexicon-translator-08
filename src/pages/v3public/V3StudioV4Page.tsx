@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Check, FolderOpen, LayoutTemplate, Wand2, Sparkles } from 'lucide-react';
+import { ArrowLeft, Check, FolderOpen, LayoutTemplate, Wand2 } from 'lucide-react';
 import CoverStudioPro from '@/components/admin/CoverStudioPro';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
 import '@/styles/v3-public.css';
 
 const INCLUDED = [
-  'Couverture en 3 étapes (qualité V2)',
+  'Couverture en 3 étapes avec illustration IA (qualité V2)',
   'Éditeur broché : modèles, textes, dos et quatrième',
   'Import de votre propre image',
   'Luminosité, contraste, gras, justification',
@@ -37,7 +37,7 @@ export default function V3StudioV4Page() {
           <li className="flex gap-2 text-sm">
             {hasAccess
               ? <><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Illustration IA (Cover Studio Pro) incluse</>
-              : <><Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" /><span className="text-muted-foreground">Option : illustration IA, incluse dans Édition</span></>}
+              : <><Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />Aperçu avant validation : vous choisissez la couverture qui vous convient</>}
           </li>
         </ul>
         <div className="mt-6 grid gap-3 sm:grid-cols-3">
