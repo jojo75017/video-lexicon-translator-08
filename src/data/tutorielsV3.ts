@@ -75,7 +75,7 @@ export const TUTORIELS_V3: TutorielV3[] = [
     'Suivez l’assistant étape par étape.',
     'Votre brouillon est sauvegardé automatiquement.',
   ]),
-  t(11, 'Créer', '« Écrire maintenant » : 5 propositions', '/v3/create?ecrire=1', [
+  t(11, 'Créer', '« Écrire maintenant » : 5 propositions', '/v3/lancer', [
     'Remplissez la fiche rapide.',
     "L'IA propose 5 idées de livre détaillées.",
     'Choisissez-en une : le sommaire est créé directement.',
