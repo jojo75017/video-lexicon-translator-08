@@ -346,24 +346,17 @@ export default function IllustrationGeneratorPanel({
           </DialogDescription>
         </DialogHeader>
 
-        {!hasAccess && !loading ? (
-          <div className="space-y-3 text-sm">
-            <p className="rounded-lg border border-border bg-muted/40 p-3">
-              Importez votre image ou utilisez un modèle : les textes, le dos, la quatrième et les
-              exports PDF KDP / PNG 300 DPI sont inclus dans votre formule.
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Option : illustration IA, incluse dans Édition ou à l'unité{' '}
-              <a href="/v3/forfaits" className="underline">voir les forfaits</a>.
-            </p>
-          </div>
-        ) : (
+        {(
           <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-2 text-sm">
-              <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
-                {credits.remaining} génération(s) incluse(s) restante(s)
-              </Badge>
-              {credits.remaining <= 0 && (
+              {!hasAccess ? (
+                <Badge variant="default">Illustration incluse dans votre formule</Badge>
+              ) : (
+                <Badge variant={credits.remaining > 0 ? 'default' : 'secondary'}>
+                  {credits.remaining} génération(s) incluse(s) restante(s)
+                </Badge>
+              )}
+              {hasAccess && credits.remaining <= 0 && (
                 <span className="text-muted-foreground">
                   {key
                     ? 'Les suivantes utilisent votre clé personnelle.'
@@ -371,6 +364,7 @@ export default function IllustrationGeneratorPanel({
                 </span>
               )}
             </div>
+
 
             {/* 1. Partir d'un de mes livres */}
             <div className="space-y-2 rounded-lg border border-border p-3">
