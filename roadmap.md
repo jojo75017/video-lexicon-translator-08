@@ -62,3 +62,6 @@
 
 ## Conversation « Je raconte un livre »
 - [x] Centrer l’accueil, la saisie, les exemples et les questions de Camille sur l’histoire, les personnages et les scènes du livre raconté.
+
+## Navigation depuis un livre ouvert
+- [x] Afficher directement « Créer un nouveau livre » sur le livre ouvert, sans imposer un retour par l’accueil, tout en conservant les livres enregistrés.
