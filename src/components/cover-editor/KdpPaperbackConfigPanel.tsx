@@ -402,8 +402,20 @@ export default function KdpPaperbackConfigPanel({ project, onProjectUpdated }: P
 
             {/* Schéma non éditable : quatrième | dos | première */}
             <div className="space-y-2">
-              <p className="text-sm font-medium text-foreground">
-                Schéma du fichier complet (non éditable)
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-sm font-medium text-foreground">
+                  Schéma du fichier complet (non éditable)
+                </p>
+                <button
+                  type="button"
+                  className="rounded-md border border-border bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:opacity-90"
+                  onClick={() => document.getElementById('etape-export')?.scrollIntoView({ behavior: 'smooth', block: 'center' })}
+                >
+                  Exporter la couverture (PDF KDP, première, dos, quatrième)
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Ce schéma montre seulement les repères de coupe : il n'est pas exporté tel quel. L'export reprend votre vraie couverture, sans repères.
               </p>
               <div
                 className="relative w-full overflow-hidden rounded-lg border-2 border-dashed border-destructive/50 bg-muted"
