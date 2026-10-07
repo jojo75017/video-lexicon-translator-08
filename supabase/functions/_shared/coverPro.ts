@@ -77,7 +77,7 @@ const PAID_STATUSES = new Set(["active", "completed", "paid"]);
 export async function hasCoverProRight(
   service: SupabaseClient,
   user: AuthedUser,
-): Promise<{ granted: boolean; reason: "admin" | "purchased" | null }> {
+): Promise<{ granted: boolean; reason: "admin" | "purchased" | "plan" | null }> {
   if (user.isAdmin) return { granted: true, reason: "admin" };
   if (!user.email) return { granted: false, reason: null };
 
@@ -90,7 +90,20 @@ export async function hasCoverProRight(
   const owns = (data ?? []).some((r: { status?: string }) =>
     PAID_STATUSES.has((r.status ?? "").toLowerCase())
   );
-  return owns ? { granted: true, reason: "purchased" } : { granted: false, reason: null };
+  if (owns) return { granted: true, reason: "purchased" };
+
+  // Inclus d'office dans les abonnements actifs Édition et Maison d'Édition
+  // (hors anciens accès à vie, qui gardent l'achat à l'unité).
+  const { data: sub } = await service
+    .from("subscribers")
+    .select("plan_tier,plan_type,status")
+    .ilike("email", user.email)
+    .maybeSingle();
+  const s = sub as { plan_tier?: string; plan_type?: string; status?: string } | null;
+  const included = !!s && ["active", "trialing"].includes((s.status ?? "").toLowerCase()) &&
+    ["edition", "maison"].includes((s.plan_tier ?? "").toLowerCase()) &&
+    (s.plan_type ?? "").toLowerCase() === "subscription";
+  return included ? { granted: true, reason: "plan" } : { granted: false, reason: null };
 }
 
 /* ------------------------------------------------------------------ */
