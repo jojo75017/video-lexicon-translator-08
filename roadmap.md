@@ -1,5 +1,8 @@
 # Roadmap
 
+## PDF de l’accueil actualisé — 7 octobre 2026
+- [ ] Refaire l’aperçu intégral depuis l’accueil connecté actuel, contrôler chaque page et fournir un lien de téléchargement sans publication ni email.
+
 ## Exports séparés du broché
 - [x] Vérifier les quatre téléchargements dans l’éditeur connecté : PDF complet sans repères, première/quatrième 1800 × 2700 px, dos 114 × 2700 px au format fini à 300 pixels par pouce.
 
