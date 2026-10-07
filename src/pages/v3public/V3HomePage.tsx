@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
 import {
