@@ -121,7 +121,7 @@ export const V3_PLANS: V3Plan[] = [
   {
     id: "maison",
     name: "Maison d'Édition",
-    tagline: "Tout compris : Édition + tous les compléments (hors Cover Studio Pro et Studio Jeunesse & BD, en option)",
+    tagline: "Tout compris : Édition + tous les compléments (Cover Studio Pro inclus ; Studio Jeunesse & BD en option)",
     monthlyPrice: 97,
     yearlyPrice: 897,
     booksPerMonth: null,
