@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, ArrowRight, History, MessageSquare, ListOrdered } from 'lucide-react';
+import { BookOpen, ArrowRight, History, MessageSquare, ListOrdered, Headphones } from 'lucide-react';
 import { readBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { loadOutlineVersions, loadRemoteThread } from '@/lib/v3/genieThread';
 
@@ -73,6 +73,11 @@ export default function V3ResumeBookCard({ compact = false }: { compact?: boolea
             : 'Ce brouillon est conservé sur cet appareil. Connectez-vous pour le retrouver partout.'}
         </p>
       )}
+      <p className="mt-2 flex items-center gap-1.5 text-[11px] font-medium" style={{ color: 'var(--v3-emerald, #064e3b)' }}>
+        <Headphones className="h-3.5 w-3.5" />
+        Bon à savoir : une fois terminé, vous pouvez aussi le faire en{' '}
+        <Link to="/v3/version-audio" className="underline underline-offset-2">version audio</Link>.
+      </p>
     </div>
   );
 }
