@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { Sparkles, Loader2, ImageIcon, ArrowRight, BookOpen, Save, Check, MessagesSquare } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,6 +87,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     if ((b.outline?.length ?? 0) > 0) return 2;
     return 1;
   });
+  const routeLocation = useLocation();
   useEffect(() => { if (showWizard) setDesk(3); }, [showWizard]);
   // « Retour aux choix » : ramène sur les 4 boutons de parcours.
   useEffect(() => {
@@ -94,9 +96,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       setTimeout(() => document.getElementById('choix-parcours')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150);
     };
     go();
-    window.addEventListener('hashchange', go);
-    return () => window.removeEventListener('hashchange', go);
-  });
+  }, [routeLocation.key]);
 
   // L'explication d'accueil reste ouverte tant que rien n'est écrit, puis s'efface.
   const [hasStory, setHasStory] = useState(() => Boolean((readBookBrief()?.sourceText || '').trim()));
