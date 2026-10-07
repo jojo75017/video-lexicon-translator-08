@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Feather, ArrowLeft, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
+import V3ResetBookButton from '@/components/v3public/V3ResetBookButton';
 import { readBookBrief } from '@/lib/v3/bookBrief';
 import {
   effectiveChapterText,
@@ -87,9 +88,16 @@ export default function V3BookPage() {
     <>
       <section className="v3-section-dark">
         <div className="max-w-4xl mx-auto px-5 md:px-8 py-14">
-          <Link to="/v3/gallery" className="text-white/60 text-sm hover:text-white flex items-center gap-2">
-            <ArrowLeft className="w-4 h-4" /> Retour à la galerie
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Link to="/v3/mes-livres" className="text-white/60 text-sm hover:text-white flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" /> Retour à mes livres
+            </Link>
+            <V3ResetBookButton
+              navigateTo="/v3/create"
+              title="Créer un nouveau livre"
+              subtitle="partir d’une page blanche"
+            />
+          </div>
           <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-6">{book.title}</h1>
           {book.author_name && <div className="mt-2 text-white/60">par {book.author_name}</div>}
         </div>
