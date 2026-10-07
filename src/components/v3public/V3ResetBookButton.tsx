@@ -1,5 +1,6 @@
 import { RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
+import AgentPortrait from './AgentPortrait';
 import { resetBookProject } from '@/lib/v3/bookBrief';
 import { clearWrittenChapters } from '@/lib/v3/writtenChapters';
 
@@ -16,10 +17,17 @@ export default function V3ResetBookButton() {
     <button
       type="button"
       onClick={onClick}
-      className="v3-btn v3-btn-reset-green text-xs font-semibold shadow-sm hover:opacity-90 transition-opacity"
-      style={{ background: 'var(--v3-emerald, #2d3e33)', borderColor: 'var(--v3-emerald, #2d3e33)' }}
+      className="v3-btn v3-btn-reset-green v3-btn-newbook"
+      title="Effacer le livre en cours et repartir d’une page blanche"
     >
-      <RotateCcw className="w-3.5 h-3.5" /> Nouveau livre (remettre à zéro)
+      <span className="v3-newbook-face" aria-hidden="true">
+        <AgentPortrait id="camille" name="Camille" />
+      </span>
+      <span className="v3-newbook-labels">
+        <span className="v3-newbook-title">Nouveau livre</span>
+        <span className="v3-newbook-sub">remettre à zéro</span>
+      </span>
+      <RotateCcw className="v3-newbook-icon" aria-hidden="true" />
     </button>
   );
 }

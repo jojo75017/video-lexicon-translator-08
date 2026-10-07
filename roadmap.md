@@ -51,3 +51,7 @@
 ## Parcours en 5 étapes
 - [x] Remplacer l'étape « Publication sur Amazon KDP » par « Voir tous les outils » et ajouter la note discrète « Pour les nouveaux : ils seront mis au fur et à mesure. » avec lien « Voir les tutoriels ».
 - [x] Vérifier dans le navigateur connecté les deux destinations (/v3/outils et /v3/tutoriels-v3) et le build.
+
+## Bouton « Nouveau livre (remettre à zéro) »
+- [x] Agrandir le bouton et lui donner un impact visuel avec la tête de robot de Camille (portrait en médaillon, titre en gras, mention « remettre à zéro », halo animé).
+- [x] Réaligner l'en-tête de /v3/create et /v3/lancer (Retour à gauche, Nouveau livre à droite, rangée d'actions en dessous) et vérifier dans le navigateur connecté.

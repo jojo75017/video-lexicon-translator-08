@@ -581,3 +581,42 @@
 /* Sections "dark" devenues claires : forcer un texte lisible sur les classes primary-foreground */
 .v3pub .v3-section-dark [class*='text-primary-foreground'] { color: #2f4a3a !important; }
 .dark .v3pub .v3-section-dark [class*='text-primary-foreground'] { color: var(--v3-ink) !important; }
+
+/* ── « Nouveau livre (remettre à zéro) » : bouton d'action principal, avec la tête de Camille ── */
+.v3pub .v3-btn.v3-btn-newbook {
+  padding: 8px 22px 8px 8px;
+  gap: 12px;
+  border-radius: 999px;
+  box-shadow: 0 16px 34px -14px rgba(29, 78, 216, 0.75);
+}
+.v3pub .v3-btn.v3-btn-newbook:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 24px 46px -14px rgba(29, 78, 216, 0.85);
+}
+.v3pub .v3-btn-newbook .v3-newbook-face {
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+  overflow: hidden;
+  flex: none;
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px rgba(255, 255, 255, 0.32);
+}
+.v3pub .v3-btn-newbook .v3-newbook-labels { display: flex; flex-direction: column; line-height: 1.05; text-align: left; }
+.v3pub .v3-btn-newbook .v3-newbook-title { font-size: 17px; font-weight: 800; letter-spacing: 0.01em; }
+.v3pub .v3-btn-newbook .v3-newbook-sub {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.85;
+}
+.v3pub .v3-btn-newbook .v3-newbook-icon { width: 20px; height: 20px; flex: none; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .v3pub .v3-btn-newbook .v3-newbook-face { animation: v3-newbook-pulse 2.8s ease-in-out infinite; }
+  @keyframes v3-newbook-pulse {
+    0%, 100% { box-shadow: 0 0 0 2px #ffffff, 0 0 0 5px rgba(255, 255, 255, 0.32); }
+    50% { box-shadow: 0 0 0 2px #ffffff, 0 0 0 9px rgba(255, 255, 255, 0.14); }
+  }
+}

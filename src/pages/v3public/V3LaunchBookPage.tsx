@@ -23,10 +23,10 @@ export default function V3LaunchBookPage() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <BackButton />
-          <div className="flex flex-wrap items-center gap-2">
-            <V3ResetBookButton />
-            <V3QuickActionsBar />
-          </div>
+          <V3ResetBookButton />
+        </div>
+        <div className="mt-3 flex flex-wrap">
+          <V3QuickActionsBar />
         </div>
 
         <div className="mt-6 text-center">
