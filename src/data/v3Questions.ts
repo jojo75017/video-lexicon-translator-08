@@ -65,7 +65,7 @@ const CURATED: QuestionEntry[] = [
     answer:
       'Oui : les titres sont nettoyés (plus d’artefacts JSON), dédoublonnés, et la table des matières utilise un habillage soigné dans les exports DOCX et PDF.',
     theme: 'Exports & fichiers',
-    action: { label: 'Exporter mon livre', route: '/v3/hub?tab=export' },
+    action: { label: 'Exporter mon livre', route: '/v3/library' },
   },
   {
     id: 'q-paypal',

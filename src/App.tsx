@@ -114,6 +114,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
+import V3HubAdminOnly from './components/v3public/V3HubAdminOnly';
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const EbookLongFormOfferPage = lazy(() => import('./pages/v3public/EbookLongFormOfferPage'));
 const StudioMicroSeriesOfferPage = lazy(() => import('./pages/v3public/StudioMicroSeriesOfferPage'));
@@ -851,7 +852,7 @@ const App = () => {
               <Route path="outils/audiobook" element={<V3PaidModuleRoute><V3AudiobookPage /></V3PaidModuleRoute>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
 
-              <Route path="hub" element={<V3LockedGate><V3Gate><V3HubPage /></V3Gate></V3LockedGate>} />
+              <Route path="hub" element={<V3LockedGate><V3HubAdminOnly><V3Gate><V3HubPage /></V3Gate></V3HubAdminOnly></V3LockedGate>} />
 
               {/* Alias historiques : plus aucun lien V3 ne doit tomber en 404 */}
               {V3_LEGACY_ALIASES.map(([from, to]) => (

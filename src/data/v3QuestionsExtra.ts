@@ -378,7 +378,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Un DOCX ou un PDF pour l’intérieur, et un JPEG ou PDF pour la couverture selon le format choisi.',
     theme: 'Publier sur Amazon KDP',
-    action: { label: 'Exporter mon livre', route: '/v3/hub?tab=export' },
+    action: { label: 'Exporter mon livre', route: '/v3/library' },
   },
   {
     id: 'x-kdp-02',
@@ -700,7 +700,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Oui, vos fichiers exportés vous appartiennent et peuvent être vendus sur votre propre boutique.',
     theme: 'Business & revenus',
-    action: { label: 'Exporter mes fichiers', route: '/v3/hub?tab=export' },
+    action: { label: 'Exporter mes fichiers', route: '/v3/library' },
   },
   {
     id: 'x-biz-03',
@@ -922,7 +922,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Word (DOCX), PDF et Markdown, avec un sommaire propre dans les deux premiers.',
     theme: 'Exports & fichiers',
-    action: { label: 'Exporter', route: '/v3/hub?tab=export' },
+    action: { label: 'Exporter', route: '/v3/library' },
   },
   {
     id: 'x-exp-02',
@@ -930,7 +930,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'Oui, le DOCX s’ouvre dans Word ou un traitement de texte gratuit et reste entièrement modifiable.',
     theme: 'Exports & fichiers',
-    action: { label: 'Exporter en Word', route: '/v3/hub?tab=export' },
+    action: { label: 'Exporter en Word', route: '/v3/library' },
   },
   {
     id: 'x-exp-03',
@@ -954,7 +954,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'La table des matières est présentée proprement et les titres sont dédoublonnés avant export.',
     theme: 'Exports & fichiers',
-    action: { label: 'Exporter en PDF', route: '/v3/hub?tab=export' },
+    action: { label: 'Exporter en PDF', route: '/v3/library' },
   },
   {
     id: 'x-exp-06',

@@ -15,3 +15,4 @@
 - The launch email sequence tracks the V3 preview PDF click and repeats the PDF only until each recipient has clicked it, so follow-ups stay relevant without repeatedly showing an already-viewed document.
 - The authenticated V3 home excludes acquisition content and groups every paid add-on after the useful studio sections, so subscribers see a workspace overview before optional purchases.
 - The header library loads ownership-filtered metadata through a security-invoker function, excluding manuscript bodies and embedded image blobs to prevent timeouts without weakening RLS.
+- The legacy /v3/hub page is admin-only via V3HubAdminOnly, redirecting clients to the equivalent current page so old links never expose the technical workshop.

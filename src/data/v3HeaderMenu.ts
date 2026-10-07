@@ -45,12 +45,10 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     links: [
       { label: 'Écrire un livre', to: '/v3/lancer', badge: 'Direct', desc: 'Ouvrez tout de suite la fiche du livre et lancez la rédaction' },
       { label: 'Ebook Planner V2 — 22 agents', to: '/ebook-planner', badge: 'Populaire', desc: 'Le pipeline P1–P15 éprouvé, en production' },
-      { label: 'Parcours 30 agents', to: '/v3/hub?tab=parcours', badge: 'V3', desc: 'Le nouveau workflow enrichi' },
       { label: 'Corriger mon livre', to: '/v3/corriger', badge: 'Nouveau', desc: 'Importez un manuscrit terminé : correction intégrale chapitre par chapitre, relecture et export KDP' },
       { label: 'BookPerfect AI', to: '/bookperfect', desc: 'Correction et polissage IA de votre manuscrit' },
 
       { label: 'Ebookbot — Chat IA', to: '/ebookbot', desc: 'Assistant conversationnel pour brainstormer' },
-      { label: 'Outils V3 (Hub)', to: '/v3/hub?tab=outils', desc: 'Tous les micro-outils IA regroupés' },
       { label: "Assistant Ebookstudio", to: '/v3/assistant', badge: 'Nouveau', desc: 'Posez votre question : réponse claire + bouton vers le bon outil' },
       { label: 'Traduction 10 langues', to: '/v3/outils/traduction', badge: 'Nouveau', desc: 'EN, ES, DE, IT, PT, NL, PL, JA, ZH, AR — IA + relecture' },
     ],
@@ -62,10 +60,10 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Le livre-objet',
     links: [
-      { label: 'Studio de couverture', to: '/v3/hub?tab=parcours&module=cover-studio-pro', badge: 'V4', desc: 'Le studio professionnel visible dans votre maison d’édition : titres, styles, images et variantes' },
+      { label: 'Studio de couverture', to: '/v3/cover-pro', badge: 'V4', desc: 'Le studio professionnel visible dans votre maison d’édition : titres, styles, images et variantes' },
       { label: 'BD Studio', to: '/bd-studio', desc: 'Bandes dessinées et albums illustrés' },
       { label: 'Illustrations intérieures', to: '/v3/create/illustre', desc: 'Images cohérentes pour chapitres et sections' },
-      { label: 'Documentation Studio', to: '/v3/hub?tab=documentation', desc: 'Docs, annexes, glossaires' },
+      { label: 'Documentation Studio', to: '/v3/outils', desc: 'Docs, annexes, glossaires' },
       { label: 'Signature auteur', to: '/signature', desc: 'Blocs signature et biographies prêts à coller' },
     ],
   },
@@ -96,7 +94,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Amazon Spy', to: '/v3/outils/espion-concurrents', desc: 'Analyse concurrentielle en temps réel' },
       { label: 'Séries & Tomes', to: '/series-tomes', desc: 'Planifiez vos séries multi-tomes' },
       { label: 'Compteur de mots KDP', to: '/word-count', desc: 'Objectifs pages/mots par format Amazon' },
-      { label: 'Exporter le livre', to: '/v3/hub?tab=export', desc: 'DOCX, PDF, ePub, KDP-ready' },
+      { label: 'Exporter le livre', to: '/v3/library', desc: 'DOCX, PDF, ePub, KDP-ready' },
     ],
   },
   {
@@ -113,7 +111,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Programme partenaires', to: '/partenaires', badge: 'Nouveau', desc: 'Textes prêts à copier, suivi des clics et des ventes, règles du programme' },
       { label: 'Galerie communauté', to: '/v3/gallery', desc: 'Livres publiés par les auteurs Ebookstudio' },
       { label: 'Ma page auteur', to: '/v3/auteur', desc: 'Configurez votre profil public' },
-      { label: 'Marketing & Emails', to: '/v3/hub?tab=outils', desc: 'Séquences email, tunnels, relance' },
+      { label: 'Marketing & Emails', to: '/v3/outils', desc: 'Séquences email, tunnels, relance' },
       { label: 'Formation Audio', to: '/formation-audio', desc: 'Podcasts et cours audio' },
       { label: 'Séries Audio', to: '/formation-series-audio', desc: 'Formations en séries structurées' },
     ],

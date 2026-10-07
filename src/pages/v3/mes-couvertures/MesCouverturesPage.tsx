@@ -354,7 +354,7 @@ export default function MesCouverturesPage() {
             <Link to="/v3/paiements">Mes paiements</Link>
           </Button>
           <Button asChild className="gap-2 bg-primary font-semibold text-primary-foreground hover:bg-primary/90">
-            <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">
+            <Link to="/v3/cover-pro">
               <ImageIcon className="h-4 w-4" /> Ouvrir le Studio V4
             </Link>
           </Button>
@@ -371,7 +371,7 @@ export default function MesCouverturesPage() {
             <div className="max-w-[230px]">
               {/* Vue abonné : ce bouton ouvre le Studio V4, jamais le studio payant. */}
               <Button asChild className="w-full gap-2 bg-orange-500 text-primary-foreground hover:bg-orange-600">
-                <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">
+                <Link to="/v3/cover-pro">
                   <Plus className="h-4 w-4" /> Créer ma couverture
                 </Link>
               </Button>
@@ -416,7 +416,7 @@ export default function MesCouverturesPage() {
               Créez votre première couverture : vous pourrez la retrouver et la modifier ici.
             </p>
             <Button asChild className="gap-2">
-              <Link to="/v3/hub?tab=parcours&module=cover-studio-pro">
+              <Link to="/v3/cover-pro">
                 <Plus className="h-4 w-4" /> Ouvrir le Studio V4
               </Link>
             </Button>

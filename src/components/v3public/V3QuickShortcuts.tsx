@@ -5,7 +5,7 @@ const SHORTCUTS = [
   { label: 'Contenu KDP', to: '/v3/kdp', color: '#4D7C5B', agent: 'gaspard', name: 'Gaspard', role: 'Toutes les pages KDP' },
   { label: 'Créer', to: '/v3/create', color: '#0F766E', agent: 'camille', name: 'Camille', role: 'Lancer un livre' },
   { label: 'Écrire', to: '/v3/lancer', color: '#1D4ED8', agent: 'victor', name: 'Victor', role: 'Rédiger chapitre par chapitre' },
-  { label: 'Habiller', to: '/v3/hub?tab=parcours&module=cover-studio-pro', color: '#EC4899', agent: 'iris', name: 'Iris', role: 'Couvertures' },
+  { label: 'Habiller', to: '/v3/cover-pro', color: '#EC4899', agent: 'iris', name: 'Iris', role: 'Couvertures' },
   { label: 'Publier', to: '/audit-pilot', color: '#0891B2', agent: 'timothee', name: 'Timothée', role: 'Audit avant publication' },
   { label: 'Vendre', to: '/kdp-keywords', color: '#CA8A04', agent: 'solene', name: 'Solène', role: 'Mots-clés Amazon' },
   { label: 'Livres spéciaux', to: '/v3/create/illustre', color: '#9333EA', agent: 'prune', name: 'Prune', role: 'Albums et illustrés' },
