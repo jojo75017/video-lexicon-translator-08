@@ -68,3 +68,6 @@
 
 ## Bibliothèque du menu
 - [x] Alléger le chargement des livres sans manuscrits ni images incorporées volumineuses, conserver les droits privés et vérifier les livres à l’écran : 28 livres avec chapitres et 2 brouillons affichés, réponse 200, aucune erreur de page.
+
+## Hub V3 masqué aux clients
+- [x] /v3/hub réservé aux admins, clients redirigés ; liens remplacés

@@ -144,7 +144,7 @@ export const V3_UPSELL_PACKS: V3UpsellPack[] = [
     desc: 'La 1re plateforme IA qui produit TOUTE la documentation d\'un produit numérique (SaaS, plugin, app, outil IA, API…) : Brand Book, manuel utilisateur, doc technique, FAQ, centre d\'aide + kit marketing (landing, one page, Product Hunt, AppSumo, kits média/affiliés) et communication (scripts vidéo, posts LinkedIn/X/Facebook). Exports Word, PDF Premium, HTML, Markdown, PowerPoint.',
     price: 47,
     priceId: 'v3_pack_documentation_studio_once',
-    to: '/v3/hub?tab=documentation',
+    to: '/v3/outils',
     badge: 'Nouveau',
     alacarte: true,
     modules: ['documentation-studio'],

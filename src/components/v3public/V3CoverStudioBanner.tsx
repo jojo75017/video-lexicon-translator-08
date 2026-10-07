@@ -18,7 +18,7 @@ const ACTIONS = [
     primary: false,
   },
   {
-    to: '/v3/hub?tab=parcours&module=cover-studio-pro',
+    to: '/v3/cover-pro',
     title: 'Ouvrir le Studio V4',
     description: 'Titres, styles, images et variantes : le studio complet de votre maison d’édition.',
     icon: ShoppingBag,
