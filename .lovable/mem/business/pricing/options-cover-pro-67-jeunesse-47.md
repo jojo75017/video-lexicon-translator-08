@@ -1,14 +1,10 @@
 ---
-name: Options à l'unité — Cover Studio Pro 67 € et Studio Jeunesse 47 €
-description: Cover Studio Pro et Studio Jeunesse ne sont inclus dans aucun forfait ; options payantes à vie pour tous
+name: Cover Studio Pro inclus dans Édition, Studio Jeunesse 47 € en option
+description: Cover Studio Pro inclus d'office dans les abonnements Édition/Maison ; 67 € à l'unité pour les autres ; Studio Jeunesse 47 € option pour tous
 type: feature
 ---
 
-Ces deux modules ne sont **jamais inclus** dans un forfait (ni Plume 27 €, ni Édition 47 €, ni Maison d'Édition 97 €) :
+- **Cover Studio Pro** : inclus d'office (valeur 67 €) dans les abonnements actifs **Édition** et **Maison d'Édition** (plan_type subscription). Plume et anciens accès à vie : achat à l'unité 67 € (les acheteurs existants gardent leur droit).
+- **Studio Jeunesse — 47 €**, paiement unique, option pour tous les forfaits.
 
-- **Cover Studio Pro — 67 €**, paiement unique, accès à vie.
-- **Studio Jeunesse — 47 €**, paiement unique, accès à vie.
-
-Mise en œuvre : paiement à l'unité via `v3-upsell-checkout` (packs `cover_studio_pro` et `studio_jeunesse`), droit accordé par le webhook dans `module_entitlements` (modules `cover_studio_pro` et `studio-jeunesse`). Ces deux modules figurent dans `PURCHASE_ONLY_MODULES` de `useModuleAccess` : la formule Édition/Maison ne les débloque pas.
-
-Textes des offres : la ligne « En option : Cover Studio Pro (67 €) et Studio Jeunesse (47 €) » apparaît sur Édition et Maison d'Édition.
+Mise en œuvre : vérification serveur dans `hasCoverProRight` (coverPro.ts) : admin → achat module_entitlements → abonnement Édition/Maison actif.

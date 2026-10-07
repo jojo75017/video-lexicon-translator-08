@@ -48,7 +48,7 @@ const cards = [
       'BD Studio Pro',
       'Traductions, audiolivre premium et maisons d’édition inclus',
       'Amazon Spy, KDP avancé et priorité aux nouveautés V4',
-      'En option : Cover Studio Pro (67 €) et Studio Jeunesse (47 €)',
+      'Inclus dans Édition : Cover Studio KDP Pro · En option : Studio Jeunesse (47 €)',
     ],
     to: '/v3/forfaits',
     icon: Crown,

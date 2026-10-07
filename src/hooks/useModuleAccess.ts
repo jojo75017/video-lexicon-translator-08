@@ -45,6 +45,14 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user?.email) { setHasAccess(false); setReason(null); return; }
 
+      // Cover Studio Pro : inclus d'office dans l'abonnement Édition (vérifié côté serveur).
+      if (moduleKey === 'cover_studio_pro') {
+        const { data: st } = await supabase.functions.invoke('cover-pro-status', { body: {} });
+        const ok = !!st?.hasAccess;
+        setHasAccess(ok);
+        setReason(ok ? (st?.reason === 'plan' ? 'plan' : 'purchased') : null);
+        return;
+      }
       const env = getStripeEnvironment();
       const { data } = await supabase.rpc('get_my_module_entitlements');
       const owned = (data ?? []).some(
