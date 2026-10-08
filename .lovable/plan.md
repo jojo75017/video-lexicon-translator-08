@@ -20,6 +20,17 @@
 - Bouton principal : **« J’accède à EbookStudio V3 à vie pour 47 € »**.
 - Le bouton doit mener au bon de commande EbookStudio en conservant les paramètres de suivi (`utm_*`, `src`, `ref`).
 
+### Direction visuelle à donner à Landaa
+- Reprendre l’identité du tunnel EbookStudio : **bleu nuit profond** en fond (`#071225`) et panneaux bleu nuit plus clair (`#13233D`).
+- Titres et textes principaux : **blanc cassé** (`#F8F5EE`) ; textes secondaires : bleu gris clair (`#A9B7CA`).
+- Boutons d’achat et actions principales : **orange vif** (`#FF6518`), avec texte blanc. L’orange doit être réservé aux clics importants.
+- Prix, garantie et petits éléments premium : **or** (`#F6BD2A`).
+- Confirmations, coches et éléments rassurants : **vert** (`#26D58B`).
+- Bordures discrètes : bleu gris (`#293D5B`).
+- Style général : professionnel, rassurant et éditorial ; pas de violet, pas de fond blanc dominant, pas de couleurs pastel, pas d’effets trop chargés.
+- Conserver la même palette sur la page principale, l’OTO 97 €, l’alternative 67 € et la confirmation pour donner l’impression d’un seul parcours.
+- Les prix **47 €**, **97 €** et **67 €** doivent être très visibles en or ; les boutons « Oui » en orange et les liens « Non merci » en texte clair, sans les rendre invisibles.
+
 ### 2. Bon de commande à 47 €
 - Produit principal : **EbookStudio V3 — accès à vie**.
 - Prix : **47 €**, paiement unique.
