@@ -138,7 +138,7 @@ export default function V3MainTabs() {
           </div>
 
           {/* Accès rapides — bleu / blanc / rouge, centrés au milieu de la barre */}
-          <div className="flex flex-1 flex-wrap items-center justify-center gap-2 px-2 py-1">
+          <div className="flex w-full flex-wrap items-center justify-center gap-2 pt-1">
             <NavLink
               to="/v3"
               end
