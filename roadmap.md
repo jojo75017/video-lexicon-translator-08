@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Boutons de navigation plus professionnels
-- [ ] Harmoniser uniquement les boutons de navigation ; conserver toutes les têtes de robots, les libellés et les destinations.
+- [x] Harmoniser uniquement les boutons de navigation ; conserver toutes les têtes de robots, les libellés et les destinations. Huit portraits présents et compilation vérifiée, sans publication.
 
 ## Présentation de l’accueil en trois pages
 - [x] Créer le nouveau PDF de trois pages avec une première page riche, les 26 portraits et leurs rôles, des captures actuelles ; trois pages inspectées, marge basse de la page 2 corrigée, livré sans publication ni envoi.

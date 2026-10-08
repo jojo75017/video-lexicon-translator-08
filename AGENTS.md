@@ -1,4 +1,5 @@
 # Architecture
+- V3 navigation groups category buttons separately from neutral admin actions, with scoped toolbar tokens so unrelated page controls retain their existing styles.
 - Separate wrap image exports crop the shared full-cover renderer at each zone’s finished dimensions, preserving artwork and text without printing editor guides.
 - Wrap layout templates transform existing text elements locally and preview through the export renderer, preserving content, private images, image adjustments and KDP geometry.
 - Cover brightness limits must match controls, persistence and export filters, so stronger brightening survives reload and printing.

@@ -653,7 +653,7 @@
   --nav-shadow: 0 1px 3px rgb(15 23 42 / 0.08);
 }
 .v3pub .v3-professional-tabs { background: var(--nav-surface) !important; border-color: var(--nav-border) !important; }
-.v3pub .v3-category-group { display: flex; align-items: center; gap: 8px; flex: none; padding: 6px; background: var(--nav-group); border: 1px solid var(--nav-border); border-radius: 16px; }
+.v3pub .v3-category-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 100%; padding: 6px; background: var(--nav-group); border: 1px solid var(--nav-border); border-radius: 16px; }
 .v3pub .v3-professional-tabs nav > a { height: 42px; box-shadow: var(--nav-shadow) !important; padding: 8px 14px !important; }
 .v3pub .v3-professional-tabs nav > a:first-child { background: var(--nav-blue) !important; border-color: var(--nav-blue) !important; color: var(--nav-surface) !important; }
 .v3pub .v3-professional-tabs nav > a:nth-child(2) { background: var(--nav-surface) !important; border-color: var(--nav-border) !important; color: var(--nav-blue-hover) !important; }

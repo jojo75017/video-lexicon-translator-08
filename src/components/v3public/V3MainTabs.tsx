@@ -97,7 +97,7 @@ export default function V3MainTabs() {
       )}
       <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 py-3 flex items-center gap-2 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
-        <nav className="hidden xl:flex items-center gap-2 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
+        <nav className="hidden xl:flex flex-wrap items-center gap-2 flex-1 min-w-0 font-sans">
           <NavLink
             to="/v3"
             end
