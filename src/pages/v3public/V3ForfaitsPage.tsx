@@ -10,7 +10,7 @@ export default function V3ForfaitsPage() {
     <div className="mx-auto max-w-7xl"><BackButton className="mb-4" />
       <h1 className="text-center text-4xl font-bold">Les offres EbookStudio</h1>
       <V3PricingOverview />
-      <section aria-labelledby="kdp-publication-limits" className="border-y border-destructive/40 py-6 text-destructive">
+      <section aria-labelledby="kdp-publication-limits" className="border-y border-destructive/40 py-6 text-destructive [&_*]:!text-destructive">
         <h2 id="kdp-publication-limits" className="text-xl font-bold">Exigences KDP — limites de publication à vérifier</h2>
         <p className="mt-3 font-semibold">Limite journalière globale indiquée : 3 titres par jour maximum.</p>
         <p className="mt-2 font-semibold">Limite hebdomadaire restreinte signalée : 10 titres par semaine.</p>
