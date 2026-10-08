@@ -57,7 +57,7 @@ const RedirectClickPage = () => {
     const sep = destination.includes('?') ? '&' : '?';
     // On transmet l'email du prospect à la destination : le ReadingGate le
     // reconnaît et ne lui redemande jamais son email (il l'a déjà donné).
-    const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
+    const emailParam = email && destination.startsWith('/') ? `&email=${encodeURIComponent(email)}` : '';
     const finalUrl = `${destination}${sep}src=email${template ? `&t=${encodeURIComponent(template)}` : ''}${emailParam}`;
 
     // Suivi non bloquant, y compris sans email identifié (Systeme.io en texte
