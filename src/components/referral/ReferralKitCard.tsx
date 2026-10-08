@@ -17,11 +17,6 @@ import {
  */
 const RATE_PCT = Math.round(COMMISSION_FIRST_PAYMENT_RATE * 100);
 
-const Plume_MONTHLY = 27;
-const PLUME_YEARLY = 270;
-const EDITION_MONTHLY = 47;
-const EDITION_YEARLY = 470;
-
 const ReferralKitCard = () => {
   const { code, stats, loading } = useReferral();
   const [copied, setCopied] = useState<string | null>(null);
@@ -31,9 +26,7 @@ const ReferralKitCard = () => {
     return `${buildPartnerLink(code)}&utm_source=parrainage`;
   }, [code]);
 
-  const plumeMonthlyCommission = formatEuro(Plume_MONTHLY * COMMISSION_FIRST_PAYMENT_RATE);
-  const editionMonthlyCommission = formatEuro(EDITION_MONTHLY * COMMISSION_FIRST_PAYMENT_RATE);
-  const editionYearlyCommission = formatEuro(EDITION_YEARLY * COMMISSION_FIRST_PAYMENT_RATE);
+  const commission = formatEuro(47 * COMMISSION_FIRST_PAYMENT_RATE);
 
   const posts = useMemo(
     () => [
@@ -73,11 +66,9 @@ const ReferralKitCard = () => {
         <div>
           <h2 className="text-lg font-bold">Votre kit de parrainage</h2>
           <p className="text-sm text-muted-foreground">
-            <strong>{RATE_PCT} %</strong> de commission sur le premier paiement de chaque abonnement
-            parrainé. Exemples : {plumeMonthlyCommission} sur Plume mensuel ({Plume_MONTHLY} €),
-            {editionMonthlyCommission} sur Édition mensuel ({EDITION_MONTHLY} €), jusqu'à{' '}
-            <strong>{editionYearlyCommission}</strong> sur Édition annuel ({EDITION_YEARLY} €). Votre
-            lien suit automatiquement les personnes que vous envoyez.
+            <strong>{RATE_PCT} %</strong> de commission sur le premier paiement encaissé.
+            Exemple : <strong>{commission}</strong> sur l’accès à vie à 47 €.
+            Votre lien suit les personnes que vous envoyez.
           </p>
         </div>
       </div>

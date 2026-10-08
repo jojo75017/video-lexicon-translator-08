@@ -1,4 +1,4 @@
-import { V3_PLANS, type V3Plan } from './v3Pricing';
+import { V3_LIFETIME_OFFERS, type V3Plan } from './v3Pricing';
 
 /**
  * Programme Partenaires EbookStudio V3 — SOURCE UNIQUE.
@@ -45,24 +45,12 @@ export interface PartnerEarning {
 }
 
 /** Gains par formule, calculés depuis les tarifs V3 réels. */
-export const PARTNER_EARNINGS: PartnerEarning[] = V3_PLANS.flatMap((plan) => [
-  {
-    planId: plan.id,
-    planName: plan.name,
-    label: `${plan.name} — mensuel`,
-    price: plan.monthlyPrice,
-    commission: round2(plan.monthlyPrice * COMMISSION_FIRST_PAYMENT_RATE),
-    highlight: false,
-  },
-  {
-    planId: plan.id,
-    planName: plan.name,
-    label: `${plan.name} — annuel`,
-    price: plan.yearlyPrice,
-    commission: round2(plan.yearlyPrice * COMMISSION_FIRST_PAYMENT_RATE),
-    highlight: plan.id === 'edition',
-  },
-]);
+export const PARTNER_EARNINGS: PartnerEarning[] = [{
+  planId: 'plume', planName: V3_LIFETIME_OFFERS.base.title,
+  label: 'EbookStudio — accès à vie', price: V3_LIFETIME_OFFERS.base.price,
+  commission: round2(V3_LIFETIME_OFFERS.base.price * COMMISSION_FIRST_PAYMENT_RATE),
+  highlight: false,
+}];
 
 /** Meilleure commission possible sur une seule vente. */
 export const BEST_COMMISSION = Math.max(...PARTNER_EARNINGS.map((e) => e.commission));
@@ -92,9 +80,9 @@ export const PARTNER_PLATFORMS: { value: string; label: string }[] = [
 export const PARTNER_BENEFITS: { title: string; detail: string }[] = [
   {
     title: `${Math.round(COMMISSION_FIRST_PAYMENT_RATE * 100)} % de commission`,
-    detail: `Sur le premier paiement de chaque abonnement souscrit avec votre lien — jusqu'à ${formatEuro(
+    detail: `Sur le premier paiement de chaque achat initial avec votre lien — jusqu'à ${formatEuro(
       BEST_COMMISSION,
-    )} pour une formule annuelle.`,
+    )} sur l’accès à vie.`,
   },
   {
     title: 'Un lien de suivi personnel',
@@ -143,7 +131,7 @@ export const PARTNER_TARGET_TYPES: { label: string; where: string; why: string }
 /** Règles du programme, affichées publiquement. */
 export const PARTNER_RULES: string[] = [
   'La commission porte sur le premier paiement encaissé, une fois le délai de remboursement passé.',
-  'Aucune commission sur vos propres abonnements ni sur ceux de vos comptes secondaires.',
+  'Aucune commission sur vos propres achats ni sur ceux de vos comptes secondaires.',
   'Aucune promesse de revenus, aucun discours « argent facile » : le studio se recommande sur son résultat, pas sur du rêve.',
   'Aucune publicité payante sur la marque EbookStudio ni sur son nom en référencement payant.',
   'Le lien de suivi est personnel et reste actif tant que vous êtes partenaire.',
@@ -161,8 +149,6 @@ export interface CopyBlock {
  * `link` est son propre lien de suivi.
  */
 export const buildPartnerKit = (link: string): CopyBlock[] => {
-  const plume = V3_PLANS[0];
-  const edition = V3_PLANS[1];
   return [
     {
       key: 'presentation',
@@ -188,7 +174,7 @@ EbookStudio V3 est construit pour l'inverse : vous accompagner jusqu'à la fin.
 - La correction se fait en quatre passes, comme en maison d'édition.
 - La couverture respecte les gabarits Amazon, et les données KDP sont prêtes à coller.
 
-Deux formules : ${plume.name} à ${plume.monthlyPrice} €/mois et ${edition.name} à ${edition.monthlyPrice} €/mois (deux mois offerts en annuel).
+EbookStudio : 47 € à vie en paiement unique, avec le Pack Édition Pro à 97 € en option.
 
 Vous pouvez le découvrir ici : ${link}
 
@@ -202,7 +188,7 @@ Vous pouvez le découvrir ici : ${link}
 
 Dans cette vidéo, je montre comment écrire et publier un livre complet sur Amazon KDP avec EbookStudio V3 : construction du sommaire, écriture chapitre par chapitre avec mémoire du livre, correction éditoriale, couverture aux gabarits KDP et export du fichier final.
 
-Formules : ${plume.name} ${plume.monthlyPrice} €/mois · ${edition.name} ${edition.monthlyPrice} €/mois (deux mois offerts sur l'année).
+EbookStudio : 47 € à vie. Pack Édition Pro : 97 € en option.
 
 Sommaire :
 00:00 Le vrai problème : finir un livre
@@ -228,7 +214,7 @@ ${link}`,
       label: 'Réponse en commentaire ou en message',
       hint: 'Quand on vous demande « tu utilises quoi ? ».',
       body: `J'utilise EbookStudio V3 : le sommaire se construit en dialogue, chaque chapitre est écrit séparément avec la mémoire du livre, et la correction se fait en quatre passes. L'export et les données KDP sont prêts à coller. C'est ici si tu veux voir : ${link}
-(lien partenaire, je touche une commission si tu t'abonnes)`,
+(lien partenaire, je touche une commission si tu achètes)`,
     },
   ];
 };
@@ -250,11 +236,11 @@ Bonjour,
 
 Je suis Georges Boubet, auteur sur Amazon KDP. J'ai développé EbookStudio, un studio francophone qui accompagne un livre du sommaire jusqu'au fichier accepté par KDP : écriture chapitre par chapitre avec mémoire du livre, correction en quatre passes, couverture aux gabarits Amazon, données KDP prêtes à coller.
 
-La version 3 ouvre le ${V3_OPENING_LABEL}, en abonnement (27 € et 47 € par mois).
+EbookStudio propose un accès à vie à 47 €, puis des options professionnelles facultatives.
 
-Je cherche deux ou trois partenaires dont l'audience publie déjà sur KDP. La proposition est simple : ${rate} % de commission sur le premier paiement de chaque abonnement souscrit via votre lien, soit jusqu'à ${formatEuro(
+Je cherche deux ou trois partenaires dont l'audience publie déjà sur KDP. La proposition est simple : ${rate} % de commission sur le premier paiement de chaque achat initial via votre lien, soit jusqu'à ${formatEuro(
         BEST_COMMISSION,
-      )} par vente en formule annuelle. Je vous ouvre un accès complet gratuit pour que vous testiez avant de décider — je ne vous demande pas de recommander à l'aveugle.
+      )} sur l’accès à vie. Je vous ouvre un accès complet gratuit pour que vous testiez avant de décider — je ne vous demande pas de recommander à l'aveugle.
 
 Le détail est ici : ${kitUrl}
 
@@ -276,7 +262,7 @@ EbookStudio V3 (ouverture le ${V3_OPENING_LABEL}) construit le sommaire avec l'a
 
 Je vous propose un accès complet gratuit pour l'essayer. Si le résultat vous convainc, il existe un programme partenaire à ${rate} % de commission sur le premier paiement (jusqu'à ${formatEuro(
         BEST_COMMISSION,
-      )} par abonnement annuel) : ${kitUrl}
+      )} sur l’accès à vie) : ${kitUrl}
 
 Et si ça ne vous convainc pas, votre retour m'intéresse quand même.
 
@@ -327,9 +313,9 @@ Bonjour,
 
 Vous utilisez déjà EbookStudio. Il arrive donc souvent qu'on vous demande avec quoi vous écrivez vos livres. À partir d'aujourd'hui, cette réponse peut vous rapporter quelque chose.
 
-Le programme de parrainage est ouvert : ${rate} % de commission sur le premier paiement de chaque abonnement souscrit avec votre lien, soit jusqu'à ${formatEuro(
+Le programme de parrainage est ouvert : ${rate} % de commission sur le premier paiement de chaque achat initial avec votre lien, soit jusqu'à ${formatEuro(
         BEST_COMMISSION,
-      )} pour une formule annuelle. Aucune démarche compliquée, aucun engagement.
+      )} sur l’accès à vie. Aucune démarche compliquée, aucun engagement.
 
 Vous créez votre lien en une minute ici : ${kitUrl}
 
@@ -347,9 +333,9 @@ Georges`,
 
 Vous utilisez EbookStudio et j'ai le sentiment que le studio vous sert vraiment — c'est exactement le profil que je cherche.
 
-Si vous en parlez déjà autour de vous, autant que cela vous rapporte quelque chose : le programme partenaire verse ${rate} % de commission sur le premier paiement de chaque abonnement souscrit avec votre lien, jusqu'à ${formatEuro(
+Si vous en parlez déjà autour de vous, autant que cela vous rapporte quelque chose : le programme partenaire verse ${rate} % de commission sur le premier paiement de chaque achat initial avec votre lien, jusqu'à ${formatEuro(
         BEST_COMMISSION,
-      )} pour une formule annuelle.
+      )} sur l’accès à vie.
 
 Vous obtenez votre lien en une minute ici : ${kitUrl}
 

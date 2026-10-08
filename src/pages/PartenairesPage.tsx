@@ -34,7 +34,7 @@ const STEPS: { n: string; title: string; detail: string }[] = [
     n: '2',
     title: 'Vous recevez votre lien',
     detail:
-      'Un lien personnel, créé en une seconde. Chaque clic et chaque abonnement souscrit sont comptés.',
+      'Un lien personnel, créé en une seconde. Chaque clic et chaque achat initial sont comptés.',
   },
   {
     n: '3',
@@ -59,10 +59,10 @@ export default function PartenairesPage() {
   return (
     <div className="min-h-screen" style={{ background: PAPER, color: INK }}>
       <SeoHead
-        title={`Programme partenaires EbookStudio — ${ratePct} % par abonnement`}
+        title={`Programme partenaires EbookStudio — ${ratePct} % par achat initial`}
         description={`Recommandez EbookStudio V3 à votre audience d'auteurs et touchez ${ratePct} % du premier paiement, jusqu'à ${formatEuro(
           BEST_COMMISSION,
-        )} par abonnement. Accès d'essai offert, kit de textes prêt à publier.`}
+        )} par achat initial. Accès d'essai offert, kit de textes prêt à publier.`}
         canonical="/partenaires"
       />
 
@@ -103,7 +103,7 @@ export default function PartenairesPage() {
           <p className="mt-5 max-w-2xl text-base leading-relaxed md:text-lg" style={{ color: INK_SOFT }}>
             EbookStudio V3 accompagne un livre du sommaire jusqu'au fichier accepté par Amazon KDP.
             Si vous parlez à des auteurs — chaîne, blog, newsletter, groupe, podcast — vous touchez{' '}
-            <strong>{ratePct} % du premier paiement</strong> de chaque abonnement souscrit avec
+            <strong>{ratePct} % du premier paiement</strong> de chaque achat initial avec
             votre lien, soit jusqu'à <strong>{formatEuro(BEST_COMMISSION)}</strong> par vente.
           </p>
 
@@ -158,8 +158,7 @@ export default function PartenairesPage() {
         <div className="mx-auto max-w-5xl px-5 py-14">
           <h2 className="text-2xl font-bold md:text-3xl">Les commissions, en clair</h2>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: INK_SOFT }}>
-            {ratePct} % du premier paiement encaissé. Les formules annuelles rapportent le plus,
-            parce que le premier paiement y couvre l'année entière.
+            {ratePct} % du premier paiement encaissé. L’accès à vie à 47 € correspond à 7,05 € de commission.
           </p>
 
           <div
@@ -211,7 +210,7 @@ export default function PartenairesPage() {
             style={{ background: IVORY, borderColor: GOLD }}
           >
             <label className="block text-sm font-semibold">
-              Si {sales} personne{sales > 1 ? 's' : ''} de votre audience s'abonne
+              Si {sales} personne{sales > 1 ? 's' : ''} de votre audience achètent
               {sales > 1 ? 'nt' : ''}
             </label>
             <input
@@ -221,7 +220,7 @@ export default function PartenairesPage() {
               value={sales}
               onChange={(e) => setSales(Number(e.target.value))}
               className="mt-3 w-full accent-[#B08D3F]"
-              aria-label="Nombre d'abonnements générés"
+              aria-label="Nombre d’achats initiaux"
             />
             <p className="mt-3 text-2xl font-bold" style={{ color: INK }}>
               ≈ {formatEuro(projected)}

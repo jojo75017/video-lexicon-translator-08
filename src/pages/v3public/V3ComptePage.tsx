@@ -116,7 +116,7 @@ export default function V3ComptePage() {
               className="text-xs font-semibold inline-flex items-center gap-1"
               style={{ color: "#008296" }}
             >
-              "Voir les offres à vie" <ArrowRight size={12} />
+              Voir les offres à vie <ArrowRight size={12} />
             </Link>
           </div>
 

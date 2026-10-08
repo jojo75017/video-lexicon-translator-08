@@ -87,7 +87,7 @@ const CURATED: QuestionEntry[] = [
     id: 'q-v2',
     question: 'J’étais client de la V2, que devient mon accès ?',
     answer:
-      'Votre V2 reste acquise à vie, trois modules V3 vous sont offerts, et vous gardez -20 % à vie sur Plume ou Édition.',
+      'Votre V2 reste accessible jusqu’au 31 décembre 2026, vos modules V3 offerts et vos avantages déjà acquis restent conservés. Aucun nouvel achat obligatoire.',
     theme: 'Forfaits & paiement',
     action: { label: 'Mon offre ancien client', route: '/v3/migration' },
   },
