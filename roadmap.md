@@ -1,7 +1,7 @@
 # Roadmap
 
 ## Présentation de l’accueil en trois pages
-- [ ] Créer le nouveau PDF avec une première page riche, les portraits des robots et leurs rôles, des captures actuelles ; inspecter les trois pages, livrer sans publication ni envoi.
+- [x] Créer le nouveau PDF de trois pages avec une première page riche, les 26 portraits et leurs rôles, des captures actuelles ; trois pages inspectées, marge basse de la page 2 corrigée, livré sans publication ni envoi.
 
 ## Modules de l’accueil : inclus ou options
 - [x] Ajouter les mentions directement sous les titres des dix encarts noirs ; dix encarts vérifiés dans l’accueil connecté, captures couverture et niches lisibles, build OK, sans publication.
