@@ -84,4 +84,5 @@
 - [x] OTO « Pack Édition Pro 97 € » après l'achat 47 €, puis version allégée Cover Studio Pro 67 €
 - [ ] OTO 2 et 3, paiement en un clic, tableau de suivi : plus tard, si les ventes suivent
 
-- [ ] Préparer et envoyer la relance Resend aux non-cliqueurs autorisée par Georges, après validation de la formulation exacte et du ciblage (100/j max).
+- [x] Préparer la relance Resend aux non-cliqueurs autorisée par Georges, avec désinscription, exclusion des acheteurs/abonnés et anti-doublon ; premier lot de 100 envoyé le 8 octobre 2026, plafond quotidien atteint.
+- [ ] Envoyer les lots restants de cette relance, 100 maximum par jour, uniquement après une nouvelle autorisation explicite de Georges.

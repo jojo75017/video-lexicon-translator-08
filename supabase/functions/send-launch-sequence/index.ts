@@ -38,6 +38,7 @@ interface LaunchEmail {
   preheader: string;
   ctaLabel: string;
   goal: string;
+  header?: string;
   /** Paragrapes du corps (texte). Le CTA est inséré automatiquement. */
   paragraphs: string[];
 }
@@ -138,6 +139,20 @@ const LAUNCH_EMAILS: LaunchEmail[] = [
       "Même si vous ne retenez qu'une seule idée, elle peut devenir le point de départ du livre que vous repoussez depuis trop longtemps.",
     ],
   },
+  {
+    step: 7,
+    template: "grande-nouveaute-non-cliqueurs-2026-10-08",
+    shortKey: "apv3",
+    subject: "Une grande nouveauté arrive bientôt",
+    preheader: "Inscrivez-vous dès maintenant pour ne rien manquer.",
+    ctaLabel: "Je m'inscris maintenant",
+    goal: "Inscription des non-cliqueurs avant la grande nouveauté",
+    header: "EbookStudio — une grande nouveauté arrive",
+    paragraphs: [
+      "Une grande nouveauté arrive bientôt chez EbookStudio.",
+      "Inscrivez-vous dès maintenant pour ne rien manquer.",
+    ],
+  },
 ];
 
 const SIGN = `Georges Boubet\nFondateur d'EbookStudio\n${DIRECT_EMAIL}`;
@@ -187,13 +202,13 @@ async function isAdmin(req: Request, baseUrl: string): Promise<boolean> {
   return allowed === true;
 }
 
-function buildText(email: LaunchEmail, firstName: string | null, ctaUrl: string): string {
+function buildText(email: LaunchEmail, firstName: string | null, ctaUrl: string, unsubscribeUrl: string): string {
   const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
   const body = email.paragraphs.join("\n\n");
-  return `${hello}\n\n${body}\n\n>> ${email.ctaLabel} : ${ctaUrl}\n\n${SIGN}`;
+  return `${hello}\n\n${body}\n\n>> ${email.ctaLabel} : ${ctaUrl}\n\n${SIGN}\n\nSe désinscrire : ${unsubscribeUrl}`;
 }
 
-function buildHtml(email: LaunchEmail, firstName: string | null, ctaUrl: string, pixelUrl: string): string {
+function buildHtml(email: LaunchEmail, firstName: string | null, ctaUrl: string, pixelUrl: string, unsubscribeUrl: string): string {
   const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
   const paragraphs = email.paragraphs
     .map((p) => {
@@ -216,7 +231,7 @@ function buildHtml(email: LaunchEmail, firstName: string | null, ctaUrl: string,
 <tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:#1f2937">
 <tr><td style="background:#232F3E;padding:22px 26px;color:#ffffff;font:700 21px/1.3 Arial,Helvetica,sans-serif">
-EbookStudio — V3 arrive le 1er octobre
+${email.header ?? "EbookStudio — V3 arrive le 1er octobre"}
 </td></tr>
 <tr><td style="padding:26px;font-size:16px;line-height:1.6">
 <p style="margin:0 0 16px">${hello}</p>
@@ -228,7 +243,7 @@ ${paragraphs}
 <p style="margin:20px 0 0">Georges Boubet<br><span style="color:#555;font-size:14px">EbookStudio — 71 livres déjà publiés</span></p>
 </td></tr>
 </table>
-<p style="font-size:11px;color:#999;text-align:center;margin:16px 0 0">Vous recevez cet email car vous avez demandé à découvrir EbookStudio. Désinscription via le lien de pied de page.</p>
+<p style="font-size:11px;color:#999;text-align:center;margin:16px 0 0">Vous recevez cet email car vous avez demandé à découvrir EbookStudio. <a href="${unsubscribeUrl}" style="color:#999">Se désinscrire</a></p>
 <img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;width:1px;height:1px" />
 </td></tr></table></body></html>`;
 }
@@ -388,14 +403,15 @@ Deno.serve(async (req) => {
       const encEmail = encodeURIComponent(r.email);
       const ctaUrl = `${SITE_ORIGIN}/r/${email.shortKey}?e=${encEmail}&t=${encodeURIComponent(email.template)}`;
       const pixelUrl = `${baseUrl}/functions/v1/track-email-open?s=${email.step}&t=${encodeURIComponent(email.template)}&e=${encEmail}`;
+      const unsubscribeUrl = `${baseUrl}/functions/v1/unsubscribe?email=${encEmail}`;
 
       const res = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN,
         to: [to],
         reply_to: REPLY_TO,
         subject: email.subject,
-        html: buildHtml(email, r.first_name, ctaUrl, pixelUrl),
-        text: buildText(email, r.first_name, ctaUrl),
+        html: buildHtml(email, r.first_name, ctaUrl, pixelUrl, unsubscribeUrl),
+        text: buildText(email, r.first_name, ctaUrl, unsubscribeUrl),
         tags: [{ name: "sequence", value: email.template }],
       });
 
