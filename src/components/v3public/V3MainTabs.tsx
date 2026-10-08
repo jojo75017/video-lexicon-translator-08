@@ -98,79 +98,6 @@ export default function V3MainTabs() {
       <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 py-3 flex items-center gap-2 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
         <nav className="hidden xl:flex flex-wrap items-center gap-2 flex-1 min-w-0 font-sans">
-          <NavLink
-            to="/v3"
-            end
-            className="v3-btn h-9 rounded-full text-[12px] ml-1 shrink-0 transition-transform"
-            style={({ isActive }) => ({
-              padding: '8px 10px', gap: 6,
-              background: '#1D4ED8',
-              color: '#ffffff',
-              border: '1px solid #1e40af',
-              fontWeight: 700,
-              textShadow: 'none',
-              ...(isActive ? { boxShadow: '0 0 0 2px rgba(29,78,216,0.35)' } : {}),
-            })}
-          >
-            <span aria-hidden className="text-[15px] hidden min-[1440px]:inline">🏠</span>
-            <span>Accueil</span>
-          </NavLink>
-          <NavLink
-            to="/v3/offre"
-            className={({ isActive }) =>
-              `v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform ${isActive ? 'ring-2 ring-offset-1' : ''}`
-            }
-            style={{
-              background: '#ffffff',
-              color: '#1e3a8a',
-              border: '1px solid #94a3b8',
-              fontWeight: 700,
-              textShadow: 'none',
-              padding: '8px 10px',
-              gap: 6,
-            }}
-          >
-            <span aria-hidden>✨</span>
-            <span>Offre à vie · 15 oct.</span>
-          </NavLink>
-          <NavLink
-            to={pathname === '/v3' ? '/v3#v3-upsells' : '/v3/upsells'}
-            onClick={
-              pathname === '/v3'
-                ? (e) => {
-                    e.preventDefault();
-                    const el = document.getElementById('v3-upsells');
-                    if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    else navigate('/v3/upsells');
-                  }
-                : undefined
-            }
-            className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
-            style={({ isActive }) => ({
-              background: '#DC2626',
-              color: '#ffffff',
-              border: '1px solid #b91c1c',
-              fontWeight: 700,
-              textShadow: 'none',
-              padding: '8px 10px',
-              gap: 6,
-              ...(isActive ? { boxShadow: '0 0 0 2px rgba(220,38,38,0.35)' } : {}),
-            })}
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>UPSELLS</span>
-            <span
-              className="hidden min-[1440px]:inline text-[10px] font-bold rounded-full px-1.5 py-0.5"
-              style={{ background: '#ffffff', color: '#b91c1c' }}
-            >
-              6
-            </span>
-          </NavLink>
-
-
-
-
-
           <div className="v3-category-group">
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
@@ -208,6 +135,75 @@ export default function V3MainTabs() {
               </div>
             );
           })}
+          </div>
+
+          {/* Accès rapides — bleu / blanc / rouge, centrés au milieu de la barre */}
+          <div className="flex w-full flex-wrap items-center justify-center gap-2 pt-1">
+            <NavLink
+              to="/v3"
+              end
+              className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
+              style={({ isActive }) => ({
+                padding: '8px 14px', gap: 6,
+                background: '#1D4ED8',
+                color: '#ffffff',
+                border: '1px solid #1e40af',
+                fontWeight: 600,
+                ...(isActive ? { boxShadow: '0 0 0 2px rgba(29,78,216,0.35)' } : {}),
+              })}
+            >
+              <span aria-hidden className="text-[15px] hidden min-[1440px]:inline">🏠</span>
+              <span>Accueil</span>
+            </NavLink>
+            <NavLink
+              to="/v3/offre"
+              className={({ isActive }) =>
+                `v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform ${isActive ? 'ring-2 ring-offset-1' : ''}`
+              }
+              style={{
+                background: '#ffffff',
+                color: '#1e3a8a',
+                border: '1px solid #94a3b8',
+                fontWeight: 600,
+                padding: '8px 14px',
+                gap: 6,
+              }}
+            >
+              <span aria-hidden>✨</span>
+              <span>Offre à vie · 15 oct.</span>
+            </NavLink>
+            <NavLink
+              to={pathname === '/v3' ? '/v3#v3-upsells' : '/v3/upsells'}
+              onClick={
+                pathname === '/v3'
+                  ? (e) => {
+                      e.preventDefault();
+                      const el = document.getElementById('v3-upsells');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      else navigate('/v3/upsells');
+                    }
+                  : undefined
+              }
+              className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
+              style={({ isActive }) => ({
+                background: '#DC2626',
+                color: '#ffffff',
+                border: '1px solid #b91c1c',
+                fontWeight: 600,
+                padding: '8px 14px',
+                gap: 6,
+                ...(isActive ? { boxShadow: '0 0 0 2px rgba(220,38,38,0.35)' } : {}),
+              })}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>UPSELLS</span>
+              <span
+                className="hidden min-[1440px]:inline text-[10px] font-bold rounded-full px-1.5 py-0.5"
+                style={{ background: '#ffffff', color: '#b91c1c' }}
+              >
+                6
+              </span>
+            </NavLink>
           </div>
         </nav>
 
