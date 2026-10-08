@@ -96,24 +96,13 @@ Le module Traduction transforme votre manuscrit en 10 langues — anglais, espag
 La communauté EbookStudio, accessible depuis /communaute, réunit déjà plus de 220 discussions et près de 300 réponses sur tout ce qui touche à l'écriture, à la publication KDP, au marketing et aux outils de la V3. Posez vos questions, partagez vos réussites, apprenez des autres auteurs.`,
   },
   {
-    title: '13. L\'offre de lancement & les 2 forfaits (8:50 → 9:35)',
+    title: '13. Accès à vie et options (8:50 → 9:35)',
     duration: '~45 s',
-    body: `Parlons tarifs — c'est clair, c'est transparent.
-
-JUSQU'AU 30 SEPTEMBRE : 47 € en un seul paiement, et vous gardez votre accès à vie.
-Pas d'abonnement, pas de mensualité, toutes les mises à jour incluses.
-
-À partir du 1er octobre, EbookStudio passe en abonnement, avec deux forfaits seulement :
-
-PLUME — 27 € par mois (ou 270 € par an, deux mois offerts).
-50 livres par mois, 22 agents IA, tous les onglets, Sommaire IA guidé, 10 langues incluses, audiolivre inclus.
-
-ÉDITION — 47 € par mois (ou 470 € par an, deux mois offerts). Notre forfait le plus recommandé.
-Livres illimités, 30 agents IA, Recherche Approfondie, Sommaire IA avancé, séries multi-tomes, Cover Studio Pro, BD Studio Pro et outils KDP avancés. Les gros compléments premium restent disponibles à la carte.
-
-Ancien client de la V2 ? Vous gardez votre V2 à vie et vous obtenez -20 % à vie sur Plume ou Édition.
-
-Paiement par carte ou par PayPal.`,
+    body: `EbookStudio : 47 € en un seul paiement pour votre accès à vie, sans abonnement.
+Écriture guidée, correction, exports et couverture incluse.
+Le Pack Édition Pro est facultatif : 97 € en paiement unique, avec Cover Studio Pro, KDP avancé, BD Studio et BookPerfect.
+Si vous voulez uniquement Cover Studio Pro, il reste disponible à 67 €. Les autres compléments restent à la carte.
+Les anciens clients et les abonnés actuels conservent leurs droits.`,
   },
   {
     title: '14. Sécurité, sauvegarde & vos données (9:35 → 9:50)',

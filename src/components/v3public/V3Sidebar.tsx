@@ -142,8 +142,8 @@ const NAV: NavSection[] = [
   {
     section: 'Mon compte',
     items: [
-      { to: '/v3/compte', label: 'Mon compte & abonnement', icon: User },
-      { to: '/v3/forfaits', label: 'Forfaits & tarifs', icon: Gem },
+      { to: '/v3/compte', label: 'Mon compte & accès', icon: User },
+      { to: '/v3/forfaits', label: 'Offres à vie & options', icon: Gem },
       
       { to: '/v3/auteur', label: 'Profil auteur', icon: User },
       { to: '/v3/parametres', label: 'Paramètres', icon: Settings },

@@ -12,7 +12,7 @@ export const LANCEMENT_PRICE_ID = "v3_edition_lifetime";
 export const LANCEMENT_FIN_ISO = "2026-10-15T23:59:59+02:00";
 export const LANCEMENT_FIN_LABEL = "15 octobre 2026";
 export const LANCEMENT_APRES_LABEL =
-  "À partir du 16 octobre 2026 : abonnements Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois.";
+  "Le contingent de lancement reste limité. Les compléments professionnels sont facultatifs, en paiement unique.";
 export const isLancementOuvert = (now = Date.now()) => now <= Date.parse(LANCEMENT_FIN_ISO);
 
 /** Source enregistrée pour les prospects du tunnel. */
@@ -129,7 +129,7 @@ export const LANCEMENT_OBJECTIONS: { objection: string; answer: string; answerLa
   {
     objection: "C'est trop cher",
     answer:
-      "Un seul livre confié à un prestataire (couverture, correction, mise en page) coûte largement plus qu'un abonnement mensuel ici. Et vous pouvez arrêter quand vous voulez : l'abonnement se résilie en un clic, sans engagement.",
+      "Vous payez une seule fois pour votre accès EbookStudio. Les options sont facultatives, sans prélèvement récurrent.",
     answerLancement:
       "Un seul livre confié à un prestataire (couverture, correction, mise en page) coûte largement plus que 47 €. Ici vous payez une seule fois, sans abonnement, et vous gardez l'atelier à vie.",
   },
@@ -141,7 +141,7 @@ export const LANCEMENT_OBJECTIONS: { objection: string; answer: string; answerLa
   {
     objection: "Et si ça ne marche pas pour moi ?",
     answer:
-      "Vous commencez par un mois, vous écrivez un premier livre et vous jugez sur le résultat. Si l'atelier ne vous convient pas, vous résiliez avant la période suivante.",
+      "Vous disposez d’une garantie de 30 jours et d’un support par email pour vous accompagner.",
     answerLancement:
       "Vous payez une seule fois, sans abonnement ni reconduction. Vous avancez à votre rythme, livre après livre, et Georges vous répond par email si vous bloquez.",
   },
@@ -168,7 +168,7 @@ export const LANCEMENT_FAQ: { q: string; a: string; abonnementOnly?: boolean }[]
   },
   {
     q: "Et après le 15 octobre ?",
-    a: "La V3 passe uniquement en abonnement : Plume 27 €/mois, Édition 47 €/mois, Maison d'Édition 97 €/mois.",
+    a: "Cette opération de lancement se termine. Vos droits acquis restent conservés ; aucun nouvel abonnement n’est annoncé. Les options restent à la carte.",
   },
   {
     q: "Puis-je résilier ?",

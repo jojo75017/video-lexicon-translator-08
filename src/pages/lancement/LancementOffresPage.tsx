@@ -12,7 +12,8 @@ import LancementOfferBanner from '@/components/lancement/LancementOfferBanner';
 import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
 import { trackCaptureEvent } from '@/lib/captureTracking';
-import { V3_PLANS, type V3BillingInterval, type V3PlanId } from '@/data/v3Pricing';
+import { V3_PLANS } from '@/data/v3Pricing';
+import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import {
   LANCEMENT_FAQ, LANCEMENT_FIN_LABEL, LANCEMENT_PLACES, LANCEMENT_PRIX, LANCEMENT_PRICE_ID,
   LANCEMENT_APRES_LABEL, isLancementOuvert, LANCEMENT_GARANTIES, LANCEMENT_OBJECTIONS,
@@ -22,7 +23,6 @@ import {
 export default function LancementOffresPage() {
   const [params] = useSearchParams();
   const source = params.get('source') || '';
-  const [interval, setInterval] = useState<V3BillingInterval>('month');
   const [checkout, setCheckout] = useState<{ priceId: string; planName: string } | null>(null);
 
   usePageMeta({
@@ -37,12 +37,6 @@ export default function LancementOffresPage() {
 
   const { places, ouvert } = useLancementPlaces();
   const edition = V3_PLANS.find((p) => p.id === 'edition');
-
-  const openCheckout = (plan: V3PlanId, planName: string) => {
-    const priceId = `v3_${plan}_${interval === 'month' ? 'monthly' : 'annual'}`;
-    void trackCaptureEvent('lancement', 'checkout_open');
-    setCheckout({ priceId, planName });
-  };
 
   const returnUrl = `${window.location.origin}/lancement/merci?session_id={CHECKOUT_SESSION_ID}${
     source ? `&source=${encodeURIComponent(source)}` : ''
@@ -62,12 +56,11 @@ export default function LancementOffresPage() {
           <h1 className="mx-auto mt-5 max-w-3xl text-3xl font-bold leading-tight md:text-5xl">
             {ouvert
               ? "L'atelier V3 Édition, à vie, pour 47 € une seule fois"
-              : "Choisissez la formule qui correspond à votre rythme d'écriture"}
+              : "Les offres à vie et les options EbookStudio"}
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             {ouvert ? "L'atelier complet pour écrire, corriger, habiller, publier et vendre votre livre. Un seul paiement, aucun abonnement." : <>
-            Toutes les formules contiennent l'atelier complet : écrire, corriger, habiller, publier,
-            vendre. Elles se distinguent par le volume et les studios professionnels inclus.</>}
+            Le contingent de lancement est fermé. Vos droits acquis restent conservés ; les compléments professionnels sont facultatifs et sans abonnement.</>}
           </p>
         </header>
 
@@ -176,44 +169,9 @@ export default function LancementOffresPage() {
         </section>
         ) : (
         <section id="offres" className="mt-20">
-          <h2 className="text-center text-2xl font-bold md:text-3xl">Les trois formules</h2>
-          <div className="mt-6 flex justify-center gap-2 rounded-full border bg-muted/40 p-1 w-fit mx-auto">
-            <button
-              type="button"
-              onClick={() => setInterval('month')}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
-                interval === 'month' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              Mensuel
-            </button>
-            <button
-              type="button"
-              onClick={() => setInterval('year')}
-              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
-                interval === 'year' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'
-              }`}
-            >
-              Annuel · 2 mois offerts
-            </button>
-          </div>
-
-          <div className="mt-8 grid gap-6 lg:grid-cols-3">
-            {V3_PLANS.map((plan) => {
-              const amount = interval === 'month' ? plan.monthlyPrice : plan.yearlyPrice;
-              const highlight = plan.id === 'edition';
-              return (
-                <div
-                  key={plan.id}
-                  className={`flex flex-col rounded-2xl border bg-card p-6 ${
-                    highlight ? 'border-primary shadow-lg lg:scale-[1.02]' : ''
-                  }`}
-                >
-                  {highlight && (
-                    <span className="mb-3 w-fit rounded-full bg-primary px-3 py-1 text-xs font-bold text-primary-foreground">
-                      Le plus choisi
-                    </span>
-                  )}
+          <V3PricingOverview baseAvailable={false} />
+        </section>
+        )}
                   <h3 className="text-xl font-bold">{plan.name}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">{plan.tagline}</p>
                   <p className="mt-5 text-4xl font-bold">
@@ -281,7 +239,7 @@ export default function LancementOffresPage() {
         <section className="mt-16">
           <h2 className="text-2xl font-bold md:text-3xl">Questions fréquentes</h2>
           <Accordion type="single" collapsible className="mt-4">
-            {LANCEMENT_FAQ.filter((f) => !(ouvert && f.abonnementOnly)).map((f, i) => (
+            {LANCEMENT_FAQ.filter((f) => !f.abonnementOnly).map((f, i) => (
               <AccordionItem key={f.q} value={`q${i}`}>
                 <AccordionTrigger className="text-left">{f.q}</AccordionTrigger>
                 <AccordionContent className="text-muted-foreground">{f.a}</AccordionContent>

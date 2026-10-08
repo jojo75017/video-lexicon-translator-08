@@ -31,7 +31,7 @@ export default function V3LaunchGlobalBanner() {
           className="text-[13px] sm:text-[14px] font-medium text-white"
           style={{ fontFamily: "'Work Sans', system-ui, sans-serif" }}
         >
-          <strong className="text-[#D4AF37]">V3 Édition à vie — 47 € une seule fois</strong> — 15 places, ensuite uniquement par abonnement.{' '}
+          <strong className="text-[#D4AF37]">V3 Édition à vie — 47 € une seule fois</strong> — 15 places de lancement, options facultatives.{' '}
           <span className="underline decoration-[#D4AF37]/60 underline-offset-2 group-hover:decoration-[#D4AF37]">
             Voir l'offre →
           </span>

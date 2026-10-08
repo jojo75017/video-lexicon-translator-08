@@ -26,7 +26,7 @@ export default function LancementOfferBanner({ source }: { source?: string }) {
   if (r.ms === 0 || places <= 0) {
     return (
       <div className="w-full border-b border-primary/20 bg-primary/5 px-4 py-3 text-center text-sm text-foreground">
-        L'offre de lancement est terminée. {LANCEMENT_APRES_LABEL.replace('À partir du 16 octobre 2026 : a', 'A')}
+        L'offre de lancement est terminée. {LANCEMENT_APRES_LABEL}
       </div>
     );
   }

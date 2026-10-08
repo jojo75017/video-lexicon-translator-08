@@ -78,7 +78,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi seulement 15 places ?",
-    a: "Parce que c'est le tout dernier contingent d'accès à vie avant le passage définitif aux abonnements. L'offre ferme dès la 15e commande réglée, ou au 15 octobre 2026 au plus tard, selon ce qui arrive en premier. Le compteur affiché en haut de page correspond aux commandes réellement payées.",
+    a: "Parce que ce contingent de lancement est limité. L'offre ferme dès la 15e commande réglée, ou au 15 octobre 2026 au plus tard, selon ce qui arrive en premier. Le compteur affiché en haut de page correspond aux commandes réellement payées.",
   },
   {
     q: "Puis-je payer avec PayPal ?",
@@ -102,7 +102,7 @@ const FAQ: Array<{ q: string; a: string }> = [
   },
   {
     q: "Pourquoi commander maintenant ?",
-    a: "Parce qu'il ne reste que 15 accès à vie à 47 €, pendant 15 jours au maximum. Ensuite, EbookStudio est proposé uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois.",
+    a: "Ce contingent de lancement à 47 € est limité à 15 places jusqu’au 15 octobre 2026. Les compléments professionnels restent facultatifs, sans abonnement.",
   },
   {
     q: "Comment mon accès est-il ouvert après le paiement ?",
@@ -451,8 +451,8 @@ export default function V3CommanderPage() {
                 </div>
                 <p className="subscription">
                   {offerOver
-                    ? "EbookStudio est désormais accessible uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois."
-                    : `Après ces ${FONDATEUR_SEATS} places, EbookStudio sera accessible uniquement par abonnement : Plume 27 €/mois, Édition 47 €/mois ou Maison d'Édition 97 €/mois.`}
+                    ? "Le contingent de lancement est fermé. Vos accès déjà achetés restent conservés."
+                    : `Un seul paiement pour votre accès. Après l’achat, le Pack Édition Pro à 97 € vous sera proposé en option, sans obligation.`}
                 </p>
 
                 <label htmlFor="cmdq-email">Votre adresse e-mail</label>
@@ -484,7 +484,7 @@ export default function V3CommanderPage() {
                     {/* Offre fermée : plus aucun paiement à vie possible,
                         on redirige vers les abonnements. */}
                     <a href="/v3/forfaits" className="pay" style={{ textAlign: "center" }}>
-                      Voir les abonnements →
+                      Voir les offres et options →
                     </a>
                     <p className="secure">
                       Les {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} € sont toutes prises.
@@ -572,18 +572,17 @@ export default function V3CommanderPage() {
           <div>
             <small>POURQUOI MAINTENANT ?</small>
             <h2>
-              Les {FONDATEUR_SEATS} derniers accès à vie, puis c'est terminé
+              Un contingent de lancement limité à {FONDATEUR_SEATS} places
             </h2>
             <p>
-              EbookStudio V3 est désormais proposé par abonnement : Plume 27 €/mois, Édition
-              47 €/mois ou Maison d'Édition 97 €/mois. Avant de fermer définitivement l'accès à vie,
-              j'ouvre un tout dernier contingent de {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} €,
+              EbookStudio V3 se choisit en paiement unique, avec des options facultatives.
+              Pour cette opération, j'ouvre un tout dernier contingent de {FONDATEUR_SEATS} places à {FONDATEUR_PRICE} €,
               valable jusqu'au {FONDATEUR_END_LABEL} au plus tard. Vous payez une seule fois et
               vous ne repayez jamais.
             </p>
             <p style={{ fontSize: "0.9rem", opacity: 0.85 }}>
-              Les deux studios vendus séparément restent des options payantes pour tout le monde :
-              Cover Studio Pro (67 €) et Studio Jeunesse (47 €).
+              Le Pack Édition Pro à 97 € inclut Cover Studio Pro. Le studio de couverture Pro seul
+              reste disponible à 67 €, et Studio Jeunesse à 47 €. Les clients déjà équipés gardent leurs droits.
             </p>
           </div>
         </section>

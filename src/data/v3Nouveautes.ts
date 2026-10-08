@@ -9,7 +9,7 @@
  * Il n'y a plus aucun badge « NEW » écrit à la main : on ajoute une ligne ici, c'est tout.
  */
 
-import { getV3Plan } from './v3Pricing';
+
 
 /** Palier requis pour utiliser la nouveauté. */
 export type V3NouveauteTier = 'offert' | 'plume' | 'edition';
@@ -29,14 +29,12 @@ export interface V3Nouveaute {
   status?: V3NouveauteStatus;
 }
 
-const plume = getV3Plan('plume');
-const edition = getV3Plan('edition');
 
 /** Libellés de palier dérivés des tarifs réels (jamais écrits en dur). */
 export const V3_TIER_LABEL: Record<V3NouveauteTier, string> = {
   offert: '🎁 Offert à tous',
-  plume: `Plume ${plume?.monthlyPrice ?? 27} €/mois`,
-  edition: `Édition ${edition?.monthlyPrice ?? 47} €/mois`,
+  plume: 'Accès inclus / droits acquis',
+  edition: 'Studio professionnel / option',
 };
 
 export const V3_TIER_COLOR: Record<V3NouveauteTier, string> = {

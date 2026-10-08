@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Crown, Key, CreditCard, Gauge, ArrowRight, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { V3_PLANS, formatPrice } from "@/data/v3Pricing";
+import { V3_PLANS } from "@/data/v3Pricing";
 import { BackButton } from "@/components/v3/BackButton";
 
 type ProjectRow = {
@@ -98,7 +98,7 @@ export default function V3ComptePage() {
                   {currentPlan.name}
                 </p>
                 <p className="text-xs mb-3" style={{ color: "#6b7280" }}>
-                  {formatPrice(currentPlan.monthlyPrice)}/mois · {currentPlan.agentsCount} agents
+                  Vos conditions d’achat et droits acquis restent inchangés
                 </p>
               </>
             ) : (
@@ -107,7 +107,7 @@ export default function V3ComptePage() {
                   Aucun
                 </p>
                 <p className="text-xs mb-3" style={{ color: "#6b7280" }}>
-                  Choisissez un forfait pour commencer
+                  Consultez vos achats et vos droits d’accès
                 </p>
               </>
             )}
@@ -116,7 +116,7 @@ export default function V3ComptePage() {
               className="text-xs font-semibold inline-flex items-center gap-1"
               style={{ color: "#008296" }}
             >
-              {currentPlan ? "Changer" : "Voir les forfaits"} <ArrowRight size={12} />
+              "Voir les offres à vie" <ArrowRight size={12} />
             </Link>
           </div>
 
@@ -241,7 +241,7 @@ export default function V3ComptePage() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold border"
               style={{ borderColor: "#008296", color: "#008296" }}
             >
-              Changer de forfait
+              Voir les offres et options
             </Link>
           </div>
         </section>
