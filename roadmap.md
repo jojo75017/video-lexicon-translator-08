@@ -72,3 +72,7 @@
 ## Hub V3 masqué aux clients
 - [x] /v3/hub réservé aux admins, clients redirigés ; liens remplacés
 - [x] Studio V4 abonnés sur /v3/studio-v4, boutons couverture reliés
+
+## Modèle 47 € + OTO (version allégée)
+- [x] OTO « Pack Édition Pro 97 € » après l'achat 47 €, puis version allégée Cover Studio Pro 67 €
+- [ ] OTO 2 et 3, paiement en un clic, tableau de suivi : plus tard, si les ventes suivent
