@@ -6,6 +6,7 @@ import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 import useV3Open from '@/hooks/useV3Open';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
+import { Button } from '@/components/ui/button';
 import AgentPortrait from '@/components/v3public/AgentPortrait';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
@@ -79,7 +80,7 @@ export default function V3MainTabs() {
 
   return (
     <div data-v3-nav=""
-      className="sticky top-16 z-30 relative overflow-x-clip"
+      className="v3-professional-tabs sticky top-16 z-30 relative overflow-x-clip"
       style={{
         background: 'var(--v3-paper)',
         borderBottom: '1px solid var(--v3-line)',
@@ -94,9 +95,9 @@ export default function V3MainTabs() {
           🔒 Aperçu de la V3 — les onglets s'ouvrent le 1ᵉʳ octobre 2026
         </div>
       )}
-      <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 h-14 flex items-center gap-1 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
+      <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 py-3 flex items-center gap-2 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
-        <nav className="hidden xl:flex items-center gap-0.5 min-[1440px]:gap-1 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
+        <nav className="hidden xl:flex items-center gap-2 flex-1 min-w-0 overflow-x-auto v3-no-scrollbar font-sans">
           <NavLink
             to="/v3"
             end
@@ -170,6 +171,7 @@ export default function V3MainTabs() {
 
 
 
+          <div className="v3-category-group">
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
 
@@ -180,7 +182,8 @@ export default function V3MainTabs() {
                 onMouseEnter={(e) => openCat(cat.key, e.currentTarget)}
                 onMouseLeave={scheduleClose}
               >
-                <button
+                <Button
+                  variant="ghost"
                   type="button"
                   onClick={(e) => {
                     if (openKey === cat.key) setOpenKey(null);
@@ -188,22 +191,12 @@ export default function V3MainTabs() {
                   }}
                   data-active={active ? 'true' : 'false'}
                   className="v3-btn v3-robot-tab flex h-9 items-center gap-1 rounded-full text-[11.5px] min-[1440px]:text-[12px] font-sans font-semibold whitespace-nowrap transition-colors"
-                  style={(() => {
-                    const c = ROBOT_THEME[cat.key]?.color ?? '#0F766E';
-                    return {
-                      ['--robot' as string]: c,
-                      padding: window.innerWidth < 1440 ? '8px 5px' : '8px 10px',
-                      color: '#ffffff',
-                      textShadow: 'none',
-                      borderColor: active ? c : `${c}cc`,
-                      background: active ? c : `${c}E6`,
-                    };
-                  })()}
+                  data-category={cat.key}
                 >
                   {ROBOT_THEME[cat.key] && (
                     <span
                       aria-hidden
-                      className="inline-block w-6 h-6 -ml-1 rounded-full overflow-hidden shrink-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover"
+                      className="inline-block w-7 h-7 rounded-full overflow-hidden shrink-0 [&_img]:w-full [&_img]:h-full [&_img]:object-cover"
                       style={{ boxShadow: '0 0 0 1.5px #ffffff' }}
                     >
                       <AgentPortrait id={ROBOT_THEME[cat.key].agent} name={ROBOT_THEME[cat.key].name} />
@@ -211,10 +204,11 @@ export default function V3MainTabs() {
                   )}
                   <span>{cat.label}</span>
                   <ChevronDown className="w-3.5 h-3.5 opacity-90" style={{ color: '#ffffff' }} />
-                </button>
+                </Button>
               </div>
             );
           })}
+          </div>
         </nav>
 
         {/* « Tous les outils » reste visible à droite, hors de la zone scrollable */}
