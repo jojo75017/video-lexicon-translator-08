@@ -1,5 +1,8 @@
 # Roadmap
 
+## Présentation de l’accueil en trois pages
+- [x] Créer le nouveau PDF de trois pages avec une première page riche, les 26 portraits et leurs rôles, des captures actuelles ; trois pages inspectées, marge basse de la page 2 corrigée, livré sans publication ni envoi.
+
 ## Modules de l’accueil : inclus ou options
 - [x] Ajouter les mentions directement sous les titres des dix encarts noirs ; dix encarts vérifiés dans l’accueil connecté, captures couverture et niches lisibles, build OK, sans publication.
 - [x] Vérifier les huit modules et afficher leur statut réel sans changer les droits ni les paiements ; préciser les OTO déjà disponibles (97 € puis alternative 67 €, OTO suivantes différées). Rendu navigateur vérifié, aucune erreur de page, build OK.
