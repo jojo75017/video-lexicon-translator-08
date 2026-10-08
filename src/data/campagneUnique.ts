@@ -76,6 +76,7 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   l4: { key: 'l4', destination: '/commander', template: 'v3l-dernier-J1', label: 'Commander avant ce soir' },
   l5: { key: 'l5', destination: 'https://www.trafic-affiliation.com/niches_ebookstudio/', template: 'v3l-niches-offertes', label: 'Découvrir mes 10 niches offertes' },
   l6: { key: 'l6', destination: 'https://www.trafic-affiliation.com/niches_ebookstudio/', template: 'v3l-niches-offertes-relance-2', label: 'Choisir une niche pour mon prochain ebook' },
+  nouveaute1: { key: 'nouveaute1', destination: '/', template: 'grande-nouveaute-non-cliqueurs-2026-10-08', label: "Je m'inscris maintenant" },
 
   /* Vidéos courtes (shorts YouTube / TikTok) — une page de découverte douce,
    * l'essai gratuit d'abord, jamais le paiement en premier. */
