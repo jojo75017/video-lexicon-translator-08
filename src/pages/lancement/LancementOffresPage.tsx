@@ -172,55 +172,6 @@ export default function LancementOffresPage() {
           <V3PricingOverview baseAvailable={false} />
         </section>
         )}
-                  <h3 className="text-xl font-bold">{plan.name}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">{plan.tagline}</p>
-                  <p className="mt-5 text-4xl font-bold">
-                    {amount} €
-                    <span className="text-base font-normal text-muted-foreground">
-                      {interval === 'month' ? ' / mois' : ' / an'}
-                    </span>
-                  </p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {interval === 'year'
-                      ? `soit ${Math.round((amount / 12) * 100) / 100} € par mois`
-                      : 'sans engagement, résiliable à tout moment'}
-                  </p>
-                  <ul className="mt-5 flex-1 space-y-2 text-sm">
-                    {plan.features.slice(0, 9).map((f) => (
-                      <li key={f} className="flex gap-2">
-                        <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{f}
-                      </li>
-                    ))}
-                  </ul>
-                  {/* PayPal retiré du tunnel de lancement : paiement par carte uniquement. */}
-                  <div className="mt-6 space-y-2">
-                    <Button
-                      size="lg"
-                      className="w-full"
-                      variant={highlight ? 'default' : 'outline'}
-                      onClick={() => openCheckout(plan.id, plan.name)}
-                    >
-                      Je choisis {plan.name}
-                    </Button>
-                    <p className="text-center text-xs text-muted-foreground">
-                      Paiement sécurisé par carte bancaire
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-8 grid gap-3 rounded-xl border bg-muted/40 p-6 sm:grid-cols-2 lg:grid-cols-4">
-            {LANCEMENT_GARANTIES.map((g) => (
-              <div key={g} className="flex gap-2 text-sm">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{g}
-              </div>
-            ))}
-          </div>
-        </section>
-        )}
-
         {/* Sécuriser */}
         <section className="mt-20">
           <h2 className="text-2xl font-bold md:text-3xl">

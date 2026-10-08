@@ -73,15 +73,15 @@ const CURATED: QuestionEntry[] = [
     answer:
       'Oui. Le paiement carte et le paiement PayPal sont proposés côte à côte sur la page de commande.',
     theme: 'Forfaits & paiement',
-    action: { label: 'Voir les forfaits', route: '/v3/forfaits' },
+    action: { label: 'Voir les offres à vie', route: '/v3/forfaits' },
   },
   {
     id: 'q-forfaits',
-    question: 'Quelle différence entre Plume et Édition ?',
+    question: 'Que contiennent l’accès à vie et le Pack Édition Pro ?',
     answer:
-      'Plume (27 €/mois) donne tous les onglets d’écriture, le Sommaire IA guidé, les 10 langues, l’audiolivre et l’export. Édition (47 €/mois) ajoute la Recherche Approfondie, le Sommaire IA avancé, Cover Studio Pro, BD Studio Pro et inclut absolument tous les compléments (BookPerfect, traductions relues, audio premium, coaching 1-à-1). Il n’existe que ces deux forfaits. En annuel, deux mois sont offerts.',
+      'EbookStudio : 47 € à vie en paiement unique. Pack Édition Pro : 97 € en option, avec Cover Studio Pro, KDP avancé, BD Studio et BookPerfect. Cover Studio Pro seul : 67 €. Les autres compléments restent à la carte ; les droits acquis des anciens clients sont conservés.',
     theme: 'Forfaits & paiement',
-    action: { label: 'Comparer les forfaits', route: '/v3/forfaits' },
+    action: { label: 'Comparer les offres', route: '/v3/forfaits' },
   },
   {
     id: 'q-v2',

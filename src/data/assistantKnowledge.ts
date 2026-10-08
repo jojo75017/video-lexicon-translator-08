@@ -176,9 +176,9 @@ export const ASSISTANT_FAQ: AssistantFaqEntry[] = [
     question: 'Quels sont les forfaits et les prix ?',
     keywords: ['prix', 'tarif', 'forfait', 'abonnement', 'plume', 'édition', 'combien'],
     answer:
-      "Deux formules seulement : **Plume 27 €/mois** (270 €/an, 50 livres/mois) et **Édition 47 €/mois** (470 €/an, livres illimités et studios professionnels) — 2 mois offerts en annuel. Les gros compléments premium restent à la carte. Les anciens clients V2 gardent -20 % à vie.",
+      "EbookStudio : 47 € à vie en paiement unique. Pack Édition Pro : 97 € en option, avec Cover Studio Pro, KDP avancé, BD Studio et BookPerfect. Cover Studio Pro seul : 67 €. Les autres compléments restent à la carte ; les droits acquis des anciens clients sont conservés.",
     actions: [
-      { label: 'Voir les forfaits', route: '/v3/forfaits' },
+      { label: 'Voir les offres à vie', route: '/v3/forfaits' },
       { label: 'Migration ancien client V2', route: '/v3/migration' },
     ],
   },

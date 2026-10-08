@@ -39,15 +39,15 @@ const ReferralKitCard = () => {
     () => [
       {
         label: 'Message court (SMS, WhatsApp)',
-        text: `J'écris mes livres et je les publie sur Amazon avec EbookStudio : plan, chapitres, couverture et fichiers prêts pour KDP. La V3 ouvre le 1er octobre avec l'abonnement Plume à 27 €/mois ou Édition à 47 €/mois. Le lien : ${link}`,
+        text: `J'écris mes livres et je les publie sur Amazon avec EbookStudio : plan, chapitres, couverture et fichiers prêts pour KDP. EbookStudio se choisit à 47 € en paiement unique, avec le Pack Édition Pro à 97 € en option. Le lien : ${link}`,
       },
       {
         label: 'Publication Facebook / groupe KDP',
-        text: `Je partage l'outil que j'utilise pour écrire et publier mes livres sur Amazon KDP.\n\nEn pratique : je donne mon sujet, j'obtiens un sommaire que je corrige, les chapitres sont rédigés en français, la couverture est calculée au format exact de KDP (dos compris) et j'exporte un Word + PDF prêts à téléverser.\n\nLa V3 ouvre le 1er octobre (Plume 27 €/mois, Édition 47 €/mois, 2 mois offerts en annuel). Si ça vous intéresse : ${link}`,
+        text: `Je partage l'outil que j'utilise pour écrire et publier mes livres sur Amazon KDP.\n\nEn pratique : je donne mon sujet, j'obtiens un sommaire que je corrige, les chapitres sont rédigés en français, la couverture est calculée au format exact de KDP (dos compris) et j'exporte un Word + PDF prêts à téléverser.\n\nEbookStudio : 47 € à vie, sans abonnement. Pack Édition Pro à 97 € en option. Si ça vous intéresse : ${link}`,
       },
       {
         label: 'Description de vidéo YouTube',
-        text: `Vous voulez écrire et publier un livre sur Amazon sans savoir écrire ni maquetter ? EbookStudio fait le sommaire, rédige les chapitres en français, calcule la couverture au format KDP et exporte Word + PDF.\n\nLa V3 ouvre le 1er octobre : Plume 27 €/mois ou Édition 47 €/mois. Lien (je touche une commission si vous vous abonnez) : ${link}`,
+        text: `Vous voulez écrire et publier un livre sur Amazon sans savoir écrire ni maquetter ? EbookStudio fait le sommaire, rédige les chapitres en français, calcule la couverture au format KDP et exporte Word + PDF.\n\nEbookStudio : 47 € à vie, Pack Édition Pro à 97 € en option. Lien (je touche une commission si vous achetez) : ${link}`,
       },
     ],
     [link],
