@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { BadgeCheck, BookOpenText, FileCheck2, Layers, Tags, Type } from 'lucide-react';
 import aiMetadataImg from '@/assets/v3-kdp-ai-metadata.jpg';
 
@@ -37,6 +38,7 @@ export default function V3KdpFeatureShowcase7() {
             <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
               Métadonnées IA et optimiseur d’annonces
             </h3>
+              <V3FeatureAccessInfo included="Titres, descriptions et métadonnées Amazon KDP" />
             <ul className="mt-5 space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>

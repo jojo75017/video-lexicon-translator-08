@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { BookCopy, Layers, Repeat2, Sparkles, TrendingUp, Users } from 'lucide-react';
 import seriesImg from '@/assets/v3-kdp-book-series.jpg';
 
@@ -37,6 +38,7 @@ export default function V3KdpFeatureShowcase10() {
             <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
               Votre livre devient une série — encore plus professionnel
             </h3>
+              <V3FeatureAccessInfo included="Écriture des suites et continuité de votre série de livres" />
             <ul className="mt-5 space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>
