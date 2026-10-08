@@ -249,7 +249,7 @@ export default function V3CommanderPage() {
           src,
           ref,
           environment: getStripeEnvironment(),
-          returnUrl: `${window.location.origin}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
+          returnUrl: `${window.location.origin}/oto/edition-pro?session_id={CHECKOUT_SESSION_ID}`,
         },
       });
       if (error) {

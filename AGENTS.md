@@ -19,3 +19,4 @@
 - The subscriber cover studio (Studio V4) lives at /v3/studio-v4 as a standalone page reusing CoverStudioPro, so subscribers reach it without the legacy hub or the paid /v3/cover-pro offer.
 - Cover Studio Pro access is decided server-side in hasCoverProRight (purchase or active Édition/Maison subscription), so UI gates never diverge from paid rights.
 - Cover illustrations for subscribers without Cover Studio Pro use the shared included engine (`src/lib/cover-editor/includedCoverEngine.ts`, V2 `generate-ai-cover`) and store results in the private covers bucket, so the paid Pro pipeline and its credits stay untouched.
+- Post-purchase one-time offers live on /oto/* and grant rights via v3-upsell-checkout packs + module_entitlements, so no new Stripe products are needed.

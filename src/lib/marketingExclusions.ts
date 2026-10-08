@@ -8,6 +8,7 @@ export const MARKETING_EXCLUDED_PREFIXES = [
   '/ebook',
   '/admin',
   '/commander',
+  '/oto',
   '/commande',
   '/paiement',
   '/confirmation',
