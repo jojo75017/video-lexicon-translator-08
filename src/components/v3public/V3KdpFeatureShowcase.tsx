@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { Search, Sparkles } from 'lucide-react';
 import nicheResearchImg from '@/assets/v3-kdp-niche-research.jpg';
 
@@ -59,6 +60,7 @@ export default function V3KdpFeatureShowcase() {
               <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
                 Moteur de recherche de niches et de mots-clés
               </h3>
+              <V3FeatureAccessInfo included="Recherche de niches et mots-clés" options={[{ title: "Étude de marché Pro", route: "/v3/outils/espion-concurrents" }]} />
               <ul className="mt-5 space-y-3">
                 {BENEFITS.map((benefit) => (
                   <li key={benefit} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>

@@ -620,3 +620,13 @@
     50% { box-shadow: 0 0 0 2px #ffffff, 0 0 0 9px rgba(255, 255, 255, 0.14); }
   }
 }
+
+/* Access labels stay legible on both dark feature panels and light engine cards. */
+.v3pub .v3-module-status {
+  background: var(--v3-joy-orange-soft);
+  color: var(--v3-joy-ink);
+  border-color: var(--v3-joy-orange);
+}
+.v3pub .v3-module-status * { color: inherit; }
+.v3pub .v3-feature-access { color: var(--v3-on-emerald); }
+.v3pub .v3-feature-access p { color: inherit; }

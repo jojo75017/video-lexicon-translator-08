@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { Globe2, Languages, MapPin, Search, Store, TrendingUp } from 'lucide-react';
 import multilingualImg from '@/assets/v3-kdp-multilingual.jpg';
 
@@ -37,6 +38,7 @@ export default function V3KdpFeatureShowcase6() {
             <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
               Publication multilingue
             </h3>
+              <V3FeatureAccessInfo included="Rédaction de nouveaux livres en plusieurs langues" options={[{ title: "Traduction relue d’un livre existant", route: "/v3/outils/traduction" }]} />
             <ul className="mt-5 space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>

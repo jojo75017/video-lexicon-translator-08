@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { Baby, Layers, Palette, Puzzle, Shapes, Sparkles } from 'lucide-react';
 import aiIllustrationsImg from '@/assets/v3-kdp-ai-illustrations.jpg';
 
@@ -37,6 +38,7 @@ export default function V3KdpFeatureShowcase3() {
             <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
               Générateur d’illustrations et d’œuvres d’art par IA
             </h3>
+              <V3FeatureAccessInfo included="Illustration de couverture standard avec le moteur V2" />
             <ul className="mt-5 space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>

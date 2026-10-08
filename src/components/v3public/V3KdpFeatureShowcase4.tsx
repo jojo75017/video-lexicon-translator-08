@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { BookMarked, Palette, Printer, Ruler, Scan, Layers } from 'lucide-react';
 import coverDesignerImg from '@/assets/v3-kdp-cover-designer.jpg';
 
@@ -37,6 +38,7 @@ export default function V3KdpFeatureShowcase4() {
             <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
               Concepteur de couvertures IA
             </h3>
+              <V3FeatureAccessInfo included="Studio V4 : modèles, textes et exports KDP 300 DPI" options={[{ title: "Cover Studio KDP Pro", coverPro: true }]} />
             <ul className="mt-5 space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>

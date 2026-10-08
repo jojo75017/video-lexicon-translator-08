@@ -1,3 +1,4 @@
+import V3FeatureAccessInfo from './V3FeatureAccessInfo';
 import { BookOpen, Clapperboard, FileText, ListTree, Palette, ShieldCheck } from 'lucide-react';
 import bookTypesImg from '@/assets/v3-kdp-book-types.jpg';
 import finishedBooksImg from '@/assets/v3-kdp-finished-books.jpg';
@@ -38,6 +39,7 @@ export default function V3KdpFeatureShowcase2() {
             <h3 className="v3-serif mt-4 text-2xl font-semibold leading-tight md:text-3xl" style={{ color: 'var(--v3-on-emerald)' }}>
               Une suite complète de création de livres par IA
             </h3>
+              <V3FeatureAccessInfo included="Écriture de livres, plans et chapitres" />
             <ul className="mt-5 space-y-3">
               {BENEFITS.map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-3 text-[14px] leading-6 md:text-[15px]" style={{ color: 'color-mix(in srgb, var(--v3-on-emerald) 90%, transparent)' }}>
