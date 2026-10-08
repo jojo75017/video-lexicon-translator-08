@@ -31,7 +31,10 @@ const RedirectClickPage = () => {
     const email = cleanEmail(params.get('e') || params.get('email') || '');
     const step = params.get('s') || shortKey;
     const template = params.get('t') || short?.template || shortKey;
-    const raw = params.get('u') || short?.destination || '';
+    // Les emails « grande nouveauté » déjà envoyés pointaient vers apv3 : on les
+    // renvoie vers le tunnel Landaa.
+    const nouveaute = template === SHORT_LINKS.nouv16.template;
+    const raw = nouveaute ? SHORT_LINKS.nouv16.destination : params.get('u') || short?.destination || '';
 
     // Destination : URL interne, domaine EbookStudio ou page partenaire
     // explicitement autorisée pour le cadeau des 10 niches.
@@ -41,9 +44,10 @@ const RedirectClickPage = () => {
         const url = new URL(raw, window.location.origin);
         const isInternal = url.origin === window.location.origin || url.hostname.endsWith('ebookstudio.fr');
         const isTrustedGiftPage = url.hostname === 'www.trafic-affiliation.com' && url.pathname === '/niches_ebookstudio/';
+        const isLandaaTunnel = url.hostname === 'ebookstudio-2026-offre-47.landaa.io';
         if (isInternal) {
           destination = url.pathname + url.search + url.hash;
-        } else if (isTrustedGiftPage) {
+        } else if (isTrustedGiftPage || isLandaaTunnel) {
           destination = url.toString();
         }
       }

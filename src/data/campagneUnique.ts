@@ -98,6 +98,9 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
    * en second. C'est le lien à coller dans Systeme.io. */
   apv3: { key: 'apv3', destination: '/avant-premiere', template: 'v3-avant-premiere', label: 'Voir la V3 en avant-première' },
 
+  /* Relance « grande nouveauté » du 8 octobre : bouton vers le tunnel Landaa. */
+  nouv16: { key: 'nouv16', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/de-vente', template: 'grande-nouveaute-non-cliqueurs-2026-10-08', label: "Je m'inscris maintenant" },
+
   /* Passage des abonnés existants vers leur offre V3 fidélité. */
   v3fidelite: { key: 'v3fidelite', destination: '/v3/migration', template: 'v3-passage-abonnes', label: 'Découvrir ma V3 et mon tarif fidélité' },
 

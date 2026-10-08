@@ -142,7 +142,7 @@ const LAUNCH_EMAILS: LaunchEmail[] = [
   {
     step: 7,
     template: "grande-nouveaute-non-cliqueurs-2026-10-08",
-    shortKey: "apv3",
+    shortKey: "nouv16",
     subject: "Une grande nouveauté arrive bientôt",
     preheader: "Inscrivez-vous dès maintenant pour ne rien manquer.",
     ctaLabel: "Je m'inscris maintenant",
