@@ -1,5 +1,21 @@
 # Modèle « à l'américaine » : offre d'entrée 47 € + OTO (sans abonnement)
 
+## Votre raisonnement est-il bon ? Oui
+- **Designrr** (votre capture) : 27 $ à vie pour entrer, puis 97, 297 et 497 $ par an en montées de gamme. C'est exactement le schéma « petit prix d'entrée, puis offres plus chères ».
+- **Publisher Rocket** (votre capture) : 199 $ à vie en un seul paiement, plus une case à cocher à 24,99 $ (un cours) sur le bon de commande, et une garantie de 30 jours.
+- **Ce qu'on en retient** : à vie + case à cocher + montée de gamme, ça marche chez eux. À 47 €, vous êtes 4 fois moins cher que Rocket, avec plus d'outils (écriture, couverture, KDP). Le 47 € sert à faire entrer le client. La marge se fait sur les OTO.
+- **Un seul point de vigilance** : Designrr limite son entrée (10 générations par mois). Votre 47 € doit garder une limite claire (nombre de livres par mois, outils de base), sinon personne n'achète la suite.
+
+## Ce que contient l'offre à 47 € (proposition)
+- Écrire un livre, Je raconte un livre, Je raconte ma vie, J'ai déjà mon sommaire
+- Correction, HumanizeAI, exports PDF, Word et EPUB
+- Studio V4 de couverture : illustration incluse, exports 300 DPI
+- Outils KDP de base : mots-clés et catégories
+- Limite : 10 livres par mois et 40 chapitres par livre
+- Mises à jour de la V3 et garantie de 30 jours, comme Rocket
+- Ce qui n'y est pas, mais dans les OTO : Cover Studio Pro, KDP avancé, BD, Jeunesse, Jeux
+
+
 ## Pourquoi ça tient la route
 - **Vos clients utilisent leur propre clé IA** (Gemini, OpenRouter, Azure) : un client ne vous coûte presque rien chaque mois. Un paiement unique est donc rentable, et vous n'êtes pas obligé de facturer tous les mois.
 - **Un seul achat, c'est plus simple à vendre** que 27 €/mois : moins d'hésitation, aucun désabonnement à gérer, aucun impayé.
