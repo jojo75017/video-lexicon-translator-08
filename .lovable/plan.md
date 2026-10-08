@@ -1,91 +1,85 @@
-# Modèle « à l'américaine » : offre d'entrée 47 € + OTO (sans abonnement)
+# Tunnel permanent à partir du 16 octobre 2026
 
-## Votre raisonnement est-il bon ? Oui
-- **Designrr** (votre capture) : 27 $ à vie pour entrer, puis 97, 297 et 497 $ par an en montées de gamme. C'est exactement le schéma « petit prix d'entrée, puis offres plus chères ».
-- **Publisher Rocket** (votre capture) : 199 $ à vie en un seul paiement, plus une case à cocher à 24,99 $ (un cours) sur le bon de commande, et une garantie de 30 jours.
-- **Ce qu'on en retient** : à vie + case à cocher + montée de gamme, ça marche chez eux. À 47 €, vous êtes 4 fois moins cher que Rocket, avec plus d'outils (écriture, couverture, KDP). Le 47 € sert à faire entrer le client. La marge se fait sur les OTO.
-- **Un seul point de vigilance** : Designrr limite son entrée (10 générations par mois). Votre 47 € doit garder une limite claire (nombre de livres par mois, outils de base), sinon personne n'achète la suite.
+## Décision validée
+À partir du **16 octobre 2026**, l’offre d’entrée devient :
 
-## Ce que contient l'offre à 47 € (proposition)
-- Écrire un livre, Je raconte un livre, Je raconte ma vie, J'ai déjà mon sommaire
-- Correction, HumanizeAI, exports PDF, Word et EPUB
-- Studio V4 de couverture : illustration incluse, exports 300 DPI
-- Outils KDP de base : mots-clés et catégories
-- Limite : 10 livres par mois et 40 chapitres par livre
-- Mises à jour de la V3 et garantie de 30 jours, comme Rocket
-- Ce qui n'y est pas, mais dans les OTO : Cover Studio Pro, KDP avancé, BD, Jeunesse, Jeux
+- **EbookStudio V3 — 47 € en paiement unique, accès à vie** ;
+- **10 livres par mois, soit 120 livres par an** ;
+- jusqu’à **40 chapitres par livre**, avec 30 ou moins conseillé ;
+- aucune mensualité ;
+- plus de compteur « 15 places » ni de date limite ;
+- les clients et abonnés actuels conservent tous leurs droits.
 
+## Brief à transmettre à Landaa
 
-## Pourquoi ça tient la route
-- **Vos clients utilisent leur propre clé IA** (Gemini, OpenRouter, Azure) : un client ne vous coûte presque rien chaque mois. Un paiement unique est donc rentable, et vous n'êtes pas obligé de facturer tous les mois.
-- **Un seul achat, c'est plus simple à vendre** que 27 €/mois : moins d'hésitation, aucun désabonnement à gérer, aucun impayé.
-- **Le chiffre d'affaires se fait sur les OTO** (offres proposées juste après l'achat) : en général, 20 à 35 % des acheteurs prennent au moins une OTO. Avec 3 OTO, le panier moyen passe de 47 € à environ 80–110 €. C'est une estimation : les vrais chiffres se mesurent sur vos ventes.
-- **La limite à connaître** : sans abonnement, il faut sans cesse de nouveaux acheteurs. C'est pourquoi on garde des compléments à la carte et des nouveautés V4 vendues à part, pour faire revenir les clients.
+### 1. Page de vente principale
+- Garder le prix **47 € une seule fois** et la promesse d’**accès à vie**.
+- Retirer partout : « 15 places », « jusqu’au 15 octobre », compte à rebours, urgence de fermeture et mentions d’un futur abonnement obligatoire.
+- Afficher clairement : **10 livres par mois — 120 livres par an**.
+- Ne pas présenter Amazon KDP comme l’unique plateforme de publication.
+- Bouton principal : **« J’accède à EbookStudio V3 à vie pour 47 € »**.
+- Le bouton doit mener au bon de commande EbookStudio en conservant les paramètres de suivi (`utm_*`, `src`, `ref`).
 
-## Le parcours d'achat
+### 2. Bon de commande à 47 €
+- Produit principal : **EbookStudio V3 — accès à vie**.
+- Prix : **47 €**, paiement unique.
+- Conserver la case facultative **Pack Boost de Lancement — 17 €** si elle est déjà présente.
+- Ne pas ajouter d’abonnement, de paiement récurrent ou d’autre formule.
+- Après paiement accepté, envoyer automatiquement l’acheteur vers l’OTO 1.
+
+### 3. OTO 1 après l’achat
+- Titre : **Pack Édition Pro — accès à vie**.
+- Prix : **97 €**, paiement unique.
+- Deux choix très visibles :
+  - **« Oui, j’ajoute le Pack Édition Pro à 97 € »** ;
+  - **« Non merci, je continue sans le Pack Édition Pro »**.
+- Ne jamais représenter le refus comme une perte de l’achat à 47 € : l’accès principal est déjà acquis.
+
+### 4. Alternative après refus de l’OTO 1
+- Proposer uniquement **Cover Studio Pro — 67 €**, paiement unique.
+- Deux choix :
+  - **« Oui, j’ajoute Cover Studio Pro à 67 € »** ;
+  - **« Non merci, accéder à mon espace »**.
+- Après acceptation ou refus, envoyer vers la page de confirmation et l’espace client.
+
+### 5. Page de confirmation
+- Confirmer séparément les achats réellement effectués : 47 €, Boost 17 €, Pack Édition Pro 97 € ou Cover Studio Pro 67 €.
+- Bouton principal : **« Accéder à EbookStudio »**.
+- Ne pas afficher d’OTO supplémentaire pour cette première version.
+
+## Parcours final
 
 ```text
-Page de vente  ->  Bon de commande 47 €  (+ case à cocher 17 €)
-                         |
-                   OTO 1 : Pack Édition Pro 97 €
-                     oui -> OTO 2        non -> version allégée : Cover Studio Pro 67 €
-                         |
-                   OTO 2 : Pack Livres spéciaux 47 €
-                     oui / non -> OTO 3
-                         |
-                   OTO 3 : Pack Lancement Amazon 27 €
-                         |
-                   Page merci + accès immédiat
+Page Landaa
+    ↓
+Commande EbookStudio 47 € (+ Boost 17 € facultatif)
+    ↓ paiement confirmé
+OTO Pack Édition Pro 97 €
+    ├─ Oui → confirmation + espace client
+    └─ Non → Cover Studio Pro 67 €
+                  ├─ Oui → confirmation + espace client
+                  └─ Non → confirmation + espace client
 ```
 
-### Offre d'entrée — 47 € (accès à vie)
-Le socle actuel « Plume » : Écrire un livre, Je raconte, correction, Studio V4 de couverture inclus (illustration V2, exports 300 DPI), outils KDP de base, HumanizeAI. Paiement unique par carte.
+## Basculement EbookStudio à préparer
+- À **00 h 00, heure de Paris, le 16 octobre**, supprimer la fermeture automatique du paiement à 47 € liée à la date et aux 15 places.
+- Conserver le contrôle serveur du prix : aucun ancien lien ne doit pouvoir commander un autre montant.
+- Remplacer les compteurs et messages de clôture sur `/commander`, les offres, le menu et les bandeaux par la présentation permanente.
+- Faire pointer la racine publique vers la nouvelle page Landaa, tout en conservant les paramètres de suivi.
+- Enchaîner le paiement confirmé vers l’OTO 97 €, puis vers l’alternative 67 € en cas de refus.
+- Accorder les droits seulement après confirmation réelle de chaque paiement.
+- Préserver les abonnements historiques et les achats antérieurs, sans migration forcée.
+- Arrêter les relances propres à l’opération « 15 places jusqu’au 15 octobre » ; aucun email ne sera envoyé sans autorisation explicite.
 
-**Case à cocher sur le bon de commande — 17 €** : Pack Boost de Lancement (existe déjà à 17 €).
-
-### OTO 1 — Pack Édition Pro 97 € (au lieu de 47 €/mois)
-Cover Studio Pro, outils KDP avancés, BD Studio, BookPerfect, livres illimités : tout ce qui est réservé aujourd'hui au forfait Édition.
-**Si le client refuse** → on lui propose seulement le Cover Studio Pro à 67 € (prix existant).
-
-### OTO 2 — Pack Livres spéciaux 47 €
-Studio Jeunesse, Album 3–6 ans, Jeux & Énigmes, Cherche & Trouve, Histoires courtes. Ensemble, ils valent plus de 120 € s'ils sont achetés un par un.
-
-### OTO 3 — Pack Lancement Amazon 27 €
-Étude de marché, mots-clés, posts réseaux et version audio d'un livre.
-
-### Après l'achat : les ventes complémentaires
-- La page « Compléments & options » reste, avec les prix actuels à 17, 27 et 47 €.
-- La précommande V4 Micro-Séries reste à 67 €.
-- La version audio d'un livre reste à 9,99 €.
-
-## Ce qu'on garde pour ne léser personne
-- **Abonnés actuels Plume et Édition** : ils gardent leur abonnement et leurs droits. Chacun peut, s'il le veut, passer en accès à vie.
-- **Acheteurs à vie (47 € / 59 €)** : ils gardent tout. On leur propose les OTO 1 et 2 dans leur espace, au même prix.
-- **Anciens clients V2** : la V2 reste incluse jusqu'au 31/12/2026, et la remise de −20 % s'applique aussi aux OTO.
-- **Offre de lancement 15 places jusqu'au 15 octobre** : elle ne change pas. Le nouveau parcours ouvre ensuite.
-
-## Version allégée recommandée (peu de travail)
-On démarre petit, avec ce qui existe déjà. Le reste ne vient que si les ventes suivent.
-1. **Étape 1** : le tunnel `/commander` à 47 € reste tel quel, avec la case à 17 € (le Boost existe déjà).
-2. **Étape 2** : une seule page d'OTO après le paiement : « Pack Édition Pro 97 € », avec « Oui » et « Non merci ». Si le client répond non, on lui propose le Cover Studio Pro à 67 € (prix existant).
-3. **Étape 3** : le client arrive dans son espace. Les autres packs restent sur la page « Compléments & options », qui existe déjà.
-
-Ce qu'on ne fait pas tout de suite : le paiement en un clic, les OTO 2 et 3 et le tableau de suivi. On les ajoute plus tard si l'OTO 1 se vend bien.
-Pour le travail : 1 nouveau prix de paiement, 1 page et 1 droit d'accès. Les abonnements des clients actuels ne bougent pas.
-
-## Version complète (plus tard, si les ventes suivent)
-1. Les OTO 2 et 3 dans le parcours.
-2. Le paiement en un clic.
-3. Le tableau de suivi dans l'admin.
-4. Le retrait des abonnements de la page des forfaits pour les nouveaux clients.
-
-## Points à trancher
-- Garder un petit abonnement facultatif, par exemple 9 €/mois pour les nouveautés et le support ? Je propose non au départ.
-- Faut-il proposer le paiement en 2 ou 3 fois ? Votre règle actuelle l'interdit. Je la garde, sauf si vous changez d'avis.
+## Contrôles avant mise en ligne
+- Tester les quatre parcours : 47 € seul ; 47 € + Boost ; 47 € + 97 € ; 47 € + refus 97 € + 67 €.
+- Vérifier les droits obtenus après chaque combinaison et l’absence de double débit.
+- Vérifier les retours après paiement, les refus, l’actualisation de page et les anciens liens directs.
+- Vérifier sur mobile et ordinateur que les prix, boutons et mentions « paiement unique » sont lisibles.
+- Faire une dernière vérification le **15 octobre**, puis publier le basculement uniquement avec l’autorisation de Georges.
 
 ## Détails techniques
-- Nouveaux produits de paiement à paiement unique : `v3_front_47`, `v3_oto_edition_pro_97`, `v3_oto_specials_47`, `v3_oto_launch_27`. On réutilise les produits existants pour le Boost à 17 € et le Cover Pro à 67 €.
-- OTO en un clic : la carte est enregistrée au premier paiement, puis débitée sur les pages d'OTO avec une confirmation côté serveur. Repli : un paiement intégré classique.
-- Les droits sont donnés par `module_entitlements` (`edition_pro`, `specials_pack`, `launch_pack`). `hasCoverProRight` et `PRO_ONLY` reconnaissent aussi `edition_pro`.
-- Routes : `/commander`, puis `/commander/oto-1`, `/oto-1b`, `/oto-2`, `/oto-3` et `/merci`. Le tunnel reste centralisé dans `LAUNCH_TUNNEL_URL`.
-- Mises à jour : la mémoire des tarifs (fin des abonnements pour les nouveaux clients au profit du modèle 47 € + OTO), `v3Pricing.ts` et `AGENTS.md`.
+- Le système actuel ferme effectivement l’offre le 15 octobre à 23 h 59 et bloque aussi le paiement côté serveur : le changement doit donc être fait dans l’affichage **et** dans le contrôle de paiement.
+- L’URL Landaa est centralisée dans EbookStudio ; une seule modification doit suffire pour la redirection publique.
+- L’OTO 97 € existe déjà sous le droit `edition_pro`, et l’alternative Cover Studio Pro reste à 67 €.
+- Aucun paiement « en un clic » n’est requis pour cette version : un paiement intégré classique peut être utilisé pour les options.
