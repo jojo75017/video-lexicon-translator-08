@@ -85,7 +85,7 @@ export async function hasCoverProRight(
     .from("module_entitlements")
     .select("status")
     .eq("email", user.email)
-    .eq("module", COVER_PRO_MODULE);
+    .in("module", [COVER_PRO_MODULE, "edition-pro"]);
 
   const owns = (data ?? []).some((r: { status?: string }) =>
     PAID_STATUSES.has((r.status ?? "").toLowerCase())
