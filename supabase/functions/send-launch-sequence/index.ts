@@ -38,6 +38,7 @@ interface LaunchEmail {
   preheader: string;
   ctaLabel: string;
   goal: string;
+  header?: string;
   /** Paragrapes du corps (texte). Le CTA est inséré automatiquement. */
   paragraphs: string[];
 }
@@ -141,11 +142,12 @@ const LAUNCH_EMAILS: LaunchEmail[] = [
   {
     step: 7,
     template: "grande-nouveaute-non-cliqueurs-2026-10-08",
-    shortKey: "nouveaute1",
+    shortKey: "apv3",
     subject: "Une grande nouveauté arrive bientôt",
     preheader: "Inscrivez-vous dès maintenant pour ne rien manquer.",
     ctaLabel: "Je m'inscris maintenant",
     goal: "Inscription des non-cliqueurs avant la grande nouveauté",
+    header: "EbookStudio — une grande nouveauté arrive",
     paragraphs: [
       "Une grande nouveauté arrive bientôt chez EbookStudio.",
       "Inscrivez-vous dès maintenant pour ne rien manquer.",
@@ -229,7 +231,7 @@ function buildHtml(email: LaunchEmail, firstName: string | null, ctaUrl: string,
 <tr><td align="center">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;background:#ffffff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;font-family:Georgia,'Times New Roman',serif;color:#1f2937">
 <tr><td style="background:#232F3E;padding:22px 26px;color:#ffffff;font:700 21px/1.3 Arial,Helvetica,sans-serif">
-EbookStudio — V3 arrive le 1er octobre
+${email.header ?? "EbookStudio — V3 arrive le 1er octobre"}
 </td></tr>
 <tr><td style="padding:26px;font-size:16px;line-height:1.6">
 <p style="margin:0 0 16px">${hello}</p>
