@@ -83,3 +83,5 @@
 ## Modèle 47 € + OTO (version allégée)
 - [x] OTO « Pack Édition Pro 97 € » après l'achat 47 €, puis version allégée Cover Studio Pro 67 €
 - [ ] OTO 2 et 3, paiement en un clic, tableau de suivi : plus tard, si les ventes suivent
+
+- [ ] Préparer et envoyer la relance Resend aux non-cliqueurs autorisée par Georges, après validation de la formulation exacte et du ciblage (100/j max).
