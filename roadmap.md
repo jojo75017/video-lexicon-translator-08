@@ -1,6 +1,7 @@
 # Roadmap
 
 ## Modules de l’accueil : inclus ou options
+- [ ] Ajouter les mentions directement sous les titres des dix encarts noirs et vérifier leur visibilité dans l’accueil connecté.
 - [x] Vérifier les huit modules et afficher leur statut réel sans changer les droits ni les paiements ; préciser les OTO déjà disponibles (97 € puis alternative 67 €, OTO suivantes différées). Rendu navigateur vérifié, aucune erreur de page, build OK.
 
 ## Harmonisation des offres à paiement unique
