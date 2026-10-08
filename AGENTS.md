@@ -22,3 +22,4 @@
 - Post-purchase one-time offers live on /oto/* and grant rights via v3-upsell-checkout packs + module_entitlements, so no new Stripe products are needed.
 
 - Public pricing uses V3_LIFETIME_OFFERS while V3_PLANS remains historical subscription data, so new offers do not alter existing subscriber rights or billing.
+- Home engine module badges reuse findPaidModuleForPath and useModuleAccess without granting rights; administrator access is distinguished from customer inclusion to avoid misleading paid-option labels.

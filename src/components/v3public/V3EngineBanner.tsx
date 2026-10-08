@@ -12,6 +12,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { TWO_STEP_ENGINES } from '@/data/v3TwoStepEngines';
+import V3ModuleStatusBadge from './V3ModuleStatusBadge';
 
 const INK = 'var(--v3-joy-ink)';
 const MUTED = 'var(--v3-joy-muted)';
@@ -121,6 +122,7 @@ export function V3EngineGrid({ className = '' }: { className?: string }) {
                   </div>
                 )}
                 <p className="mt-2 text-[12.5px] leading-relaxed" style={{ color: MUTED }}>{e.desc}</p>
+                <V3ModuleStatusBadge route={e.route} />
                 {e.route && (
                   <span className="mt-3 inline-flex items-center gap-1 text-[12.5px] font-semibold" style={{ color: ORANGE }}>
                     Ouvrir le module <ArrowRight className="w-3.5 h-3.5" />

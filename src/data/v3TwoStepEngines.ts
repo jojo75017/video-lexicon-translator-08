@@ -60,7 +60,7 @@ export const TWO_STEP_ENGINES: TwoStepEngine[] = [
   {
     id: 'correction',
     role: 'Correction',
-    title: 'Correction du livre',
+    title: 'BookPerfect — correction Pro',
     desc: 'Passe éditoriale complète, chapitre par chapitre.',
     route: '/v3/corriger',
     temps1: { moteur: 'gemini', label: GEMINI_LABEL, output: 'Relevé des fautes, ruptures de ton et incohérences.' },
@@ -90,7 +90,7 @@ export const TWO_STEP_ENGINES: TwoStepEngine[] = [
   {
     id: 'audio',
     role: 'Narration',
-    title: 'Livre audio',
+    title: 'Audiolivre Premium',
     desc: 'Votre manuscrit lu au format audio, prêt à publier.',
     route: '/v3/outils/audiobook',
     temps1: { moteur: 'gemini', label: GEMINI_LABEL, output: 'Préparation du texte à lire : découpe, ponctuation, prononciations.' },
@@ -110,7 +110,7 @@ export const TWO_STEP_ENGINES: TwoStepEngine[] = [
   {
     id: 'traduction',
     role: 'International',
-    title: 'Traduction 10 langues',
+    title: 'Traductions relues — 10 langues',
     desc: 'Le même livre publié sur les marchés Amazon étrangers.',
     route: '/v3/outils/traduction',
     temps1: { moteur: 'gemini', label: GEMINI_LABEL, output: 'Glossaire, noms propres et repères de style à conserver.' },

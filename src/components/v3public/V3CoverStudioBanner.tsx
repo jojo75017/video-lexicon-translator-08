@@ -70,7 +70,7 @@ export default function V3CoverStudioBanner() {
                   className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em]"
                   style={{ color: 'var(--v3-joy-orange-600)' }}
                 >
-                  <Crown className="h-3.5 w-3.5" /> Studio de couverture V4 — Nouveauté en avance
+                  <Crown className="h-3.5 w-3.5" /> Studio de couverture V4 — Inclus dans votre accès
                 </span>
                 <h2
                   className="v3-serif mt-1 text-2xl font-bold leading-tight sm:text-3xl"
