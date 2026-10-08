@@ -50,18 +50,19 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
   return (
     <aside
       data-contemplation-allow="true"
-      className="sticky top-[7.5rem] z-20 border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
+      data-v3-nav=""
+      className="v3-professional-admin sticky top-[7.5rem] z-20 border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
       aria-label="Accès rapides administrateur"
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 overflow-x-auto">
         <span
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[12px] font-bold"
-          style={{ borderColor: '#D4AF37', background: '#0B2A1C', color: '#FFF3D0' }}
+          className="v3-admin-status inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold"
         >
-          <ShieldCheck className="h-3.5 w-3.5" style={{ color: '#D4AF37' }} />
+          <ShieldCheck className="h-3.5 w-3.5" />
           {preview ? 'Aperçu abonné (admin)' : 'Mode admin — test complet V3'}
         </span>
 
+        <div className="v3-admin-actions">
         {ACCESS_LINKS.map(({ label, path, icon: Icon }) => {
           const display = label === 'Admin' ? 'Dashboard admin' : label;
           // En aperçu abonné, seul le retour en V2 reste accessible
@@ -89,7 +90,7 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
               key={path}
               type="button"
               size="sm"
-              variant={isSubscriberAllowed ? 'default' : 'outline'}
+              variant={isSubscriberAllowed ? 'default' : 'ghost'}
               className="shrink-0"
               onClick={() => navigate(path)}
             >
@@ -103,6 +104,7 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
           {preview ? <EyeOff className="mr-1.5 h-4 w-4" /> : <Eye className="mr-1.5 h-4 w-4" />}
           {preview ? 'Revenir en mode admin' : 'Voir comme un abonné'}
         </Button>
+        </div>
       </div>
     </aside>
   );

@@ -22,6 +22,7 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
 
   return (
     <header
+      data-v3-nav=""
       className="v3-header-sage sticky top-0 z-40 overflow-x-clip"
       style={{
         background: 'linear-gradient(180deg, #064e3b 0%, #053e2f 100%)',

@@ -36,8 +36,8 @@ export default function AdminQuickNav() {
           key={path}
           type="button"
           size="sm"
-          variant={isActive(path) ? 'default' : 'outline'}
-          className="shrink-0"
+          variant={isActive(path) ? 'secondary' : 'ghost'}
+          className="shrink-0 rounded-md text-xs"
           onClick={() => navigate(path)}
         >
           <Icon className="mr-1.5 h-4 w-4" />

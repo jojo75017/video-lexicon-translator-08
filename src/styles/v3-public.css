@@ -630,3 +630,53 @@
 .v3pub .v3-module-status * { color: inherit; }
 .v3pub .v3-feature-access { color: var(--v3-on-emerald); }
 .v3pub .v3-feature-access p { color: inherit; }
+
+/* Navigation grouped to match the selected professional toolbar. */
+.v3pub {
+  --nav-surface: #ffffff;
+  --nav-background: #f8fafc;
+  --nav-group: #f1f5f9;
+  --nav-border: #e2e8f0;
+  --nav-ink: #475569;
+  --nav-dark: #0f172a;
+  --nav-blue: #2563eb;
+  --nav-blue-hover: #1d4ed8;
+  --nav-blue-soft: #eff6ff;
+  --nav-rose: #f43f5e;
+  --nav-create: #0d9488;
+  --nav-write: #4f46e5;
+  --nav-cover: #ec4899;
+  --nav-kdp: #059669;
+  --nav-publish: #0891b2;
+  --nav-sell: #d97706;
+  --nav-special: #7c3aed;
+  --nav-shadow: 0 1px 3px rgb(15 23 42 / 0.08);
+}
+.v3pub .v3-professional-tabs { background: var(--nav-surface) !important; border-color: var(--nav-border) !important; }
+.v3pub .v3-category-group { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 100%; padding: 6px; background: var(--nav-group); border: 1px solid var(--nav-border); border-radius: 16px; }
+.v3pub .v3-professional-tabs nav > a { height: 42px; box-shadow: var(--nav-shadow) !important; padding: 8px 14px !important; }
+.v3pub .v3-professional-tabs nav > a:first-child { background: var(--nav-blue) !important; border-color: var(--nav-blue) !important; color: var(--nav-surface) !important; }
+.v3pub .v3-professional-tabs nav > a:nth-child(2) { background: var(--nav-surface) !important; border-color: var(--nav-border) !important; color: var(--nav-blue-hover) !important; }
+.v3pub .v3-professional-tabs nav > a:nth-child(3) { background: var(--nav-rose) !important; border-color: var(--nav-rose) !important; color: var(--nav-surface) !important; }
+.v3pub .v3-professional-tabs button.v3-robot-tab { height: 42px; padding: 6px 12px; gap: 8px; border-radius: 12px; font-size: 12px; box-shadow: var(--nav-shadow); }
+.v3pub .v3-robot-tab[data-category="creer"] { --robot: var(--nav-create); }
+.v3pub .v3-robot-tab[data-category="ecrire"] { --robot: var(--nav-write); }
+.v3pub .v3-robot-tab[data-category="habiller"] { --robot: var(--nav-cover); }
+.v3pub .v3-robot-tab[data-category="kdp"] { --robot: var(--nav-kdp); }
+.v3pub .v3-robot-tab[data-category="publier"] { --robot: var(--nav-publish); }
+.v3pub .v3-robot-tab[data-category="vendre"] { --robot: var(--nav-sell); }
+.v3pub .v3-robot-tab[data-category="livres"] { --robot: var(--nav-special); }
+.v3pub .v3-robot-tab[data-category="plans"] { --robot: var(--nav-sell); }
+.v3pub .v3-professional-admin { background: var(--nav-background); box-shadow: none; border-color: var(--nav-border); }
+.v3pub .v3-admin-status { background: var(--nav-dark); color: var(--nav-surface); }
+.v3pub .v3-admin-status * { color: inherit; }
+.v3pub .v3-admin-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; padding: 4px; background: var(--nav-group); border: 1px solid var(--nav-border); border-radius: 12px; }
+.v3pub .v3-admin-actions button { background: transparent; color: var(--nav-ink); border: none; border-radius: 8px; font-size: 12px; box-shadow: none; }
+.v3pub .v3-admin-actions button:first-child { background: var(--nav-blue); color: var(--nav-surface); }
+.v3pub .v3-admin-actions button:last-child { color: var(--nav-blue-hover); }
+.v3pub .v3-admin-actions button:not(:disabled):hover { background: var(--nav-surface); color: var(--nav-blue-hover); }
+.v3pub .v3-admin-actions button * { color: inherit; }
+.v3pub .v3-header-sage nav .v3-btn { background: transparent !important; color: var(--nav-ink) !important; border: 1px solid transparent !important; border-radius: 8px; padding: 8px 10px; box-shadow: none; }
+.v3pub .v3-header-sage nav .v3-btn * { color: inherit !important; }
+.v3pub .v3-header-sage nav .v3-btn:hover { background: var(--nav-surface) !important; }
+.v3pub .v3-header-sage nav .v3-btn-gold { background: var(--nav-blue) !important; color: var(--nav-surface) !important; }
