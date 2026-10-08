@@ -82,6 +82,17 @@ OTO Pack Édition Pro 97 €
 - Préserver les abonnements historiques et les achats antérieurs, sans migration forcée.
 - Arrêter les relances propres à l’opération « 15 places jusqu’au 15 octobre » ; aucun email ne sera envoyé sans autorisation explicite.
 
+## Lien Landaa et relance du 16 octobre
+- Georges transmettra l’URL définitive du nouveau tunnel Landaa avant le basculement. Jusque-là, conserver l’URL actuellement enregistrée dans EbookStudio.
+- Le 16 octobre, remplacer uniquement l’URL centralisée du tunnel, puis vérifier que la racine publique et tous les boutons concernés ouvrent la nouvelle page en conservant les paramètres de suivi.
+- Préparer une relance exceptionnelle via **Resend**, destinée uniquement aux **non-acheteurs**.
+- Exclure avant envoi tous les acheteurs de l’accès à vie, les acheteurs V3 et les abonnés actifs ; ne jamais relancer un client déjà payé.
+- Respecter le plafond Resend de **100 emails maximum par jour**. Si la cible dépasse 100 personnes, répartir l’envoi sur plusieurs jours sans dépasser cette limite.
+- Aucun envoi automatique ni programmé sans validation explicite de Georges le jour même.
+- Angle du message : **« Une grande nouveauté vous attend bientôt »**, avec invitation à s’inscrire ou découvrir EbookStudio, sans fausse urgence ni faux nombre de places.
+- Le lien de l’email devra pointer vers le nouveau tunnel Landaa avec un suivi dédié, par exemple `utm_source=resend`, `utm_medium=email`, `utm_campaign=nouveaute_16_octobre`.
+- Prévoir un objet, un pré-en-tête, une version texte simple, le lien de désinscription et un test envoyé uniquement à Georges avant l’autorisation finale.
+
 ## Contrôles avant mise en ligne
 - Tester les quatre parcours : 47 € seul ; 47 € + Boost ; 47 € + 97 € ; 47 € + refus 97 € + 67 €.
 - Vérifier les droits obtenus après chaque combinaison et l’absence de double débit.
