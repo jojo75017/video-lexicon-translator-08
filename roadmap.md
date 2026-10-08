@@ -1,5 +1,8 @@
 # Roadmap
 
+## Modules de l’accueil : inclus ou options
+- [ ] Vérifier les huit modules et afficher leur statut réel sans changer les droits ni les paiements ; préciser les OTO déjà disponibles.
+
 ## Harmonisation des offres à paiement unique
 - [x] Remplacer les promotions d’abonnements par accès à vie 47 € et Pack Édition Pro 97 €, conserver les options et les droits acquis, vérifier les pages sans publier.
 

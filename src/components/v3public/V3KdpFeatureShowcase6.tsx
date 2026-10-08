@@ -2,7 +2,7 @@ import { Globe2, Languages, MapPin, Search, Store, TrendingUp } from 'lucide-rea
 import multilingualImg from '@/assets/v3-kdp-multilingual.jpg';
 
 const BENEFITS = [
-  { icon: Languages, text: 'Traduction de votre livre dans 10 langues, incluse dans tous les forfaits.' },
+  { icon: Languages, text: 'Rédaction en 10 langues ; la traduction relue d’un livre existant est un complément, selon vos droits.' },
   { icon: MapPin, text: 'Adaptation du contenu aux lecteurs de chaque pays.' },
   { icon: Search, text: 'Mots-clés propres à chaque marché Amazon.' },
   { icon: Store, text: 'Accès aux boutiques Amazon du monde entier.' },
