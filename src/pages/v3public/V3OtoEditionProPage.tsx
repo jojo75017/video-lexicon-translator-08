@@ -60,7 +60,7 @@ export default function V3OtoEditionProPage() {
         </h1>
         <p className="mt-3 text-center text-muted-foreground">
           {isPro
-            ? "Le forfait Édition coûte 47 € par mois. Aujourd'hui seulement, vous l'avez à vie pour un seul paiement."
+            ? "Ajoutez les studios professionnels à votre accès EbookStudio : 97 € en un seul paiement, sans abonnement."
             : 'Pas besoin de tout ? Gardez au moins le studio de couverture professionnel.'}
         </p>
 

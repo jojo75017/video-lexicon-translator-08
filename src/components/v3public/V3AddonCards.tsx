@@ -58,9 +58,9 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
             <Link
               to="/v3/forfaits"
               className="v3-btn v3-btn-outline text-[12.5px]"
-              title="Comparer les forfaits et les compléments"
+              title="Comparer les offres et les compléments"
             >
-              <Gem className="h-4 w-4" /> Comparer les forfaits
+              <Gem className="h-4 w-4" /> Comparer les offres
             </Link>
           )}
         </div>
@@ -73,7 +73,7 @@ export default function V3AddonCards({ title = 'Compléments & options', compact
         >
           <p className="text-sm" style={{ color: 'var(--v3-ink)' }}>
             <strong>Compléments premium disponibles à la carte : {formatPrice(V3_ADDONS_TOTAL_VALUE)} au total.</strong>{' '}
-            Ils restent séparés des forfaits afin que vous ne payiez que l'accompagnement renforcé dont vous avez besoin.
+            Ils restent séparés de votre accès afin que vous ne payiez que l'accompagnement renforcé dont vous avez besoin.
           </p>
         </div>
       )}

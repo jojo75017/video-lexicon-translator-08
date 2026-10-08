@@ -277,3 +277,32 @@ export const V3_ADDONS = {
 /** Prix unique de la conversion audio d'un livre. */
 export const AUDIO_SINGLE_PRICE = 9.99;
 export const AUDIO_SINGLE_PRICE_ID = "v3_audio_single";
+
+/** Public one-time offers; V3_PLANS remains historical subscription data. */
+export const V3_LIFETIME_OFFERS = {
+  base: {
+    price: 47,
+    title: "EbookStudio — accès à vie",
+    features: [
+      "Écrire un livre, raconter un livre ou sa vie, partir de son sommaire",
+      "Correction du manuscrit et HumanizeAI",
+      "Mise en page et exports PDF, Word et EPUB",
+      "Studio V4 : illustration incluse, aperçu et exports 300 DPI",
+      "Outils KDP de base : description, mots-clés et catégories",
+      "Votre propre clé IA pour les moteurs concernés",
+    ],
+  },
+  pro: {
+    price: 97,
+    title: "Pack Édition Pro — accès à vie",
+    priceId: "v3_pack_edition_pro_once",
+    features: [
+      "Complément à votre accès EbookStudio, sans abonnement",
+      "Cover Studio KDP Pro inclus (valeur 67 €)",
+      "Outils KDP avancés : Amazon Spy, mots-clés Pro et audit",
+      "BD Studio et BookPerfect",
+      "Livres illimités et chapitres plus longs",
+    ],
+  },
+  cover: { price: 67, title: "Cover Studio KDP Pro seul", priceId: "v3_pack_cover_studio_pro_once" },
+} as const;

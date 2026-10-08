@@ -1,104 +1,52 @@
-import { ArrowRight, Check, Crown, Feather, Gift } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, Check, Crown, Feather, Gift, Palette } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { V3_PLANS, formatPrice, V2_ACCESS_NOTE } from '@/data/v3Pricing';
-import { V2_LEGACY_MODULES } from '@/data/v2LegacyAccess';
+import { V3_LIFETIME_OFFERS, formatPrice, V2_ACCESS_NOTE } from '@/data/v3Pricing';
 import { Button } from '@/components/ui/button';
+import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
+import type { V3UpsellPack, V3PackId } from '@/data/roadmapV3';
 
-const cards = [
-  {
-    key: 'legacy',
-    title: 'Déjà abonné',
-    price: 'Votre V2 reste acquise',
-    note: `${V2_LEGACY_MODULES.length} modules V3 inclus, sans nouvel achat`,
-    description: 'Vous ne perdez rien : vous gagnez la V3 essentielle, offerte à vie.',
-    items: [
-      '40 chapitres · 5 000 mots par chapitre',
-      'Génie, sommaire IA et rédaction chapitre par chapitre',
-      'Correcteur du livre et exports PDF, DOCX, EPUB',
-      'Discussion libre avec l’IA (votre clé)',
-      'Couverture simple (qualité V2) et recherche avancée',
-    ],
-    to: '/v3/migration',
-    icon: Gift,
-  },
-  {
-    key: 'plume',
-    title: 'Plume',
-    price: `${formatPrice(V3_PLANS[0].monthlyPrice)} / mois`,
-    note: `${V3_PLANS[0].booksPerMonth} livres par mois · V2 incluse`,
-    description: V3_PLANS[0].idealFor,
-    items: [
-      '40 chapitres · 5 000 mots · 8 personnages',
-      'Couverture Kindle et broché KDP',
-      'Audiolivre standard et 10 langues',
-      'Import de manuscrit et correction pro',
-      'Mockups, fiche produit KDP et calendrier',
-    ],
-    to: '/v3/forfaits',
-    icon: Feather,
-  },
-  {
-    key: 'edition',
-    title: 'Édition',
-    price: `${formatPrice(V3_PLANS[1].monthlyPrice)} / mois`,
-    note: 'Livres illimités · V2 incluse',
-    description: V3_PLANS[1].idealFor,
-    items: [
-      '60 chapitres · 8 000 mots · personnages illimités',
-      'BD Studio Pro',
-      'Traductions, audiolivre premium et maisons d’édition inclus',
-      'Amazon Spy, KDP avancé et priorité aux nouveautés V4',
-      'Inclus dans Édition : Cover Studio KDP Pro · En option : Studio Jeunesse (47 €)',
-    ],
-    to: '/v3/forfaits',
-    icon: Crown,
-  },
-] as const;
-
-export default function V3PricingOverview() {
+export default function V3PricingOverview({ baseAvailable = true }: { baseAvailable?: boolean }) {
+  const [checkout, setCheckout] = useState<V3UpsellPack | null>(null);
+  const { base, pro, cover } = V3_LIFETIME_OFFERS;
+  const openPro = () => setCheckout({ id: 'edition_pro' as V3PackId, title: pro.title, desc: 'Les studios professionnels en complément de votre accès.', price: pro.price, priceId: pro.priceId, to: '/v3', modules: [] });
   return (
-    <section className="v3-shell" aria-labelledby="v3-offers-title">
-      <div className="rounded-3xl px-5 py-7 md:px-7" style={{ background: 'var(--v3-joy-cream)', border: '1px solid var(--v3-joy-orange-soft)' }}>
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em]" style={{ color: 'var(--v3-joy-orange-600)' }}>Trois façons d’entrer dans la V3</p>
-            <h2 id="v3-offers-title" className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
-              Choisissez seulement ce dont vous avez besoin
-            </h2>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/v3/forfaits">Comparer en détail <ArrowRight /></Link>
-          </Button>
-        </div>
-
-        <div className="mt-3">
-          <p className="rounded-md px-3 py-2 text-xs font-semibold" style={{ background: 'var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}>
-            {V2_ACCESS_NOTE} Dans les trois offres, vous gardez votre ancien espace en plus de la V3.
-          </p>
-        </div>
-
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          {cards.map(({ icon: Icon, ...card }) => (
-            <article key={card.key} className="flex flex-col rounded-2xl bg-white p-5" style={{ border: card.key === 'plume' ? '2px solid var(--v3-joy-orange)' : '1px solid var(--v3-joy-orange-soft)' }}>
-              <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4" style={{ color: 'var(--v3-joy-orange-600)' }} />
-                <h3 className="v3-serif text-lg font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>{card.title}</h3>
-              </div>
-              <p className="mt-3 text-lg font-bold" style={{ color: 'var(--v3-joy-ink)' }}>{card.price}</p>
-              <p className="text-xs font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>{card.note}</p>
-              <p className="mt-3 min-h-12 text-xs leading-relaxed" style={{ color: 'var(--v3-joy-muted)' }}>{card.description}</p>
-              <ul className="mt-3 space-y-1.5">
-                {card.items.map((item) => item.includes('Cover Studio KDP Pro')
-                  ? <li key={item} className="flex gap-2 rounded-md px-2 py-1.5 text-xs font-bold text-white" style={{ background: 'var(--v3-joy-orange)' }}><span aria-hidden>🎨</span>{item}</li>
-                  : <li key={item} className="flex gap-2 text-xs"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0" style={{ color: 'var(--v3-joy-orange-600)' }} />{item}</li>)}
-              </ul>
-              <Link to={card.to} className="mt-4 inline-flex items-center gap-1 text-xs font-semibold" style={{ color: 'var(--v3-joy-orange-600)' }}>
-                Voir cette offre <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </article>
-          ))}
-        </div>
+    <section className="v3-shell py-7" aria-labelledby="v3-offers-title">
+      <header className="mb-7">
+        <p className="text-xs font-bold uppercase text-primary">Paiement unique · Sans reconduction</p>
+        <h2 id="v3-offers-title" className="mt-2 text-3xl font-semibold text-foreground">Votre accès à vie, vos options à la carte</h2>
+        <p className="mt-3 text-muted-foreground">Commencez à 47 €. Ajoutez les studios professionnels uniquement si vous en avez besoin.</p>
+      </header>
+      <div className="grid gap-5 lg:grid-cols-3">
+        <article className="flex flex-col rounded-lg border bg-card p-6 text-card-foreground">
+          <Feather className="h-6 w-6 text-primary" />
+          <h3 className="mt-3 text-xl font-semibold">{base.title}</h3>
+          <p className="mt-4 text-3xl font-bold">{formatPrice(base.price)}</p>
+          <p className="text-sm text-muted-foreground">Un seul paiement pour votre accès</p>
+          <ul className="my-5 flex-1 space-y-3">{base.features.map(item => <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}</ul>
+          {baseAvailable ? <Button asChild><Link to="/commander">Voir l’offre à 47 € <ArrowRight /></Link></Button> : <p className="text-sm text-muted-foreground">Le contingent de lancement est fermé. Aucune nouvelle commande à 47 € n’est ouverte pour le moment.</p>}
+        </article>
+        <article className="flex flex-col rounded-lg border-2 border-primary bg-card p-6 text-card-foreground">
+          <Crown className="h-6 w-6 text-primary" />
+          <h3 className="mt-3 text-xl font-semibold">{pro.title}</h3>
+          <p className="mt-4 text-3xl font-bold">+ {formatPrice(pro.price)}</p>
+          <p className="text-sm text-muted-foreground">Option facultative · paiement unique</p>
+          <ul className="my-5 flex-1 space-y-3">{pro.features.map(item => <li key={item} className={item.includes('Cover Studio') ? 'flex gap-2 rounded-md bg-primary px-3 py-2 text-sm font-bold text-primary-foreground' : 'flex gap-2 text-sm'}>{item.includes('Cover Studio') ? <Palette className="h-4 w-4 shrink-0" /> : <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />}{item}</li>)}</ul>
+          <Button onClick={openPro}>Ajouter le Pack Édition Pro</Button>
+          <p className="mt-3 text-xs text-muted-foreground">Le Pack Pro ne remplace pas l’accès de base. Les autres options restent séparées.</p>
+        </article>
+        <article className="flex flex-col rounded-lg border bg-card p-6 text-card-foreground">
+          <Gift className="h-6 w-6 text-primary" />
+          <h3 className="mt-3 text-xl font-semibold">Déjà client ? Vous gardez vos droits</h3>
+          <p className="mt-4 text-sm text-muted-foreground">Vos achats à vie et vos abonnements déjà souscrits ne changent pas. Aucun nouvel achat n’est obligatoire.</p>
+          <p className="mt-4 text-sm">{V2_ACCESS_NOTE}</p>
+          <p className="mt-4 text-sm">La couverture incluse reste accessible aux anciens clients et à Plume. Les acheteurs du Pro et les abonnés Édition/Maison conservent le Pro.</p>
+          <p className="mt-4 text-sm">Besoin uniquement du Pro pour les couvertures ? {cover.title} : {formatPrice(cover.price)}, sans abonnement.</p>
+          <Button asChild variant="outline" className="mt-5"><Link to="/v3/upsells">Voir les compléments & options <ArrowRight /></Link></Button>
+          <Button asChild variant="ghost" className="mt-2"><Link to="/v3/compte">Mon accès actuel</Link></Button>
+        </article>
       </div>
+      {checkout && <V3UpsellCheckout pack={checkout} onClose={() => setCheckout(null)} />}
     </section>
   );
 }
