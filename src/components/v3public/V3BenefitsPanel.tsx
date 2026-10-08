@@ -75,7 +75,7 @@ export default function V3BenefitsPanel() {
           className="inline-flex items-center gap-1.5 text-[13px] font-semibold"
           style={{ color: 'var(--v3-joy-ink)' }}
         >
-          Comparer les deux forfaits <ArrowRight className="h-3.5 w-3.5" />
+          Comparer les offres à vie <ArrowRight className="h-3.5 w-3.5" />
         </Link>
       </div>
     </section>

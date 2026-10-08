@@ -13,7 +13,7 @@ import {
   V3_TIER_LABEL,
   type V3Nouveaute,
 } from '@/data/v3Nouveautes';
-import { getV3Plan } from '@/data/v3Pricing';
+import { V3_LIFETIME_OFFERS } from '@/data/v3Pricing';
 
 function NouveauteCard({ item }: { item: V3Nouveaute }) {
   const meta = V3_TIER_LABEL[item.tier];
@@ -44,7 +44,7 @@ function NouveauteCard({ item }: { item: V3Nouveaute }) {
 export default function V3NouveautesPage() {
   const months = groupNouveautesByMonth();
   const upcoming = getUpcomingNouveautes();
-  const edition = getV3Plan('edition');
+  const edition = V3_LIFETIME_OFFERS.pro;
 
   useEffect(() => {
     markNouveautesSeen();
@@ -63,7 +63,7 @@ export default function V3NouveautesPage() {
             Tout ce qui vient d'arriver dans EbookStudio V3
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Les nouveautés du mois en premier, avec le forfait qui les contient et un accès
+            Les nouveautés du mois en premier, avec leur formule d’accès et un accès
             direct à l'outil.
           </p>
           <div className="mt-3 flex items-center justify-center gap-2 text-sm text-slate-500">
@@ -107,16 +107,16 @@ export default function V3NouveautesPage() {
 
         <div className="mt-12 p-6 rounded-2xl bg-gradient-to-br from-[#008296] to-emerald-700 text-white text-center">
           <Award className="h-8 w-8 mx-auto mb-3" />
-          <h3 className="text-2xl font-bold mb-2">Vous n'avez pas encore le bon forfait ?</h3>
+          <h3 className="text-2xl font-bold mb-2">Besoin des studios professionnels ?</h3>
           <p className="mb-4 opacity-90">
-            Le forfait Édition {edition?.monthlyPrice ?? 47} €/mois débloque tout : livres
-            illimités, {edition?.agentsCount ?? 30} agents IA et tous les modules Pro inclus.
+            Le Pack Édition Pro à {edition.price} € en paiement unique ajoute Cover Studio Pro,
+            les outils KDP avancés, BD Studio et BookPerfect. Les autres compléments restent à la carte.
           </p>
           <Link
             to="/v3/forfaits"
             className="inline-block px-6 py-3 rounded-full bg-white text-[#008296] font-semibold hover:bg-yellow-100 transition"
           >
-            Voir les forfaits
+            Voir les offres à vie
           </Link>
         </div>
       </div>

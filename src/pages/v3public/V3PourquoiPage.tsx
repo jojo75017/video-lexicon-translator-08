@@ -4,6 +4,7 @@ import {
   Languages, Users, Clock, Gem, CheckCircle2, ArrowRight, Star, Zap,
   FileText, Layers, Wand2, Target, Award,
 } from 'lucide-react';
+import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import { BackButton } from "@/components/v3/BackButton";
 
 /**
@@ -224,30 +225,9 @@ export default function V3PourquoiPage() {
         </div>
       </Section>
 
-      {/* Tarifs */}
-      <Section id="tarifs" icon={<Gem />} title="Nos forfaits à l'ouverture (Octobre 2026)">
-        <div className="grid md:grid-cols-2 gap-4 mt-2">
-          <PlanCard
-            name="Plume"
-            price="27 €"
-            per="/ mois"
-            highlights={['270 € / an (2 mois offerts)', '50 livres / mois', 'Exports Kindle / KDP', 'Correcteur IA']}
-          />
-          <PlanCard
-            name="Édition"
-            recommended
-            price="47 €"
-            per="/ mois"
-            highlights={['470 € / an (2 mois offerts)', 'Livres illimités', 'Traduction 10 langues', 'Cover Studio Pro']}
-          />
-        </div>
-        <p className="text-xs text-[#6B7280] mt-4">
-          Deux forfaits seulement : Plume et Édition. Les gros compléments premium restent proposés séparément. Les abonnements
-          démarrent le 1<sup>er</sup> octobre 2026, avec le premier mois offert.
-        </p>
-
+      <Section id="tarifs" icon={<Gem />} title="Les offres à paiement unique">
+        <V3PricingOverview />
       </Section>
-
 
       {/* CTA */}
       <section className="max-w-4xl mx-auto px-6 py-12">

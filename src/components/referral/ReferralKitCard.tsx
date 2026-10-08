@@ -17,11 +17,6 @@ import {
  */
 const RATE_PCT = Math.round(COMMISSION_FIRST_PAYMENT_RATE * 100);
 
-const Plume_MONTHLY = 27;
-const PLUME_YEARLY = 270;
-const EDITION_MONTHLY = 47;
-const EDITION_YEARLY = 470;
-
 const ReferralKitCard = () => {
   const { code, stats, loading } = useReferral();
   const [copied, setCopied] = useState<string | null>(null);
@@ -31,23 +26,21 @@ const ReferralKitCard = () => {
     return `${buildPartnerLink(code)}&utm_source=parrainage`;
   }, [code]);
 
-  const plumeMonthlyCommission = formatEuro(Plume_MONTHLY * COMMISSION_FIRST_PAYMENT_RATE);
-  const editionMonthlyCommission = formatEuro(EDITION_MONTHLY * COMMISSION_FIRST_PAYMENT_RATE);
-  const editionYearlyCommission = formatEuro(EDITION_YEARLY * COMMISSION_FIRST_PAYMENT_RATE);
+  const commission = formatEuro(47 * COMMISSION_FIRST_PAYMENT_RATE);
 
   const posts = useMemo(
     () => [
       {
         label: 'Message court (SMS, WhatsApp)',
-        text: `J'écris mes livres et je les publie sur Amazon avec EbookStudio : plan, chapitres, couverture et fichiers prêts pour KDP. La V3 ouvre le 1er octobre avec l'abonnement Plume à 27 €/mois ou Édition à 47 €/mois. Le lien : ${link}`,
+        text: `J'écris mes livres et je les publie sur Amazon avec EbookStudio : plan, chapitres, couverture et fichiers prêts pour KDP. EbookStudio se choisit à 47 € en paiement unique, avec le Pack Édition Pro à 97 € en option. Le lien : ${link}`,
       },
       {
         label: 'Publication Facebook / groupe KDP',
-        text: `Je partage l'outil que j'utilise pour écrire et publier mes livres sur Amazon KDP.\n\nEn pratique : je donne mon sujet, j'obtiens un sommaire que je corrige, les chapitres sont rédigés en français, la couverture est calculée au format exact de KDP (dos compris) et j'exporte un Word + PDF prêts à téléverser.\n\nLa V3 ouvre le 1er octobre (Plume 27 €/mois, Édition 47 €/mois, 2 mois offerts en annuel). Si ça vous intéresse : ${link}`,
+        text: `Je partage l'outil que j'utilise pour écrire et publier mes livres sur Amazon KDP.\n\nEn pratique : je donne mon sujet, j'obtiens un sommaire que je corrige, les chapitres sont rédigés en français, la couverture est calculée au format exact de KDP (dos compris) et j'exporte un Word + PDF prêts à téléverser.\n\nEbookStudio : 47 € à vie, sans abonnement. Pack Édition Pro à 97 € en option. Si ça vous intéresse : ${link}`,
       },
       {
         label: 'Description de vidéo YouTube',
-        text: `Vous voulez écrire et publier un livre sur Amazon sans savoir écrire ni maquetter ? EbookStudio fait le sommaire, rédige les chapitres en français, calcule la couverture au format KDP et exporte Word + PDF.\n\nLa V3 ouvre le 1er octobre : Plume 27 €/mois ou Édition 47 €/mois. Lien (je touche une commission si vous vous abonnez) : ${link}`,
+        text: `Vous voulez écrire et publier un livre sur Amazon sans savoir écrire ni maquetter ? EbookStudio fait le sommaire, rédige les chapitres en français, calcule la couverture au format KDP et exporte Word + PDF.\n\nEbookStudio : 47 € à vie, Pack Édition Pro à 97 € en option. Lien (je touche une commission si vous achetez) : ${link}`,
       },
     ],
     [link],
@@ -73,11 +66,9 @@ const ReferralKitCard = () => {
         <div>
           <h2 className="text-lg font-bold">Votre kit de parrainage</h2>
           <p className="text-sm text-muted-foreground">
-            <strong>{RATE_PCT} %</strong> de commission sur le premier paiement de chaque abonnement
-            parrainé. Exemples : {plumeMonthlyCommission} sur Plume mensuel ({Plume_MONTHLY} €),
-            {editionMonthlyCommission} sur Édition mensuel ({EDITION_MONTHLY} €), jusqu'à{' '}
-            <strong>{editionYearlyCommission}</strong> sur Édition annuel ({EDITION_YEARLY} €). Votre
-            lien suit automatiquement les personnes que vous envoyez.
+            <strong>{RATE_PCT} %</strong> de commission sur le premier paiement encaissé.
+            Exemple : <strong>{commission}</strong> sur l’accès à vie à 47 €.
+            Votre lien suit les personnes que vous envoyez.
           </p>
         </div>
       </div>

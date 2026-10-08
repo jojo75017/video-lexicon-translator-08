@@ -1,5 +1,8 @@
 # Roadmap
 
+## Harmonisation des offres à paiement unique
+- [x] Remplacer les promotions d’abonnements par accès à vie 47 € et Pack Édition Pro 97 €, conserver les options et les droits acquis, vérifier les pages sans publier.
+
 ## PDF de l’accueil actualisé — 7 octobre 2026
 - [x] Refaire l’aperçu intégral depuis l’accueil connecté actuel : 12 pages inspectées, coupures corrigées, aucun lien actif ; PDF téléchargeable sans publication ni email.
 

@@ -508,7 +508,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'L’audio standard est inclus dès Plume, la version premium fait partie de l’offre Édition.',
     theme: 'Audio & audiolivres',
-    action: { label: 'Comparer les forfaits', route: '/v3/forfaits' },
+    action: { label: 'Comparer les offres', route: '/v3/forfaits' },
   },
 
   // ── Traductions & langues ────────────────────────────────────────
@@ -534,7 +534,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     answer:
       'La traduction automatique est incluse ; la version relue fait partie des compléments de l’offre Édition.',
     theme: 'Traductions & langues',
-    action: { label: 'Comparer les forfaits', route: '/v3/forfaits' },
+    action: { label: 'Comparer les offres', route: '/v3/forfaits' },
   },
   {
     id: 'x-trad-04',
@@ -756,9 +756,9 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-forf-01',
     question: 'Quels sont les prix affichés aujourd’hui ?',
     answer:
-      'Plume est à 27 € par mois et Édition à 47 € par mois. En annuel, deux mois sont offerts.',
+      'EbookStudio : 47 € à vie en paiement unique. Pack Édition Pro : 97 € en option, avec Cover Studio Pro, KDP avancé, BD Studio et BookPerfect. Cover Studio Pro seul : 67 €. Les autres compléments restent à la carte ; les droits acquis des anciens clients sont conservés.',
     theme: 'Forfaits & paiement',
-    action: { label: 'Voir les forfaits', route: '/v3/forfaits' },
+    action: { label: 'Voir les offres à vie', route: '/v3/forfaits' },
   },
   {
     id: 'x-forf-02',

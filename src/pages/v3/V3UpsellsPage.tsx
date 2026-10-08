@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Gem } from 'lucide-react';
-import { V3_ADDON_LIST, V3_ADDONS_TOTAL_VALUE, V3_PLANS, formatPrice } from '@/data/v3Pricing';
+import { V3_ADDON_LIST, V3_ADDONS_TOTAL_VALUE, V3_LIFETIME_OFFERS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
 import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
@@ -8,7 +8,7 @@ import { MICRO_SERIES_OFFER } from '@/data/microSeriesOffer';
 
 /** /v3/upsells — Gros compléments premium proposés séparément des forfaits. */
 export default function V3UpsellsPage() {
-  const edition = V3_PLANS[V3_PLANS.length - 1];
+  const edition = V3_LIFETIME_OFFERS.pro;
   const { hasFull, hasBase } = useV3Entitlement();
 
   return (
@@ -28,7 +28,7 @@ export default function V3UpsellsPage() {
             Compléments & options
           </h1>
           <p className="mt-2 max-w-2xl text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
-            Renforcez un livre précis sans changer de forfait : correction professionnelle, traductions
+            Renforcez un livre précis sans changer votre accès : correction professionnelle, traductions
             relues, version audio premium, accompagnement. Chaque option s'ajoute en un paiement unique.
           </p>
         </header>
@@ -109,15 +109,15 @@ export default function V3UpsellsPage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h2 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-                Les studios professionnels : {edition?.name ?? 'Édition'}
+                Les studios professionnels : Pack Édition Pro
               </h2>
               <p className="mt-1 text-sm" style={{ color: 'var(--v3-muted)' }}>
-                {edition ? `${formatPrice(edition.monthlyPrice)} / mois` : '47 € / mois'} — livres illimités,
+                {formatPrice(edition.price)} en paiement unique — livres illimités,
                 Cover Studio Pro, BD Studio Pro et outils KDP avancés. Les compléments ci-dessus restent à la carte.
               </p>
             </div>
             <Link to="/v3/forfaits" className="v3-btn v3-btn-gold">
-              <Gem className="h-4 w-4" /> Voir les forfaits <ArrowRight className="h-4 w-4" />
+              <Gem className="h-4 w-4" /> Voir les offres à vie <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </section>
