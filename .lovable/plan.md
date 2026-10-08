@@ -48,12 +48,20 @@ Studio Jeunesse, Album 3–6 ans, Jeux & Énigmes, Cherche & Trouve, Histoires c
 - **Anciens clients V2** : la V2 reste incluse jusqu'au 31/12/2026, et la remise de −20 % s'applique aussi aux OTO.
 - **Offre de lancement 15 places jusqu'au 15 octobre** : elle ne change pas. Le nouveau parcours ouvre ensuite.
 
-## Les étapes
-1. **Phase 1 — Décisions (vous)** : valider les prix (47, 17, 97/67, 47, 27), le contenu de chaque pack et la date d'ouverture (proposée : 16 octobre).
-2. **Phase 2 — Le parcours d'achat** : bon de commande avec la case à 17 €, 3 pages d'OTO avec « Oui, j'ajoute » et « Non merci », une page merci, et le déblocage automatique des droits.
-3. **Phase 3 — Les espaces clients** : afficher les OTO non achetées dans l'espace du client, et retirer les abonnements de la page des forfaits. Ils restent actifs pour ceux qui les ont déjà.
-4. **Phase 4 — Le suivi** : un tableau dans l'admin avec, pour chaque OTO, le nombre de pages vues, le taux d'acceptation et le panier moyen.
-5. **Phase 5 — Les tests** : des achats en mode test pour chaque cas (tout accepter, tout refuser, version allégée), puis une vérification des droits. Aucune publication ni aucun email sans votre accord.
+## Version allégée recommandée (peu de travail)
+On démarre petit, avec ce qui existe déjà. Le reste ne vient que si les ventes suivent.
+1. **Étape 1** : le tunnel `/commander` à 47 € reste tel quel, avec la case à 17 € (le Boost existe déjà).
+2. **Étape 2** : une seule page d'OTO après le paiement : « Pack Édition Pro 97 € », avec « Oui » et « Non merci ». Si le client répond non, on lui propose le Cover Studio Pro à 67 € (prix existant).
+3. **Étape 3** : le client arrive dans son espace. Les autres packs restent sur la page « Compléments & options », qui existe déjà.
+
+Ce qu'on ne fait pas tout de suite : le paiement en un clic, les OTO 2 et 3 et le tableau de suivi. On les ajoute plus tard si l'OTO 1 se vend bien.
+Pour le travail : 1 nouveau prix de paiement, 1 page et 1 droit d'accès. Les abonnements des clients actuels ne bougent pas.
+
+## Version complète (plus tard, si les ventes suivent)
+1. Les OTO 2 et 3 dans le parcours.
+2. Le paiement en un clic.
+3. Le tableau de suivi dans l'admin.
+4. Le retrait des abonnements de la page des forfaits pour les nouveaux clients.
 
 ## Points à trancher
 - Garder un petit abonnement facultatif, par exemple 9 €/mois pour les nouveautés et le support ? Je propose non au départ.
