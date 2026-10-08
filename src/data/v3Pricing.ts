@@ -283,7 +283,12 @@ export const V3_LIFETIME_OFFERS = {
   base: {
     price: 47,
     title: "EbookStudio — accès à vie",
+    booksPerMonth: 10,
+    booksPerYear: 120,
+    chaptersMax: 40,
     features: [
+      "10 livres par mois, soit jusqu’à 120 livres par an",
+      "40 chapitres maximum par livre ; privilégiez 30 chapitres ou moins",
       "Écrire un livre, raconter un livre ou sa vie, partir de son sommaire",
       "Correction du manuscrit et HumanizeAI",
       "Mise en page et exports PDF, Word et EPUB",
