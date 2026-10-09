@@ -36,6 +36,14 @@ const PLANS: Record<
   v2_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 4700, installments: 1, monthly: 4700 },
   v2_2x: { label: "EbookStudio Pro — accès à vie (2× 25€)", total: 5000, installments: 2, monthly: 2500 },
   v2_3x: { label: "EbookStudio Pro — accès à vie (3× 18€)", total: 5400, installments: 3, monthly: 1800 },
+  // Nouvelles offres (nouveaux clients, à partir du 16/10/2026).
+  // Auteur : 97 € par an. 1× = abonnement annuel renouvelé ; 3× = 3 mensualités, accès 12 mois.
+  auteur97_1x: { label: "EbookStudio Auteur — 97 € par an", total: 9700, installments: 1, monthly: 9700 },
+  auteur97_3x: { label: "EbookStudio Auteur — 1 an (3× 32,34 €)", total: 9702, installments: 3, monthly: 3234 },
+  // Édition à vie : 247 € en 1×, 3× ou 6×. Inclut le Pack Édition Pro.
+  edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 24700, installments: 1, monthly: 24700 },
+  edition247_3x: { label: "EbookStudio Édition — accès à vie (3× 82,34 €)", total: 24702, installments: 3, monthly: 8234 },
+  edition247_6x: { label: "EbookStudio Édition — accès à vie (6× 41,17 €)", total: 24702, installments: 6, monthly: 4117 },
 };
 
 Deno.serve(async (req) => {
@@ -112,6 +120,7 @@ Deno.serve(async (req) => {
       email: trimmedEmail,
       order_id: orderId,
       installments_total: String(planDef.installments),
+      plan_label: planDef.label,
     };
     const srcTag = clean(src);
     const refTag = clean(ref);
@@ -119,7 +128,29 @@ Deno.serve(async (req) => {
     if (refTag) commonMeta.ref = refTag;
 
     let sessionParams: Record<string, any>;
-    if (planDef.installments === 1) {
+    if (normalizedPlan === "auteur97_1x") {
+      // Abonnement annuel renouvelé automatiquement chaque année.
+      sessionParams = {
+        mode: "subscription",
+        ui_mode: "embedded_page",
+        locale: "fr",
+        customer: customerId,
+        return_url: returnUrl,
+        line_items: [{
+          quantity: 1,
+          price_data: {
+            currency: "eur",
+            unit_amount: planDef.monthly,
+            recurring: { interval: "year" },
+            product_data: { name: planDef.label },
+          },
+        }],
+        "subscription_data[metadata][order_id]": orderId,
+        "subscription_data[metadata][kind]": "v3_full_pack",
+        "subscription_data[metadata][installments_total]": "1",
+        metadata: commonMeta,
+      };
+    } else if (planDef.installments === 1) {
       // Paiement unique 547€.
       sessionParams = {
         mode: "payment",

@@ -25,3 +25,4 @@
 - Public pricing uses V3_LIFETIME_OFFERS while V3_PLANS remains historical subscription data, so new offers do not alter existing subscriber rights or billing.
 - Home engine module badges reuse findPaidModuleForPath and useModuleAccess without granting rights; administrator access is distinguished from customer inclusion to avoid misleading paid-option labels.
 - Dark homepage feature panels show access information immediately below their titles, separating included workflows from paid extensions through the shared access badge without changing permissions.
+- New-customer offers (Auteur yearly, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), so historical 47 € and subscription rights stay untouched.

@@ -232,6 +232,45 @@ async function grantV3Lifetime(email: string) {
   return accessCode;
 }
 
+// Offre Auteur 97 €/an : accès actif pendant 12 mois (prolongé à chaque renouvellement).
+async function grantV3Annual(email: string) {
+  const supabase = getSupabase();
+  const { data: existing } = await supabase.from("subscribers")
+    .select("access_code, plan_type").eq("email", email).maybeSingle();
+  const accessCode = existing?.access_code || generateAccessCode();
+  // Ne jamais rétrograder un accès à vie existant.
+  if (existing?.plan_type === "lifetime") return accessCode;
+  const expiresAt = new Date();
+  expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+  expiresAt.setDate(expiresAt.getDate() + 3);
+  await supabase.from("subscribers").upsert({
+    email, access_code: accessCode, status: "active",
+    plan_type: "annual", plan_tier: "auteur", expires_at: expiresAt.toISOString(),
+  }, { onConflict: "email" });
+  return accessCode;
+}
+
+// Offre Édition à vie 247 € : accès à vie + Pack Édition Pro (idempotent).
+async function grantEdition247(email: string, sessionId: string, env: StripeEnv) {
+  const code = await grantV3Lifetime(email);
+  const supabase = getSupabase();
+  const { data: existing } = await supabase.from("module_entitlements")
+    .select("id").eq("email", email).eq("module", "edition-pro").eq("status", "active").maybeSingle();
+  if (!existing) {
+    await supabase.from("module_entitlements").insert({
+      email, module: "edition-pro", status: "active", amount: 0,
+      currency: "eur", environment: env, stripe_session_id: `${sessionId}_edition247`,
+    });
+  }
+  return code;
+}
+
+async function grantForPlan(plan: string, email: string, sessionId: string, env: StripeEnv) {
+  if (plan.startsWith("auteur97_")) return grantV3Annual(email);
+  if (plan.startsWith("edition247_")) return grantEdition247(email, sessionId, env);
+  return grantV3Lifetime(email);
+}
+
 // Bloque l'accès (échéances en échec après la période de grâce).
 async function suspendAccess(email: string) {
   const supabase = getSupabase();
@@ -336,7 +375,7 @@ async function handleV3SubscriptionReferral(session: any) {
   console.log("Subscription referral commission recorded:", email, commission);
 }
 
-async function handleV3CheckoutCompleted(session: any) {
+async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
   const orderId = session.metadata?.order_id;
   if (!orderId) return;
   const supabase = getSupabase();
@@ -354,7 +393,7 @@ async function handleV3CheckoutCompleted(session: any) {
       installments_paid: 1,
       completed_at: new Date().toISOString(),
     }).eq("id", orderId);
-    if (email) accessCode = await grantV3Lifetime(email);
+    if (email) accessCode = await grantForPlan(plan, email, session.id, env);
   } else {
     // Échéancier : 1re échéance encaissée, accès ouvert dès maintenant.
     await supabase.from("v3_installment_orders").update({
@@ -363,9 +402,12 @@ async function handleV3CheckoutCompleted(session: any) {
       stripe_subscription_id: subscriptionId,
       grace_until: null,
     }).eq("id", orderId);
-    if (email) accessCode = await grantV3Lifetime(email);
+    if (email) accessCode = await grantForPlan(plan, email, session.id, env);
   }
 
+  if (email && plan.startsWith("edition247_")) {
+    await sendLifetimeAccessEmail(email, String(session.metadata?.plan_label || plan), accessCode);
+  }
   if (email && isV2Lifetime) {
     const label = installmentsTotal <= 1
       ? "EbookStudio Pro — accès à vie, 47 € payés en une fois"
@@ -435,6 +477,13 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   // La 1re échéance est déjà comptée au checkout ; on ignore la facture initiale.
   if (invoice.billing_reason === "subscription_create") return;
 
+  // Auteur 97 €/an : chaque renouvellement annuel payé prolonge l'accès de 12 mois.
+  if (String(order.plan ?? "") === "auteur97_1x") {
+    await supabase.from("v3_installment_orders").update({ status: "active", grace_until: null }).eq("id", order.id);
+    if (order.email) await grantV3Annual(order.email as string);
+    return;
+  }
+
   const paid = (order.installments_paid as number) + 1;
   const total = order.installments_total as number;
 
@@ -451,7 +500,10 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
       grace_until: null,
       completed_at: new Date().toISOString(),
     }).eq("id", order.id);
-    if (order.email) await grantV3Lifetime(order.email as string);
+    // Auteur 3× : l'accès reste de 12 mois (pas d'accès à vie).
+    if (order.email && !String(order.plan ?? "").startsWith("auteur97_")) {
+      await grantForPlan(String(order.plan ?? ""), order.email as string, String(subscriptionId), env);
+    }
   } else {
     await supabase.from("v3_installment_orders").update({
       status: "active",
@@ -537,7 +589,7 @@ Deno.serve(async (req) => {
         if (session.metadata?.kind === "v3_subscription") {
           await handleV3SubscriptionCompleted(session);
         } else if (session.metadata?.kind === "v3_full_pack") {
-          await handleV3CheckoutCompleted(session);
+          await handleV3CheckoutCompleted(session, env);
         } else if (session.metadata?.kind === "v3_upsell_pack") {
           await handleV3UpsellPackCompleted(session, env);
         } else {

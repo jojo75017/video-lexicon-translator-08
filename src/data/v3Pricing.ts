@@ -311,3 +311,56 @@ export const V3_LIFETIME_OFFERS = {
   },
   cover: { price: 67, title: "Cover Studio KDP Pro seul", priceId: "v3_pack_cover_studio_pro_once" },
 } as const;
+
+/**
+ * Nouvelles offres pour les nouveaux clients (à partir du 16/10/2026).
+ * Les identifiants `plan` correspondent aux formules autorisées côté serveur
+ * (fonction v3-pack-checkout). Les anciens clients gardent leurs droits.
+ */
+export interface V3NewOfferOption { plan: string; label: string; installments: number; amount: number }
+export const V3_NEW_OFFERS = {
+  auteur: {
+    title: "EbookStudio Auteur",
+    price: 97,
+    period: "par an",
+    renewal: "Renouvellement automatique chaque année, résiliable à tout moment.",
+    booksPerMonth: 10,
+    chaptersMax: 40,
+    options: [
+      { plan: "auteur97_1x", label: "97 € par an", installments: 1, amount: 97 },
+      { plan: "auteur97_3x", label: "3 × 32,34 € (1 an d'accès)", installments: 3, amount: 32.34 },
+    ] as V3NewOfferOption[],
+    features: [
+      "Les 4 parcours : Écrire un livre, Je raconte un livre, Je raconte ma vie, J'ai déjà mon sommaire",
+      "Rédaction chapitre par chapitre avec les robots",
+      "Correction éditoriale et HumanizeAI",
+      "Exports PDF, DOCX et EPUB · mise en page Kindle et broché",
+      "Studio de couverture V4 : illustration IA, 5 modèles, PDF KDP 300 DPI",
+      "Outils KDP de base : mots-clés, description, catégories",
+      "Rédaction en 10 langues",
+      "10 livres par mois · 40 chapitres max (30 conseillés)",
+    ],
+    paidOptions: "En option : Cover Studio Pro 67 €, Studio Jeunesse 47 €, Version audio 9,99 €, Micro-Séries 67 €.",
+  },
+  edition: {
+    title: "EbookStudio Édition à vie",
+    price: 247,
+    period: "à vie",
+    renewal: "Aucun renouvellement : vous payez une fois, l'accès est à vie.",
+    booksPerMonth: 20,
+    chaptersMax: 60,
+    options: [
+      { plan: "edition247_1x", label: "247 € en une fois", installments: 1, amount: 247 },
+      { plan: "edition247_3x", label: "3 × 82,34 €", installments: 3, amount: 82.34 },
+      { plan: "edition247_6x", label: "6 × 41,17 €", installments: 6, amount: 41.17 },
+    ] as V3NewOfferOption[],
+    features: [
+      "Tout le contenu de l'offre Auteur",
+      "Pack Édition Pro inclus : Cover Studio Pro, BD Studio Pro",
+      "Recherche approfondie, Amazon Spy et outils KDP avancés",
+      "20 livres par mois · 60 chapitres max",
+      "Mises à jour de la V3 incluses",
+    ],
+    paidOptions: "Restent en option : Studio Jeunesse, Version audio, Micro-Séries V4, accompagnement personnel.",
+  },
+} as const;
