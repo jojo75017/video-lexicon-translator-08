@@ -21,10 +21,11 @@ function getSupabase() {
   );
 }
 
-// Catalogue des formules autorisées (montants en centimes EUR).
+// `first` = surplus en centimes ajouté à la 1re échéance seulement, pour que
+// le total payé soit exactement le prix rond (ex. 32,34 + 32,33 + 32,33 = 97,00).
 const PLANS: Record<
   string,
-  { label: string; total: number; installments: number; monthly: number }
+  { label: string; total: number; installments: number; monthly: number; first?: number }
 > = {
   full_1x: { label: "Pack Pro Vendeur V3 — paiement unique", total: 54700, installments: 1, monthly: 54700 },
   full_3x: { label: "Pack Pro Vendeur V3 — 3× sans frais", total: 56700, installments: 3, monthly: 18900 },
@@ -37,14 +38,17 @@ const PLANS: Record<
   v2_2x: { label: "EbookStudio Pro — accès à vie (2× 25€)", total: 5000, installments: 2, monthly: 2500 },
   v2_3x: { label: "EbookStudio Pro — accès à vie (3× 18€)", total: 5400, installments: 3, monthly: 1800 },
   // Nouvelles offres (nouveaux clients, à partir du 16/10/2026).
-  // Auteur : 97 € par an. 1× = abonnement annuel renouvelé ; 3× = 3 mensualités, accès 12 mois.
   auteur97_1x: { label: "EbookStudio Auteur — 97 € par an", total: 9700, installments: 1, monthly: 9700 },
-  auteur97_3x: { label: "EbookStudio Auteur — 1 an (3× 32,34 €)", total: 9702, installments: 3, monthly: 3234 },
-  // Édition à vie : 497 € en 1×, 3× ou 6×. Inclut le Pack Édition Pro.
+  auteur97_3x: { label: "EbookStudio Auteur — 1 an (3 échéances, total 97 €)", total: 9700, installments: 3, monthly: 3233, first: 1 },
   edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 49700, installments: 1, monthly: 49700 },
-  edition247_3x: { label: "EbookStudio Édition — accès à vie (3× 165,67 €)", total: 49701, installments: 3, monthly: 16567 },
-  edition247_6x: { label: "EbookStudio Édition — accès à vie (6× 82,84 €)", total: 49704, installments: 6, monthly: 8284 },
+  edition247_3x: { label: "EbookStudio Édition — accès à vie (3 échéances, total 497 €)", total: 49700, installments: 3, monthly: 16566, first: 2 },
+  edition247_6x: { label: "EbookStudio Édition — accès à vie (6 échéances, total 497 €)", total: 49700, installments: 6, monthly: 8283, first: 2 },
 };
+
+// Les nouvelles offres restent fermées en production tant que Georges n'a pas
+// validé le basculement. Le mode test reste toujours ouvert pour les essais.
+const NEW_OFFERS_LIVE_ENABLED = false;
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -72,6 +76,11 @@ Deno.serve(async (req) => {
       throw new Error("returnUrl invalide");
     }
 
+    const isNewOffer = normalizedPlan.startsWith("auteur97_") || normalizedPlan.startsWith("edition247_");
+    if (isNewOffer && env === "live" && !NEW_OFFERS_LIVE_ENABLED) {
+      throw new Error("Cette offre ouvre le 16 octobre 2026. Merci de revenir à cette date.");
+    }
+
     // Résoudre / créer le client Stripe (via gateway).
     const found = await stripeRequest(env, "GET", "/customers", { email: trimmedEmail, limit: 1 });
     const customerId: string = found?.data?.[0]?.id
@@ -79,6 +88,35 @@ Deno.serve(async (req) => {
 
     // Enregistrer la commande (suivi des échéances).
     const supabase = getSupabase();
+
+    // Anti double débit : si la même personne a déjà une session ouverte pour
+    // la même formule (actualisation, retour arrière), on la réutilise.
+    if (isNewOffer) {
+      const since = new Date(Date.now() - 30 * 60 * 1000).toISOString();
+      const { data: prev } = await supabase
+        .from("v3_installment_orders")
+        .select("id, stripe_session_id, status")
+        .eq("email", trimmedEmail).eq("plan", normalizedPlan).eq("environment", env)
+        .gte("created_at", since).order("created_at", { ascending: false }).limit(1).maybeSingle();
+      if (prev?.status && prev.status !== "pending") {
+        throw new Error("Un paiement pour cette formule vient déjà d'être validé avec cet email. Connectez-vous à votre espace client.");
+      }
+      if (prev?.stripe_session_id) {
+        try {
+          const s = await stripeRequest(env, "GET", `/checkout/sessions/${prev.stripe_session_id}`);
+          if (s?.status === "open" && s.client_secret) {
+            return new Response(JSON.stringify({ clientSecret: s.client_secret, orderId: prev.id, reused: true }),
+              { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          }
+          if (s?.status === "complete") {
+            throw new Error("Ce paiement est déjà enregistré. Connectez-vous à votre espace client.");
+          }
+        } catch (e) {
+          if (e instanceof Error && e.message.includes("déjà")) throw e;
+        }
+      }
+    }
+
 
     // Opération fondateur : les formules d'accès à vie ne sont vendables que
     // dans la limite des places et de la date. Le contrôle est fait ici, côté
@@ -190,7 +228,15 @@ Deno.serve(async (req) => {
             recurring: { interval: "month" },
             product_data: { name: planDef.label },
           },
-        }],
+        }, ...(planDef.first ? [{
+          // Ajustement d'arrondi facturé une seule fois, sur la 1re échéance.
+          quantity: 1,
+          price_data: {
+            currency: "eur",
+            unit_amount: planDef.first,
+            product_data: { name: "Ajustement d'arrondi (1re échéance)" },
+          },
+        }] : [])],
         "subscription_data[metadata][order_id]": orderId,
         "subscription_data[metadata][kind]": "v3_full_pack",
         "subscription_data[metadata][installments_total]": String(planDef.installments),

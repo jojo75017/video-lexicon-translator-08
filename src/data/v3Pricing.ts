@@ -328,7 +328,7 @@ export const V3_NEW_OFFERS = {
     chaptersMax: 40,
     options: [
       { plan: "auteur97_1x", label: "97 € par an", installments: 1, amount: 97 },
-      { plan: "auteur97_3x", label: "3 × 32,34 € (1 an d'accès)", installments: 3, amount: 32.34 },
+      { plan: "auteur97_3x", label: "3 fois : 32,34 € puis 2 × 32,33 € (1 an d'accès)", installments: 3, amount: 32.33, first: 32.34 },
     ] as V3NewOfferOption[],
     features: [
       "Les 4 parcours : Écrire un livre, Je raconte un livre, Je raconte ma vie, J'ai déjà mon sommaire",
@@ -352,8 +352,8 @@ export const V3_NEW_OFFERS = {
     // Les identifiants de plan (edition247_*) sont des clés de synchronisation permanentes : ne pas les renommer.
     options: [
       { plan: "edition247_1x", label: "497 € en une fois", installments: 1, amount: 497 },
-      { plan: "edition247_3x", label: "3 × 165,67 €", installments: 3, amount: 165.67 },
-      { plan: "edition247_6x", label: "6 × 82,84 €", installments: 6, amount: 82.84 },
+      { plan: "edition247_3x", label: "3 fois : 165,68 € puis 2 × 165,66 €", installments: 3, amount: 165.66, first: 165.68 },
+      { plan: "edition247_6x", label: "6 fois : 82,85 € puis 5 × 82,83 €", installments: 6, amount: 82.83, first: 82.85 },
     ] as V3NewOfferOption[],
     features: [
       "Tout le contenu de l'offre Auteur",

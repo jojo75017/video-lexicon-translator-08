@@ -25,15 +25,15 @@ const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; 
     title: 'EbookStudio Auteur — 97 € par an',
     options: [
       { id: 'auteur97_1x', label: '97 € par an', sub: 'Renouvellement annuel, résiliable à tout moment' },
-      { id: 'auteur97_3x', label: '3 × 32,34 €', sub: '3 mensualités · 1 an d\'accès' },
+      { id: 'auteur97_3x', label: '32,34 € puis 2 × 32,33 €', sub: '3 mensualités · 1 an d\'accès' },
     ],
   },
   edition247: {
     title: 'EbookStudio Édition — accès à vie',
     options: [
       { id: 'edition247_1x', label: '1 × 497 €', sub: 'Paiement unique · accès à vie' },
-      { id: 'edition247_3x', label: '3 × 165,67 €', sub: 'Échéancier mensuel' },
-      { id: 'edition247_6x', label: '6 × 82,84 €', sub: 'Échéancier mensuel' },
+      { id: 'edition247_3x', label: '165,68 € puis 2 × 165,66 €', sub: 'Échéancier mensuel' },
+      { id: 'edition247_6x', label: '82,85 € puis 5 × 82,83 €', sub: 'Échéancier mensuel' },
     ],
   },
   base: {
