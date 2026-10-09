@@ -92,6 +92,6 @@
 
 - [x] Préparer la relance Resend aux non-cliqueurs autorisée par Georges, avec désinscription, exclusion des acheteurs/abonnés et anti-doublon ; premier lot de 100 envoyé le 8 octobre 2026, plafond quotidien atteint.
 - [ ] Envoyer les lots restants de cette relance, 100 maximum par jour, uniquement après une nouvelle autorisation explicite de Georges.
-- [x] Offres 97 €/an et 247 € à vie : paiement + affichage page des offres
+- [x] Offres 97 €/an et 497 € à vie : paiement + affichage page des offres
 - [ ] Tunnel /commander et brief Landaa à basculer le 16/10 (après fermeture 47 €)
 - [ ] OTO 197 € et Studio Jeunesse après achat (à construire)
