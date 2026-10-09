@@ -5,7 +5,7 @@ import { V3_NEW_OFFERS, formatPrice, V2_ACCESS_NOTE } from '@/data/v3Pricing';
 import { Button } from '@/components/ui/button';
 import V3PackCheckout from '@/components/admin/V3PackCheckout';
 
-/** Offres pour les nouveaux clients : Auteur 97 €/an et Édition à vie 247 €. */
+/** Offres pour les nouveaux clients : Auteur 97 €/an et Édition à vie 497 €. */
 export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
   const [product, setProduct] = useState<'auteur' | 'edition247' | null>(null);
   const { auteur, edition } = V3_NEW_OFFERS;

@@ -40,10 +40,10 @@ const PLANS: Record<
   // Auteur : 97 € par an. 1× = abonnement annuel renouvelé ; 3× = 3 mensualités, accès 12 mois.
   auteur97_1x: { label: "EbookStudio Auteur — 97 € par an", total: 9700, installments: 1, monthly: 9700 },
   auteur97_3x: { label: "EbookStudio Auteur — 1 an (3× 32,34 €)", total: 9702, installments: 3, monthly: 3234 },
-  // Édition à vie : 247 € en 1×, 3× ou 6×. Inclut le Pack Édition Pro.
-  edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 24700, installments: 1, monthly: 24700 },
-  edition247_3x: { label: "EbookStudio Édition — accès à vie (3× 82,34 €)", total: 24702, installments: 3, monthly: 8234 },
-  edition247_6x: { label: "EbookStudio Édition — accès à vie (6× 41,17 €)", total: 24702, installments: 6, monthly: 4117 },
+  // Édition à vie : 497 € en 1×, 3× ou 6×. Inclut le Pack Édition Pro.
+  edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 49700, installments: 1, monthly: 49700 },
+  edition247_3x: { label: "EbookStudio Édition — accès à vie (3× 165,67 €)", total: 49701, installments: 3, monthly: 16567 },
+  edition247_6x: { label: "EbookStudio Édition — accès à vie (6× 82,84 €)", total: 49704, installments: 6, monthly: 8284 },
 };
 
 Deno.serve(async (req) => {

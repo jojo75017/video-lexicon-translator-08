@@ -344,15 +344,16 @@ export const V3_NEW_OFFERS = {
   },
   edition: {
     title: "EbookStudio Édition à vie",
-    price: 247,
+    price: 497,
     period: "à vie",
     renewal: "Aucun renouvellement : vous payez une fois, l'accès est à vie.",
     booksPerMonth: 20,
     chaptersMax: 60,
+    // Les identifiants de plan (edition247_*) sont des clés de synchronisation permanentes : ne pas les renommer.
     options: [
-      { plan: "edition247_1x", label: "247 € en une fois", installments: 1, amount: 247 },
-      { plan: "edition247_3x", label: "3 × 82,34 €", installments: 3, amount: 82.34 },
-      { plan: "edition247_6x", label: "6 × 41,17 €", installments: 6, amount: 41.17 },
+      { plan: "edition247_1x", label: "497 € en une fois", installments: 1, amount: 497 },
+      { plan: "edition247_3x", label: "3 × 165,67 €", installments: 3, amount: 165.67 },
+      { plan: "edition247_6x", label: "6 × 82,84 €", installments: 6, amount: 82.84 },
     ] as V3NewOfferOption[],
     features: [
       "Tout le contenu de l'offre Auteur",

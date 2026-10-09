@@ -90,7 +90,7 @@ const CountdownTimer = () => {
           className="text-center text-destructive/80 text-xs mt-3 flex items-center justify-center gap-1"
         >
           <Flame className="w-3 h-3" />
-          Le prix passera à 247€ après expiration
+          Le prix passera à 497€ après expiration
         </motion.p>
       )}
     </motion.div>

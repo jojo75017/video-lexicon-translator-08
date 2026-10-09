@@ -170,7 +170,7 @@ export default function V3MainTabs() {
               }}
             >
               <span aria-hidden>✨</span>
-              <span>Nos offres · 97 €/an ou 247 € à vie</span>
+              <span>Nos offres · 97 €/an ou 497 € à vie</span>
             </NavLink>
             <NavLink
               to={pathname === '/v3' ? '/v3#v3-upsells' : '/v3/upsells'}
@@ -339,7 +339,7 @@ export default function V3MainTabs() {
                 textShadow: 'none',
               }}
             >
-              ✨ Nos offres · 97 €/an ou 247 € à vie
+              ✨ Nos offres · 97 €/an ou 497 € à vie
             </NavLink>
             <NavLink
               to="/v3/upsells"

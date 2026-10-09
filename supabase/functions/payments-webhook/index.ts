@@ -250,7 +250,7 @@ async function grantV3Annual(email: string) {
   return accessCode;
 }
 
-// Offre Édition à vie 247 € : accès à vie + Pack Édition Pro (idempotent).
+// Offre Édition à vie 497 € : accès à vie + Pack Édition Pro (idempotent).
 async function grantEdition247(email: string, sessionId: string, env: StripeEnv) {
   const code = await grantV3Lifetime(email);
   const supabase = getSupabase();
