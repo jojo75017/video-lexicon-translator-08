@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function V3ForfaitsPage() {
-  usePageMeta({ title: 'Offres Auteur et Édition — EbookStudio', description: 'EbookStudio Auteur à 97 € par an ou Édition à vie à 247 €, payable en plusieurs fois. Les droits des clients actuels sont conservés.' });
+  usePageMeta({ title: 'Offres Auteur et Édition — EbookStudio', description: 'EbookStudio Auteur à 97 € par an ou Édition à vie à 497 €, payable en plusieurs fois. Les droits des clients actuels sont conservés.' });
   return <main className="min-h-screen bg-background px-4 py-10 text-foreground">
     <div className="mx-auto max-w-7xl"><BackButton className="mb-4" />
       <h1 className="text-center text-4xl font-bold">Les offres EbookStudio</h1>
