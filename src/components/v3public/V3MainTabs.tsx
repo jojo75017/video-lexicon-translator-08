@@ -339,7 +339,7 @@ export default function V3MainTabs() {
                 textShadow: 'none',
               }}
             >
-              ✨ Offre à vie · 15 oct.
+              ✨ Nos offres · 97 €/an ou 247 € à vie
             </NavLink>
             <NavLink
               to="/v3/upsells"
