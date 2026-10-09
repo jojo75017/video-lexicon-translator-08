@@ -130,13 +130,13 @@ export const V3_HEADER_MENU: MenuCategory[] = [
   },
   {
     key: 'plans',
-    label: 'Offres à vie',
+    label: 'Nos offres',
     emoji: '👑',
     color: '#c9a84c',
-    tagline: 'Un paiement, puis vos options au choix',
+    tagline: 'Auteur par an ou Édition à vie',
     links: [
-      { label: 'EbookStudio — 47 € à vie', to: '/v3/forfaits', badge: 'Paiement unique', desc: 'Écriture, correction, couverture incluse et outils KDP de base' },
-      { label: 'Pack Édition Pro — 97 € à vie', to: '/v3/forfaits', badge: 'Option facultative', desc: 'Cover Studio Pro, KDP avancé, BD Studio et BookPerfect' },
+      { label: 'EbookStudio Auteur — 97 €/an', to: '/v3/forfaits', badge: '3 × 32,33 € possible', desc: 'Tous les parcours, correction, couverture incluse et outils KDP de base' },
+      { label: 'EbookStudio Édition à vie — 497 €', to: '/v3/forfaits', badge: '3 × ou 6 × possible', desc: 'Tout Auteur + Cover Studio Pro, KDP avancé, BD Studio et BookPerfect, sans renouvellement' },
       { label: 'Compléments & options', to: '/v3/upsells', desc: 'Des studios et services à ajouter uniquement si vous en avez besoin' },
       { label: 'Ancien client V2', to: '/v3/migration', badge: 'Droits conservés', desc: 'Vos achats et avantages acquis restent inchangés' },
       { label: 'Calendrier des ouvertures', to: '/v3/calendrier', badge: 'Dates exactes', desc: 'Ce qui est déjà libre et la date d’ouverture de chaque module' },
