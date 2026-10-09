@@ -8,8 +8,9 @@ import { toast } from 'sonner';
 const GOLD = '#c9a84c';
 const GOLD_LIGHT = '#f0d78c';
 
-type PlanId = 'full_1x' | 'full_3x' | 'full_4x' | 'base_1x' | 'base_3x';
-type Product = 'full' | 'base';
+type PlanId = 'full_1x' | 'full_3x' | 'full_4x' | 'base_1x' | 'base_3x'
+  | 'auteur97_1x' | 'auteur97_3x' | 'edition247_1x' | 'edition247_3x' | 'edition247_6x';
+type Product = 'full' | 'base' | 'auteur' | 'edition247';
 
 const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; label: string; sub: string }[] }> = {
   full: {
@@ -18,6 +19,21 @@ const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; 
       { id: 'full_1x', label: '1 × 547€', sub: 'Paiement unique · le plus économique' },
       { id: 'full_3x', label: '3 × 189€', sub: 'Échéancier mensuel (567€)' },
       { id: 'full_4x', label: '4 × 144€', sub: 'Petit budget (576€)' },
+    ],
+  },
+  auteur: {
+    title: 'EbookStudio Auteur — 97 € par an',
+    options: [
+      { id: 'auteur97_1x', label: '97 € par an', sub: 'Renouvellement annuel, résiliable à tout moment' },
+      { id: 'auteur97_3x', label: '3 × 32,34 €', sub: '3 mensualités · 1 an d\'accès' },
+    ],
+  },
+  edition247: {
+    title: 'EbookStudio Édition — accès à vie',
+    options: [
+      { id: 'edition247_1x', label: '1 × 247 €', sub: 'Paiement unique · accès à vie' },
+      { id: 'edition247_3x', label: '3 × 82,34 €', sub: 'Échéancier mensuel' },
+      { id: 'edition247_6x', label: '6 × 41,17 €', sub: 'Échéancier mensuel' },
     ],
   },
   base: {
