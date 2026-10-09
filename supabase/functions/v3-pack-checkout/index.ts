@@ -228,7 +228,15 @@ Deno.serve(async (req) => {
             recurring: { interval: "month" },
             product_data: { name: planDef.label },
           },
-        }],
+        }, ...(planDef.first ? [{
+          // Ajustement d'arrondi facturé une seule fois, sur la 1re échéance.
+          quantity: 1,
+          price_data: {
+            currency: "eur",
+            unit_amount: planDef.first,
+            product_data: { name: "Ajustement d'arrondi (1re échéance)" },
+          },
+        }] : [])],
         "subscription_data[metadata][order_id]": orderId,
         "subscription_data[metadata][kind]": "v3_full_pack",
         "subscription_data[metadata][installments_total]": String(planDef.installments),
