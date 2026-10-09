@@ -120,6 +120,7 @@ Deno.serve(async (req) => {
       email: trimmedEmail,
       order_id: orderId,
       installments_total: String(planDef.installments),
+      plan_label: planDef.label,
     };
     const srcTag = clean(src);
     const refTag = clean(ref);

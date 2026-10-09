@@ -405,7 +405,7 @@ async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
     if (email) accessCode = await grantForPlan(plan, email, session.id, env);
   }
 
-  if (email && (plan.startsWith("auteur97_") || plan.startsWith("edition247_"))) {
+  if (email && plan.startsWith("edition247_")) {
     await sendLifetimeAccessEmail(email, String(session.metadata?.plan_label || plan), accessCode);
   }
   if (email && isV2Lifetime) {
