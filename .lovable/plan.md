@@ -1,107 +1,57 @@
-# Tunnel permanent à partir du 16 octobre 2026
+# Nouvelles offres pour les nouveaux clients (à partir du 16 octobre)
 
-## Décision validée
-À partir du **16 octobre 2026**, l’offre d’entrée devient :
+## Mon avis
+Votre raisonnement tient la route. 47 € à vie ne rembourse pas 2 500 € d'investissement. Pour rentrer dans vos frais, il faut environ **26 ventes à 97 €** ou **11 ventes à 247 €** sur l'année. C'est atteignable avec votre liste actuelle (plus de 1 200 contacts). Ces prix restent aussi sous Publisher Rocket (199 $) et Designrr (297 à 497 $ par an).
 
-- **EbookStudio V3 — 47 € en paiement unique, accès à vie** ;
-- **10 livres par mois, soit 120 livres par an** ;
-- jusqu’à **40 chapitres par livre**, avec 30 ou moins conseillé ;
-- aucune mensualité ;
-- plus de compteur « 15 places » ni de date limite ;
-- les clients et abonnés actuels conservent tous leurs droits.
+Les anciens clients gardent tout ce qu'ils ont (accès à 47 €, V2, abonnements, achats). Rien ne change pour eux.
 
-## Brief à transmettre à Landaa
+## Les deux offres
 
-### 1. Page de vente principale
-- Garder le prix **47 € une seule fois** et la promesse d’**accès à vie**.
-- Retirer partout : « 15 places », « jusqu’au 15 octobre », compte à rebours, urgence de fermeture et mentions d’un futur abonnement obligatoire.
-- Afficher clairement : **10 livres par mois — 120 livres par an**.
-- Ne pas présenter Amazon KDP comme l’unique plateforme de publication.
-- Bouton principal : **« J’accède à EbookStudio V3 à vie pour 47 € »**.
-- Le bouton doit mener au bon de commande EbookStudio en conservant les paramètres de suivi (`utm_*`, `src`, `ref`).
+### Offre 1 — « EbookStudio Auteur » : 97 € par an
+- Paiement en 1 fois (97 €) ou en 3 fois (3 × 32,33 €).
+- Renouvellement automatique chaque année, résiliable à tout moment.
+- Modules inclus :
+  - Les quatre parcours : Écrire un livre, Je raconte un livre, Je raconte ma vie, J'ai déjà mon sommaire
+  - Rédaction chapitre par chapitre avec les robots
+  - Correction éditoriale et HumanizeAI
+  - Exports PDF, DOCX et EPUB, mise en page Kindle et broché
+  - Studio de couverture V4 standard : illustration IA, cinq modèles, PDF KDP 300 DPI
+  - Outils KDP de base : mots-clés, description, catégories
+  - Rédaction en 10 langues
+  - 10 livres par mois, 40 chapitres maximum (30 conseillés)
+- Options payantes en plus : Cover Studio Pro 67 €, Studio Jeunesse 47 €, Version audio 9,99 €, Micro-Séries 67 €.
 
-### Direction visuelle à donner à Landaa
-- Reprendre l’identité du tunnel EbookStudio : **bleu nuit profond** en fond (`#071225`) et panneaux bleu nuit plus clair (`#13233D`).
-- Titres et textes principaux : **blanc cassé** (`#F8F5EE`) ; textes secondaires : bleu gris clair (`#A9B7CA`).
-- Boutons d’achat et actions principales : **orange vif** (`#FF6518`), avec texte blanc. L’orange doit être réservé aux clics importants.
-- Prix, garantie et petits éléments premium : **or** (`#F6BD2A`).
-- Confirmations, coches et éléments rassurants : **vert** (`#26D58B`).
-- Bordures discrètes : bleu gris (`#293D5B`).
-- Style général : professionnel, rassurant et éditorial ; pas de violet, pas de fond blanc dominant, pas de couleurs pastel, pas d’effets trop chargés.
-- Conserver la même palette sur la page principale, l’OTO 97 €, l’alternative 67 € et la confirmation pour donner l’impression d’un seul parcours.
-- Les prix **47 €**, **97 €** et **67 €** doivent être très visibles en or ; les boutons « Oui » en orange et les liens « Non merci » en texte clair, sans les rendre invisibles.
+### Offre 2 — « EbookStudio Édition à vie » : 247 €
+- Paiement en 1 fois, en 3 fois (3 × 82,33 €) ou en 6 fois (6 × 41,17 €).
+- Aucun renouvellement : accès à vie.
+- Modules inclus :
+  - Tout le contenu de l'offre Auteur
+  - Pack Édition Pro inclus : Cover Studio Pro, BD Studio Pro, recherche approfondie, Amazon Spy et outils KDP avancés
+  - 20 livres par mois, 60 chapitres maximum
+  - Mises à jour de la V3 incluses
+- Restent payants : Studio Jeunesse, Version audio, Micro-Séries V4 (précommande), services avec accompagnement personnel.
 
-### 2. Bon de commande à 47 €
-- Produit principal : **EbookStudio V3 — accès à vie**.
-- Prix : **47 €**, paiement unique.
-- Conserver la case facultative **Pack Boost de Lancement — 17 €** si elle est déjà présente.
-- Ne pas ajouter d’abonnement, de paiement récurrent ou d’autre formule.
-- Après paiement accepté, envoyer automatiquement l’acheteur vers l’OTO 1.
+### Après l'achat (OTO)
+- Après l'offre Auteur à 97 € : proposition de passer à l'offre à vie avec 50 € de réduction (197 €). Si refus, Cover Studio Pro à 67 €.
+- Après l'offre à vie à 247 € : Studio Jeunesse à 47 € (une seule proposition).
+- Le Pack Édition Pro à 97 € ne sera plus proposé aux nouveaux clients, puisqu'il est inclus dans l'offre à vie. Les anciens clients pourront toujours l'acheter.
 
-### 3. OTO 1 après l’achat
-- Titre : **Pack Édition Pro — accès à vie**.
-- Prix : **97 €**, paiement unique.
-- Deux choix très visibles :
-  - **« Oui, j’ajoute le Pack Édition Pro à 97 € »** ;
-  - **« Non merci, je continue sans le Pack Édition Pro »**.
-- Ne jamais représenter le refus comme une perte de l’achat à 47 € : l’accès principal est déjà acquis.
+## Ce qui change dans le site
+- Page des offres, accueil visiteur, tunnel `/commander` : deux cartes, 97 € par an et 247 € à vie, avec la liste des modules ci-dessus et un choix 1×/3×/6×.
+- Les mentions « 47 € à vie » disparaissent pour les nouveaux clients. Elles restent visibles dans « Mon compte » pour les clients qui l'ont acheté.
+- L'offre fondateur à 47 € ferme définitivement le 15 octobre à 23 h 59, comme prévu.
+- Un nouveau brief pour Landaa, avec les deux prix et les mêmes couleurs, remplace le brief précédent à 47 €.
+- Les droits ne sont accordés qu'après la confirmation réelle de chaque paiement. En cas d'échéance impayée, l'accès est suspendu, puis réactivé une fois la situation régularisée (mécanisme déjà existant).
 
-### 4. Alternative après refus de l’OTO 1
-- Proposer uniquement **Cover Studio Pro — 67 €**, paiement unique.
-- Deux choix :
-  - **« Oui, j’ajoute Cover Studio Pro à 67 € »** ;
-  - **« Non merci, accéder à mon espace »**.
-- Après acceptation ou refus, envoyer vers la page de confirmation et l’espace client.
-
-### 5. Page de confirmation
-- Confirmer séparément les achats réellement effectués : 47 €, Boost 17 €, Pack Édition Pro 97 € ou Cover Studio Pro 67 €.
-- Bouton principal : **« Accéder à EbookStudio »**.
-- Ne pas afficher d’OTO supplémentaire pour cette première version.
-
-## Parcours final
-
-```text
-Page Landaa
-    ↓
-Commande EbookStudio 47 € (+ Boost 17 € facultatif)
-    ↓ paiement confirmé
-OTO Pack Édition Pro 97 €
-    ├─ Oui → confirmation + espace client
-    └─ Non → Cover Studio Pro 67 €
-                  ├─ Oui → confirmation + espace client
-                  └─ Non → confirmation + espace client
-```
-
-## Basculement EbookStudio à préparer
-- À **00 h 00, heure de Paris, le 16 octobre**, supprimer la fermeture automatique du paiement à 47 € liée à la date et aux 15 places.
-- Conserver le contrôle serveur du prix : aucun ancien lien ne doit pouvoir commander un autre montant.
-- Remplacer les compteurs et messages de clôture sur `/commander`, les offres, le menu et les bandeaux par la présentation permanente.
-- Faire pointer la racine publique vers la nouvelle page Landaa, tout en conservant les paramètres de suivi.
-- Enchaîner le paiement confirmé vers l’OTO 97 €, puis vers l’alternative 67 € en cas de refus.
-- Accorder les droits seulement après confirmation réelle de chaque paiement.
-- Préserver les abonnements historiques et les achats antérieurs, sans migration forcée.
-- Arrêter les relances propres à l’opération « 15 places jusqu’au 15 octobre » ; aucun email ne sera envoyé sans autorisation explicite.
-
-## Lien Landaa et relance du 16 octobre
-- Georges transmettra l’URL définitive du nouveau tunnel Landaa avant le basculement. Jusque-là, conserver l’URL actuellement enregistrée dans EbookStudio.
-- Le 16 octobre, remplacer uniquement l’URL centralisée du tunnel, puis vérifier que la racine publique et tous les boutons concernés ouvrent la nouvelle page en conservant les paramètres de suivi.
-- Préparer une relance exceptionnelle via **Resend**, destinée uniquement aux **non-acheteurs**.
-- Exclure avant envoi tous les acheteurs de l’accès à vie, les acheteurs V3 et les abonnés actifs ; ne jamais relancer un client déjà payé.
-- Respecter le plafond Resend de **100 emails maximum par jour**. Si la cible dépasse 100 personnes, répartir l’envoi sur plusieurs jours sans dépasser cette limite.
-- Aucun envoi automatique ni programmé sans validation explicite de Georges le jour même.
-- Angle du message : **« Une grande nouveauté vous attend bientôt »**, avec invitation à s’inscrire ou découvrir EbookStudio, sans fausse urgence ni faux nombre de places.
-- Le lien de l’email devra pointer vers le nouveau tunnel Landaa avec un suivi dédié, par exemple `utm_source=resend`, `utm_medium=email`, `utm_campaign=nouveaute_16_octobre`.
-- Prévoir un objet, un pré-en-tête, une version texte simple, le lien de désinscription et un test envoyé uniquement à Georges avant l’autorisation finale.
-
-## Contrôles avant mise en ligne
-- Tester les quatre parcours : 47 € seul ; 47 € + Boost ; 47 € + 97 € ; 47 € + refus 97 € + 67 €.
-- Vérifier les droits obtenus après chaque combinaison et l’absence de double débit.
-- Vérifier les retours après paiement, les refus, l’actualisation de page et les anciens liens directs.
-- Vérifier sur mobile et ordinateur que les prix, boutons et mentions « paiement unique » sont lisibles.
-- Faire une dernière vérification le **15 octobre**, puis publier le basculement uniquement avec l’autorisation de Georges.
+## À valider avant de construire
+1. Quotas de l'offre à vie : 20 livres par mois et 60 chapitres, ou les mêmes quotas que l'offre Auteur ?
+2. Faut-il afficher une remise de 20 % aux anciens clients V2 qui veulent passer à l'offre à vie à 247 € ?
+3. Le Boost à 17 € reste-t-il sur le bon de commande ?
 
 ## Détails techniques
-- Le système actuel ferme effectivement l’offre le 15 octobre à 23 h 59 et bloque aussi le paiement côté serveur : le changement doit donc être fait dans l’affichage **et** dans le contrôle de paiement.
-- L’URL Landaa est centralisée dans EbookStudio ; une seule modification doit suffire pour la redirection publique.
-- L’OTO 97 € existe déjà sous le droit `edition_pro`, et l’alternative Cover Studio Pro reste à 67 €.
-- Aucun paiement « en un clic » n’est requis pour cette version : un paiement intégré classique peut être utilisé pour les options.
+- Nouveaux prix de paiement avec des identifiants stables : `v3_auteur_yearly` (97 €/an, récurrent), `v3_auteur_yearly_3x` (échéancier sur 3 mois puis renouvellement annuel), `v3_edition_lifetime_247` (1×), `v3_edition_lifetime_247_3x` et `v3_edition_lifetime_247_6x` (abonnements à durée limitée).
+- `V3_LIFETIME_OFFERS` est remplacé côté affichage par `V3_NEW_OFFERS` dans `src/data/v3Pricing.ts`. `V3_PLANS` et l'offre 47 € restent en données historiques.
+- Liste des modules ajoutée à `v3ModuleAccess.ts` pour les nouveaux droits `v3_auteur` et `v3_edition_lifetime_247`. Le droit `edition_pro` s'applique automatiquement à l'offre à vie.
+- Fonctions de paiement : liste blanche des nouveaux prix, attribution des droits par le webhook, échéancier réutilisant la logique d'échelonnement existante.
+- Tests sur les prix (97, 247, montants des échéances) et les quotas dans `v3Pricing.test.ts`.
+- Aucun email ni aucune publication sans votre autorisation.
