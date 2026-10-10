@@ -317,7 +317,7 @@ export const V3_LIFETIME_OFFERS = {
  * Les identifiants `plan` correspondent aux formules autorisées côté serveur
  * (fonction v3-pack-checkout). Les anciens clients gardent leurs droits.
  */
-export interface V3NewOfferOption { plan: string; label: string; installments: number; amount: number }
+export interface V3NewOfferOption { plan: string; label: string; installments: number; amount: number; first?: number }
 export const V3_NEW_OFFERS = {
   auteur: {
     title: "EbookStudio Auteur",

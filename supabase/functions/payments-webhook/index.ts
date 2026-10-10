@@ -379,6 +379,11 @@ async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
   const orderId = session.metadata?.order_id;
   if (!orderId) return;
   const supabase = getSupabase();
+  // Droits accordés uniquement après paiement confirmé, et une seule fois.
+  if (session.payment_status === "unpaid") return;
+  const { data: existingOrder } = await supabase
+    .from("v3_installment_orders").select("status").eq("id", orderId).maybeSingle();
+  if (existingOrder && existingOrder.status !== "pending") return;
   const installmentsTotal = Number(session.metadata?.installments_total || "1");
   const email = (session.metadata?.email || session.customer_email || "").toLowerCase();
   const subscriptionId = session.subscription || null;
