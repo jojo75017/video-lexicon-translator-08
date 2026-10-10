@@ -87,6 +87,7 @@ const SubscriptionPage = lazy(() => import('./pages/SubscriptionPage'));
 const DemoPage = lazy(() => import('./pages/DemoPage'));
 const FaqAssistancePage = lazy(() => import('./pages/FaqAssistancePage'));
 const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
+const NouvelleOffrePaiementPage = lazy(() => import('./pages/NouvelleOffrePaiementPage'));
 const V3OtoEditionProPage = lazy(() => import('./pages/v3public/V3OtoEditionProPage'));
 const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiementPage'));
 const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
@@ -562,6 +563,7 @@ const App = () => {
             <Route path="/faq" element={<FaqAssistancePage />} />
             <Route path="/assistance" element={<FaqAssistancePage />} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
+            <Route path="/paiement-offre" element={<NouvelleOffrePaiementPage />} />
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />

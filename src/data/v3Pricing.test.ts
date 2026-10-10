@@ -44,7 +44,7 @@ describe("Nouvelles offres 97 € / 497 €", () => {
   it("les échéances couvrent le prix", () => {
     for (const o of [...NEW.auteur.options, ...NEW.edition.options]) {
       const base = o.plan.startsWith("auteur") ? 97 : 497;
-      expect(Math.abs(o.amount * o.installments - base)).toBeLessThan(0.1);
+      expect(Math.round(((o.first ?? o.amount) + o.amount * (o.installments - 1)) * 100)).toBe(Math.round(base * 100));
     }
   });
   it("quotas : Auteur 10 livres/40 ch., Édition 20 livres/60 ch.", () => {
