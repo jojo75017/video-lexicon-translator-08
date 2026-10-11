@@ -19,7 +19,7 @@ export const V2_PURCHASE_LINK_TPE = 'https://www.trafic-affiliation.com/ebookstu
  * À mettre à jour ici (et ici seulement) après le 15 octobre 2026.
  */
 export const LAUNCH_TUNNEL_URL =
-  'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/de-vente';
+  'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy';
 
 /** Tunnel de vente avec conservation des paramètres d'URL (utm_*, src, ref…). */
 export function launchTunnelUrl(): string {
