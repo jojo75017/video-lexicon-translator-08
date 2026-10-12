@@ -582,7 +582,7 @@ export default function V3CommanderPage() {
             </p>
             <p style={{ fontSize: "0.9rem", opacity: 0.85 }}>
               Le Pack Édition Pro à 97 € inclut Cover Studio Pro. Le studio de couverture Pro seul
-              reste disponible à 67 €. Les clients déjà équipés gardent leurs droits.
+              reste disponible à 67 €, et Studio Jeunesse à 47 €. Les clients déjà équipés gardent leurs droits.
             </p>
           </div>
         </section>
