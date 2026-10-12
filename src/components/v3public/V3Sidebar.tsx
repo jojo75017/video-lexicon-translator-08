@@ -258,8 +258,8 @@ export default function V3Sidebar() {
       <div className="sticky top-[49px] z-10 bg-background px-2 py-2">
         <NavLink
           to="/v3/studio-v4"
-          title="Créer ma couverture — Cover Studio Pro"
-          aria-label="Créer ma couverture — Cover Studio Pro"
+          title="Créer ma couverture — Studio de couverture"
+          aria-label="Créer ma couverture — Studio de couverture"
           style={{ background: '#EC4899', color: '#ffffff' }}
           className="relative flex min-h-12 items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:brightness-110"
         >
@@ -268,7 +268,7 @@ export default function V3Sidebar() {
             <>
               <span className="min-w-0 flex-1">
                 <span className="block truncate">Créer ma couverture</span>
-                 <span className="block truncate text-[10px] font-medium opacity-90">Cover Studio Pro</span>
+                 <span className="block truncate text-[10px] font-medium opacity-90">Studio de couverture</span>
               </span>
               <span className="rounded bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase">V4</span>
             </>
