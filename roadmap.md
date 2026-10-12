@@ -1,5 +1,9 @@
 # Roadmap
 
+## Catalogue partenaires public et affichage Jeunesse
+- [x] Retirer les mentions Jeunesse de Compléments & options, Nos offres et commande sans changer paiements ni accès ; BD Studio Pro conservé.
+- [x] Afficher les six cartes publiques sur /partenaires et ajouter le lien depuis le bandeau d’accueil ; accès sans connexion, nouvel onglet AI Team, titre exact et grille ordinateur/mobile vérifiés sans publier.
+
 ## Boutons de navigation plus professionnels
 - [x] Harmoniser uniquement les boutons de navigation ; conserver toutes les têtes de robots, les libellés et les destinations. Huit portraits présents et compilation vérifiée, sans publication.
 
@@ -94,7 +98,7 @@
 - [ ] Envoyer les lots restants de cette relance, 100 maximum par jour, uniquement après une nouvelle autorisation explicite de Georges.
 - [x] Offres 97 €/an et 497 € à vie : paiement + affichage page des offres
 - [ ] Tunnel /commander et brief Landaa à basculer le 16/10 (après fermeture 47 €)
-- [ ] OTO 197 € et Studio Jeunesse après achat (à construire)
+- [ ] OTO 197 € après achat — différée ; Studio Jeunesse annulé.
 
 ## Publication du 12 octobre 2026
 - [x] Publier ebookstudio.fr avec l'ancien tunnel (…/tunnel-de-vente/de-vente) : redirection de la racine vérifiée sur le site en ligne, deux visites à vide.

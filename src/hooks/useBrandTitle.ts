@@ -14,6 +14,7 @@ export function useBrandTitle() {
 
   useEffect(() => {
     const ensureSuffix = () => {
+      if (location.pathname === '/partenaires') return;
       const current = document.title || '';
       if (current.endsWith(BRAND_SUFFIX)) return;
       const base = current.trim().replace(/\s+[—\-|·]\s*EbookStudio.*$/i, '').trim();
