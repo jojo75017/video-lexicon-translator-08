@@ -204,6 +204,22 @@ export default function V3MainTabs() {
                 6
               </span>
             </NavLink>
+            <NavLink
+              to="/outils-partenaires"
+              className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
+              style={({ isActive }) => ({
+                background: '#16A34A',
+                color: '#ffffff',
+                border: '1px solid #15803D',
+                fontWeight: 600,
+                padding: '8px 14px',
+                gap: 6,
+                ...(isActive ? { boxShadow: '0 0 0 2px rgba(22,163,74,0.35)' } : {}),
+              })}
+            >
+              <span aria-hidden>🤝</span>
+              <span>Partenaires</span>
+            </NavLink>
           </div>
         </nav>
 
@@ -354,6 +370,20 @@ export default function V3MainTabs() {
               }}
             >
               <Sparkles className="w-4 h-4" /> UPSELLS — packs &amp; compléments
+            </NavLink>
+            <NavLink
+              to="/outils-partenaires"
+              onClick={() => setMobileOpen(false)}
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              style={{
+                background: '#16A34A',
+                color: '#ffffff',
+                border: '1px solid #15803D',
+                fontWeight: 700,
+                textShadow: 'none',
+              }}
+            >
+              🤝 Partenaires — outils recommandés
             </NavLink>
 
 

@@ -182,7 +182,6 @@ export default function V3HomePage() {
       </section>
 
       {!user && <V3PricingOverview />}
-      {!user && <V3PartnersBand />}
 
       {!user && (
         <>
@@ -195,6 +194,8 @@ export default function V3HomePage() {
             </h2>
           </section>
           <V3CoverStudioBanner />
+          {/* Partenaires : prend la place du bloc Studio BD & Jeunesse retiré. */}
+          <V3PartnersBand />
         </>
       )}
 
