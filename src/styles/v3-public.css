@@ -729,3 +729,6 @@
 .partner-tools .partner-tools-discover:focus-visible{outline:2px solid var(--partner-text);outline-offset:4px}
 .partner-tools-footer{border-color:var(--partner-border)}
 .partner-tools-disclosure{color:var(--partner-muted)}
+.partner-tools h1,.partner-tools h2{color:var(--partner-text);font-family:inherit;font-style:normal;letter-spacing:0}
+.partner-tools-footer p{color:var(--partner-muted)}
+.partner-tools-card > span{color:var(--partner-stripe);font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif}
