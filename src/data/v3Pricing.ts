@@ -340,7 +340,8 @@ export const V3_NEW_OFFERS = {
       "Rédaction en 10 langues",
       "10 livres par mois · 40 chapitres max (30 conseillés)",
     ],
-    paidOptions: "En option : Cover Studio Pro 67 €, Studio Jeunesse 47 €, Version audio 9,99 €, Micro-Séries 67 €.",
+    paidOptions: "En option : Cover Studio Pro 67 €, Version audio 9,99 €, Micro-Séries 67 €.",
+    paidLinks: [{ label: "EbookStudio AI Team — 10 robots KDP 47€", href: "https://www.trafic-affiliation.com/captur_robotsamazonkdp" }],
   },
   edition: {
     title: "EbookStudio Édition à vie",
@@ -362,6 +363,7 @@ export const V3_NEW_OFFERS = {
       "20 livres par mois · 60 chapitres max",
       "Mises à jour de la V3 incluses",
     ],
-    paidOptions: "Restent en option : Studio Jeunesse, Version audio, Micro-Séries V4, accompagnement personnel.",
+    paidOptions: "Restent en option : Version audio, Micro-Séries V4, accompagnement personnel.",
+    paidLinks: [{ label: "EbookStudio AI Team — 10 robots KDP 47€", href: "https://www.trafic-affiliation.com/captur_robotsamazonkdp" }],
   },
 } as const;
