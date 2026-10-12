@@ -17,7 +17,8 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
       <p className="text-sm text-muted-foreground">{o.options.map(x => x.label).join(' · ')}</p>
       <p className="mt-1 text-xs text-muted-foreground">{o.renewal}</p>
       <ul className="my-5 flex-1 space-y-3">{o.features.map(item => <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}</ul>
-      <p className="mb-4 text-xs text-muted-foreground">{o.paidOptions}</p>
+      <p className="mb-2 text-xs text-muted-foreground">{o.paidOptions}</p>
+      <ul className="mb-4 space-y-1">{o.paidLinks.map(l => <li key={l.href}><a href={l.href} target="_blank" rel="nofollow sponsored noopener" className="text-xs font-semibold text-primary underline">{l.label}</a></li>)}</ul>
       <Button onClick={onBuy}>Choisir {o.title} <ArrowRight /></Button>
     </article>
   );

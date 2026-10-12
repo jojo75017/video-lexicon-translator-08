@@ -12,7 +12,7 @@ import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
 import V3UpsellRotator from '@/components/v3public/V3UpsellRotator';
 import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
-import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
+import V3PartnersBand from '@/components/v3public/V3PartnersBand';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
 import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
@@ -182,6 +182,7 @@ export default function V3HomePage() {
       </section>
 
       {!user && <V3PricingOverview />}
+      {!user && <V3PartnersBand />}
 
       {!user && (
         <>
@@ -190,11 +191,10 @@ export default function V3HomePage() {
               Les nouveautés
             </div>
             <h2 className="v3-serif mt-1 text-2xl font-semibold" style={{ color: 'var(--v3-joy-ink)' }}>
-              Deux ateliers qui viennent d’ouvrir
+              Un atelier qui vient d’ouvrir
             </h2>
           </section>
           <V3CoverStudioBanner />
-          <BdComicNewsBanner />
         </>
       )}
 
@@ -297,8 +297,7 @@ export default function V3HomePage() {
                   Des studios et services en option, à ajouter quand vous en avez besoin.
                 </p>
               </div>
-              <BdComicNewsBanner />
-              <V3CoverStudioBanner />
+                  <V3CoverStudioBanner />
               <V3MicroSeriesSurpriseBanner />
               <V3UpsellRotator />
               <V3PricingOverview />
