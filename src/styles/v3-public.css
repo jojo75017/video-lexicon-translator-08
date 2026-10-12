@@ -691,3 +691,41 @@
 .v3-partners-link b{font-weight:700;font-size:13px}
 .v3-partners-link em{font-style:normal;color:var(--p-accent);font-weight:700}
 .v3-partners-note{text-align:center;margin:12px 0 0;color:var(--p-muted);font-size:11.5px}
+.v3-partners-all{color:var(--p-accent);font-size:13px;font-weight:600;text-underline-offset:4px}
+.v3-partners-all:hover{text-decoration:underline}
+
+/* Scoped public partner catalogue: no subscriber theme or controls. */
+.partner-tools {
+  --partner-bg: #0b1324;
+  --partner-card: #111c33;
+  --partner-border: #1f2d4a;
+  --partner-text: #f1f5f9;
+  --partner-muted: #b6c3d9;
+  --partner-accent: #f97316;
+  --partner-accent-hover: #fb923c;
+  --partner-button-text: #0b1324;
+  --partner-video: #38bdf8;
+  --partner-plr: #34d399;
+  --partner-edition: #fbbf24;
+  --partner-books: #fb7185;
+  --partner-comic: #c084fc;
+  background: var(--partner-bg);
+  color: var(--partner-text);
+  letter-spacing: 0;
+}
+.partner-tools-brand{display:inline-flex;align-items:center;gap:12px;font-size:18px;font-weight:700;color:var(--partner-text)}
+.partner-tools-eyebrow{color:var(--partner-accent);font-size:12px;font-weight:700;text-transform:uppercase}
+.partner-tools-intro,.partner-tools-description,.partner-tools-footer{color:var(--partner-muted)}
+.partner-tools-card{background:var(--partner-card);border:1px solid var(--partner-border);border-top:3px solid var(--partner-stripe);border-radius:8px;overflow-wrap:anywhere}
+.partner-tools-card[data-tone="video"]{--partner-stripe:var(--partner-video)}
+.partner-tools-card[data-tone="plr"]{--partner-stripe:var(--partner-plr)}
+.partner-tools-card[data-tone="edition"]{--partner-stripe:var(--partner-edition)}
+.partner-tools-card[data-tone="books"]{--partner-stripe:var(--partner-books)}
+.partner-tools-card[data-tone="comic"]{--partner-stripe:var(--partner-comic)}
+.partner-tools-card[data-tone="team"]{--partner-stripe:var(--partner-accent)}
+.partner-tools-category{color:var(--partner-stripe)}
+.partner-tools .partner-tools-discover{background:var(--partner-accent);color:var(--partner-button-text);font-weight:700}
+.partner-tools .partner-tools-discover:hover{background:var(--partner-accent-hover)}
+.partner-tools .partner-tools-discover:focus-visible{outline:2px solid var(--partner-text);outline-offset:4px}
+.partner-tools-footer{border-color:var(--partner-border)}
+.partner-tools-disclosure{color:var(--partner-muted)}

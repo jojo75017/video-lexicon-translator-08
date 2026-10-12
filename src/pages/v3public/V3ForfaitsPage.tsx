@@ -18,7 +18,7 @@ export default function V3ForfaitsPage() {
         <p className="mt-3 text-sm">Vérifiez les limites applicables à votre compte auprès de KDP avant de publier. Elles sont distinctes des livres créés avec EbookStudio (10 ou 20 par mois selon l’offre). Vous pouvez aussi publier sur d’autres plateformes, notamment Kobo et Apple Books.</p>
       </section>
       <section className="mt-8 border-t py-6"><h2 className="text-2xl font-semibold">Les services restent à la carte</h2>
-        <p className="my-3 text-muted-foreground">Version audio d’un livre : 9,99 €. Studio Jeunesse : 47 €. Précommande Micro-Séries V4 : 67 €. Aucun de ces compléments n’est ajouté automatiquement.</p>
+        <p className="my-3 text-muted-foreground">Version audio d’un livre : 9,99 €. Précommande Micro-Séries V4 : 67 €. Aucun de ces compléments n’est ajouté automatiquement.</p>
         <Button asChild variant="outline"><Link to="/v3/upsells">Voir toutes les options</Link></Button>
       </section>
       <p className="mt-6 text-sm text-muted-foreground">Les abonnements historiques se consultent dans <Link to="/v3/compte" className="underline">Mon compte</Link> ; aucune formule mensuelle ou annuelle n’est proposée aux nouveaux clients sur cette page.</p>

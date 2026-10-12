@@ -1,5 +1,9 @@
 # Roadmap
 
+## Catalogue partenaires public et affichage Jeunesse
+- [ ] Retirer les mentions Jeunesse de Compléments & options, Nos offres et commande sans changer paiements ni accès ; conserver BD Studio Pro.
+- [ ] Afficher les six cartes publiques sur /partenaires et ajouter le lien depuis le bandeau d’accueil ; vérifier ordinateur/mobile sans publier.
+
 ## Boutons de navigation plus professionnels
 - [x] Harmoniser uniquement les boutons de navigation ; conserver toutes les têtes de robots, les libellés et les destinations. Huit portraits présents et compilation vérifiée, sans publication.
 

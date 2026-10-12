@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 /** Bandeau « Nos partenaires » : liens affiliés externes, aucune logique d'accès. */
 const PARTNERS = [
   { icon: '🎬', label: 'VID par MyBoxVideo', href: 'https://warriorplus.com/o2/a/l9g3wdx/0' },
@@ -19,6 +21,7 @@ export default function V3PartnersBand() {
             </a>
           ))}
         </div>
+        <div className="mt-4 text-center"><Link to="/partenaires" className="v3-partners-all">Voir tous nos partenaires →</Link></div>
         <p className="v3-partners-note">
           Pages en anglais, traduisibles en 1 clic (clic droit → « Traduire en français »). Liens partenaires : EbookStudio peut percevoir une commission, sans surcoût pour vous.
         </p>

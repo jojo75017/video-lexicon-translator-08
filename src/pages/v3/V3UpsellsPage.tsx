@@ -3,7 +3,6 @@ import { ArrowRight, Gem } from 'lucide-react';
 import { V3_ADDON_LIST, V3_ADDONS_TOTAL_VALUE, V3_LIFETIME_OFFERS, formatPrice } from '@/data/v3Pricing';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
-import BdComicNewsBanner from '@/components/bd/BdComicNewsBanner';
 import { MICRO_SERIES_OFFER } from '@/data/microSeriesOffer';
 
 /** /v3/upsells — Gros compléments premium proposés séparément des forfaits. */
@@ -32,11 +31,6 @@ export default function V3UpsellsPage() {
             relues, version audio premium, accompagnement. Chaque option s'ajoute en un paiement unique.
           </p>
         </header>
-
-        {/* Grande nouveauté V4 — Studio BD & Jeunesse */}
-        <div className="mb-8">
-          <BdComicNewsBanner compact />
-        </div>
 
         <section className="mb-8" aria-labelledby="v4-preview-title">
           <div className="mb-4">
