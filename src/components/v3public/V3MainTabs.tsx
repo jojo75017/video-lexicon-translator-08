@@ -220,6 +220,23 @@ export default function V3MainTabs() {
               <span aria-hidden>🤝</span>
               <span>Partenaires</span>
             </NavLink>
+            <a
+              href="https://www.trafic-affiliation.com/captur_robotsamazonkdp"
+              target="_blank"
+              rel="nofollow sponsored noopener"
+              className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
+              style={{
+                background: '#F6BD2A',
+                color: '#1E2536',
+                border: '1px solid #D69E10',
+                fontWeight: 700,
+                padding: '8px 14px',
+                gap: 6,
+              }}
+            >
+              <span aria-hidden>🤖</span>
+              <span>Nouveau · EbookStudio AI Team</span>
+            </a>
           </div>
         </nav>
 
@@ -385,6 +402,22 @@ export default function V3MainTabs() {
             >
               🤝 Partenaires — outils recommandés
             </NavLink>
+            <a
+              href="https://www.trafic-affiliation.com/captur_robotsamazonkdp"
+              target="_blank"
+              rel="nofollow sponsored noopener"
+              onClick={() => setMobileOpen(false)}
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              style={{
+                background: '#F6BD2A',
+                color: '#1E2536',
+                border: '1px solid #D69E10',
+                fontWeight: 700,
+                textShadow: 'none',
+              }}
+            >
+              🤖 Nouveau · EbookStudio AI Team
+            </a>
 
 
             {V3_HEADER_MENU.map((cat) => (
