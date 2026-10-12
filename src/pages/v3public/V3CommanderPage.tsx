@@ -74,7 +74,7 @@ const INCLUDED = [
 const FAQ: Array<{ q: string; a: string }> = [
   {
     q: "Que comprend exactement le paiement de 47 € ?",
-    a: "Le paiement ouvre votre accès à vie à EbookStudio V3 et aux fonctionnalités incluses dans cette offre. Il n'y a aucune mensualité à régler. Cover Studio Pro (67 €) reste vendu séparément.",
+    a: "Le paiement ouvre votre accès à vie à EbookStudio V3 et aux fonctionnalités incluses dans cette offre. Il n'y a aucune mensualité à régler. Deux studios restent vendus séparément pour tout le monde : Cover Studio Pro (67 €) et Studio Jeunesse (47 €).",
   },
   {
     q: "Pourquoi seulement 15 places ?",
@@ -582,7 +582,7 @@ export default function V3CommanderPage() {
             </p>
             <p style={{ fontSize: "0.9rem", opacity: 0.85 }}>
               Le Pack Édition Pro à 97 € inclut Cover Studio Pro. Le studio de couverture Pro seul
-              reste disponible à 67 €. Les clients déjà équipés gardent leurs droits.
+              reste disponible à 67 €, et Studio Jeunesse à 47 €. Les clients déjà équipés gardent leurs droits.
             </p>
           </div>
         </section>
