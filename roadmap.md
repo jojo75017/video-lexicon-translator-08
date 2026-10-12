@@ -95,3 +95,9 @@
 - [x] Offres 97 €/an et 497 € à vie : paiement + affichage page des offres
 - [ ] Tunnel /commander et brief Landaa à basculer le 16/10 (après fermeture 47 €)
 - [ ] OTO 197 € et Studio Jeunesse après achat (à construire)
+
+## Publication du 12 octobre 2026
+- [x] Publier ebookstudio.fr avec l'ancien tunnel (…/tunnel-de-vente/de-vente) : redirection de la racine vérifiée sur le site en ligne, deux visites à vide.
+- [x] Vérifier les cinq liens de paiement en ligne (Auteur 97 €/an et 3×, Édition 497 € en 1×/3×/6×) : pages ouvertes, email demandé, montants affichés corrects, aucune erreur de page.
+- [ ] Débloquer les paiements réels des nouvelles offres (Auteur 97 €, Édition 497 €) — reste fermé jusqu'à la validation explicite de Georges.
+- [ ] Nouveau tunnel Landaa du 16/10 à remplacer dans src/data/externalLinks.ts + brief à mettre à jour avec 497 €.
