@@ -17,7 +17,7 @@ const corsHeaders = {
 
 const TRANCHE = 500;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const CTA_URL = "https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy";
+const CTA_URL = "https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/de-vente";
 const V3_PREVIEW_PDF_URL = "https://drive.google.com/file/d/106hJ-9E_ZQNL_Oib6X0XXt_Ef2UNbaEg/view?usp=sharing";
 const FIN_ISO = "2026-10-15T23:59:59+02:00";
 const PAUSE_KEY = "offre_lancement_sequence";
