@@ -78,7 +78,7 @@ const ApiKeysFloatingButton = () => {
           'text-sm font-semibold transition-all duration-200',
           valid
             ? 'bg-[#008296] text-white hover:bg-[#006b7a]'
-            : 'bg-[#FF9E2D] text-white hover:bg-[#e88a14] animate-pulse ring-2 ring-[#FF9E2D]/40',
+            : 'bg-[#FF9E2D] text-white hover:bg-[#e88a14] ring-2 ring-[#FF9E2D]/40',
         )}
       >
         {valid ? <CheckCircle2 className="h-4 w-4" /> : <KeyRound className="h-4 w-4" />}
