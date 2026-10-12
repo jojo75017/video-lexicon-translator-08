@@ -101,3 +101,4 @@
 - [x] Vérifier les cinq liens de paiement en ligne (Auteur 97 €/an et 3×, Édition 497 € en 1×/3×/6×) : pages ouvertes, email demandé, montants affichés corrects, aucune erreur de page.
 - [ ] Débloquer les paiements réels des nouvelles offres (Auteur 97 €, Édition 497 €) — reste fermé jusqu'à la validation explicite de Georges.
 - [ ] Nouveau tunnel Landaa du 16/10 à remplacer dans src/data/externalLinks.ts + brief à mettre à jour avec 497 €.
+- [x] Accueil public : bandeau « Nos partenaires », lien externe AI Team 47 € dans les deux offres, retrait de l'affichage Studio BD & Jeunesse.
