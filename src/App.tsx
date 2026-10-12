@@ -593,7 +593,8 @@ const App = () => {
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/mon-parrainage" replace />} />
             <Route path="/mon-parrainage" element={<ReferralKitPage />} />
-            <Route path="/partenaires" element={<PartnerToolsPage />} />
+            <Route path="/partenaires" element={<PartenairesPage />} />
+            <Route path="/outils-partenaires" element={<PartnerToolsPage />} />
             <Route path="/prestation-kdp" element={<PrestationKdpPage />} />
             <Route path="/partenariat" element={<Navigate to="/partenaires" replace />} />
             <Route path="/affiliation" element={<Navigate to="/offres" replace />} />

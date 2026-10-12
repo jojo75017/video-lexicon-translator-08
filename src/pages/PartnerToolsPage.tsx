@@ -15,7 +15,7 @@ const partners = [
 const partnerIcons = { video: Clapperboard, plr: Bot, edition: LibraryBig, books: Radio, comic: Shield, team: Bot };
 
 export default function PartnerToolsPage() {
-  usePageMeta({ title: 'Nos partenaires — EbookStudio', description: "Une sélection d'outils complémentaires pour vos livres : vidéo, édition, bandes dessinées et contenus prêts à l'emploi.", canonical: 'https://ebookstudio.fr/partenaires' });
+  usePageMeta({ title: 'Nos partenaires — EbookStudio', description: "Une sélection d'outils complémentaires pour vos livres : vidéo, édition, bandes dessinées et contenus prêts à l'emploi.", canonical: 'https://ebookstudio.fr/outils-partenaires' });
 
   return (
     <main className="partner-tools min-h-screen">

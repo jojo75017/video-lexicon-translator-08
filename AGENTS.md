@@ -1,5 +1,5 @@
 # Architecture
-- The public partner-tool catalogue is a standalone presentation-only page, separate from the retained affiliate-program code, so external recommendations never change customer entitlements or payment flows.
+- The public partner-tool catalogue uses /outils-partenaires as a standalone presentation-only page; /partenaires retains the affiliate programme, so external recommendations never replace the programme or change customer entitlements or payment flows.
 - V3 navigation groups category buttons separately from neutral admin actions, with scoped toolbar tokens so unrelated page controls retain their existing styles.
 - Separate wrap image exports crop the shared full-cover renderer at each zone’s finished dimensions, preserving artwork and text without printing editor guides.
 - Wrap layout templates transform existing text elements locally and preview through the export renderer, preserving content, private images, image adjustments and KDP geometry.

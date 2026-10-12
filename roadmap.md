@@ -2,7 +2,8 @@
 
 ## Catalogue partenaires public et affichage Jeunesse
 - [x] Retirer les mentions Jeunesse de Compléments & options, Nos offres et commande sans changer paiements ni accès ; BD Studio Pro conservé.
-- [x] Afficher les six cartes publiques sur /partenaires et ajouter le lien depuis le bandeau d’accueil ; accès sans connexion, nouvel onglet AI Team, titre exact et grille ordinateur/mobile vérifiés sans publier.
+- [x] Afficher les six cartes publiques sur /outils-partenaires et ajouter le lien depuis le bandeau d’accueil ; accès sans connexion, nouvel onglet AI Team, titre exact et grille ordinateur/mobile vérifiés sans publier.
+- [x] Rétablir /partenaires pour le programme partenaires existant ; déplacer le catalogue, son lien, son URL canonique et son exception de titre vers /outils-partenaires, sans publier.
 
 ## Boutons de navigation plus professionnels
 - [x] Harmoniser uniquement les boutons de navigation ; conserver toutes les têtes de robots, les libellés et les destinations. Huit portraits présents et compilation vérifiée, sans publication.
