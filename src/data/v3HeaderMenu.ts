@@ -136,7 +136,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     tagline: 'Auteur par an ou Édition à vie',
     links: [
       { label: 'EbookStudio Auteur — 97 €/an', to: '/v3/forfaits', badge: '3 × 32,33 € possible', desc: 'Tous les parcours, correction, couverture incluse et outils KDP de base' },
-      { label: 'EbookStudio Édition à vie — 497 €', to: '/v3/forfaits', badge: '3 × ou 6 × possible', desc: 'Tout Auteur + Cover Studio Pro, KDP avancé, BD Studio et BookPerfect, sans renouvellement' },
+      { label: 'EbookStudio Édition à vie — 497 €', to: '/v3/forfaits', badge: '3 × ou 6 × possible', desc: 'Tout Auteur + studio de couverture Pro, KDP avancé, BD Studio et BookPerfect, sans renouvellement' },
       { label: 'Compléments & options', to: '/v3/upsells', desc: 'Des studios et services à ajouter uniquement si vous en avez besoin' },
       { label: 'Ancien client V2', to: '/v3/migration', badge: 'Droits conservés', desc: 'Vos achats et avantages acquis restent inchangés' },
       { label: 'Calendrier des ouvertures', to: '/v3/calendrier', badge: 'Dates exactes', desc: 'Ce qui est déjà libre et la date d’ouverture de chaque module' },
