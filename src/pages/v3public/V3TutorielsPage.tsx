@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { RUBRIQUES_V3, TUTORIELS_V3, type TutorielV3 } from '@/data/tutorielsV3';
-import welcomeVideo from '@/assets/videos/bienvenue-v3-30s.mp4.asset.json';
 
 const KDP_RESOURCES = [
   {
@@ -57,7 +56,6 @@ const BOOKING_URL = 'https://calendly.com/boubetgeorges/nouvelle-reunion';
 
 export default function V3TutorielsPage() {
   const [open, setOpen] = useState<TutorielV3 | null>(null);
-  const [welcome, setWelcome] = useState(false);
   const [i, setI] = useState(0);
   const start = (t: TutorielV3) => { setOpen(t); setI(0); };
 
@@ -68,21 +66,6 @@ export default function V3TutorielsPage() {
         <h1 className="mt-2 text-3xl font-bold">Tutoriels V3</h1>
         <p className="mt-1 text-muted-foreground">{TUTORIELS_V3.length} tutoriels courts, pas à pas, pour tout faire de A à Z.</p>
       </div>
-
-      <section className="mb-8 rounded-xl border bg-card p-5">
-        <h2 className="text-xl font-semibold">🎬 Vidéo de bienvenue</h2>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-muted-foreground">« Bienvenue dans la V3 » — 30 secondes pour découvrir le studio.</p>
-          <Button onClick={() => setWelcome(true)}><PlayCircle className="mr-1.5 h-4 w-4" />Voir la vidéo</Button>
-        </div>
-      </section>
-
-      <Dialog open={welcome} onOpenChange={setWelcome}>
-        <DialogContent className="max-w-4xl">
-          <DialogHeader><DialogTitle>Bienvenue dans la V3</DialogTitle></DialogHeader>
-          <video src={welcomeVideo.url} controls autoPlay playsInline className="aspect-video w-full rounded-md" />
-        </DialogContent>
-      </Dialog>
 
       {RUBRIQUES_V3.map((r) => (
         <section key={r} className="mb-8">
