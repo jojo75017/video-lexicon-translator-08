@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router-dom';
-import { V2V3FloatingSwitch } from './V2V3FloatingSwitch';
+import { V2V3FloatingSwitch, V2V3ModeButton } from './V2V3FloatingSwitch';
 
 // État admin partagé simulé (mutable pour tester le cas non-admin)
 const adminState = { isAdmin: true, isChecking: false };
@@ -91,6 +91,39 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
 
     const { container } = renderAt('/');
     // Attendre le résolveur async
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(container.querySelector('button')).toBeNull();
+  });
+
+  it('variante inline : même bascule V2 ↔ V3 que le bouton flottant', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={['/v3']}>
+        <LocationProbe />
+        <V2V3ModeButton variant="inline" />
+      </MemoryRouter>,
+    );
+
+    const btn = await screen.findByRole('button', { name: /Revenir à EbookStudio V2/i });
+    expect(btn).toHaveTextContent('Revenir à la V2');
+
+    await user.click(btn);
+
+    expect(screen.getByTestId('location')).toHaveTextContent('/ebook-planner');
+    expect(screen.getByRole('button', { name: /Ouvrir EbookStudio V3/i })).toHaveTextContent('Ouvrir la V3');
+    expect(localStorage.getItem('ebookstudio_v3_mode')).toBeNull();
+  });
+
+  it('variante inline : invisible pour un non-admin', async () => {
+    adminState.isAdmin = false;
+
+    const { container } = render(
+      <MemoryRouter initialEntries={['/v3']}>
+        <V2V3ModeButton variant="inline" />
+      </MemoryRouter>,
+    );
     await act(async () => {
       await Promise.resolve();
     });
