@@ -32,31 +32,25 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           borderBottom: '1px solid var(--v3-joy-orange-soft)',
         }}
       >
-        {/* Photo de fond — contrastée et saturée pour qu'elle reste présente sous le texte */}
+        {/* Photo de fond : contrastée et saturée, volontairement visible autour du texte */}
         <img src={heroBg} alt="" aria-hidden width={1920} height={800}
           className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-          style={{ filter: 'contrast(1.28) saturate(1.22) brightness(0.94)' }} />
-        {/* Voile crème : plus dense au centre pour garantir la lisibilité du texte foncé */}
+          style={{ filter: 'contrast(1.26) saturate(1.2) brightness(0.95)' }} />
+        {/* Léger voile crème : unit la photo sans l'effacer */}
         <div aria-hidden className="pointer-events-none absolute inset-0"
           style={{
             background:
-              'radial-gradient(ellipse at center, color-mix(in srgb, var(--v3-joy-cream) 96%, transparent) 0%, color-mix(in srgb, var(--v3-joy-cream) 88%, transparent) 52%, color-mix(in srgb, var(--v3-joy-cream) 62%, transparent) 100%)',
-          }} />
-        {/* Voile vertical : léger assombrissement des deux extrémités (contraste haut/bas) */}
-        <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'linear-gradient(to bottom, color-mix(in srgb, var(--v3-joy-ink) 12%, transparent), transparent 28%, transparent 72%, color-mix(in srgb, var(--v3-joy-ink) 14%, transparent))',
+              'linear-gradient(to bottom, color-mix(in srgb, var(--v3-joy-cream) 34%, transparent), color-mix(in srgb, var(--v3-joy-cream) 22%, transparent) 45%, color-mix(in srgb, var(--v3-joy-cream) 40%, transparent))',
           }} />
         {/* Halos soleil doux */}
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-24 left-[8%] h-64 w-64 rounded-full opacity-60 blur-3xl"
+          className="pointer-events-none absolute -top-24 left-[8%] h-64 w-64 rounded-full opacity-50 blur-3xl"
           style={{ background: 'var(--v3-joy-orange-soft)' }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-16 right-[6%] h-72 w-72 rounded-full opacity-60 blur-3xl"
+          className="pointer-events-none absolute -bottom-16 right-[6%] h-72 w-72 rounded-full opacity-50 blur-3xl"
           style={{ background: 'var(--v3-joy-yellow-soft)' }}
         />
         <div
@@ -65,81 +59,93 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
         />
 
         <div className="relative v3-shell py-10 text-center md:py-14">
-          <span
-            className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]"
+          {/* Carte crème derrière le texte : contraste garanti, photo visible autour */}
+          <div
+            className="mx-auto max-w-4xl rounded-3xl px-5 py-8 md:px-12 md:py-11"
             style={{
-              color: 'var(--v3-joy-orange-600)',
-              background: 'var(--v3-joy-orange-soft)',
-              border: '1px solid color-mix(in srgb, var(--v3-joy-orange) 35%, transparent)',
+              background: 'color-mix(in srgb, var(--v3-joy-cream) 93%, transparent)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid var(--v3-joy-orange-soft)',
+              boxShadow: '0 26px 60px -40px color-mix(in srgb, var(--v3-joy-ink) 65%, transparent)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" /> Votre maison d'édition IA
-          </span>
-
-          <h1
-            className="v3-serif mx-auto mt-5 max-w-4xl text-[28px] font-semibold leading-[1.1] md:text-[40px]"
-            style={{ color: 'var(--v3-joy-ink)' }}
-          >
-            Publiez votre livre sur{' '}
             <span
+              className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em]"
               style={{
-                background: 'linear-gradient(90deg, var(--v3-joy-orange), var(--v3-joy-yellow))',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent',
+                color: 'var(--v3-joy-orange-600)',
+                border: '1px solid var(--v3-joy-orange-soft)',
+                boxShadow: '0 2px 8px -4px color-mix(in srgb, var(--v3-joy-ink) 40%, transparent)',
               }}
             >
-              Amazon KDP
-            </span>{' '}
-            — même si vous n'écrivez pas une ligne.
-          </h1>
+              <Sparkles className="h-3.5 w-3.5" /> Votre maison d'édition IA
+            </span>
 
-          <p className="v3-serif mt-3 text-lg italic" style={{ color: 'var(--v3-joy-orange-600)' }}>
-            De la première idée au livre que vous êtes fier de présenter.
-          </p>
-
-          <p className="mx-auto mt-4 max-w-3xl text-[15px] leading-relaxed md:text-[16.5px]" style={{ color: 'var(--v3-joy-muted)' }}>
-            D'une simple idée à un livre complet, prêt pour Amazon : texte, couverture, version Kindle et brochée,
-            livre audio et métadonnées. Recevez aussi le kit de démarrage + 10 niches rentables.
-          </p>
-
-          <ul className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {PILLS.map(({ label, icon: Icon }, i) => (
-              <li
-                key={label}
-                className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-[12.5px] font-bold shadow-sm"
+            <h1
+              className="v3-serif mx-auto mt-5 max-w-3xl text-[28px] font-semibold leading-[1.1] md:text-[40px]"
+              style={{ color: 'var(--v3-joy-ink)' }}
+            >
+              Publiez votre livre sur{' '}
+              <span
                 style={{
-                  border: `2px solid ${i % 2 ? 'var(--v3-joy-yellow-soft)' : 'var(--v3-joy-orange-soft)'}`,
-                  color: 'var(--v3-joy-ink)',
+                  background: 'linear-gradient(90deg, var(--v3-joy-orange-600), var(--v3-joy-yellow-600))',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  color: 'transparent',
                 }}
               >
-                <Icon className="h-3.5 w-3.5" style={{ color: i % 2 ? 'var(--v3-joy-yellow-600)' : 'var(--v3-joy-orange-600)' }} /> {label}
-              </li>
-            ))}
-          </ul>
+                Amazon KDP
+              </span>{' '}
+              — même si vous n'écrivez pas une ligne.
+            </h1>
 
-          <button
-            type="button"
-            data-contemplation-allow="true"
-            onClick={() => {
-              void trackCaptureEvent('v3', 'reserve_open', { leadMagnet: '10-niches-offertes' });
-              setCaptureOpen(true);
-            }}
-            className="v3-joy-cta mt-7 inline-flex h-auto min-h-12 max-w-full items-center justify-center gap-2 whitespace-normal rounded-2xl px-8 py-4 text-center text-[14px] font-bold text-white transition-all hover:-translate-y-0.5 sm:text-[15px]"
-            style={{
-              background: 'var(--v3-joy-orange)',
-              boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)',
-            }}
-          >
-            <Gift className="h-4 w-4 shrink-0" />
-            Recevoir le kit + 10 niches offerts
-          </button>
-          <div className="mt-4">
-            <a href="/v3/tutoriels-v3" data-contemplation-allow="true"
-              className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-[14px] font-bold transition-colors"
-              style={{ border: '2px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}>
-              🎬 Voir les Tutoriels V3 (25)
-            </a>
+            <p className="v3-serif mt-3 text-lg font-medium italic" style={{ color: 'var(--v3-joy-orange-600)' }}>
+              De la première idée au livre que vous êtes fier de présenter.
+            </p>
+
+            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed md:text-[16.5px]" style={{ color: 'var(--v3-joy-muted)' }}>
+              D'une simple idée à un livre complet, prêt pour Amazon : texte, couverture, version Kindle et brochée,
+              livre audio et métadonnées. Recevez aussi le kit de démarrage + 10 niches rentables.
+            </p>
+
+            <ul className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              {PILLS.map(({ label, icon: Icon }, i) => (
+                <li
+                  key={label}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-[12.5px] font-bold shadow-sm"
+                  style={{
+                    border: `2px solid ${i % 2 ? 'var(--v3-joy-yellow-soft)' : 'var(--v3-joy-orange-soft)'}`,
+                    color: 'var(--v3-joy-ink)',
+                  }}
+                >
+                  <Icon className="h-3.5 w-3.5" style={{ color: i % 2 ? 'var(--v3-joy-yellow-600)' : 'var(--v3-joy-orange-600)' }} /> {label}
+                </li>
+              ))}
+            </ul>
+
+            <button
+              type="button"
+              data-contemplation-allow="true"
+              onClick={() => {
+                void trackCaptureEvent('v3', 'reserve_open', { leadMagnet: '10-niches-offertes' });
+                setCaptureOpen(true);
+              }}
+              className="v3-joy-cta mt-7 inline-flex h-auto min-h-12 max-w-full items-center justify-center gap-2 whitespace-normal rounded-2xl px-8 py-4 text-center text-[14px] font-bold text-white transition-all hover:-translate-y-0.5 sm:text-[15px]"
+              style={{
+                background: 'var(--v3-joy-orange)',
+                boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)',
+              }}
+            >
+              <Gift className="h-4 w-4 shrink-0" />
+              Recevoir le kit + 10 niches offerts
+            </button>
+            <div className="mt-4">
+              <a href="/v3/tutoriels-v3" data-contemplation-allow="true"
+                className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-2.5 text-[14px] font-bold transition-colors"
+                style={{ border: '2px solid var(--v3-joy-orange-soft)', color: 'var(--v3-joy-orange-600)' }}>
+                🎬 Voir les Tutoriels V3 (25)
+              </a>
+            </div>
           </div>
         </div>
       </section>
