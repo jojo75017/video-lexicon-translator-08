@@ -98,6 +98,7 @@ describe('V2V3FloatingSwitch (E2E interaction)', () => {
   });
 
   it('variante inline : même bascule V2 ↔ V3 que le bouton flottant', async () => {
+    localStorage.setItem('ebookstudio_v3_mode', '1');
     const user = userEvent.setup();
     render(
       <MemoryRouter initialEntries={['/v3']}>
