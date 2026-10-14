@@ -111,7 +111,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               Publiez votre livre sur{' '}
               <span
                 style={{
-                  background: 'linear-gradient(90deg, var(--v3-joy-orange-600), color-mix(in srgb, var(--v3-joy-yellow-600) 35%, var(--v3-joy-orange-600)))',
+                  background: 'linear-gradient(90deg, color-mix(in srgb, var(--v3-joy-orange-600) 88%, var(--v3-joy-ink)), color-mix(in srgb, var(--v3-joy-yellow-600) 78%, var(--v3-joy-ink)))',
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
