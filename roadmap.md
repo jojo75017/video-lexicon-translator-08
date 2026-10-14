@@ -1,8 +1,9 @@
 # Roadmap
 
 ## Vidéos tutoriels V3 — suite
-- [ ] Produire le tutoriel 5 (2 min) et les tutoriels 10 à 15 (1 min chacun), dans la continuité des quatre premières vidéos — réalisation lancée, résultats attendus.
-- [ ] Ajouter les vidéos terminées aux sept tutoriels correspondants et vérifier leur lecture dans l’application, sans publier — dépend des fichiers livrés.
+- [x] Produire le tutoriel 5 (2 min) et les tutoriels 10 à 15 (1 min chacun) : les sept vidéos sont livrées, avec voix française et écrans réels de la V3.
+- [x] Ajouter les sept vidéos à leur tutoriel et vérifier la lecture dans l’application ; bande-son du tutoriel 11 corrigée (la voix manquait) et validée par Georges.
+- [ ] Publier les tutoriels 5 et 10 à 15 sur https://ebookstudio.fr — en attente de l’accord de Georges.
 
 ## Guide EbookStudio de A à Z
 - [x] Rédiger le guide pratique de 88 pages : huit chapitres, préface, sommaire, mot de l’auteur, présentation de Georges fondée sur son travail réel, remerciements et QR fourni ; textes personnels proposés à sa validation.
