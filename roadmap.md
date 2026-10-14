@@ -126,3 +126,6 @@
 - [x] Tuto 16 « Rédiger avec le Studio Pro » : vidéo prête et ajoutée (sans publier)
 - [ ] Publication Tutos 16–17 sur ebookstudio.fr : demande de Georges, publication lancée le 14/10 à 16:03 UTC
 - [ ] Nouveau : « Mes livres : retrouver et reprendre » — à clarifier avec Georges (nouvelle vidéo tuto ou question ?)
+
+## Tutos V3 vidéo
+- [x] Tuto 19 « Mes livres : retrouver et reprendre » : vidéo prête (68 s, voix OpenAI) et ajoutée — en attente écoute de Georges puis publication
