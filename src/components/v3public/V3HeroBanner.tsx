@@ -12,6 +12,7 @@ import { trackCaptureEvent } from '@/lib/captureTracking';
 import { Link } from 'react-router-dom';
 import { LANCEMENT_FIN_ISO, LANCEMENT_PRIX } from '@/data/lancementTunnel';
 import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
+import heroBg from '@/assets/v3-hero-bg.jpg';
 
 const PILLS = [
   { label: 'Kindle', icon: BookOpen },
@@ -63,6 +64,10 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           borderBottom: '1px solid var(--v3-joy-orange-soft)',
         }}
       >
+        <img src={heroBg} alt="" aria-hidden width={1920} height={800}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
+        <div aria-hidden className="pointer-events-none absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--v3-joy-cream) 92%, transparent) 0%, color-mix(in srgb, var(--v3-joy-cream) 78%, transparent) 55%, color-mix(in srgb, var(--v3-joy-cream) 45%, transparent) 100%)' }} />
         {/* Halos soleil doux */}
         <div
           aria-hidden
@@ -152,15 +157,6 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
             ))}
           </ul>
 
-          {ouvert && (
-            <div className="mt-7">
-              <Link to="/lancement/offres#offres" data-contemplation-allow="true"
-                className="v3-joy-cta inline-flex min-h-12 items-center justify-center gap-2 rounded-2xl px-8 py-4 text-[15px] font-bold text-white"
-                style={{ background: 'var(--v3-joy-orange)', boxShadow: '0 12px 30px -10px color-mix(in srgb, var(--v3-joy-orange) 55%, transparent)' }}>
-                Je réserve ma place à {LANCEMENT_PRIX} €
-              </Link>
-            </div>
-          )}
           <button
             type="button"
             data-contemplation-allow="true"
