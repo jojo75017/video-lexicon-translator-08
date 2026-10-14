@@ -336,7 +336,10 @@ function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio,
         },
       });
       if (error || !(data as any)?.imageUrl) throw new Error((error as any)?.message || 'Génération échouée');
-      const imageUrl = (data as any).imageUrl as string;
+      const rawUrl = (data as any).imageUrl as string;
+      // Stocke l'image dans le stockage pour garder une URL courte, lisible par la bibliothèque.
+      const { persistEbookImageToLibrary } = await import('@/lib/ebookImageStorage');
+      const imageUrl = await persistEbookImageToLibrary({ imageUrl: rawUrl, ebookTitle: r.title, chapterTitle: 'couverture' });
       const newImages = [{ type: 'front_cover', url: imageUrl, title: r.title }];
       const { error: upErr } = await supabase
         .from('ebook_projects')

@@ -397,6 +397,8 @@ async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
       status: "completed",
       installments_paid: 1,
       completed_at: new Date().toISOString(),
+      // Abonnement annuel (auteur97_1x) : lien requis pour les renouvellements.
+      ...(subscriptionId ? { stripe_subscription_id: subscriptionId } : {}),
     }).eq("id", orderId);
     if (email) accessCode = await grantForPlan(plan, email, session.id, env);
   } else {
