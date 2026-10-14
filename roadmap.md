@@ -112,3 +112,6 @@
 - [ ] Débloquer les paiements réels des nouvelles offres (Auteur 97 €, Édition 497 €) — reste fermé jusqu'à la validation explicite de Georges.
 - [ ] Nouveau tunnel Landaa du 16/10 à remplacer dans src/data/externalLinks.ts + brief à mettre à jour avec 497 €.
 - [x] Accueil public : bandeau « Nos partenaires », lien externe AI Team 47 € dans les deux offres, retrait de l'affichage Studio BD & Jeunesse.
+
+## Bascule V2/V3 à côté de l'onglet AI Team
+- [x] Placer le bouton « Ouvrir la V3 / Revenir à la V2 » dans la barre d'onglets, juste à droite de « Nouveau · EbookStudio AI Team » (ordinateur et mobile), sans doublon flottant sur /v3 ; sept tests et rendu navigateur vérifiés, sans publication.
