@@ -120,3 +120,9 @@
 
 ## Bascule V2/V3 à côté de l'onglet AI Team
 - [x] Placer le bouton « Ouvrir la V3 / Revenir à la V2 » dans la barre d'onglets, juste à droite de « Nouveau · EbookStudio AI Team » (ordinateur et mobile), sans doublon flottant sur /v3 ; sept tests et rendu navigateur vérifiés, sans publication.
+
+## Tutos V3 vidéo
+- [x] Tuto 17 « La correction éditoriale » : vidéo prête et ajoutée (sans publier)
+- [x] Tuto 16 « Rédiger avec le Studio Pro » : vidéo prête et ajoutée (sans publier)
+- [ ] Publication Tutos 16–17 sur ebookstudio.fr : demande de Georges, publication lancée le 14/10 à 16:03 UTC
+- [ ] Nouveau : « Mes livres : retrouver et reprendre » — à clarifier avec Georges (nouvelle vidéo tuto ou question ?)
