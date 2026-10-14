@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Sparkles, BookOpen, BookMarked, ImageIcon, AudioLines, Tags, Gift } from 'lucide-react';
 import {
   Dialog,
@@ -9,9 +9,6 @@ import {
 } from '@/components/ui/dialog';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { trackCaptureEvent } from '@/lib/captureTracking';
-import { Link } from 'react-router-dom';
-import { LANCEMENT_FIN_ISO, LANCEMENT_PRIX } from '@/data/lancementTunnel';
-import { useLancementPlaces, placesLabel } from '@/hooks/useLancementPlaces';
 import heroBg from '@/assets/v3-hero-bg.jpg';
 
 const PILLS = [
@@ -22,38 +19,9 @@ const PILLS = [
   { label: 'Métadonnées', icon: Tags },
 ];
 
-const OPENING_DATE = Date.parse(LANCEMENT_FIN_ISO);
-
-const remainingUntilOpening = () => {
-  const difference = Math.max(0, OPENING_DATE - Date.now());
-  return {
-    days: Math.floor(difference / 86_400_000),
-    hours: Math.floor((difference % 86_400_000) / 3_600_000),
-    minutes: Math.floor((difference % 3_600_000) / 60_000),
-  };
-};
-
-const CountdownValue = ({ value, label }: { value: number; label: string }) => (
-  <div className="min-w-[72px] px-3 py-2 text-center" style={{ borderRight: '1px solid var(--v3-joy-orange-soft)' }}>
-    <div className="v3-serif text-2xl font-semibold tabular-nums" style={{ color: 'var(--v3-joy-orange-600)' }}>
-      {String(value).padStart(2, '0')}
-    </div>
-    <div className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--v3-joy-muted)' }}>
-      {label}
-    </div>
-  </div>
-);
-
 /** Premier module de l'accueil V3 — style « Jovial Premium Gold ». */
 export default function V3HeroBanner({ className = '' }: { className?: string }) {
-  const [remaining, setRemaining] = useState(remainingUntilOpening);
   const [captureOpen, setCaptureOpen] = useState(false);
-  const { places, ouvert } = useLancementPlaces();
-
-  useEffect(() => {
-    const interval = window.setInterval(() => setRemaining(remainingUntilOpening()), 30_000);
-    return () => window.clearInterval(interval);
-  }, []);
 
   return (
     <>
@@ -64,10 +32,22 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           borderBottom: '1px solid var(--v3-joy-orange-soft)',
         }}
       >
+        {/* Photo de fond — contrastée et saturée pour qu'elle reste présente sous le texte */}
         <img src={heroBg} alt="" aria-hidden width={1920} height={800}
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover" />
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          style={{ filter: 'contrast(1.28) saturate(1.22) brightness(0.94)' }} />
+        {/* Voile crème : plus dense au centre pour garantir la lisibilité du texte foncé */}
         <div aria-hidden className="pointer-events-none absolute inset-0"
-          style={{ background: 'radial-gradient(ellipse at center, color-mix(in srgb, var(--v3-joy-cream) 92%, transparent) 0%, color-mix(in srgb, var(--v3-joy-cream) 78%, transparent) 55%, color-mix(in srgb, var(--v3-joy-cream) 45%, transparent) 100%)' }} />
+          style={{
+            background:
+              'radial-gradient(ellipse at center, color-mix(in srgb, var(--v3-joy-cream) 96%, transparent) 0%, color-mix(in srgb, var(--v3-joy-cream) 88%, transparent) 52%, color-mix(in srgb, var(--v3-joy-cream) 62%, transparent) 100%)',
+          }} />
+        {/* Voile vertical : léger assombrissement des deux extrémités (contraste haut/bas) */}
+        <div aria-hidden className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'linear-gradient(to bottom, color-mix(in srgb, var(--v3-joy-ink) 12%, transparent), transparent 28%, transparent 72%, color-mix(in srgb, var(--v3-joy-ink) 14%, transparent))',
+          }} />
         {/* Halos soleil doux */}
         <div
           aria-hidden
@@ -93,25 +73,8 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               border: '1px solid color-mix(in srgb, var(--v3-joy-orange) 35%, transparent)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" /> {ouvert ? placesLabel(places) : 'La V3 est ouverte'}
+            <Sparkles className="h-3.5 w-3.5" /> Votre maison d'édition IA
           </span>
-
-          {ouvert && <div
-            className="mx-auto mt-4 inline-flex overflow-hidden rounded-2xl bg-white shadow-sm"
-            style={{ border: '2px solid var(--v3-joy-orange-soft)' }}
-            aria-label={`${remaining.days} jours, ${remaining.hours} heures et ${remaining.minutes} minutes avant la fin de l'offre`}
-          >
-            <CountdownValue value={remaining.days} label="jours" />
-            <CountdownValue value={remaining.hours} label="heures" />
-            <div className="min-w-[72px] px-3 py-2 text-center">
-              <div className="v3-serif text-2xl font-semibold tabular-nums" style={{ color: 'var(--v3-joy-orange-600)' }}>
-                {String(remaining.minutes).padStart(2, '0')}
-              </div>
-              <div className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: 'var(--v3-joy-muted)' }}>
-                minutes
-              </div>
-            </div>
-          </div>}
 
           <h1
             className="v3-serif mx-auto mt-5 max-w-4xl text-[28px] font-semibold leading-[1.1] md:text-[40px]"
@@ -132,9 +95,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
           </h1>
 
           <p className="v3-serif mt-3 text-lg italic" style={{ color: 'var(--v3-joy-orange-600)' }}>
-            {ouvert
-              ? `V3 Édition à vie pour ${LANCEMENT_PRIX} € une seule fois — ${placesLabel(places)}, jusqu'au 15 octobre.`
-              : "Votre maison d'édition IA est ouverte."}
+            De la première idée au livre que vous êtes fier de présenter.
           </p>
 
           <p className="mx-auto mt-4 max-w-3xl text-[15px] leading-relaxed md:text-[16.5px]" style={{ color: 'var(--v3-joy-muted)' }}>
@@ -186,7 +147,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
       <Dialog open={captureOpen} onOpenChange={setCaptureOpen}>
         <DialogContent data-contemplation-allow="true" className="max-h-[90vh] max-w-xl overflow-y-auto p-4 sm:p-6">
           <DialogHeader className="sr-only">
-            <DialogTitle>Réserver ma place pour EbookStudio V3</DialogTitle>
+            <DialogTitle>Recevoir le kit de démarrage et les 10 niches offertes</DialogTitle>
             <DialogDescription>
               Inscrivez votre email pour recevoir le kit de démarrage et les 10 niches offertes.
             </DialogDescription>
