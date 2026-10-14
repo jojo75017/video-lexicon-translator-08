@@ -16,6 +16,7 @@ import tuto14Video from '@/assets/videos/tuto-14-histoires-courtes.mp4.asset.jso
 import tuto15Video from '@/assets/videos/tuto-15-je-raconte-ma-vie.mp4.asset.json';
 import tuto17Video from '@/assets/videos/tuto-17-correction-editoriale.mp4.asset.json';
 import tuto16Video from '@/assets/videos/tuto-16-studio-pro.mp4.asset.json';
+import tuto19Video from '@/assets/videos/tuto-19-mes-livres.mp4.asset.json';
 // Source unique des tutoriels V3 (diaporamas + futures vidéos).
 export type TutoRubrique = 'Démarrer' | 'Les 5 étapes' | 'Créer' | 'Écrire et corriger' | 'Habiller' | 'Publier et vendre';
 
