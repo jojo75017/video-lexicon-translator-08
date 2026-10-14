@@ -87,7 +87,6 @@ export default function V3HomePage() {
         <V3SubscriberHome user={user} />
       ) : user === null ? (
         <>
-          <V3LaunchBanner />
           {/* 2. PROMESSE PRINCIPALE */}
           <V3HeroBanner />
         </>

@@ -93,7 +93,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               border: '1px solid color-mix(in srgb, var(--v3-joy-orange) 35%, transparent)',
             }}
           >
-            <Sparkles className="h-3.5 w-3.5" /> {ouvert ? `Offre de lancement · ${placesLabel(places)}` : 'La V3 est ouverte'}
+            <Sparkles className="h-3.5 w-3.5" /> {ouvert ? placesLabel(places) : 'La V3 est ouverte'}
           </span>
 
           {ouvert && <div
@@ -133,7 +133,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
 
           <p className="v3-serif mt-3 text-lg italic" style={{ color: 'var(--v3-joy-orange-600)' }}>
             {ouvert
-              ? `Offre de lancement : V3 Édition à vie pour ${LANCEMENT_PRIX} € une seule fois — ${placesLabel(places)}, jusqu'au 15 octobre.`
+              ? `V3 Édition à vie pour ${LANCEMENT_PRIX} € une seule fois — ${placesLabel(places)}, jusqu'au 15 octobre.`
               : "Votre maison d'édition IA est ouverte."}
           </p>
 
