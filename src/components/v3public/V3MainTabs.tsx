@@ -239,6 +239,14 @@ export default function V3MainTabs() {
               <span>Nouveau · EbookStudio AI Team</span>
             </a>
             <V2V3ModeButton variant="inline" />
+            <NavLink
+              to="/v3/tutoriels-v3"
+              className="v3-btn h-9 rounded-full text-[12px] shrink-0"
+              style={{ background: '#1D4ED8', color: '#FFFFFF', border: '1px solid #1E40AF', fontWeight: 700, padding: '8px 14px', gap: 6 }}
+            >
+              <span aria-hidden>🎬</span>
+              <span>Tutoriels</span>
+            </NavLink>
           </div>
         </nav>
 
@@ -421,6 +429,14 @@ export default function V3MainTabs() {
               🤖 Nouveau · EbookStudio AI Team
             </a>
             <V2V3ModeButton variant="inline" />
+            <NavLink
+              to="/v3/tutoriels-v3"
+              onClick={() => setMobileOpen(false)}
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              style={{ background: '#1D4ED8', color: '#FFFFFF', border: '1px solid #1E40AF', fontWeight: 700 }}
+            >
+              🎬 Tutoriels
+            </NavLink>
 
 
 
