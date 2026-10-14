@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Sparkles, BookOpen, BookMarked, ImageIcon, AudioLines, Tags, Gift } from 'lucide-react';
 import {
   Dialog,
@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { trackCaptureEvent } from '@/lib/captureTracking';
+import { supabase } from '@/integrations/supabase/client';
 import heroBg from '@/assets/v3-hero-bg.jpg';
 
 const PILLS = [
@@ -19,9 +20,24 @@ const PILLS = [
   { label: 'Métadonnées', icon: Tags },
 ];
 
+/** Prénom de la personne connectée (vide pour un visiteur anonyme). */
+function readPrenom(user: any): string {
+  if (!user) return '';
+  const meta = user.user_metadata ?? {};
+  const fullName: string = meta.first_name || meta.full_name || meta.name || '';
+  return fullName.trim().split(/\s+/)[0] || String(user.email ?? '').split('@')[0] || '';
+}
+
 /** Premier module de l'accueil V3 — style « Jovial Premium Gold ». */
 export default function V3HeroBanner({ className = '' }: { className?: string }) {
   const [captureOpen, setCaptureOpen] = useState(false);
+  const [prenom, setPrenom] = useState('');
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setPrenom(readPrenom(data.user)));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => setPrenom(readPrenom(session?.user ?? null)));
+    return () => sub.subscription.unsubscribe();
+  }, []);
 
   return (
     <>
@@ -59,13 +75,13 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
         />
 
         <div className="relative v3-shell py-10 text-center md:py-14">
-          {/* Carte crème derrière le texte : contraste garanti, photo visible autour */}
+          {/* Carte crème semi-transparente derrière le texte : la photo reste visible à travers */}
           <div
             className="mx-auto max-w-4xl rounded-3xl px-5 py-8 md:px-12 md:py-11"
             style={{
-              background: 'color-mix(in srgb, var(--v3-joy-cream) 93%, transparent)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
+              background: 'color-mix(in srgb, var(--v3-joy-cream) 32%, transparent)',
+              backdropFilter: 'blur(8px)',
+              WebkitBackdropFilter: 'blur(8px)',
               border: '1px solid var(--v3-joy-orange-soft)',
               boxShadow: '0 26px 60px -40px color-mix(in srgb, var(--v3-joy-ink) 65%, transparent)',
             }}
@@ -78,17 +94,24 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
                 boxShadow: '0 2px 8px -4px color-mix(in srgb, var(--v3-joy-ink) 40%, transparent)',
               }}
             >
-              <Sparkles className="h-3.5 w-3.5" /> Votre maison d'édition IA
+              <Sparkles className="h-3.5 w-3.5" /> EbookStudio V3
             </span>
 
+            <p
+              className="v3-serif mx-auto mt-4 max-w-3xl text-lg font-medium leading-snug md:text-[22px]"
+              style={{ color: 'var(--v3-joy-ink)', textShadow: '0 1px 2px color-mix(in srgb, var(--v3-joy-cream) 92%, transparent)' }}
+            >
+              Bienvenue dans votre maison d'édition{prenom ? `, ${prenom}` : ''}
+            </p>
+
             <h1
-              className="v3-serif mx-auto mt-5 max-w-3xl text-[28px] font-semibold leading-[1.1] md:text-[40px]"
-              style={{ color: 'var(--v3-joy-ink)' }}
+              className="v3-serif mx-auto mt-4 max-w-3xl text-[28px] font-semibold leading-[1.1] md:text-[40px]"
+              style={{ color: 'var(--v3-joy-ink)', textShadow: '0 1px 2px color-mix(in srgb, var(--v3-joy-ink) 16%, transparent)' }}
             >
               Publiez votre livre sur{' '}
               <span
                 style={{
-                  background: 'linear-gradient(90deg, var(--v3-joy-orange-600), var(--v3-joy-yellow-600))',
+                  background: 'linear-gradient(90deg, color-mix(in srgb, var(--v3-joy-orange-600) 88%, var(--v3-joy-ink)), color-mix(in srgb, var(--v3-joy-yellow-600) 78%, var(--v3-joy-ink)))',
                   WebkitBackgroundClip: 'text',
                   backgroundClip: 'text',
                   color: 'transparent',
@@ -99,11 +122,11 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               — même si vous n'écrivez pas une ligne.
             </h1>
 
-            <p className="v3-serif mt-3 text-lg font-medium italic" style={{ color: 'color-mix(in srgb, var(--v3-joy-orange-600) 76%, var(--v3-joy-ink))' }}>
+            <p className="v3-serif mt-3 text-lg font-semibold italic" style={{ color: 'color-mix(in srgb, var(--v3-joy-orange-600) 18%, var(--v3-joy-ink))', textShadow: '0 1px 2px color-mix(in srgb, var(--v3-joy-cream) 92%, transparent)' }}>
               De la première idée au livre que vous êtes fier de présenter.
             </p>
 
-            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed md:text-[16.5px]" style={{ color: 'var(--v3-joy-muted)' }}>
+            <p className="mx-auto mt-4 max-w-2xl text-[15px] leading-relaxed md:text-[16.5px]" style={{ color: 'color-mix(in srgb, var(--v3-joy-muted) 55%, var(--v3-joy-ink))', textShadow: '0 1px 2px color-mix(in srgb, var(--v3-joy-cream) 92%, transparent)' }}>
               D'une simple idée à un livre complet, prêt pour Amazon : texte, couverture, version Kindle et brochée,
               livre audio et métadonnées. Recevez aussi le kit de démarrage + 10 niches rentables.
             </p>
