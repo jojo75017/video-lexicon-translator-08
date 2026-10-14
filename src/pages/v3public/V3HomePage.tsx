@@ -15,7 +15,6 @@ import V3CoverStudioBanner from '@/components/v3public/V3CoverStudioBanner';
 import V3PartnersBand from '@/components/v3public/V3PartnersBand';
 import Niches10Offer from '@/components/marketing/Niches10Offer';
 import { V3EngineStrip, V3EngineGrid } from '@/components/v3public/V3EngineBanner';
-import V3LaunchBanner from '@/components/v3public/V3LaunchBanner';
 import V3HeroBanner from '@/components/v3public/V3HeroBanner';
 import V3StartHereHomeBanner from '@/components/v3public/V3StartHereHomeBanner';
 import V3MicroSeriesSurpriseBanner from '@/components/v3public/V3MicroSeriesSurpriseBanner';
