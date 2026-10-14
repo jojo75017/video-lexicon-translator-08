@@ -882,7 +882,7 @@ const App = () => {
           {!isAdminAuthRoute && <ScrollToTopButton />}
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
           {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
-          {!isAdminAuthRoute && (isAuthenticated || isAdmin) && (
+          {!isAdminAuthRoute && !pathname.startsWith('/v3') && (isAuthenticated || isAdmin) && (
             <V2V3FloatingSwitch forceVisible={isAdmin} />
           )}
           {isAuthenticated && <AISosModal />}
