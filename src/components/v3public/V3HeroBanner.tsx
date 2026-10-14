@@ -99,7 +99,7 @@ export default function V3HeroBanner({ className = '' }: { className?: string })
               — même si vous n'écrivez pas une ligne.
             </h1>
 
-            <p className="v3-serif mt-3 text-lg font-medium italic" style={{ color: 'var(--v3-joy-orange-600)' }}>
+            <p className="v3-serif mt-3 text-lg font-medium italic" style={{ color: 'color-mix(in srgb, var(--v3-joy-orange-600) 76%, var(--v3-joy-ink))' }}>
               De la première idée au livre que vous êtes fier de présenter.
             </p>
 
