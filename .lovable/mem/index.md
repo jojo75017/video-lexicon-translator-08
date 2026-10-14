@@ -8,3 +8,4 @@
 - [Album illustré 3–6 ans](mem://features/kids-book/album-illustre-3-6) — histoire continue jusqu’à 30 pages, personnages illustrés verrouillés, module séparé
 - [Modèle 47 € + OTO](mem://business/pricing/modele-47-oto) — Accès à vie 47 €, puis OTO Édition Pro 97 €, version allégée Cover Pro 67 €
 - [Offres 97 € / 497 €](mem://business/pricing/offres-97-497) — nouveaux clients dès le 16/10 ; anciens inchangés
+- [Guide EbookStudio de A à Z](mem://features/guide-ebookstudio-a-z) — guide officiel 80–100 pages, Word + PDF, pages personnelles et QR code

@@ -1,5 +1,9 @@
 # Roadmap
 
+## Guide EbookStudio de A à Z
+- [ ] Rédiger le guide pratique de 80 à 100 pages : huit chapitres, préface, sommaire, mot de l’auteur, présentation de Georges fondée sur son travail réel, remerciements et QR fourni.
+- [ ] Produire Word et PDF assortis, contrôler toutes les pages et la lisibilité du QR, puis livrer sans modifier l’application ni envoyer d’email.
+
 ## Catalogue partenaires public et affichage Jeunesse
 - [x] Retirer les mentions Jeunesse de Compléments & options, Nos offres et commande sans changer paiements ni accès ; BD Studio Pro conservé.
 - [x] Afficher les six cartes publiques sur /outils-partenaires et ajouter le lien depuis le bandeau d’accueil ; accès sans connexion, nouvel onglet AI Team, titre exact et grille ordinateur/mobile vérifiés sans publier.
