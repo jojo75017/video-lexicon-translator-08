@@ -3,6 +3,7 @@
 ## Guide EbookStudio de A à Z
 - [x] Rédiger le guide pratique de 88 pages : huit chapitres, préface, sommaire, mot de l’auteur, présentation de Georges fondée sur son travail réel, remerciements et QR fourni ; textes personnels proposés à sa validation.
 - [x] Produire Word et PDF assortis : validation DOCX réussie, 88 pages inspectées sans débordement, titres et pagination contrôlés, QR relu depuis le PDF ; aucune modification de l’application ni aucun email.
+- [x] V2 avec images : photo de présentation en page 1 et photo de clôture légendée en page finale, PDF et Word livrés (89 pages), vérifiés page par page.
 
 ## Catalogue partenaires public et affichage Jeunesse
 - [x] Retirer les mentions Jeunesse de Compléments & options, Nos offres et commande sans changer paiements ni accès ; BD Studio Pro conservé.
