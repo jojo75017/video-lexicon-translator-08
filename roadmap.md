@@ -3,7 +3,7 @@
 ## Vidéos tutoriels V3 — suite
 - [x] Produire le tutoriel 5 (2 min) et les tutoriels 10 à 15 (1 min chacun) : les sept vidéos sont livrées, avec voix française et écrans réels de la V3.
 - [x] Ajouter les sept vidéos à leur tutoriel et vérifier la lecture dans l’application ; bande-son du tutoriel 11 corrigée (la voix manquait) et validée par Georges.
-- [ ] Publier les tutoriels 5 et 10 à 15 sur https://ebookstudio.fr — en attente de l’accord de Georges.
+- [x] Publier les tutoriels 5 et 10 à 15 et le tutoriel 11 corrigé sur https://ebookstudio.fr (publication demandée le 14/10/2026 à 15:42 UTC).
 
 ## Guide EbookStudio de A à Z
 - [x] Rédiger le guide pratique de 88 pages : huit chapitres, préface, sommaire, mot de l’auteur, présentation de Georges fondée sur son travail réel, remerciements et QR fourni ; textes personnels proposés à sa validation.
