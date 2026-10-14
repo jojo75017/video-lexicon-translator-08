@@ -8,6 +8,7 @@ import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 import { Button } from '@/components/ui/button';
 import AgentPortrait from '@/components/v3public/AgentPortrait';
+import { V2V3ModeButton } from '@/components/admin/V2V3FloatingSwitch';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
 const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
@@ -237,6 +238,7 @@ export default function V3MainTabs() {
               <span aria-hidden>🤖</span>
               <span>Nouveau · EbookStudio AI Team</span>
             </a>
+            <V2V3ModeButton variant="inline" />
           </div>
         </nav>
 
@@ -418,6 +420,9 @@ export default function V3MainTabs() {
             >
               🤖 Nouveau · EbookStudio AI Team
             </a>
+            <V2V3ModeButton variant="inline" />
+
+
 
 
             {V3_HEADER_MENU.map((cat) => (
