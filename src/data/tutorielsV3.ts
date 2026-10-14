@@ -9,7 +9,7 @@ import tuto4Video from '@/assets/videos/tuto-4-offres.mp4.asset.json';
 import bienvenueVideo from '@/assets/videos/bienvenue-v3-30s.mp4.asset.json';
 import tuto5Video from '@/assets/videos/tuto-5-cinq-etapes.mp4.asset.json';
 import tuto10Video from '@/assets/videos/tuto-10-creer-livre.mp4.asset.json';
-import tuto11Video from '@/assets/videos/tuto-11-ecrire-maintenant.mp4.asset.json';
+import tuto11Video from '@/assets/videos/tuto-11-ecrire-maintenant-v2.mp4.asset.json';
 import tuto12Video from '@/assets/videos/tuto-12-avatar-lecteur.mp4.asset.json';
 import tuto13Video from '@/assets/videos/tuto-13-remise-a-zero.mp4.asset.json';
 import tuto14Video from '@/assets/videos/tuto-14-histoires-courtes.mp4.asset.json';
