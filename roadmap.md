@@ -128,4 +128,4 @@
 - [ ] Nouveau : « Mes livres : retrouver et reprendre » — à clarifier avec Georges (nouvelle vidéo tuto ou question ?)
 
 ## Tutos V3 vidéo
-- [x] Tuto 19 « Mes livres : retrouver et reprendre » : vidéo prête (68 s, voix OpenAI) et ajoutée — en attente écoute de Georges puis publication
+- [x] Tuto 19 « Mes livres : retrouver et reprendre » : vidéo prête (68 s, voix OpenAI), validée par Georges et publiée sur ebookstudio.fr le 15/10 (asset vérifié en ligne, 200 video/mp4)
