@@ -27,12 +27,12 @@ export default function ReviewerAccessPanel() {
     <p className="text-sm text-muted-foreground">Accès offert, sans administration. Utilisez une adresse dédiée qui n’appartient à aucun client.</p>
     <div className="grid gap-4 md:grid-cols-3">
       <div><Label htmlFor="review-email">Email dédié JVZoo</Label><Input id="review-email" type="email" autoComplete="off" value={email} onChange={e => setEmail(e.target.value)} /></div>
-      <div><Label htmlFor="review-code">Code temporaire (16 caractères minimum)</Label><Input id="review-code" type="password" autoComplete="new-password" minLength={16} value={code} onChange={e => setCode(e.target.value)} /></div>
+      <div><Label htmlFor="review-code">Code temporaire (EBK-XXXXXX)</Label><Input id="review-code" type="password" autoComplete="new-password" maxLength={10} value={code} onChange={e => setCode(e.target.value.toUpperCase())} /></div>
       <div><Label htmlFor="review-expiry">Fin de l’accès</Label><Input id="review-expiry" type="date" value={expires} onChange={e => setExpires(e.target.value)} /></div>
     </div>
     <p className="text-sm">Connexion JVZoo : <a className="text-primary underline" href="https://ebookstudio.fr/connexion-abonne">https://ebookstudio.fr/connexion-abonne</a> — identifiant : email ; mot de passe à renseigner dans JVZoo : code d’accès choisi, en majuscules.</p>
     <div className="flex flex-wrap gap-3">
-      <Button disabled={busy || !email || code.trim().length < 16 || !expires} onClick={() => run('create')}>Créer l’accès Auteur</Button>
+      <Button disabled={busy || !email || !/^EBK-[A-Z0-9]{6}$/.test(code.trim()) || !expires} onClick={() => run('create')}>Créer l’accès Auteur</Button>
       <Button variant="outline" disabled={busy || !email} onClick={() => run('status')}>Vérifier l’accès</Button>
       <Button variant="destructive" disabled={busy || !email} onClick={() => run('revoke')}>Révoquer l’accès JVZoo</Button>
     </div>

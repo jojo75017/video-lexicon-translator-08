@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     if (body.action !== 'create') return reply({ error: 'Action inconnue' }, 400);
     if (sub) return reply({ error: 'Cette adresse possède déjà un compte. Utilisez une adresse dédiée inutilisée.' }, 409);
     const code = String(body.access_code ?? '').trim().toUpperCase();
-    if (!/^[A-Z0-9-]{16,64}$/.test(code)) return reply({ error: 'Code : 16 à 64 lettres, chiffres ou tirets.' }, 400);
+    if (!/^EBK-[A-Z0-9]{6}$/.test(code)) return reply({ error: 'Code au format EBK- suivi de six lettres ou chiffres requis.' }, 400);
     const expiry = new Date(String(body.expires_at));
     if (!Number.isFinite(expiry.getTime()) || expiry.getTime() <= Date.now()) return reply({ error: 'Expiration future requise' }, 400);
     // createUser never overwrites an existing identity, including an existing administrator.
