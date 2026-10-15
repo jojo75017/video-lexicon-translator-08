@@ -28,3 +28,4 @@
 - Home engine module badges reuse findPaidModuleForPath and useModuleAccess without granting rights; administrator access is distinguished from customer inclusion to avoid misleading paid-option labels.
 - Dark homepage feature panels show access information immediately below their titles, separating included workflows from paid extensions through the shared access badge without changing permissions.
 - New-customer offers (Auteur yearly, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), so historical 47 € and subscription rights stay untouched.
+- JVZoo sales enter through the jvzoo-ipn function (JVZIPN v2 cverify, product filter, unique event key) and only grant or revoke Auteur rights JVZoo itself created, so Stripe and other rights are never overwritten.

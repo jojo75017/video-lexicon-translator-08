@@ -2114,6 +2114,75 @@ export type Database = {
         }
         Relationships: []
       }
+      jvzoo_access: {
+        Row: {
+          created_at: string
+          created_subscriber: boolean
+          email: string
+          paykey: string
+          refunded_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_subscriber?: boolean
+          email: string
+          paykey: string
+          refunded_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_subscriber?: boolean
+          email?: string
+          paykey?: string
+          refunded_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      jvzoo_ipn_events: {
+        Row: {
+          created_at: string
+          detail: string | null
+          email: string | null
+          event_key: string
+          id: string
+          outcome: string
+          paykey: string | null
+          product_id: string | null
+          total: number | null
+          transaction_id: string
+          transaction_type: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          email?: string | null
+          event_key: string
+          id?: string
+          outcome?: string
+          paykey?: string | null
+          product_id?: string | null
+          total?: number | null
+          transaction_id: string
+          transaction_type: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          email?: string | null
+          event_key?: string
+          id?: string
+          outcome?: string
+          paykey?: string | null
+          product_id?: string | null
+          total?: number | null
+          transaction_id?: string
+          transaction_type?: string
+        }
+        Relationships: []
+      }
       launch_settings: {
         Row: {
           key: string
