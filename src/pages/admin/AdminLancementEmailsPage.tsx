@@ -12,12 +12,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 /** Les 4 emails de la séquence de lancement V3 (1er octobre 2026). */
 const STEPS = [
-  { step: 1, template: 'v3l-essai-J18', title: 'Email 1 — L’essai gratuit', when: 'J-18' },
-  { step: 2, template: 'v3l-livre-J10', title: 'Email 2 — Un livre écrit sous vos yeux', when: 'J-10' },
-  { step: 3, template: 'v3l-changement-J4', title: 'Email 3 — Ce qui change le 1er octobre', when: 'J-4' },
-  { step: 4, template: 'v3l-dernier-J1', title: 'Email 4 — Dernier jour à 47 €', when: 'J-1' },
-  { step: 5, template: 'v3l-niches-offertes', title: 'Lettre cadeau — 10 niches (un seul bouton)', when: 'À tout moment' },
-  { step: 6, template: 'v3l-niches-offertes-relance-2', title: 'Relance cadeau — version plus convaincante', when: 'Relance' },
+  { step: 1, template: 't16-ouverture-2026-10-16', title: 'Email 1 — C’est ouvert (16 oct. matin)', when: '16 oct.' },
+  { step: 2, template: 't16-livre-fini-2026-10-16', title: 'Email 2 — Le livre que vous repoussez', when: 'Relance' },
+  { step: 3, template: 't16-derniere-chance-2026-10-16', title: 'Email 3 — Vous n’avez pas encore regardé ?', when: 'Dernier rappel' },
 ];
 
 type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };

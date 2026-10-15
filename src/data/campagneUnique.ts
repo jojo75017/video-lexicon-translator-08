@@ -98,6 +98,11 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
    * en second. C'est le lien à coller dans Systeme.io. */
   apv3: { key: 'apv3', destination: '/avant-premiere', template: 'v3-avant-premiere', label: 'Voir la V3 en avant-première' },
 
+  /* Tunnel du 16 octobre 2026 : trois emails, un seul bouton vers Landaa. */
+  t16a: { key: 't16a', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t16&utm_content=ouverture', template: 't16-ouverture-2026-10-16', label: 'Découvrir la nouvelle offre' },
+  t16b: { key: 't16b', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t16&utm_content=livre', template: 't16-livre-fini-2026-10-16', label: 'Voir comment ça marche' },
+  t16c: { key: 't16c', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t16&utm_content=rappel', template: 't16-derniere-chance-2026-10-16', label: 'Je regarde maintenant' },
+
   /* Relance « grande nouveauté » du 8 octobre : bouton vers le tunnel Landaa. */
   nouv16: { key: 'nouv16', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/de-vente', template: 'grande-nouveaute-non-cliqueurs-2026-10-08', label: "Je m'inscris maintenant" },
 
