@@ -53,6 +53,17 @@ export function useV3Entitlement() {
       }
 
       try {
+        // Dedicated review accounts never inherit legacy V2 or paid add-on rights.
+        if (user.app_metadata?.reviewer_kind === 'jvzoo-auteur') {
+          const { data: review } = await supabase.from('subscribers')
+            .select('status,plan_tier,expires_at').eq('email', email.toLowerCase()).maybeSingle();
+          if (cancelled) return;
+          setHasBase(review?.status === 'active' && review.plan_tier === 'auteur' &&
+            !!review.expires_at && new Date(review.expires_at).getTime() > Date.now());
+          setHasFull(false);
+          setHasV2(false);
+          return;
+        }
         const { data } = await supabase.rpc('get_my_v3_installment_orders');
 
         if (cancelled) return;
