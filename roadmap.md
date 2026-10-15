@@ -129,3 +129,4 @@
 
 ## Tutos V3 vidéo
 - [x] Tuto 19 « Mes livres : retrouver et reprendre » : vidéo prête (68 s, voix OpenAI), validée par Georges et publiée sur ebookstudio.fr le 15/10 (asset vérifié en ligne, 200 video/mp4)
+- [ ] Tuto 18 « HumanizeAI » : fabriquer la vidéo avec voix française et vrais écrans de l’outil (lancée le 15/10), l’ajouter aux tutoriels, vérifier le démarrage et publier sur ebookstudio.fr — publication autorisée par Georges.
