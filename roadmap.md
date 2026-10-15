@@ -131,4 +131,5 @@
 - [x] Tuto 19 « Mes livres : retrouver et reprendre » : vidéo prête (68 s, voix OpenAI), validée par Georges et publiée sur ebookstudio.fr le 15/10 (asset vérifié en ligne, 200 video/mp4)
 - [x] Tuto 18 « HumanizeAI » : vidéo de 63 s avec voix française et vrais écrans, intégrée et publication demandée ; présence de son asset confirmée dans le site publié (200 video/mp4). Prononciation non écoutée ; contrôle lecteur automatisé non concluant.
 - [x] Préparer le panneau admin JVZoo : email dédié et code EBK choisi par Georges, accès Auteur sans paiement et révocation réservée aux comptes marqués JVZoo. Création/session Auteur/révocation testées via service avec compte jetable immédiatement révoqué ; clients et Stripe inchangés.
-- [ ] Créer le compte définitif JVZoo — attend l’email dédié, le code temporaire et la date de fin saisis par Georges dans /admin#jvzoo. Panneau dans l’aperçu seulement ; publication à autoriser. Parcours navigateur abonné non vérifié (restauration de session admin redirigée vers /auth).
+- [ ] Vérifier le parcours JVZoo à l’écran puis publier et vérifier en production — autorisé le 15/10 ; concerne Auteur 97 €/an et Édition 497 € à vie dès le 16/10, sans modification Stripe ni clients.
+- [ ] Créer le compte définitif JVZoo — attend l’email dédié, le code temporaire et la date de fin saisis par Georges dans /admin#jvzoo.
