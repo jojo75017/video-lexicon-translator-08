@@ -141,7 +141,8 @@ export const SubscriptionAuth = ({ onAuthenticated }: SubscriptionAuthProps) => 
         localStorage.setItem('ebook_planner_active_tab', 'workflow-dashboard');
         toast.success(`Bienvenue ! Plan ${data.subscriber.plan_type}`);
         onAuthenticated(normalizedEmail, data.subscriber);
-        window.location.assign(SUBSCRIBER_HOME_PATH);
+        const { data: { user: signedInUser } } = await supabase.auth.getUser();
+        window.location.assign(signedInUser?.app_metadata?.reviewer_kind === 'jvzoo-auteur' ? '/v3' : SUBSCRIBER_HOME_PATH);
       } else {
         toast.error(data.message || 'Abonnement non trouvé');
       }
