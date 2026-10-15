@@ -1,4 +1,5 @@
 # Architecture
+- JVZoo review access uses admin-only creation of a new Auteur subscriber and an immutable auth app-metadata marker for scoped revocation, never payment records or existing customer updates.
 - The public partner-tool catalogue uses /outils-partenaires as a standalone presentation-only page; /partenaires retains the affiliate programme, so external recommendations never replace the programme or change customer entitlements or payment flows.
 - V3 navigation groups category buttons separately from neutral admin actions, with scoped toolbar tokens so unrelated page controls retain their existing styles.
 - Separate wrap image exports crop the shared full-cover renderer at each zone’s finished dimensions, preserving artwork and text without printing editor guides.

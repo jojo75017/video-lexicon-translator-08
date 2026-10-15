@@ -18,6 +18,7 @@ import AdminLaunchQuickLinks from '@/components/admin/AdminLaunchQuickLinks';
 import { ErrorLogsViewer } from '@/components/admin/ErrorLogsViewer';
 import { ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
+import ReviewerAccessPanel from '@/components/admin/ReviewerAccessPanel';
 
 /** Jours entiers écoulés depuis une date (paiement/inscription). */
 const daysSince = (dateStr?: string | null): number | null => {
@@ -331,6 +332,7 @@ export const AdminPage = () => {
         <AdminLaunchQuickLinks />
 
         <AdminPanelNav />
+        <ReviewerAccessPanel />
 
         {/* Header */}
         <div className="flex items-center justify-between">
