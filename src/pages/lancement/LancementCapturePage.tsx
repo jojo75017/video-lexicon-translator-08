@@ -124,9 +124,12 @@ export default function LancementCapturePage() {
               Aucune carte demandée à cette étape. Désinscription en un clic.
             </p>
             <div className="mt-6 border-t pt-4 text-sm">
-              <Link to={offersUrl} className="font-semibold text-primary hover:underline">
-                Voir directement l'offre de lancement →
-              </Link>
+              <a
+                href={`https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy${window.location.search}`}
+                className="font-semibold text-primary hover:underline"
+              >
+                Voir directement les nouvelles offres →
+              </a>
             </div>
           </div>
         </div>
