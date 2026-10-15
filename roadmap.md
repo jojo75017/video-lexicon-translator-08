@@ -135,3 +135,7 @@
 - [ ] Confirmer le déploiement du panneau JVZoo en production — publication acceptée et programmée le 15/10 à 10:03 UTC ; contrôle unique après environ deux minutes : panneau encore absent de ebookstudio.fr/admin#jvzoo. Déploiement non confirmé. Scan renouvelé : quatre avertissements, quatre informations, aucun critique. Examen des offres Auteur 97 €/an et Édition 497 € à vie dès le 16/10.
 - [ ] Créer le compte définitif JVZoo — attend l’email dédié, le code temporaire et la date de fin saisis par Georges dans /admin#jvzoo.
 - [ ] Renseigner le dossier JVZoo : lien https://ebookstudio.fr/connexion-abonne ; email et code du compte définitif après création. Accès au compte JVZoo indisponible ici, saisie à effectuer par Georges.
+
+## Emails du tunnel du 16 octobre
+- [x] Retirer les anciens emails de lancement et préparer 3 nouveaux messages vers le tunnel Landaa (lien suivi, utm conservés).
+- [ ] Envoyer le 16/10 par lots de 100 maximum — en attente du « go » de Georges demain.
