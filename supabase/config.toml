@@ -256,3 +256,6 @@ verify_jwt = true
 [functions.lancement-confirm]
 verify_jwt = false
 
+
+[functions.jvzoo-ipn]
+verify_jwt = false
