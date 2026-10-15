@@ -19,187 +19,69 @@ interface EmailStep {
   body: string;
 }
 
+const TUNNEL = "https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy";
+
 const EMAIL_SEQUENCE: EmailStep[] = [
   {
-    step: 1,
-    dayOffset: 0,
-    dayLabel: "J+0",
-    subject: "📖 J'ai généré 150 pages en 47 minutes... voici comment",
-    preheader: "Le secret des auteurs qui publient un livre par semaine sur Amazon",
-    strategy: "CURIOSITÉ",
-    strategyColor: "bg-primary/10 text-primary border-primary/30",
+    step: 1, dayOffset: 0, dayLabel: "16 oct. matin",
+    subject: "C'est ouvert : votre maison d'édition IA vous attend",
+    preheader: "Les portes de la nouvelle offre EbookStudio viennent de s'ouvrir.",
+    strategy: "OUVERTURE", strategyColor: "bg-primary/10 text-primary border-primary/30",
     body: `Bonjour [PRÉNOM],
 
-Je vais être direct avec vous.
+Ça y est : la nouvelle version d'EbookStudio est ouverte depuis ce matin.
 
-La semaine dernière, j'ai publié mon 36ème livre sur Amazon.
-Pas en 3 mois. Pas en 3 semaines.
+Imaginez : vous posez votre idée, et une équipe de spécialistes IA vous accompagne jusqu'au livre fini — sommaire, chapitres, correction, couverture et fiche Amazon KDP.
 
-En 47 minutes.
+• Écrire un livre complet, chapitre par chapitre
+• Une couverture prête pour Amazon
+• Une correction éditoriale qui chasse les répétitions
+• Tout en français, sans jargon
 
-150 pages. Structurées. Illustrées. Prêtes pour KDP.
+J'ai préparé une page qui vous montre tout, en quelques minutes.
 
-Ce qui a changé ? J'ai construit un outil. Un vrai générateur d'ebooks propulsé par l'IA la plus avancée du marché.
+**👉 Découvrir la nouvelle offre** : ${TUNNEL}
 
-🔥 Ebookstudio Pro V2 2026 - L'usine à ebooks que j'utilise personnellement :
-
-→ 300+ idées de titres par niche rentable
-→ Plan complet généré en 30 secondes
-→ Chapitres rédigés avec votre ton et votre style
-→ Couvertures professionnelles en 1 clic
-→ Export direct PDF/EPUB prêt pour Amazon KDP
-→ Coût par ebook : environ 0,30€
-
-👉 Testez gratuitement la démo : ${DEMO_LINK}
-
-Pas de carte bancaire, pas d'engagement.
-
-L'offre Fondateur à 67€ ne durera pas éternellement.
-
-À vous de jouer,
-Georges
-
-P.S: Mon profil Amazon avec mes 35+ livres publiés : https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
-  },
-  {
-    step: 2,
-    dayOffset: 2,
-    dayLabel: "J+2",
-    subject: "⚠️ Les 3 erreurs qui tuent 90% des auteurs KDP",
-    preheader: "Erreur #2 est celle que TOUT LE MONDE fait...",
-    strategy: "DOULEUR / SOLUTION",
-    strategyColor: "bg-destructive/10 text-destructive border-destructive/30",
-    body: `[PRÉNOM],
-
-Savez-vous pourquoi 90% des gens qui veulent publier sur Amazon... n'y arrivent jamais ?
-
-❌ ERREUR #1 : Écrire sans plan - abandon garanti à la page 12.
-❌ ERREUR #2 : Passer 3 semaines sur un seul livre - pendant que d'autres en publient 5.
-❌ ERREUR #3 : Négliger la couverture et les mots-clés - 0 vente.
-
-Ebookstudio Pro V2 résout ces 3 problèmes en même temps :
-✅ Plan structuré automatiquement
-✅ Génération en 47 min
-✅ Couvertures pro + optimisation KDP intégrée
-
-Le tout pour ~0,30€ par livre.
-
-📊 Le calcul : 1 ebook/semaine × 52 = 52 livres/an, pour ~15€ de production.
-
-👉 Découvrir Ebookstudio Pro V2 : ${OFFRES_LINK}
-
-L'offre Fondateur à 67€ (au lieu de 197€) est disponible jusqu'au 30 septembre 2026.
-
-Georges
-
-P.S: Testez d'abord gratuitement : ${DEMO_LINK}`,
-  },
-  {
-    step: 3,
-    dayOffset: 4,
-    dayLabel: "J+4",
-    subject: "💰 De 0 à 35 livres Amazon - Mon parcours transparent",
-    preheader: "Chiffres réels, résultats réels, outil réel.",
-    strategy: "PREUVE SOCIALE",
-    strategyColor: "bg-green-500/10 text-green-600 border-green-500/30",
-    body: `[PRÉNOM],
-
-Aujourd'hui, pas de pitch. Juste des faits.
-
-📊 Mon parcours Amazon KDP :
-• 2023 : 0 livre publié
-• 2024 : 18 livres (méthode manuelle)
-• 2025-2026 : 35+ livres (avec Ebookstudio Pro V2)
-
-Ebookstudio Pro V2 2026 inclut :
-📝 Générateur IA (Gemini 3 Flash)
-🎨 Créateur de couvertures pro
-🔊 Convertisseur en livre audio
-📊 Dashboard marketing complet
-📧 Système email marketing inclus
-
-Le tout à 67€ (paiement unique).
-Ou en facilités : 2×35€ ou 3×25€.
-
-👉 Accéder à l'offre Fondateur : ${OFFRES_LINK}
-
-Mes livres sont sur Amazon, mon nom est public, mes résultats sont transparents.
-
-Cordialement,
 Georges Boubet
-https://www.amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
+Fondateur d'EbookStudio`,
   },
   {
-    step: 4,
-    dayOffset: 6,
-    dayLabel: "J+6",
-    subject: "⏰ [Dernière chance] L'offre Fondateur disparaît dans 48h",
-    preheader: "Après ça, le prix passe à 197€. Point final.",
-    strategy: "URGENCE",
-    strategyColor: "bg-amber-500/10 text-amber-600 border-amber-500/30",
-    body: `[PRÉNOM],
+    step: 2, dayOffset: 1, dayLabel: "Relance",
+    subject: "Le livre que vous repoussez peut exister ce mois-ci",
+    preheader: "Ce qui vous bloque n'est pas le talent. C'est la méthode.",
+    strategy: "ÉMOTION", strategyColor: "bg-primary/10 text-primary border-primary/30",
+    body: `Bonjour [PRÉNOM],
 
-L'offre Fondateur Ebookstudio Pro V2 à 67€ se termine dans 48 heures.
+Combien de fois vous êtes-vous dit « un jour, j'écrirai ce livre » ?
 
-Après ? Le prix passe à 197€.
+Ce qui bloque, presque toujours, ce n'est pas le talent : c'est la page blanche, le plan qui n'arrive pas, la peur de mal faire.
 
-🧮 Ce que vous obtenez (valeur 749€) :
-- Générateur IA illimité (197€)
-- Créateur de couvertures (67€)
-- Convertisseur livre audio (197€)
-- Dashboard marketing (67€)
-- Outils réseaux sociaux (47€)
-- Templates email (67€)
-- Optimisateur KDP (67€)
+EbookStudio prend tout ça en charge, étape par étape. Vous gardez la main sur votre histoire ; l'équipe IA fait le travail lourd.
 
-Votre prix aujourd'hui : 67€ (-66%)
-💳 Ou 2×35€ / 3×25€
+**👉 Voir comment ça marche** : ${TUNNEL}
 
-🎁 BONUS inclus : Pack 300+ idées, Guide 10 Niches KDP 2026, Groupe privé, MAJ à vie, Support Zoom.
-
-⚡ Coût par ebook : ~0,30€. Rentabilisé dès le 1er livre vendu.
-
-👉 J'accède à l'offre Fondateur : ${OFFRES_LINK}
-
-Georges
-
-P.S: Je ne relancerai pas après cet email.`,
+Georges Boubet
+Fondateur d'EbookStudio`,
   },
   {
-    step: 5,
-    dayOffset: 7,
-    dayLabel: "J+7",
-    subject: "🔒 C'est terminé ce soir à minuit",
-    preheader: "Votre dernière chance de rejoindre les fondateurs.",
-    strategy: "DERNIER APPEL",
-    strategyColor: "bg-purple-500/10 text-purple-600 border-primary/20",
-    body: `[PRÉNOM],
+    step: 3, dayOffset: 3, dayLabel: "Dernier rappel",
+    subject: "Vous n'avez pas encore regardé ?",
+    preheader: "Deux minutes suffisent pour savoir si c'est pour vous.",
+    strategy: "RAPPEL", strategyColor: "bg-primary/10 text-primary border-primary/30",
+    body: `Bonjour [PRÉNOM],
 
-Dernier email. Dernier appel.
+Je vous écris une dernière fois à ce sujet, promis.
 
-Ce soir à minuit, l'offre Fondateur à 67€ se ferme définitivement.
+La nouvelle offre EbookStudio est ouverte, et beaucoup d'auteurs ont déjà commencé leur livre.
 
-Où serez-vous dans 90 jours ?
+Si une idée dort dans un coin de votre tête, c'est peut-être le bon moment. Un clic pour voir, sans aucun engagement.
 
-📍 Scénario A : Toujours cette idée de livre dans un coin de votre tête.
-📍 Scénario B : 10, 15, 20 ebooks sur Amazon. Vos premiers revenus passifs tombent.
+**👉 Je regarde maintenant** : ${TUNNEL}
 
-La seule différence ? Un clic. Aujourd'hui.
+Une question ? Répondez simplement à cet email : je lis tout personnellement.
 
-👉 Rejoindre les Fondateurs : ${OFFRES_LINK}
-
-Merci d'avoir lu mes emails cette semaine, [PRÉNOM].
-
-Si une petite voix vous dit "et si ça marchait pour moi ?"...
-Écoutez-la. Juste cette fois.
-
-À bientôt de l'autre côté,
-Georges
-
----
-📖 35+ livres publiés sur Amazon
-🛠️ Créateur d'Ebookstudio Pro V2
-🔗 amazon.fr/Mr-Georges-Boubet/e/B0CGVLHNX7`,
+Georges Boubet
+Fondateur d'EbookStudio`,
   },
 ];
 
@@ -228,9 +110,9 @@ const EmailPreviewPage = () => {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground flex items-center gap-3">
               <Mail className="w-7 h-7 text-primary" />
-              Séquence Emails Prospects
+              Emails du tunnel du 16 octobre
             </h1>
-            <p className="text-muted-foreground text-sm mt-1">Prévisualisation des 5 emails envoyés automatiquement à vos prospects</p>
+            <p className="text-muted-foreground text-sm mt-1">Les 3 nouveaux emails — un seul bouton vers le tunnel. Les anciens emails ont été retirés.</p>
           </div>
         </div>
 
@@ -273,11 +155,11 @@ const EmailPreviewPage = () => {
               <CardContent className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Étape</span>
-                  <p className="text-foreground font-semibold">{email.step} / 5</p>
+                  <p className="text-foreground font-semibold">{email.step} / {EMAIL_SEQUENCE.length}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Envoi</span>
-                  <p className="text-foreground font-semibold">{email.dayLabel} après inscription</p>
+                  <p className="text-foreground font-semibold">{email.dayLabel}</p>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Stratégie</span>
@@ -349,7 +231,7 @@ const EmailPreviewPage = () => {
               {/* Email footer */}
               <div className="border-t border-gray-200 px-6 py-4 bg-gray-50">
                 <p className="text-[11px] text-gray-400">
-                  Vous recevez cet email car vous avez manifesté un intérêt pour Ebookstudio Pro V2.<br />
+                  Vous recevez cet email car vous avez manifesté un intérêt pour EbookStudio.<br />
                   <span className="text-amber-600 underline cursor-pointer">Voir l'offre</span> · <span className="text-amber-600 underline cursor-pointer">Tester la démo</span><br />
                   Pour ne plus recevoir ces emails, répondez "STOP" à cet email.
                 </p>
