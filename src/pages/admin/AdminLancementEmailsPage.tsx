@@ -28,10 +28,23 @@ export default function AdminLancementEmailsPage() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<Record<number, number | null>>({});
+  const [base, setBase] = useState<{ total?: number; bounced?: number; unsub?: number; inactif?: number }>({});
 
   const load = useCallback(async () => {
     setLoading(true);
     const templates = STEPS.map((s) => s.template);
+    const count = async (f?: (q: any) => any) => {
+      let q = (supabase as any).from('sales_prospects').select('*', { count: 'exact', head: true });
+      if (f) q = f(q);
+      const { count: c } = await q;
+      return c ?? undefined;
+    };
+    Promise.all([
+      count(),
+      count((q) => q.eq('status', 'bounced')),
+      count((q) => q.eq('unsubscribed', true)),
+      count((q) => q.eq('status', 'inactif')),
+    ]).then(([total, bounced, unsub, inactif]) => setBase({ total, bounced, unsub, inactif }));
     const [logRes, clickRes, audienceRes] = await Promise.all([
       (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,last_event,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).limit(2000),
       (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(2000),
@@ -107,6 +120,14 @@ export default function AdminLancementEmailsPage() {
           </div>
         </div>
 
+        <Card className="mb-4 border-primary/30 bg-primary/5 p-4">
+          <p className="text-lg font-bold text-primary">
+            Base qualifiée : {loading || remaining[2] == null ? '…' : remaining[2].toLocaleString('fr-FR')} prospects joignables
+          </p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Sur {base.total ?? '…'} adresses : {base.bounced ?? '…'} mortes ou rejetées, {base.unsub ?? '…'} désinscrits et {base.inactif ?? '…'} inactifs sont exclus, ainsi que les clients payants et les adresses de test.
+          </p>
+        </Card>
         <p className="mb-4 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
           Envois par groupes de 300 maximum. Envois manuels uniquement aux dates prévues (heure de Paris). Les clients, désinscrits et doublons sont exclus.
         </p>
