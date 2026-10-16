@@ -138,4 +138,5 @@
 
 ## Emails du tunnel du 16 octobre
 - [x] Retirer les anciens emails de lancement et préparer 3 nouveaux messages vers le tunnel Landaa (lien suivi, utm conservés).
-- [ ] Envoyer le 16/10 par lots de 100 maximum — en attente du « go » de Georges demain.
+- [x] Premier lot de 100 envoyé le 16/10 sur autorisation de Georges (tour précédent).
+- [x] Fixer les dates au 16/19/20 octobre 2026 et bloquer les envois hors date, sans automatisation.

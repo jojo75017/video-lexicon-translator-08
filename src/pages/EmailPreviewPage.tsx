@@ -46,7 +46,7 @@ Georges Boubet
 Fondateur d'EbookStudio`,
   },
   {
-    step: 2, dayOffset: 1, dayLabel: "Relance",
+    step: 2, dayOffset: 3, dayLabel: "19 octobre",
     subject: "Le livre que vous repoussez peut exister ce mois-ci",
     preheader: "Ce qui vous bloque n'est pas le talent. C'est la méthode.",
     strategy: "ÉMOTION", strategyColor: "bg-primary/10 text-primary border-primary/30",
@@ -64,7 +64,7 @@ Georges Boubet
 Fondateur d'EbookStudio`,
   },
   {
-    step: 3, dayOffset: 3, dayLabel: "Dernier rappel",
+    step: 3, dayOffset: 4, dayLabel: "20 octobre",
     subject: "Vous n'avez pas encore regardé ?",
     preheader: "Deux minutes suffisent pour savoir si c'est pour vous.",
     strategy: "RAPPEL", strategyColor: "bg-primary/10 text-primary border-primary/30",
