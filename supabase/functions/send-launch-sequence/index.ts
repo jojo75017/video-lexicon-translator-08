@@ -3,6 +3,7 @@ import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThr
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
 import { SITE_ORIGIN } from "../_shared/checkoutUrl.ts";
 import { FROM_CAMPAIGN, REPLY_TO, DIRECT_EMAIL } from "../_shared/emailIdentity.ts";
+import { canSendLaunchEmail, LAUNCH_EMAIL_DATES } from "../_shared/launchEmailSchedule.ts";
 
 /**
  * Séquence de lancement V3 (calée sur le 1er octobre 2026).
@@ -212,7 +213,11 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const mode = String(body.mode || "status"); // status | preview | send
     const stepNum = Number(body.step) || 1;
-    const email = LAUNCH_EMAILS.find((e) => e.step === stepNum) ?? LAUNCH_EMAILS[0];
+    const email = LAUNCH_EMAILS.find((e) => e.step === stepNum);
+    if (!email) return respond({ error: "Email inconnu" }, 400);
+    if (mode === "send" && !canSendLaunchEmail(stepNum)) {
+      return respond({ error: `L’email ${stepNum} peut être envoyé uniquement le ${LAUNCH_EMAIL_DATES[stepNum]} (heure de Paris).`, scheduled_date: LAUNCH_EMAIL_DATES[stepNum] }, 409);
+    }
     const segment = String(body.segment || "hot"); // hot | all | cold | personal
     const limit = Math.max(1, Math.min(100, Number(body.limit) || 100));
     // Pour test : rediriger tous les envois vers une seule adresse.

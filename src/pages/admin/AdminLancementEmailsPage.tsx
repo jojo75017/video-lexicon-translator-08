@@ -7,12 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { supabase } from '@/integrations/supabase/client';
+import { canSendLaunchEmail } from '../../../supabase/functions/_shared/launchEmailSchedule';
 
-/** Les 4 emails de la séquence de lancement V3 (1er octobre 2026). */
+/** Trois emails à des dates distinctes. */
 const STEPS = [
   { step: 1, template: 't16-ouverture-2026-10-16', title: 'Email 1 — C’est ouvert (16 oct. matin)', when: '16 oct.' },
-  { step: 2, template: 't16-livre-fini-2026-10-16', title: 'Email 2 — Le livre que vous repoussez', when: 'Relance' },
-  { step: 3, template: 't16-derniere-chance-2026-10-16', title: 'Email 3 — Vous n’avez pas encore regardé ?', when: 'Dernier rappel' },
+  { step: 2, template: 't16-livre-fini-2026-10-16', title: 'Email 2 — Le livre que vous repoussez', when: '19 oct. 2026' },
+  { step: 3, template: 't16-derniere-chance-2026-10-16', title: 'Email 3 — Vous n’avez pas encore regardé ?', when: '20 oct. 2026' },
 ];
 
 type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };
@@ -62,6 +63,7 @@ export default function AdminLancementEmailsPage() {
   }, [latest]);
 
   const runSend = async (step: number, segment: 'hot' | 'all' | 'cold' | 'personal', limit: number) => {
+    if (!canSendLaunchEmail(step)) { toast.error('Cet email ne peut pas être envoyé aujourd’hui.'); return; }
     const key = `${step}-${segment}`;
     setSending(key);
     const { data, error } = await supabase.functions.invoke('send-launch-sequence', { body: { mode: 'send', step, segment, limit } });
@@ -84,7 +86,7 @@ export default function AdminLancementEmailsPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold"><Mail className="h-6 w-6 text-primary" /> Emails du tunnel du 16 octobre</h1>
-            <p className="text-sm text-muted-foreground">Les 3 emails du nouveau tunnel, envoyés dans l’ordre. Chaque email contient un seul bouton vers la page de vente.</p>
+            <p className="text-sm text-muted-foreground">Email 1 : 16 octobre · Email 2 : 19 octobre · Email 3 : 20 octobre 2026.</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline">{sentToday} envoyé(s) aujourd’hui</Badge>
@@ -96,7 +98,7 @@ export default function AdminLancementEmailsPage() {
         </div>
 
         <p className="mb-4 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
-          Envoi limité à 100 emails par lot. Les clients, les désinscrits et les personnes ayant déjà reçu le même email sont exclus automatiquement.
+          100 emails maximum par jour, tous messages confondus. Envois manuels uniquement aux dates prévues (heure de Paris). Les clients, désinscrits et doublons sont exclus.
         </p>
 
 
@@ -115,19 +117,19 @@ export default function AdminLancementEmailsPage() {
                 </div>
               </div>
               <div className="mt-3 flex flex-wrap gap-2">
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'hot', 20)}>
+                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'hot', 20)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-hot` ? 'Envoi…' : 'Envoyer aux plus engagés'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'cold', 100)}>
+                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'cold', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null} onClick={() => runSend(s.step, 'personal', 100)}>
+                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'personal', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles'}
                 </Button>
-                <Button size="sm" disabled={sending !== null} onClick={() => runSend(s.step, 'all', 100)}>
+                <Button size="sm" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'all', 100)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 100'}
                 </Button>
