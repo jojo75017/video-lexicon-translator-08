@@ -259,13 +259,19 @@ Deno.serve(async (req) => {
     }
 
     // --- Base : prospects actifs, non désabonnés. ---
-    const { data: prospects, error: pErr } = await db
-      .from("sales_prospects")
-      .select("email,first_name,source,status,unsubscribed")
-      .eq("status", "active")
-      .eq("unsubscribed", false)
-      .limit(5000);
-    if (pErr) throw pErr;
+    const prospects: { email: string; first_name: string | null; source: string | null; status: string | null; unsubscribed: boolean | null }[] = [];
+    for (let offset = 0; ; offset += 1000) {
+      const { data: page, error: pErr } = await db
+        .from("sales_prospects")
+        .select("email,first_name,source,status,unsubscribed")
+        .eq("status", "active")
+        .eq("unsubscribed", false)
+        .order("id")
+        .range(offset, offset + 999);
+      if (pErr) throw pErr;
+      prospects.push(...(page || []));
+      if (!page || page.length < 1000) break;
+    }
 
     // --- Déjà reçus CET email (anti-doublon par template). ---
     const alreadySent = new Set<string>();
