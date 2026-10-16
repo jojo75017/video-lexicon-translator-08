@@ -25,16 +25,24 @@ export default function AdminLancementEmailsPage() {
   const [clicks, setClicks] = useState<ClickRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState<string | null>(null);
+  const [remaining, setRemaining] = useState<Record<number, number | null>>({});
 
   const load = useCallback(async () => {
     setLoading(true);
     const templates = STEPS.map((s) => s.template);
-    const [logRes, clickRes] = await Promise.all([
+    const [logRes, clickRes, audienceRes] = await Promise.all([
       (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).limit(2000),
       (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(2000),
+      Promise.all(STEPS.map(async ({ step }) => {
+        const { data, error } = await supabase.functions.invoke('send-launch-sequence', {
+          body: { mode: 'status', step, segment: 'all' },
+        });
+        return [step, !error && typeof data?.total_eligible === 'number' ? data.total_eligible : null] as const;
+      })),
     ]);
     setLogs((logRes.data || []) as LogRow[]);
     setClicks((clickRes.data || []) as ClickRow[]);
+    setRemaining(Object.fromEntries(audienceRes));
     setLoading(false);
   }, []);
 
@@ -54,7 +62,7 @@ export default function AdminLancementEmailsPage() {
     const rows = latest.filter((r) => r.template_name === s.template);
     const failed = rows.filter((r) => ['failed', 'dlq', 'bounced', 'complained'].includes(r.status)).length;
     const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email)).size;
-    return { ...s, total: rows.length, sent: rows.length - failed, failed, clicked };
+    return { ...s, total: rows.length, sent: rows.filter((r) => ['sent', 'delivered'].includes(r.status)).length, failed, clicked };
   }), [latest, clicks]);
 
   const sentToday = useMemo(() => {
@@ -111,6 +119,7 @@ export default function AdminLancementEmailsPage() {
                   <p className="text-xs text-muted-foreground">{s.when} · repère interne {s.template}</p>
                 </div>
                 <div className="flex flex-wrap gap-2">
+                  <Badge variant="outline">{loading ? 'Chargement…' : remaining[s.step] == null ? 'Nombre indisponible' : `${remaining[s.step]?.toLocaleString('fr-FR')} destinataires restants`}</Badge>
                   <Badge className="border-primary/30 bg-primary/10 text-primary">{s.sent} envoyés</Badge>
                   <Badge variant="outline">{s.clicked} clics</Badge>
                   {s.failed > 0 && <Badge className="border-destructive/30 bg-destructive/10 text-destructive">{s.failed} en échec</Badge>}
