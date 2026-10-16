@@ -18,7 +18,7 @@ const STEPS: { step: number; template: string; title: string; when: string; targ
   { step: 3, template: 't16-derniere-chance-2026-10-16', title: 'Email 3 — Vous n’avez pas encore regardé ?', when: '20 oct. 2026' },
 ];
 
-type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; error_message: string | null; created_at: string };
+type LogRow = { message_id: string | null; id: string; template_name: string | null; recipient_email: string; status: string; last_event: string | null; error_message: string | null; created_at: string };
 type ClickRow = { prospect_email: string; template_name: string | null; clicked_at: string };
 
 export default function AdminLancementEmailsPage() {
