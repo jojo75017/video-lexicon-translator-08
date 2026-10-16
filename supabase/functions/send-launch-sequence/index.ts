@@ -43,6 +43,8 @@ interface LaunchEmail {
   header?: string;
   /** Paragrapes du corps (texte). Le CTA est inséré automatiquement. */
   paragraphs: string[];
+  /** Relances ciblées selon le comportement face à l'email 1. */
+  audience?: "clicked_t16a" | "not_clicked_t16a";
 }
 
 const LAUNCH_EMAILS: LaunchEmail[] = [
@@ -92,6 +94,40 @@ const LAUNCH_EMAILS: LaunchEmail[] = [
       "La nouvelle offre EbookStudio est ouverte, et beaucoup d'auteurs ont déjà commencé leur livre.",
       "Si vous avez une idée qui dort dans un coin de votre tête, c'est peut-être le bon moment. Un clic pour voir, sans aucun engagement.",
       "Et si vous avez une question, répondez simplement à cet email : je lis tout personnellement.",
+    ],
+  },
+  {
+    step: 4,
+    audience: "clicked_t16a",
+    template: "t17-niches-cliqueurs-2026-10-17",
+    shortKey: "t17a",
+    subject: "Vos 10 niches Amazon KDP offertes (débloquez-les ici)",
+    preheader: "Un cadeau pour vous remercier d'avoir regardé vendredi.",
+    ctaLabel: "Débloquer mes 10 niches",
+    goal: "Cliqueurs de l'email 1 : cadeau 10 niches",
+    header: "EbookStudio — votre cadeau",
+    paragraphs: [
+      "Vous avez jeté un œil à l'ouverture d'EbookStudio vendredi, et je voulais vous remercier pour votre intérêt.",
+      "Trouver la bonne idée de livre est souvent l'étape qui bloque tout le monde. Alors pour vous aider à démarrer concrètement, je vous offre 10 niches Amazon KDP sélectionnées pour vous.",
+      "Vous pouvez les utiliser pour :\n- Écrire un guide pratique ;\n- Positionner un ebook professionnel pour votre activité ;\n- Ou simplement lancer votre premier titre sur Amazon.",
+      "Votre cadeau vous attend en haut de la page :",
+    ],
+  },
+  {
+    step: 5,
+    audience: "not_clicked_t16a",
+    template: "t18-question-non-cliqueurs-2026-10-18",
+    shortKey: "t18a",
+    subject: "Une question rapide : quel est votre projet ?",
+    preheader: "Pour vous, pour transmettre, ou pour votre entreprise ?",
+    ctaLabel: "Découvrir ce que vous pouvez créer",
+    goal: "Non-cliqueurs de l'email 1 : levée d'objection",
+    header: "EbookStudio — une question",
+    paragraphs: [
+      "Vendredi, je vous annonçais l'ouverture de la nouvelle version d'EbookStudio, mais vous n'avez peut-être pas eu le temps d'y jeter un œil.",
+      "Je me posais une question toute simple : quel est votre projet ? Écrivez-vous pour vous, pour transmettre une histoire, ou pour votre entreprise ?",
+      "Beaucoup pensent qu'EbookStudio sert uniquement aux romans. En réalité, vous pouvez aussi :\n- Créer un livre pour votre entreprise ou votre marque ;\n- Rédiger un guide pour attirer des clients ;\n- Transmettre un savoir, une méthode ou votre parcours de vie.",
+      "Vous n'avez plus besoin de passer des mois devant une page blanche. Prenez deux minutes pour voir si cela correspond à votre projet :",
     ],
   },
 ];
@@ -286,6 +322,23 @@ Deno.serve(async (req) => {
       if (e) alreadySent.add(e);
     }
 
+    // --- Relances ciblées : comportement face à l'email 1. ---
+    const receivedT16a = new Set<string>();
+    const clickedT16a = new Set<string>();
+    if (email.audience) {
+      for (let offset = 0; ; offset += 1000) {
+        const { data: page } = await db.from("email_send_log").select("recipient_email,status")
+          .eq("template_name", "t16-ouverture-2026-10-16").range(offset, offset + 999);
+        for (const r of page || []) {
+          if (["sent", "delivered"].includes(String((r as any).status))) receivedT16a.add(String((r as any).recipient_email || "").toLowerCase());
+        }
+        if (!page || page.length < 1000) break;
+      }
+      const { data: c16 } = await db.from("email_clicks").select("prospect_email")
+        .eq("template_name", "t16-ouverture-2026-10-16").limit(20000);
+      for (const r of c16 || []) clickedT16a.add(String((r as any).prospect_email || "").toLowerCase());
+    }
+
     const seen = new Set<string>();
     const recipients: Recipient[] = [];
     for (const p of prospects || []) {
@@ -294,6 +347,9 @@ Deno.serve(async (req) => {
       if (exclude.has(raw)) continue;
       if (alreadySent.has(raw)) continue;
       if (seen.has(raw)) continue;
+      if (email.audience === "clicked_t16a" && !clickedT16a.has(raw)) continue;
+      if (email.audience === "not_clicked_t16a" && (!receivedT16a.has(raw) || clickedT16a.has(raw))) continue;
+      if (email.audience) { seen.add(raw); recipients.push({ email: raw, first_name: (p as any).first_name ?? null, source: String((p as any).source ?? "") }); continue; }
       if (segment === "hot" && !hot.has(raw)) continue;
       // Segment « non-cliqueurs » : jamais de clic identifié, jamais entré dans le tunnel.
       if (segment === "cold" && hot.has(raw)) continue;

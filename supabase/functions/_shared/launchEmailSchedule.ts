@@ -3,6 +3,8 @@ export const LAUNCH_EMAIL_DATES: Record<number, string> = {
   1: '2026-10-16',
   2: '2026-10-19',
   3: '2026-10-20',
+  4: '2026-10-17',
+  5: '2026-10-18',
 };
 
 export function parisCalendarDate(now = new Date()): string {

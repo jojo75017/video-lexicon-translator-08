@@ -10,8 +10,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { canSendLaunchEmail } from '../../../supabase/functions/_shared/launchEmailSchedule';
 
 /** Trois emails à des dates distinctes. */
-const STEPS = [
+const STEPS: { step: number; template: string; title: string; when: string; targeted?: boolean }[] = [
   { step: 1, template: 't16-ouverture-2026-10-16', title: 'Email 1 — C’est ouvert (16 oct. matin)', when: '16 oct.' },
+  { step: 4, template: 't17-niches-cliqueurs-2026-10-17', title: 'Relance A — 10 niches offertes (cliqueurs de l’email 1)', when: '17 oct. 2026', targeted: true },
+  { step: 5, template: 't18-question-non-cliqueurs-2026-10-18', title: 'Relance B — Quel est votre projet ? (non-cliqueurs)', when: '18 oct. 2026', targeted: true },
   { step: 2, template: 't16-livre-fini-2026-10-16', title: 'Email 2 — Le livre que vous repoussez', when: '19 oct. 2026' },
   { step: 3, template: 't16-derniere-chance-2026-10-16', title: 'Email 3 — Vous n’avez pas encore regardé ?', when: '20 oct. 2026' },
 ];
@@ -94,7 +96,7 @@ export default function AdminLancementEmailsPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="flex items-center gap-2 text-2xl font-bold"><Mail className="h-6 w-6 text-primary" /> Emails du tunnel du 16 octobre</h1>
-            <p className="text-sm text-muted-foreground">Email 1 : 16 octobre · Email 2 : 19 octobre · Email 3 : 20 octobre 2026.</p>
+            <p className="text-sm text-muted-foreground">Email 1 : 16 octobre · Relance A : 17 · Relance B : 18 · Email 2 : 19 octobre · Email 3 : 20 octobre 2026.</p>
           </div>
           <div className="flex items-center gap-2">
             <Badge variant="outline">{sentToday} envoyé(s) aujourd’hui</Badge>
@@ -125,6 +127,14 @@ export default function AdminLancementEmailsPage() {
                   {s.failed > 0 && <Badge className="border-destructive/30 bg-destructive/10 text-destructive">{s.failed} en échec</Badge>}
                 </div>
               </div>
+              {s.targeted ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button size="sm" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'all', 300)}>
+                  <Send className="mr-1.5 h-4 w-4" />
+                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 300 (groupe ciblé)'}
+                </Button>
+              </div>
+              ) : (
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'hot', 20)}>
                   <Send className="mr-1.5 h-4 w-4" />
@@ -143,6 +153,7 @@ export default function AdminLancementEmailsPage() {
                   {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 300'}
                 </Button>
               </div>
+              )}
             </Card>
           ))}
         </div>

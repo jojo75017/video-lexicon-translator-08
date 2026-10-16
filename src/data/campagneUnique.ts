@@ -103,6 +103,10 @@ export const SHORT_LINKS: Record<string, ShortLink> = {
   t16b: { key: 't16b', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t16&utm_content=livre', template: 't16-livre-fini-2026-10-16', label: 'Voir comment ça marche' },
   t16c: { key: 't16c', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t16&utm_content=rappel', template: 't16-derniere-chance-2026-10-16', label: 'Je regarde maintenant' },
 
+  /* Relances ciblées du week-end : cliqueurs (17/10) et non-cliqueurs (18/10). */
+  t17a: { key: 't17a', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t17&utm_content=niches-cadeau', template: 't17-niches-cliqueurs-2026-10-17', label: 'Débloquer mes 10 niches' },
+  t18a: { key: 't18a', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/page-de-vente-copy?utm_source=email&utm_medium=resend&utm_campaign=t18&utm_content=non-cliqueurs-question', template: 't18-question-non-cliqueurs-2026-10-18', label: 'Découvrir ce que vous pouvez créer' },
+
   /* Relance « grande nouveauté » du 8 octobre : bouton vers le tunnel Landaa. */
   nouv16: { key: 'nouv16', destination: 'https://ebookstudio-2026-offre-47.landaa.io/f/tunnel-de-vente/de-vente', template: 'grande-nouveaute-non-cliqueurs-2026-10-08', label: "Je m'inscris maintenant" },
 
