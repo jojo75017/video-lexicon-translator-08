@@ -19,3 +19,13 @@ describe('Calendrier des emails du tunnel', () => {
     expect(canSendLaunchEmail(2, new Date('2026-10-18T22:00:00Z'))).toBe(true);
   });
 });
+import { describe as d2, it as i2, expect as e2 } from 'vitest';
+import { canSendLaunchEmail as can } from '../../supabase/functions/_shared/launchEmailSchedule';
+d2('relances ciblées du week-end', () => {
+  i2('relance A (cliqueurs) uniquement le 17 octobre', () => {
+    e2([16, 17, 18].map((d) => can(4, new Date(`2026-10-${d}T09:00:00Z`)))).toEqual([false, true, false]);
+  });
+  i2('relance B (non-cliqueurs) uniquement le 18 octobre', () => {
+    e2([17, 18, 19].map((d) => can(5, new Date(`2026-10-${d}T09:00:00Z`)))).toEqual([false, true, false]);
+  });
+});
