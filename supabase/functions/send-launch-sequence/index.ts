@@ -362,6 +362,7 @@ Deno.serve(async (req) => {
       const raw = String((p as any).email || "").trim().toLowerCase();
       if (!raw || isInternalEmail(raw)) continue;
       if (exclude.has(raw)) continue;
+      if (deadEmails.has(raw)) continue;
       if (alreadySent.has(raw)) continue;
       if (seen.has(raw)) continue;
       if (email.audience === "clicked_t16a" && !clickedT16a.has(raw)) continue;
