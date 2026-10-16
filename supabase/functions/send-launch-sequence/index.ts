@@ -323,6 +323,22 @@ Deno.serve(async (req) => {
       if (e) alreadySent.add(e);
     }
 
+    // --- Adresses mortes : rebonds, plaintes spam ou bloquées par Resend. ---
+    // Elles ne doivent plus jamais recevoir d'email, quel que soit le segment.
+    const deadEmails = new Set<string>();
+    for (let offset = 0; ; offset += 1000) {
+      const { data: page } = await db.from("email_send_log").select("recipient_email,last_event,status")
+        .range(offset, offset + 999);
+      for (const r of page || []) {
+        const ev = String((r as any).last_event || "");
+        if (["suppressed", "bounced", "complained"].includes(ev) || String((r as any).status) === "error") {
+          const e = String((r as any).recipient_email || "").toLowerCase();
+          if (e) deadEmails.add(e);
+        }
+      }
+      if (!page || page.length < 1000) break;
+    }
+
     // --- Relances ciblées : comportement face à l'email 1. ---
     const receivedT16a = new Set<string>();
     const clickedT16a = new Set<string>();
@@ -346,6 +362,7 @@ Deno.serve(async (req) => {
       const raw = String((p as any).email || "").trim().toLowerCase();
       if (!raw || isInternalEmail(raw)) continue;
       if (exclude.has(raw)) continue;
+      if (deadEmails.has(raw)) continue;
       if (alreadySent.has(raw)) continue;
       if (seen.has(raw)) continue;
       if (email.audience === "clicked_t16a" && !clickedT16a.has(raw)) continue;
