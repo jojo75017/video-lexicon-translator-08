@@ -137,6 +137,7 @@
 - [ ] Renseigner le dossier JVZoo : lien https://ebookstudio.fr/connexion-abonne ; email et code du compte définitif après création. Accès au compte JVZoo indisponible ici, saisie à effectuer par Georges.
 
 ## Emails du tunnel du 16 octobre
+- [x] Afficher le nombre restant pour chaque email et ajouter 29 nouveaux contacts du CSV sans doublons ni réactivation des désinscrits, sans envoi.
 - [x] Retirer les anciens emails de lancement et préparer 3 nouveaux messages vers le tunnel Landaa (lien suivi, utm conservés).
 - [x] Premier lot de 100 envoyé le 16/10 sur autorisation de Georges (tour précédent).
 - [x] Fixer les dates au 16/19/20 octobre 2026 et bloquer les envois hors date, sans automatisation.

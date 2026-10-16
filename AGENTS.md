@@ -15,7 +15,7 @@
 - The V3 home page exposes “Commence ici” as the primary subscriber entry point, so users reach specialist selection without searching through tools.
 - V3 specialist cards use a shared editorial-android portrait set through `AgentPortrait`, so the team stays visually consistent with Hector and Margaux.
 - “Écrire un livre” uses the dedicated `/v3/lancer` direct-writing flow, while “Je raconte un livre” uses `/v3/create`, so their steps never appear identical.
-- Launch email eligibility shares a Paris-date guard between the admin page and sending function, so manual requests cannot bypass the calendar.
+- Launch emails share a Paris-date guard; audience counters use the sending function's status mode to preserve exclusions.
 - The authenticated V3 home excludes acquisition content and groups every paid add-on after the useful studio sections, so subscribers see a workspace overview before optional purchases.
 - The header library loads ownership-filtered metadata through a security-invoker function, excluding manuscript bodies and embedded image blobs to prevent timeouts without weakening RLS.
 - The legacy /v3/hub page is admin-only via V3HubAdminOnly, redirecting clients to the equivalent current page so old links never expose the technical workshop.
