@@ -219,7 +219,7 @@ Deno.serve(async (req) => {
       return respond({ error: `L’email ${stepNum} peut être envoyé uniquement le ${LAUNCH_EMAIL_DATES[stepNum]} (heure de Paris).`, scheduled_date: LAUNCH_EMAIL_DATES[stepNum] }, 409);
     }
     const segment = String(body.segment || "hot"); // hot | all | cold | personal
-    const limit = Math.max(1, Math.min(100, Number(body.limit) || 100));
+    const limit = Math.max(1, Math.min(300, Number(body.limit) || 300));
     // Pour test : rediriger tous les envois vers une seule adresse.
     const overrideTestTo = typeof body.overrideTestTo === "string" && /.+@.+\..+/.test(body.overrideTestTo)
       ? body.overrideTestTo.trim().toLowerCase()

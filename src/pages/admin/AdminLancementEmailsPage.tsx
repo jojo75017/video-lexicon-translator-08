@@ -106,7 +106,7 @@ export default function AdminLancementEmailsPage() {
         </div>
 
         <p className="mb-4 rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground">
-          100 emails maximum par jour, tous messages confondus. Envois manuels uniquement aux dates prévues (heure de Paris). Les clients, désinscrits et doublons sont exclus.
+          Envois par groupes de 300 maximum. Envois manuels uniquement aux dates prévues (heure de Paris). Les clients, désinscrits et doublons sont exclus.
         </p>
 
 
@@ -130,17 +130,17 @@ export default function AdminLancementEmailsPage() {
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-hot` ? 'Envoi…' : 'Envoyer aux plus engagés'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'cold', 100)}>
+                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'cold', 300)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-cold` ? 'Envoi…' : 'Envoyer aux non-cliqueurs'}
                 </Button>
-                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'personal', 100)}>
+                <Button size="sm" variant="outline" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'personal', 300)}>
                   <Send className="mr-1.5 h-4 w-4" />
                   {sending === `${s.step}-personal` ? 'Envoi…' : 'Adresses personnelles'}
                 </Button>
-                <Button size="sm" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'all', 100)}>
+                <Button size="sm" disabled={sending !== null || !canSendLaunchEmail(s.step)} onClick={() => runSend(s.step, 'all', 300)}>
                   <Send className="mr-1.5 h-4 w-4" />
-                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 100'}
+                  {sending === `${s.step}-all` ? 'Envoi…' : 'Envoyer un lot de 300'}
                 </Button>
               </div>
             </Card>
