@@ -4,6 +4,7 @@ import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/ema
 import { SITE_ORIGIN } from "../_shared/checkoutUrl.ts";
 import { FROM_CAMPAIGN, REPLY_TO, DIRECT_EMAIL } from "../_shared/emailIdentity.ts";
 import { canSendLaunchEmail, LAUNCH_EMAIL_DATES } from "../_shared/launchEmailSchedule.ts";
+import { launchEmailBatchLimit } from "../_shared/launchEmailBatch.ts";
 
 /**
  * Séquence de lancement V3 (calée sur le 1er octobre 2026).
@@ -219,7 +220,7 @@ Deno.serve(async (req) => {
       return respond({ error: `L’email ${stepNum} peut être envoyé uniquement le ${LAUNCH_EMAIL_DATES[stepNum]} (heure de Paris).`, scheduled_date: LAUNCH_EMAIL_DATES[stepNum] }, 409);
     }
     const segment = String(body.segment || "hot"); // hot | all | cold | personal
-    const limit = Math.max(1, Math.min(300, Number(body.limit) || 300));
+    const limit = launchEmailBatchLimit(body.limit);
     // Pour test : rediriger tous les envois vers une seule adresse.
     const overrideTestTo = typeof body.overrideTestTo === "string" && /.+@.+\..+/.test(body.overrideTestTo)
       ? body.overrideTestTo.trim().toLowerCase()
