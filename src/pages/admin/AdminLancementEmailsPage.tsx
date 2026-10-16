@@ -33,7 +33,7 @@ export default function AdminLancementEmailsPage() {
     setLoading(true);
     const templates = STEPS.map((s) => s.template);
     const [logRes, clickRes, audienceRes] = await Promise.all([
-      (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).limit(2000),
+      (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,last_event,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).limit(2000),
       (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(2000),
       Promise.all(STEPS.map(async ({ step }) => {
         const { data, error } = await supabase.functions.invoke('send-launch-sequence', {
@@ -62,7 +62,7 @@ export default function AdminLancementEmailsPage() {
 
   const perStep = useMemo(() => STEPS.map((s) => {
     const rows = latest.filter((r) => r.template_name === s.template);
-    const failed = rows.filter((r) => ['failed', 'dlq', 'bounced', 'complained'].includes(r.status)).length;
+    const failed = rows.filter((r) => ['failed', 'dlq', 'bounced', 'complained', 'error'].includes(r.status) || ['suppressed', 'bounced', 'complained'].includes(r.last_event || '')).length;
     const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email)).size;
     return { ...s, total: rows.length, sent: rows.filter((r) => ['sent', 'delivered'].includes(r.status)).length, failed, clicked };
   }), [latest, clicks]);
