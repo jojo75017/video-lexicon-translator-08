@@ -124,13 +124,18 @@ const PaymentSuccessPage = () => {
             )}
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-black mb-3">
-            {ok ? "🎉 Bienvenue dans Ebookstudio Pro V2 !" : "Activation en attente"}
+            {ok ? `🎉 Bienvenue dans ${planDef?.name || "EbookStudio"} !` : "Activation en attente"}
           </h1>
           <p className="text-lg text-black/60">
             {ok
-              ? "Ton paiement est confirmé. Voici comment démarrer en 3 étapes."
+              ? `Ton paiement est confirmé${planDef ? ` (${planDef.label})` : ""}. Voici comment démarrer en 3 étapes.`
               : "On n'a pas pu activer automatiquement ton accès pour le moment."}
           </p>
+          {ok && (
+            <p className="mx-auto mt-3 max-w-xl rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm text-black/70">
+              📧 Tu vas recevoir tes accès par email d'ici <strong>quelques minutes</strong> — 24 heures au maximum.
+            </p>
+          )}
         </div>
 
         {ok && result?.email && result?.accessCode ? (
