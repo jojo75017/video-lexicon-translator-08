@@ -85,12 +85,18 @@ export default function AdminLancementEmailsPage() {
     });
   }, [logs]);
 
+  const pct = (n: number, d: number) => (d > 0 ? `${((n / d) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %` : '—');
+
   const perStep = useMemo(() => STEPS.map((s) => {
     const rows = latest.filter((r) => r.template_name === s.template);
-    const failed = rows.filter((r) => ['failed', 'dlq', 'bounced', 'complained', 'error'].includes(r.status) || ['suppressed', 'bounced', 'complained'].includes(r.last_event || '')).length;
-    const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email)).size;
-    return { ...s, total: rows.length, sent: rows.filter((r) => ['sent', 'delivered'].includes(r.status)).length, failed, clicked };
-  }), [latest, clicks]);
+    const isFailed = (r: LogRow) => ['failed', 'dlq', 'bounced', 'complained', 'error'].includes(r.status) || ['suppressed', 'bounced', 'complained'].includes(r.last_event || '');
+    const failed = rows.filter(isFailed).length;
+    const okEmails = new Set(rows.filter((r) => !isFailed(r)).map((r) => r.recipient_email.toLowerCase()));
+    const opened = new Set(rows.filter((r) => ['opened', 'clicked'].includes(r.last_event || '')).map((r) => r.recipient_email.toLowerCase())).size;
+    const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email.toLowerCase()).filter((e) => okEmails.has(e) || rows.some((r) => r.recipient_email.toLowerCase() === e))).size;
+    const unsubscribed = [...okEmails].filter((e) => unsubs.has(e)).length;
+    return { ...s, total: rows.length, sent: rows.filter((r) => ['sent', 'delivered'].includes(r.status)).length, failed, clicked, opened, unsubscribed, recipients: okEmails.size };
+  }), [latest, clicks, unsubs]);
 
   const sentToday = useMemo(() => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -156,7 +162,9 @@ export default function AdminLancementEmailsPage() {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline">{loading ? 'Chargement…' : remaining[s.step] == null ? 'Nombre indisponible' : `${remaining[s.step]?.toLocaleString('fr-FR')} destinataires restants`}</Badge>
                   <Badge className="border-primary/30 bg-primary/10 text-primary">{s.sent} envoyés</Badge>
-                  <Badge variant="outline">{s.clicked} clics</Badge>
+                  <Badge variant="outline">{s.opened} ouvertures · {pct(s.opened, s.recipients)}</Badge>
+                  <Badge variant="outline">{s.clicked} cliqueurs · {pct(s.clicked, s.recipients)}</Badge>
+                  <Badge variant="outline">{s.unsubscribed} désinscrits · {pct(s.unsubscribed, s.recipients)}</Badge>
                   {s.failed > 0 && <Badge className="border-destructive/30 bg-destructive/10 text-destructive">{s.failed} en échec</Badge>}
                 </div>
               </div>
