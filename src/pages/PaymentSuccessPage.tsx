@@ -12,7 +12,18 @@ type VerifyResult = {
   email?: string;
   accessCode?: string;
   subscriber?: any;
+  pending?: boolean;
+  packPlan?: string;
   error?: string;
+};
+
+// Offres du tunnel /paiement-offre : affichage adapté à la formule achetée.
+const PLANS: Record<string, { name: string; label: string; amount: number }> = {
+  starter27_1x: { name: "EbookStudio Starter", label: "27 € à vie", amount: 27 },
+  auteur97_1x: { name: "EbookStudio Auteur", label: "97 € par an", amount: 97 },
+  edition247_1x: { name: "EbookStudio Édition", label: "497 € à vie", amount: 497 },
+  edition247_3x: { name: "EbookStudio Édition", label: "497 € à vie (en 3 fois)", amount: 497 },
+  edition247_6x: { name: "EbookStudio Édition", label: "497 € à vie (en 6 fois)", amount: 497 },
 };
 
 const PaymentSuccessPage = () => {
@@ -22,6 +33,7 @@ const PaymentSuccessPage = () => {
   const [result, setResult] = useState<VerifyResult | null>(null);
 
   const sessionId = searchParams.get("session_id") || "";
+  const planDef = PLANS[searchParams.get("plan") || ""];
 
   const safeSessionId = useMemo(() => sessionId.trim(), [sessionId]);
 
@@ -56,7 +68,7 @@ const PaymentSuccessPage = () => {
         if (payload?.ok && payload.email && payload.subscriber) {
           localStorage.setItem("subscriber_email", payload.email);
           localStorage.setItem("subscriber_data", JSON.stringify(payload.subscriber));
-          trackPurchase(payload.subscriber?.plan_tier || 'pro', 67);
+          trackPurchase(payload.subscriber?.plan_tier || planDef?.name || "pro", planDef?.amount ?? 67);
         }
       } catch (e: any) {
         if (cancelled) return;
@@ -112,13 +124,18 @@ const PaymentSuccessPage = () => {
             )}
           </div>
           <h1 className="text-4xl md:text-5xl font-black text-black mb-3">
-            {ok ? "🎉 Bienvenue dans Ebookstudio Pro V2 !" : "Activation en attente"}
+            {ok ? `🎉 Bienvenue dans ${planDef?.name || "EbookStudio"} !` : "Activation en attente"}
           </h1>
           <p className="text-lg text-black/60">
             {ok
-              ? "Ton paiement est confirmé. Voici comment démarrer en 3 étapes."
+              ? `Ton paiement est confirmé${planDef ? ` (${planDef.label})` : ""}. Voici comment démarrer en 3 étapes.`
               : "On n'a pas pu activer automatiquement ton accès pour le moment."}
           </p>
+          {ok && (
+            <p className="mx-auto mt-3 max-w-xl rounded-lg border border-orange-200 bg-orange-50 px-4 py-2 text-sm text-black/70">
+              📧 Tu vas recevoir tes accès par email d'ici <strong>quelques minutes</strong> — 24 heures au maximum.
+            </p>
+          )}
         </div>
 
         {ok && result?.email && result?.accessCode ? (
@@ -147,7 +164,7 @@ const PaymentSuccessPage = () => {
                   </div>
                 </div>
                 <p className="text-xs text-black/50 mt-3">
-                  💡 On vient de t'envoyer ce code par email. Si tu ne le reçois pas dans 2 min, vérifie tes spams.
+                  💡 On vient de t'envoyer ce code par email. Si tu ne le reçois pas sous quelques minutes (24 h maximum), vérifie tes spams.
                 </p>
               </CardContent>
             </Card>
