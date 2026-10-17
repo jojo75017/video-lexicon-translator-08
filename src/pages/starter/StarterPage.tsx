@@ -13,7 +13,7 @@ import { getNiches5Pack, NICHES_5_LEAD_MAGNET, readNiches5Email, rememberNiches5
 
 export const STARTER_PRIX = 27;
 /** Passe à true seulement après validation explicite de Georges. */
-export const STARTER_VENTE_OUVERTE = false;
+export const STARTER_VENTE_OUVERTE = true;
 
 const INCLUS = [
   '✍️ La rédaction guidée de votre livre en français : titre, plan et chapitres',
@@ -101,9 +101,13 @@ export default function StarterPage() {
             <p className="text-sm text-muted-foreground line-through">Valeur 97 €</p>
             <p className="text-4xl font-bold text-primary">{STARTER_PRIX} € à vie</p>
             <p className="mt-1 text-sm text-muted-foreground">Moins cher qu’un restaurant, pour un livre qui porte votre nom.</p>
-            <Button size="lg" className="mt-5 w-full md:w-auto" disabled={!STARTER_VENTE_OUVERTE}>
-              {STARTER_VENTE_OUVERTE ? `👉 Je crée mon premier livre pour ${STARTER_PRIX} €` : <><Lock className="mr-2 h-4 w-4" />Ouverture prochainement</>}
-            </Button>
+            {STARTER_VENTE_OUVERTE ? (
+              <Button asChild size="lg" className="mt-5 w-full md:w-auto">
+                <Link to={`/paiement-offre?plan=starter27_1x${readNiches5Email() ? `&email=${encodeURIComponent(readNiches5Email() as string)}` : ''}`}>👉 Je crée mon premier livre pour {STARTER_PRIX} €</Link>
+              </Button>
+            ) : (
+              <Button size="lg" className="mt-5 w-full md:w-auto" disabled><Lock className="mr-2 h-4 w-4" />Ouverture prochainement</Button>
+            )}
             <p className="mt-3 text-xs text-muted-foreground">Paiement unique et sécurisé • Aucun abonnement caché • Garantie satisfait ou remboursé 14 jours</p>
           </div>
         </section>

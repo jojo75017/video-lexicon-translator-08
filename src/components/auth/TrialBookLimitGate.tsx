@@ -14,7 +14,8 @@ import { Button } from "@/components/ui/button";
  * - Essai terminé : création bloquée (le livre existant reste en lecture seule).
  */
 export function TrialBookLimitGate({ children }: { children: ReactNode }) {
-  const { loading, isTrial, isExpired } = useTrialAccess();
+  const { loading, isTrial: trialRaw, isStarter, isExpired } = useTrialAccess();
+  const isTrial = trialRaw && !isStarter;
   const { isAdmin, isChecking } = useAdminAccess();
   const [counting, setCounting] = useState(true);
   const [bookCount, setBookCount] = useState(0);

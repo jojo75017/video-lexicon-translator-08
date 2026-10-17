@@ -265,7 +265,24 @@ async function grantEdition247(email: string, sessionId: string, env: StripeEnv)
   return code;
 }
 
+// Offre Starter 27 € : accès limité à vie. Ne remplace jamais un accès existant plus large.
+async function grantStarter(email: string) {
+  const supabase = getSupabase();
+  const { data: existing } = await supabase.from("subscribers")
+    .select("access_code, plan_tier, status").eq("email", email).maybeSingle();
+  const accessCode = existing?.access_code || generateAccessCode();
+  const tier = String(existing?.plan_tier ?? "").toLowerCase();
+  const status = String(existing?.status ?? "").toLowerCase();
+  if (existing && tier !== "essai" && tier !== "starter" && (status === "active" || status === "lifetime")) return accessCode;
+  await supabase.from("subscribers").upsert({
+    email, access_code: accessCode, status: "active",
+    plan_type: "starter", plan_tier: "starter", expires_at: null, trial_ends_at: null,
+  }, { onConflict: "email" });
+  return accessCode;
+}
+
 async function grantForPlan(plan: string, email: string, sessionId: string, env: StripeEnv) {
+  if (plan.startsWith("starter27_")) return grantStarter(email);
   if (plan.startsWith("auteur97_")) return grantV3Annual(email);
   if (plan.startsWith("edition247_")) return grantEdition247(email, sessionId, env);
   return grantV3Lifetime(email);
@@ -412,7 +429,7 @@ async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
     if (email) accessCode = await grantForPlan(plan, email, session.id, env);
   }
 
-  if (email && plan.startsWith("edition247_")) {
+  if (email && (plan.startsWith("edition247_") || plan.startsWith("starter27_"))) {
     await sendLifetimeAccessEmail(email, String(session.metadata?.plan_label || plan), accessCode);
   }
   if (email && isV2Lifetime) {
