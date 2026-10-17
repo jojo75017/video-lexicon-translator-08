@@ -29,6 +29,7 @@ export default function AdminLancementEmailsPage() {
   const [sending, setSending] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<Record<number, number | null>>({});
   const [base, setBase] = useState<{ total?: number; bounced?: number; unsub?: number; inactif?: number }>({});
+  const [unsubs, setUnsubs] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -45,9 +46,19 @@ export default function AdminLancementEmailsPage() {
       count((q) => q.eq('unsubscribed', true)),
       count((q) => q.eq('status', 'inactif')),
     ]).then(([total, bounced, unsub, inactif]) => setBase({ total, bounced, unsub, inactif }));
-    const [logRes, clickRes, audienceRes] = await Promise.all([
-      (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,last_event,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).limit(2000),
-      (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(2000),
+    const fetchLogs = async () => {
+      const all: LogRow[] = [];
+      for (let offset = 0; offset < 20000; offset += 1000) {
+        const { data } = await (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,last_event,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).range(offset, offset + 999);
+        all.push(...(data || []));
+        if (!data || data.length < 1000) break;
+      }
+      return all;
+    };
+    const [logData, clickRes, unsubRes, audienceRes] = await Promise.all([
+      fetchLogs(),
+      (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(5000),
+      (supabase as any).from('sales_prospects').select('email').eq('unsubscribed', true).limit(5000),
       Promise.all(STEPS.map(async ({ step }) => {
         const { data, error } = await supabase.functions.invoke('send-launch-sequence', {
           body: { mode: 'status', step, segment: 'all' },
@@ -55,8 +66,9 @@ export default function AdminLancementEmailsPage() {
         return [step, !error && typeof data?.total_eligible === 'number' ? data.total_eligible : null] as const;
       })),
     ]);
-    setLogs((logRes.data || []) as LogRow[]);
+    setLogs(logData);
     setClicks((clickRes.data || []) as ClickRow[]);
+    setUnsubs(new Set(((unsubRes.data || []) as { email: string }[]).map((r) => r.email.toLowerCase())));
     setRemaining(Object.fromEntries(audienceRes));
     setLoading(false);
   }, []);
@@ -73,12 +85,18 @@ export default function AdminLancementEmailsPage() {
     });
   }, [logs]);
 
+  const pct = (n: number, d: number) => (d > 0 ? `${((n / d) * 100).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} %` : '—');
+
   const perStep = useMemo(() => STEPS.map((s) => {
     const rows = latest.filter((r) => r.template_name === s.template);
-    const failed = rows.filter((r) => ['failed', 'dlq', 'bounced', 'complained', 'error'].includes(r.status) || ['suppressed', 'bounced', 'complained'].includes(r.last_event || '')).length;
-    const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email)).size;
-    return { ...s, total: rows.length, sent: rows.filter((r) => ['sent', 'delivered'].includes(r.status)).length, failed, clicked };
-  }), [latest, clicks]);
+    const isFailed = (r: LogRow) => ['failed', 'dlq', 'bounced', 'complained', 'error'].includes(r.status) || ['suppressed', 'bounced', 'complained'].includes(r.last_event || '');
+    const failed = rows.filter(isFailed).length;
+    const okEmails = new Set(rows.filter((r) => !isFailed(r)).map((r) => r.recipient_email.toLowerCase()));
+    const opened = new Set(rows.filter((r) => ['opened', 'clicked'].includes(r.last_event || '')).map((r) => r.recipient_email.toLowerCase())).size;
+    const clicked = new Set(clicks.filter((c) => c.template_name === s.template).map((c) => c.prospect_email.toLowerCase()).filter((e) => okEmails.has(e) || rows.some((r) => r.recipient_email.toLowerCase() === e))).size;
+    const unsubscribed = [...okEmails].filter((e) => unsubs.has(e)).length;
+    return { ...s, total: rows.length, sent: rows.filter((r) => ['sent', 'delivered'].includes(r.status)).length, failed, clicked, opened, unsubscribed, recipients: okEmails.size };
+  }), [latest, clicks, unsubs]);
 
   const sentToday = useMemo(() => {
     const start = new Date(); start.setHours(0, 0, 0, 0);
@@ -144,7 +162,9 @@ export default function AdminLancementEmailsPage() {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="outline">{loading ? 'Chargement…' : remaining[s.step] == null ? 'Nombre indisponible' : `${remaining[s.step]?.toLocaleString('fr-FR')} destinataires restants`}</Badge>
                   <Badge className="border-primary/30 bg-primary/10 text-primary">{s.sent} envoyés</Badge>
-                  <Badge variant="outline">{s.clicked} clics</Badge>
+                  <Badge variant="outline">{s.opened} ouvertures · {pct(s.opened, s.recipients)}</Badge>
+                  <Badge variant="outline">{s.clicked} cliqueurs · {pct(s.clicked, s.recipients)}</Badge>
+                  <Badge variant="outline">{s.unsubscribed} désinscrits · {pct(s.unsubscribed, s.recipients)}</Badge>
                   {s.failed > 0 && <Badge className="border-destructive/30 bg-destructive/10 text-destructive">{s.failed} en échec</Badge>}
                 </div>
               </div>
@@ -189,6 +209,7 @@ export default function AdminLancementEmailsPage() {
                   <th className="px-3 py-2">Destinataire</th>
                   <th className="px-3 py-2">Date</th>
                   <th className="px-3 py-2">État</th>
+                  <th className="px-3 py-2">Ouvert</th>
                 </tr>
               </thead>
               <tbody>
@@ -203,11 +224,12 @@ export default function AdminLancementEmailsPage() {
                         <Badge className={failed ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-primary/30 bg-primary/10 text-primary'}>{row.status}</Badge>
                         {row.error_message && <p className="mt-1 max-w-xs text-xs text-destructive">{row.error_message}</p>}
                       </td>
+                      <td className="px-3 py-2">{['opened', 'clicked'].includes(row.last_event || '') ? 'Oui' : '—'}</td>
                     </tr>
                   );
                 })}
                 {!loading && latest.length === 0 && (
-                  <tr><td colSpan={4} className="px-3 py-10 text-center text-muted-foreground">Aucun envoi pour l’instant.</td></tr>
+                  <tr><td colSpan={5} className="px-3 py-10 text-center text-muted-foreground">Aucun envoi pour l’instant.</td></tr>
                 )}
               </tbody>
             </table>
