@@ -29,3 +29,4 @@
 - Dark homepage feature panels show access information immediately below their titles, separating included workflows from paid extensions through the shared access badge without changing permissions.
 - New-customer offers (Auteur yearly, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), so historical 47 € and subscription rights stay untouched.
 - JVZoo sales enter through the jvzoo-ipn function (JVZIPN v2 cverify, product filter, unique event key) and only grant or revoke Auteur rights JVZoo itself created, so Stripe and other rights are never overwritten.
+- EbookStudio Starter uses plan_tier/plan_type 'starter' and reuses the trial locks (useTrialAccess.isStarter) without watermark or book limit, so it never inherits legacy V2, lifetime or Pro rights.
