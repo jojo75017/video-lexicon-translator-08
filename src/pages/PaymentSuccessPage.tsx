@@ -12,7 +12,18 @@ type VerifyResult = {
   email?: string;
   accessCode?: string;
   subscriber?: any;
+  pending?: boolean;
+  packPlan?: string;
   error?: string;
+};
+
+// Offres du tunnel /paiement-offre : affichage adapté à la formule achetée.
+const PLANS: Record<string, { name: string; label: string; amount: number }> = {
+  starter27_1x: { name: "EbookStudio Starter", label: "27 € à vie", amount: 27 },
+  auteur97_1x: { name: "EbookStudio Auteur", label: "97 € par an", amount: 97 },
+  edition247_1x: { name: "EbookStudio Édition", label: "497 € à vie", amount: 497 },
+  edition247_3x: { name: "EbookStudio Édition", label: "497 € à vie (en 3 fois)", amount: 497 },
+  edition247_6x: { name: "EbookStudio Édition", label: "497 € à vie (en 6 fois)", amount: 497 },
 };
 
 const PaymentSuccessPage = () => {
@@ -22,6 +33,7 @@ const PaymentSuccessPage = () => {
   const [result, setResult] = useState<VerifyResult | null>(null);
 
   const sessionId = searchParams.get("session_id") || "";
+  const planDef = PLANS[searchParams.get("plan") || ""];
 
   const safeSessionId = useMemo(() => sessionId.trim(), [sessionId]);
 
