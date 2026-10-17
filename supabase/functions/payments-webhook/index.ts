@@ -303,7 +303,7 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string, accessC
   if (!RESEND_API_KEY) return;
   const html = `
   <div style="font-family:Inter,Arial,sans-serif;max-width:560px;margin:0 auto;color:#232F3E;background:#FAFAFA;padding:24px;border-radius:12px">
-    <h1 style="color:#008296">🎉 Bienvenue dans EbookStudio Pro</h1>
+    <h1 style="color:#008296">🎉 Bienvenue dans EbookStudio</h1>
     <p>Bonjour,</p>
     <p>Votre paiement est confirmé (<strong>${planLabel}</strong>).</p>
     <p><strong>Votre accès à vie est actif — aucun abonnement, aucune date d'expiration.</strong></p>
@@ -325,7 +325,7 @@ async function sendLifetimeAccessEmail(email: string, planLabel: string, accessC
       body: JSON.stringify({
         from: "EbookStudio <noreply@ebookstudio.fr>",
         to: [email],
-        subject: "🎉 Votre accès à vie EbookStudio Pro est actif",
+        subject: "🎉 Votre accès à vie EbookStudio est actif",
         html,
       }),
     });
