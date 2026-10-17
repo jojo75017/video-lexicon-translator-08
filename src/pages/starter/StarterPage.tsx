@@ -1,7 +1,7 @@
 // Tunnel EbookStudio Starter — /starter : capture (5 niches offertes) puis offre 27 € à vie.
 // Présentation seulement : la vente n'est pas ouverte tant que Georges ne l'a pas validée.
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Check, Loader2, ShieldCheck, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,17 @@ const INCLUS = [
   '♾️ L’accès à vie : vous payez une fois, l’outil reste à vous',
 ];
 
-export default function StarterPage() {
+export default function StarterPage({ offerOnly = false }: { offerOnly?: boolean }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const offersUrl = `/lancement/offres${location.search}`;
+  const paymentUrl = (plan: string) => {
+    const params = new URLSearchParams(location.search);
+    params.set("plan", plan);
+    const capturedEmail = readNiches5Email();
+    if (capturedEmail) params.set("email", capturedEmail);
+    return `/paiement-offre?${params.toString()}`;
+  };
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [loading, setLoading] = useState(false);
@@ -35,7 +45,7 @@ export default function StarterPage() {
   usePageMeta({
     title: 'EbookStudio Starter — votre livre pour 27 € à vie',
     description: '5 niches Amazon offertes, puis EbookStudio Starter : rédaction guidée, sommaire, export Word et PDF, 27 € une seule fois.',
-    canonical: 'https://ebookstudio.fr/starter',
+    canonical: `https://ebookstudio.fr${offerOnly ? '/lancement/offres' : '/lancement'}`,
   });
 
   useEffect(() => { void trackCaptureEvent('lancement', 'page_view', { leadMagnet: NICHES_5_LEAD_MAGNET }); }, []);
@@ -52,20 +62,22 @@ export default function StarterPage() {
       rememberNiches5Email(email);
       void trackCaptureEvent('lancement', 'email_captured', { leadMagnet: NICHES_5_LEAD_MAGNET });
       setInscrit(true);
+      navigate(offersUrl);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
       toast.error('Enregistrement impossible pour le moment. Réessayez dans un instant.');
     } finally { setLoading(false); }
   };
 
-  if (!inscrit) {
+  if (!offerOnly && !inscrit) {
     return (
       <main className="min-h-screen bg-background px-4 py-12 text-foreground md:py-20">
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 md:items-start">
           <div>
             <span className="inline-block rounded-full bg-primary/10 px-4 py-1 text-sm font-semibold text-primary">🎁 5 niches Amazon offertes</span>
-            <h1 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">Trouvez le sujet de votre premier livre en 5 minutes</h1>
+            <h1 className="mt-5 text-3xl font-bold leading-tight md:text-5xl">EbookStudio Starter — écrivez votre premier livre</h1>
             <p className="mt-5 text-lg text-muted-foreground">Recevez 5 niches qui vendent sur Amazon KDP, tirées de notre base de 600 niches, avec le mot-clé à viser pour chacune.</p>
+            <p className="mt-4 text-xl font-semibold text-primary">27 € à vie · Export Word et PDF inclus</p>
             <ul className="mt-8 space-y-3">
               {['Une niche par grande catégorie qui vend', 'Le mot-clé Amazon à viser', 'Le niveau de concurrence', 'Un angle de livre conseillé'].map((b) => (
                 <li key={b} className="flex gap-3"><Check className="mt-0.5 h-5 w-5 shrink-0 text-primary" /><span>{b}</span></li>
@@ -81,6 +93,8 @@ export default function StarterPage() {
                 {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Je reçois mes 5 niches
               </Button>
             </form>
+            <Button asChild variant="outline" className="mt-4 w-full"><Link to={offersUrl}>Découvrir directement Starter à 27 €</Link></Button>
+            <p className="mt-4 text-center text-sm"><Link to="/connexion-abonne" className="text-primary underline">Déjà client ? Me connecter</Link></p>
             <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="h-4 w-4" />Aucune carte demandée. Désinscription en un clic.</p>
           </div>
         </div>
@@ -91,37 +105,38 @@ export default function StarterPage() {
   return (
     <main className="min-h-screen bg-background px-4 py-10 text-foreground">
       <div className="mx-auto max-w-3xl">
-        <p className="rounded-lg bg-primary/10 p-3 text-center font-semibold text-primary">✅ C’est noté ! Vos 5 niches offertes sont juste en dessous.</p>
-        <h1 className="mt-8 text-center text-3xl font-bold md:text-4xl">Vous avez vos niches. Il ne vous manque plus que le livre.</h1>
+        {inscrit && <p className="rounded-lg bg-primary/10 p-3 text-center font-semibold text-primary">✅ C’est noté ! Vos 5 niches offertes sont juste en dessous.</p>}
+        <h1 className="mt-8 text-center text-3xl font-bold md:text-4xl">EbookStudio Starter — votre premier livre pour 27 € à vie</h1>
         <p className="mt-4 text-center text-lg text-muted-foreground">Avec <strong>EbookStudio Starter</strong>, transformez une de ces niches en livre complet, prêt à publier, pour <strong>{STARTER_PRIX} € une seule fois</strong>. Accès à vie, sans abonnement.</p>
 
         <section className="mt-8 rounded-2xl border bg-card p-6 shadow-lg">
           <ul className="space-y-2">{INCLUS.map((i) => <li key={i}>{i}</li>)}</ul>
           <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground line-through">Valeur 97 €</p>
+
             <p className="text-4xl font-bold text-primary">{STARTER_PRIX} € à vie</p>
             <p className="mt-1 text-sm text-muted-foreground">Moins cher qu’un restaurant, pour un livre qui porte votre nom.</p>
             {STARTER_VENTE_OUVERTE ? (
               <Button asChild size="lg" className="mt-5 w-full md:w-auto">
-                <Link to={`/paiement-offre?plan=starter27_1x${readNiches5Email() ? `&email=${encodeURIComponent(readNiches5Email() as string)}` : ''}`}>👉 Je crée mon premier livre pour {STARTER_PRIX} €</Link>
+                <Link to={paymentUrl("starter27_1x")}>👉 Je crée mon premier livre pour {STARTER_PRIX} €</Link>
               </Button>
             ) : (
               <Button size="lg" className="mt-5 w-full md:w-auto" disabled><Lock className="mr-2 h-4 w-4" />Ouverture prochainement</Button>
             )}
-            <p className="mt-3 text-xs text-muted-foreground">Paiement unique et sécurisé • Aucun abonnement caché • Garantie satisfait ou remboursé 14 jours</p>
+            <p className="mt-3 text-xs text-muted-foreground">Paiement unique et sécurisé • Aucun abonnement caché</p>
           </div>
         </section>
 
-        <section className="mt-8 rounded-2xl border p-6">
+        <section className="mt-8 border-y py-6">
           <h2 className="text-xl font-bold">Et ensuite ?</h2>
           <p className="mt-2 text-muted-foreground">Quand vous voudrez aller plus loin, vous pourrez débloquer en un clic :</p>
           <ul className="mt-3 space-y-2">
             <li>📚 <strong>Cover Studio Pro (47 €)</strong> : la couverture brochée complète, dos et quatrième, pour Amazon KDP</li>
             <li>🚀 <strong>Plan Auteur (97 €/an)</strong> : les 15 spécialistes IA, toutes les couvertures et la suite complète</li>
           </ul>
+          <div className="mt-5 flex flex-wrap gap-3"><Button asChild variant="outline"><Link to={`/v3/cover-pro${location.search}`}>Découvrir Cover Studio Pro</Link></Button><Button asChild><Link to={paymentUrl("auteur97_1x")}>Passer au plan Auteur · 97 €/an</Link></Button></div>
         </section>
 
-        <section className="mt-8">
+        {inscrit ? <section className="mt-8">
           <h2 className="text-2xl font-bold">🎁 Vos 5 niches offertes</h2>
           <div className="mt-4 grid gap-4">
             {niches.map((n) => (
@@ -133,7 +148,7 @@ export default function StarterPage() {
               </article>
             ))}
           </div>
-        </section>
+        </section> : <p className="mt-8 text-center"><Link to={`/lancement${location.search}`} className="text-primary underline">Recevoir mes 5 niches gratuites</Link></p>}
 
         <p className="mt-10 text-center text-sm"><Link to="/" className="text-muted-foreground underline">Non merci, je garde seulement mes 5 niches</Link></p>
       </div>
