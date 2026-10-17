@@ -171,8 +171,9 @@ export default function V3MainTabs() {
               }}
             >
               <span aria-hidden>✨</span>
-              <span>Nos offres · 97 €/an ou 497 € à vie</span>
+              <span>Nos offres · dès 27 € à vie</span>
             </NavLink>
+            <Button asChild variant="outline" className="h-9 shrink-0 text-xs"><Link to="/starter">Starter · 27 € à vie <ArrowRight className="h-3.5 w-3.5" /></Link></Button>
             <NavLink
               to={pathname === '/v3' ? '/v3#v3-upsells' : '/v3/upsells'}
               onClick={
@@ -382,8 +383,9 @@ export default function V3MainTabs() {
                 textShadow: 'none',
               }}
             >
-              ✨ Nos offres · 97 €/an ou 497 € à vie
+              ✨ Nos offres · dès 27 € à vie
             </NavLink>
+            <Button asChild variant="outline" className="w-full"><Link to="/starter" onClick={() => setMobileOpen(false)}>EbookStudio Starter · 27 € à vie <ArrowRight className="h-4 w-4" /></Link></Button>
             <NavLink
               to="/v3/upsells"
               onClick={() => setMobileOpen(false)}

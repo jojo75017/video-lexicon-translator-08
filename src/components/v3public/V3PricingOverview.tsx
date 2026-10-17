@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, Check, Crown, Feather, Gift } from 'lucide-react';
+import { ArrowRight, Check, Crown, Feather, Gift, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { V3_NEW_OFFERS, formatPrice, V2_ACCESS_NOTE } from '@/data/v3Pricing';
 import { Button } from '@/components/ui/button';
@@ -26,21 +26,31 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
     <section className="v3-shell py-7" aria-labelledby="v3-offers-title">
       <header className="mb-7">
         <p className="text-xs font-bold uppercase text-primary">Paiement en 1, 3 ou 6 fois</p>
-        <h2 id="v3-offers-title" className="mt-2 text-3xl font-semibold text-foreground">Deux offres claires pour écrire et publier</h2>
-        <p className="mt-3 text-muted-foreground">Un accès annuel pour démarrer, ou l'accès à vie avec tous les studios professionnels.</p>
+        <h2 id="v3-offers-title" className="mt-2 text-3xl font-semibold text-foreground">Trois offres pour écrire et publier, dès 27 € à vie</h2>
+        <p className="mt-3 text-muted-foreground">Starter pour découvrir, Auteur pour aller plus loin, Édition pour les studios professionnels.</p>
       </header>
       <div className="grid gap-5 lg:grid-cols-3">
+        <article id="starter" className="flex scroll-mt-60 flex-col rounded-lg border-2 border-primary bg-card p-6 text-card-foreground">
+          <div className="flex items-center justify-between gap-2"><Rocket className="h-6 w-6 text-primary" /><span className="text-xs font-bold uppercase text-primary">Nouveau</span></div>
+          <h3 className="mt-3 text-xl font-semibold">EbookStudio Starter</h3>
+          <p className="mt-4 text-3xl font-bold">27 € <span className="text-base font-medium text-muted-foreground">à vie</span></p>
+          <p className="mt-1 text-xs text-muted-foreground">Un seul paiement, sans abonnement.</p>
+          <ul className="my-5 flex-1 space-y-3">{['Rédaction guidée de votre livre', 'Sommaire et numérotation des pages', 'Modèles standard', 'Export Word (DOCX) et PDF'].map(item => <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>)}</ul>
+          <p className="mb-4 text-xs text-muted-foreground">Pour aller plus loin : Cover Studio Pro à 47 € ou Auteur à 97 €/an, en option.</p>
+          <Button asChild><Link to="/paiement-offre?plan=starter27_1x">Je prends Starter à 27 € <ArrowRight /></Link></Button>
+          <Button asChild variant="ghost" className="mt-2"><Link to="/starter">Découvrir Starter et les 5 niches offertes</Link></Button>
+        </article>
         <Card o={auteur} Icon={Feather} onBuy={() => setProduct('auteur')} />
         <Card o={edition} Icon={Crown} highlight onBuy={() => setProduct('edition247')} />
-        <article className="flex flex-col rounded-lg border bg-card p-6 text-card-foreground">
+      </div>
+        <section className="mt-6 border-y py-5 text-foreground">
           <Gift className="h-6 w-6 text-primary" />
           <h3 className="mt-3 text-xl font-semibold">Déjà client ? Vous gardez vos droits</h3>
           <p className="mt-4 text-sm text-muted-foreground">Votre accès à vie à 47 €, vos achats et vos abonnements déjà souscrits ne changent pas. Aucun nouvel achat n'est obligatoire.</p>
           <p className="mt-4 text-sm">{V2_ACCESS_NOTE}</p>
           <Button asChild variant="outline" className="mt-5"><Link to="/v3/upsells">Voir les compléments & options <ArrowRight /></Link></Button>
           <Button asChild variant="ghost" className="mt-2"><Link to="/v3/compte">Mon accès actuel</Link></Button>
-        </article>
-      </div>
+        </section>
       <V3PackCheckout open={product !== null} onClose={() => setProduct(null)} product={product ?? 'auteur'} />
     </section>
   );

@@ -133,8 +133,9 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     label: 'Nos offres',
     emoji: '👑',
     color: '#c9a84c',
-    tagline: 'Auteur par an ou Édition à vie',
+    tagline: 'Starter, Auteur ou Édition',
     links: [
+      { label: 'EbookStudio Starter — 27 € à vie', to: '/starter', badge: 'Nouveau', desc: 'Rédaction guidée, sommaire, modèles standard et exports Word (DOCX) et PDF, sans abonnement' },
       { label: 'EbookStudio Auteur — 97 €/an', to: '/v3/forfaits', badge: '3 × 32,33 € possible', desc: 'Tous les parcours, correction, couverture incluse et outils KDP de base' },
       { label: 'EbookStudio Édition à vie — 497 €', to: '/v3/forfaits', badge: '3 × ou 6 × possible', desc: 'Tout Auteur + studio de couverture Pro, KDP avancé, BD Studio et BookPerfect, sans renouvellement' },
       { label: 'Compléments & options', to: '/v3/upsells', desc: 'Des studios et services à ajouter uniquement si vous en avez besoin' },
