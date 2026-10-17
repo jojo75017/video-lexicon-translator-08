@@ -15,6 +15,8 @@ import { supabase } from '@/integrations/supabase/client';
 export interface TrialAccessState {
   loading: boolean;
   isTrial: boolean;
+  /** Client Starter 27 € : accès à vie, mêmes modules verrouillés que l'essai. */
+  isStarter: boolean;
   isExpired: boolean;
   daysRemaining: number;
   endsAt: string | null;
@@ -27,6 +29,7 @@ export interface TrialAccessState {
 export function useTrialAccess(): TrialAccessState {
   const [loading, setLoading] = useState(true);
   const [isTrial, setIsTrial] = useState(false);
+  const [isStarter, setIsStarter] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
   const [daysRemaining, setDaysRemaining] = useState(0);
   const [endsAt, setEndsAt] = useState<string | null>(null);
@@ -54,6 +57,9 @@ export function useTrialAccess(): TrialAccessState {
 
       const tier = (data?.plan_tier ?? '').toLowerCase();
       const status = (data?.status ?? '').toLowerCase();
+      const starter = tier === 'starter' && status === 'active';
+      setIsStarter(starter);
+      if (starter) { setIsTrial(true); setIsExpired(false); setEndsAt(null); setDaysRemaining(0); return; }
       const trial = tier === 'essai';
       const end = data?.trial_ends_at ?? null;
       const expired = trial && (status === 'expired' || (!!end && new Date(end).getTime() <= Date.now()));
@@ -79,11 +85,12 @@ export function useTrialAccess(): TrialAccessState {
   return {
     loading,
     isTrial,
+    isStarter,
     isExpired,
     daysRemaining,
     endsAt,
     email,
-    watermarkExports: isTrial,
+    watermarkExports: isTrial && !isStarter,
     refresh: check,
   };
 }

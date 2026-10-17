@@ -144,7 +144,7 @@ const NAV: NavSection[] = [
     items: [
       { to: '/v3/compte', label: 'Mon compte & accès', icon: User },
       { to: '/v3/forfaits', label: 'Offres à vie & options', icon: Gem },
-      { to: '/starter', label: 'EbookStudio Starter 27 €', icon: Rocket, badge: 'Bientôt' },
+      { to: '/starter', label: 'EbookStudio Starter 27 €', icon: Rocket, badge: 'Nouveau' },
       
       { to: '/v3/auteur', label: 'Profil auteur', icon: User },
       { to: '/v3/parametres', label: 'Paramètres', icon: Settings },

@@ -100,7 +100,7 @@ export function useV3Entitlement() {
             .maybeSingle();
           const status = (sub?.status ?? '').toLowerCase();
           const tier = String(sub?.plan_tier ?? '').toLowerCase();
-          legacyV2 = tier !== 'plume' && tier !== 'edition' &&
+          legacyV2 = tier !== 'plume' && tier !== 'edition' && tier !== 'starter' && tier !== 'essai' &&
             (status === 'active' || status === 'lifetime' || tier === 'lifetime');
         }
         if (cancelled) return;

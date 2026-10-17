@@ -11,6 +11,7 @@ import { LAUNCH_TUNNEL_URL } from '@/data/externalLinks';
 const PLANS: Record<string, { title: string; detail: string }> = {
   auteur97_1x: { title: 'EbookStudio Auteur — 97 € par an', detail: '97 € aujourd\'hui, puis renouvellement automatique chaque année. Résiliable à tout moment.' },
   auteur97_3x: { title: 'EbookStudio Auteur — 1 an en 3 fois', detail: '32,34 € aujourd\'hui, puis 2 × 32,33 € les mois suivants. Total : 97 €.' },
+  starter27_1x: { title: 'EbookStudio Starter — 27 € à vie', detail: '27 € en une fois. Accès à vie, aucun renouvellement.' },
   edition247_1x: { title: 'EbookStudio Édition — 497 € à vie', detail: '497 € en une fois. Aucun renouvellement.' },
   edition247_3x: { title: 'EbookStudio Édition — à vie en 3 fois', detail: '165,68 € aujourd\'hui, puis 2 × 165,66 €. Total : 497 €. Aucun renouvellement.' },
   edition247_6x: { title: 'EbookStudio Édition — à vie en 6 fois', detail: '82,85 € aujourd\'hui, puis 5 × 82,83 €. Total : 497 €. Aucun renouvellement.' },
