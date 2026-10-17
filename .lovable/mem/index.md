@@ -9,3 +9,4 @@
 - [Modèle 47 € + OTO](mem://business/pricing/modele-47-oto) — Accès à vie 47 €, puis OTO Édition Pro 97 €, version allégée Cover Pro 67 €
 - [Offres 97 € / 497 €](mem://business/pricing/offres-97-497) — nouveaux clients dès le 16/10 ; anciens inchangés
 - [Guide EbookStudio de A à Z](mem://features/guide-ebookstudio-a-z) — guide officiel 80–100 pages, Word + PDF, pages personnelles et QR code
+- [Starter 27 € à vie](mem://business/pricing/starter-27-projet) — projet novembre/fêtes, DOCX inclus, montée vers 47 € et 97 €, non activé
