@@ -164,7 +164,7 @@ const PaymentSuccessPage = () => {
                   </div>
                 </div>
                 <p className="text-xs text-black/50 mt-3">
-                  💡 On vient de t'envoyer ce code par email. Si tu ne le reçois pas dans 2 min, vérifie tes spams.
+                  💡 On vient de t'envoyer ce code par email. Si tu ne le reçois pas sous quelques minutes (24 h maximum), vérifie tes spams.
                 </p>
               </CardContent>
             </Card>
