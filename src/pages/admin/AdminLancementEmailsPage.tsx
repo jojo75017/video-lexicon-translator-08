@@ -209,6 +209,7 @@ export default function AdminLancementEmailsPage() {
                   <th className="px-3 py-2">Destinataire</th>
                   <th className="px-3 py-2">Date</th>
                   <th className="px-3 py-2">État</th>
+                  <th className="px-3 py-2">Ouvert</th>
                 </tr>
               </thead>
               <tbody>
@@ -223,11 +224,12 @@ export default function AdminLancementEmailsPage() {
                         <Badge className={failed ? 'border-destructive/30 bg-destructive/10 text-destructive' : 'border-primary/30 bg-primary/10 text-primary'}>{row.status}</Badge>
                         {row.error_message && <p className="mt-1 max-w-xs text-xs text-destructive">{row.error_message}</p>}
                       </td>
+                      <td className="px-3 py-2">{['opened', 'clicked'].includes(row.last_event || '') ? 'Oui' : '—'}</td>
                     </tr>
                   );
                 })}
                 {!loading && latest.length === 0 && (
-                  <tr><td colSpan={4} className="px-3 py-10 text-center text-muted-foreground">Aucun envoi pour l’instant.</td></tr>
+                  <tr><td colSpan={5} className="px-3 py-10 text-center text-muted-foreground">Aucun envoi pour l’instant.</td></tr>
                 )}
               </tbody>
             </table>
