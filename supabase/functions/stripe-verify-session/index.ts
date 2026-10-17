@@ -97,6 +97,55 @@ serve(async (req) => {
       });
     }
 
+    // Offres v3-pack (Starter 27 €, Auteur 97 €/an, Édition 497 €) : les droits
+    // sont attribués par payments-webhook (source de vérité). On ne réécrit
+    // jamais plan_type / status / expires_at ici, pour ne pas écraser un accès
+    // annuel ou Starter correctement attribué.
+    const packPlan: string = session.metadata?.plan || "";
+    if (/^(starter27_|auteur97_|edition247_)/.test(packPlan)) {
+      const packLabel = packPlan.startsWith("starter27_")
+        ? "EbookStudio Starter — 27 € à vie"
+        : packPlan.startsWith("auteur97_")
+          ? "EbookStudio Auteur — 97 €/an"
+          : "EbookStudio Édition — 497 € à vie";
+
+      const { data: packSubscriber } = await supabase
+        .from("subscribers")
+        .select("*")
+        .eq("email", email)
+        .maybeSingle();
+
+      if (packSubscriber) {
+        if (!packSubscriber.stripe_customer_id && session.customer) {
+          await supabase
+            .from("subscribers")
+            .update({ stripe_customer_id: session.customer })
+            .eq("email", email);
+        }
+        return new Response(
+          JSON.stringify({
+            ok: true,
+            email,
+            accessCode: packSubscriber.access_code,
+            packPlan,
+            subscriber: packSubscriber,
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // Le webhook n'a pas encore traité le paiement : on laisse la page
+      // afficher l'attente plutôt que créer un abonnement au mauvais plan.
+      return new Response(
+        JSON.stringify({
+          ok: false,
+          pending: true,
+          error: "Activation en cours. Vos accès arrivent par email d'ici quelques minutes (24 h maximum).",
+        }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Determine plan type and trial status
     let planType = "pro";
     let expiresAt: string | null = null;
