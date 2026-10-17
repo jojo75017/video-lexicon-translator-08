@@ -10,6 +10,12 @@ export default function V3ForfaitsPage() {
     <div className="mx-auto max-w-7xl"><BackButton className="mb-4" />
       <h1 className="text-center text-4xl font-bold">Les offres EbookStudio</h1>
       <V3PricingOverview />
+      <section className="my-8 rounded-2xl border border-primary/40 bg-card p-6 text-center">
+        <p className="text-sm font-semibold text-primary">Bientôt disponible</p>
+        <h2 className="mt-1 text-2xl font-bold">EbookStudio Starter — 27 € à vie</h2>
+        <p className="mx-auto mt-2 max-w-2xl text-muted-foreground">Rédaction guidée, sommaire, numérotation des pages, modèles standard, export Word (DOCX) et PDF. Évoluez ensuite vers Cover Studio Pro (47 €) ou le plan Auteur (97 €/an).</p>
+        <Button asChild className="mt-4"><Link to="/starter">Découvrir Starter</Link></Button>
+      </section>
       <section aria-labelledby="kdp-publication-limits" className="border-y border-destructive/40 py-6 text-destructive [&_*]:!text-destructive">
         <h2 id="kdp-publication-limits" className="text-xl font-bold">Exigences KDP — limites de publication à vérifier</h2>
         <p className="mt-3 font-semibold">Limite journalière globale indiquée : 3 titres par jour maximum.</p>

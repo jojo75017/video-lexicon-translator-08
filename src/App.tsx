@@ -98,6 +98,7 @@ const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const DecouvertePage = lazy(() => import('./pages/launch/DecouvertePage'));
 const AvantPremiereV3Page = lazy(() => import('./pages/AvantPremiereV3Page'));
 const LancementCapturePage = lazy(() => import('./pages/lancement/LancementCapturePage'));
+const StarterPage = lazy(() => import('./pages/starter/StarterPage'));
 const LancementOffresPage = lazy(() => import('./pages/lancement/LancementOffresPage'));
 const LancementMerciPage = lazy(() => import('./pages/lancement/LancementMerciPage'));
 
@@ -534,6 +535,7 @@ const App = () => {
             <Route path="/commander" element={<V3CommanderPage />} />
             {/* Tunnel de lancement du 1er octobre : capture → offres → remerciement */}
             <Route path="/lancement" element={<LancementCapturePage />} />
+            <Route path="/starter" element={<StarterPage />} />
             <Route path="/lancement/offres" element={<LancementOffresPage />} />
             <Route path="/lancement/merci" element={<LancementMerciPage />} />
 
