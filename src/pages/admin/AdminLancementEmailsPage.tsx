@@ -29,6 +29,7 @@ export default function AdminLancementEmailsPage() {
   const [sending, setSending] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<Record<number, number | null>>({});
   const [base, setBase] = useState<{ total?: number; bounced?: number; unsub?: number; inactif?: number }>({});
+  const [unsubs, setUnsubs] = useState<Set<string>>(new Set());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -45,9 +46,19 @@ export default function AdminLancementEmailsPage() {
       count((q) => q.eq('unsubscribed', true)),
       count((q) => q.eq('status', 'inactif')),
     ]).then(([total, bounced, unsub, inactif]) => setBase({ total, bounced, unsub, inactif }));
-    const [logRes, clickRes, audienceRes] = await Promise.all([
-      (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,last_event,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).limit(2000),
-      (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(2000),
+    const fetchLogs = async () => {
+      const all: LogRow[] = [];
+      for (let offset = 0; offset < 20000; offset += 1000) {
+        const { data } = await (supabase as any).from('email_send_log').select('id,message_id,template_name,recipient_email,status,last_event,error_message,created_at').in('template_name', templates).order('created_at', { ascending: false }).range(offset, offset + 999);
+        all.push(...(data || []));
+        if (!data || data.length < 1000) break;
+      }
+      return all;
+    };
+    const [logData, clickRes, unsubRes, audienceRes] = await Promise.all([
+      fetchLogs(),
+      (supabase as any).from('email_clicks').select('prospect_email,template_name,clicked_at').in('template_name', templates).order('clicked_at', { ascending: false }).limit(5000),
+      (supabase as any).from('sales_prospects').select('email').eq('unsubscribed', true).limit(5000),
       Promise.all(STEPS.map(async ({ step }) => {
         const { data, error } = await supabase.functions.invoke('send-launch-sequence', {
           body: { mode: 'status', step, segment: 'all' },
@@ -55,8 +66,9 @@ export default function AdminLancementEmailsPage() {
         return [step, !error && typeof data?.total_eligible === 'number' ? data.total_eligible : null] as const;
       })),
     ]);
-    setLogs((logRes.data || []) as LogRow[]);
+    setLogs(logData);
     setClicks((clickRes.data || []) as ClickRow[]);
+    setUnsubs(new Set(((unsubRes.data || []) as { email: string }[]).map((r) => r.email.toLowerCase())));
     setRemaining(Object.fromEntries(audienceRes));
     setLoading(false);
   }, []);
