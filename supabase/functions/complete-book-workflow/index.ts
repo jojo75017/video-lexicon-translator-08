@@ -438,11 +438,31 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
   }
 }
 
+let activeBookTypeDirective = '';
+let activeIsNonFiction = false;
+
+/** Type de livre transmis par le parcours V3 (ligne « TYPE DE LIVRE : … »). */
+function detectBookType(intro: string): { label: string; nonFiction: boolean; directive: string } {
+  const m = /TYPE DE LIVRE\s*:\s*([^\n]+)/i.exec(String(intro || ''));
+  const label = (m?.[1] || '').trim();
+  const nonFiction = /guide|tutoriel|documentaire|informatif|professionnel|formation|biographie|t[ée]moignage/i.test(label);
+  if (!nonFiction) return { label, nonFiction: false, directive: '' };
+  const isGuide = /guide|tutoriel/i.test(label);
+  const isBio = /biographie|t[ée]moignage/i.test(label);
+  const directive = `TYPE DE LIVRE IMPOSÉ : ${label}. CE N'EST PAS UN ROMAN.
+INTERDICTIONS ABSOLUES : aucune intrigue, aucun personnage fictif, aucun dialogue romanesque, aucun suspense, aucun rebondissement, aucun cliffhanger, aucun titre de chapitre façon roman.${isBio ? ' Seules les personnes réelles citées par l\'auteur peuvent apparaître.' : ''}
+${isGuide ? `STRUCTURE PÉDAGOGIQUE DE CHAQUE CHAPITRE (quand c'est pertinent) : objectif clair ; introduction courte ; sous-titres ## et ### ; explications concrètes ; étapes numérotées ; liste du matériel ou des équipements ; tableau pratique en Markdown ; exemples réels et vérifiables ; encadrés « 💡 Conseil », « ⚠️ Attention » et « 📌 À retenir » ; erreurs à éviter ; précautions de sécurité ; checklist récapitulative (- [ ]) ; courte conclusion.
+Titres de chapitres descriptifs et utiles (ex. « Comment préparer sa terre avant les premières plantations »), progression du plus simple au plus avancé.` : 'Structure informative claire : sous-titres ## et ###, paragraphes courts, faits vérifiables, exemples réels, encadrés « À retenir ».'}
+N'invente jamais de chiffres, prix, paramètres techniques, horaires ou réglementations : donne des fourchettes indicatives reconnues et invite à vérifier auprès de sources fiables.`;
+  return { label, nonFiction: true, directive };
+}
+
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   const userKey = activeApiKey?.trim();
+  const withType = activeBookTypeDirective ? `${activeBookTypeDirective}\n\n${systemPrompt}` : systemPrompt;
   const finalSystemPrompt = activeLanguageDirective
-    ? `${systemPrompt}\n\n${activeLanguageDirective}`
-    : systemPrompt;
+    ? `${withType}\n\n${activeLanguageDirective}`
+    : withType;
 
   // Providers BYOK : la clé utilisateur reste prioritaire. Pour Gemini uniquement,
   // le quota gratuit (20 requêtes/jour sur certains projets) peut être épuisé au
@@ -1354,7 +1374,12 @@ serve(async (req) => {
       );
     }
 
-    const charactersContext = characters.length > 0
+    {
+      const bt = detectBookType(bookIntroduction);
+      activeBookTypeDirective = bt.directive;
+      activeIsNonFiction = bt.nonFiction;
+    }
+    const charactersContext = !activeIsNonFiction && characters.length > 0
       ? `\n\nPERSONNAGES DU LIVRE (OBLIGATOIRES À UTILISER) :\n${characters.map((c: any) => `- ${c.name} (${c.role || 'personnage'}): ${c.description}`).join('\n')}`
       : '';
 
@@ -1658,7 +1683,7 @@ MARCHÉ P2 : ${JSON.stringify(previousContext.P2 || {})}
 OBJECTIF : ~${totalWords} mots total (~${estimatedPages} pages)
 Chaque chapitre ~${wordsPerChapter} mots avec ${p3Settings.sousSectionsRange} sous-sections.
 
-MISSION PERSONNAGES : Crée 4-6 personnages UNIQUES et COHÉRENTS.
+${activeIsNonFiction ? 'PERSONNAGES : AUCUN. Ce livre n\'est pas une fiction, renvoie "personnages": [].' : 'MISSION PERSONNAGES : Crée 4-6 personnages UNIQUES et COHÉRENTS.'}
 
 IMPORTANT SI LE PROJET EST LONG :
 - Objectif, accroche, lienAvecPrecedent = 1 phrase courte chacun
@@ -1725,6 +1750,7 @@ Format JSON :
           result._qualityScore = qualityScore;
           result._attempts = attempts;
 
+          if (activeIsNonFiction) result.personnages = [];
           if (!Array.isArray(result.chapitres) || result.chapitres.length === 0) {
             throw new Error('P3_EMPTY_STRUCTURE');
           }
@@ -1784,7 +1810,7 @@ Format JSON :
         const personnagesP3 = previousContext.P3?.personnages || [];
         const personnagesAUtiliser = personnagesP3.length > 0 ? personnagesP3 : characters;
 
-        const personnagesSection = personnagesAUtiliser.length > 0
+        const personnagesSection = !activeIsNonFiction && personnagesAUtiliser.length > 0
           ? `\n\nPERSONNAGES (à utiliser OBLIGATOIREMENT) :\n${personnagesAUtiliser.map((c: any) => `- ${c.name} (${c.role}): ${c.description}${c.arc ? ` | Arc: ${c.arc}` : ''}`).join('\n')}`
           : '';
 
