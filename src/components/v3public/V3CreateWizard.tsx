@@ -970,7 +970,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
       const proposedCharacters = Array.isArray(parsed.characters) ? parsed.characters : [];
       const hasOwnCharacters = characters.some((character) => character.name.trim() || character.traits.trim());
-      if (!hasOwnCharacters && proposedCharacters.length) {
+      if (isFictionType(bookType) && !hasOwnCharacters && proposedCharacters.length) {
         setCharacters(proposedCharacters.slice(0, 8).map((character: any) => ({
           id: makeId(),
           name: cleanText(String(character?.name || '')),
@@ -997,7 +997,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
   const totalWords = chapters * wordsPerChapter;
   const estimatedPages = Math.ceil(totalWords / 250);
   const descriptionWords = description.trim().split(/\s+/).filter(Boolean).length;
-  const workflowCharacters = characters
+  const workflowCharacters = (isFictionType(bookType) ? characters : [])
     .filter((character) => character.name.trim() || character.traits.trim())
     .map((character) => ({
       id: character.id,
@@ -1823,7 +1823,7 @@ ${outlineRulesFor(bookType)}`;
               initialWordsPerChapter={wordsPerChapter}
               initialTone={tone}
               characters={workflowCharacters}
-              initialOutline={normalizedOutline}
+              initialOutline={startsFromExistingOutline || !isFictionType(bookType) ? normalizedOutline : undefined}
               initialBookIntroduction={buildWorkflowDescription()}
               onComplete={handleWorkflowComplete}
             />
