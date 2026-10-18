@@ -623,8 +623,6 @@ Réponds UNIQUEMENT avec un tableau JSON de 20 strings, sans explication:
         structure: selectedTemplate?.structure,
         numberOfPages,
         panelCount,
-        useOpenAI,
-        openaiApiKey: userApiKey || undefined,
         onProgress: (done, total) => toast.info(`Scénario : ${done}/${total} pages écrites`),
       });
 
@@ -904,8 +902,6 @@ Bubble points to ${panelData.character}.` : ''}
         structure: selectedTemplate?.structure,
         numberOfPages,
         panelCount,
-        useOpenAI,
-        openaiApiKey: userApiKey || undefined,
         onProgress: (done, total) => setCurrentProgress(Math.round((done / total) * 40)),
       });
 
