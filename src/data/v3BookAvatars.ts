@@ -481,6 +481,30 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Rédige des guides pratiques méthodiques : pour chaque chantier, liste les outils et matériaux, puis des étapes numérotées concrètes, des conseils de professionnel et des précautions de sécurité obligatoires (protections, coupure électrique, ventilation). Recommande un professionnel pour l’électricité, le gaz ou la structure. N’invente jamais de normes, de dosages ou de références produits.',
       },
+      {
+        id: 'bricolage-debutant',
+        name: '🔧 Débutant petites réparations',
+        badge: 'Premiers travaux',
+        profil: 'Primo-accédant ou locataire qui veut fixer, réparer et repeindre sans faire appel à un artisan',
+        niveau: 'debutant',
+        besoins: 'Outillage de base, gestes sûrs, petits travaux réussis du premier coup',
+        frustrations: 'Le jargon, les étapes sautées, les vidéos trop rapides',
+        ton: 'Rassurant',
+        consigne:
+          'Rédige pour un grand débutant : liste d\'outils minimale, niveau de difficulté, temps indicatif, étapes numérotées très détaillées, erreurs courantes, règles de sécurité et résultat attendu. Signale clairement les travaux dangereux ou réglementés (électricité, gaz, structure) et oriente vers un professionnel qualifié. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
+      {
+        id: 'bricolage-renovateur',
+        name: '🏠 Rénovateur méthodique',
+        badge: 'Rénovation pièce par pièce',
+        profil: 'Propriétaire qui rénove une pièce ou un logement : préparation, peinture, sols, aménagement, petite plomberie',
+        niveau: 'intermediaire',
+        besoins: 'Planifier un chantier, choisir les matériaux, enchaîner les étapes dans le bon ordre',
+        frustrations: 'Les oublis de préparation, les normes ignorées, les budgets flous',
+        ton: 'Méthodique',
+        consigne:
+          'Rédige des fiches chantier : préparation, matériaux et quantités à calculer, ordre des étapes, temps de séchage, contrôles qualité, sécurité. N\'invente jamais de normes ni de prix : invite à vérifier la réglementation en vigueur et à recourir à un professionnel pour les travaux réglementés. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
     ],
   },
   {
@@ -499,6 +523,30 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Inspirant',
         consigne:
           'Rédige avec un ton bienveillant et passionné : organise le contenu par saison ou par fiche de culture (semis, plantation, entretien, récolte), explique le pourquoi et le comment sans jargon, privilégie les méthodes naturelles. Précise que les dates varient selon la région et le climat. N’invente jamais de variétés, de dates ou de traitements.',
+      },
+      {
+        id: 'jardinage-balcon',
+        name: '🪴 Débutant balcon & petit espace',
+        badge: 'Potager en bac',
+        profil: 'Citadin qui démarre un potager sur balcon, terrasse ou petit jardin',
+        niveau: 'debutant',
+        besoins: 'Réussir ses premières récoltes avec peu de place, peu de temps et peu de matériel',
+        frustrations: 'Les conseils prévus pour de grands jardins, le vocabulaire technique',
+        ton: 'Encourageant',
+        consigne:
+          'Rédige des conseils simples et concrets pour petits espaces : contenants, substrat, exposition, légumes faciles, calendrier indicatif, arrosage, checklist par saison. Calendriers présentés comme indicatifs selon la région. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
+      {
+        id: 'jardinage-permaculture',
+        name: '🌱 Éco-jardinier sol vivant',
+        badge: 'Permaculture & naturel',
+        profil: 'Jardinier qui veut un potager nourricier sans produits chimiques : sol vivant, compost, paillage, associations',
+        niveau: 'intermediaire',
+        besoins: 'Comprendre son sol, nourrir la terre, associer les cultures, prévenir naturellement maladies et ravageurs',
+        frustrations: 'Les recettes miracles, les affirmations non vérifiées',
+        ton: 'Passionné',
+        consigne:
+          'Rédige avec méthode : explique le pourquoi et le comment, tableaux d\'associations et de rotations, techniques de compost et de paillage, prévention naturelle. N\'invente jamais d\'effets non prouvés ; reste sur des pratiques reconnues. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
       },
     ],
   },
@@ -519,6 +567,30 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Rédige des guides d’utilisation et d’entretien concrets et des comparatifs équilibrés fondés sur des critères de choix (usage, entretien, encombrement, consommation). N’invente jamais de tests, de marques, de prix ni de caractéristiques techniques : invite le lecteur à vérifier la notice du fabricant.',
       },
+      {
+        id: 'maison-organisation',
+        name: '🧺 Organisation & gain de temps',
+        badge: 'Rangement malin',
+        profil: 'Foyer actif qui veut une maison rangée, des placards optimisés et des tâches simplifiées',
+        niveau: 'tous',
+        besoins: 'Astuces de rangement, routines, petits espaces, solutions pour tous les budgets',
+        frustrations: 'Les intérieurs de magazine irréalistes, les achats inutiles',
+        ton: 'Pratique',
+        consigne:
+          'Rédige des astuces concrètes classées par pièce, routines simples, listes d\'équipements utiles, solutions par budget (petit, moyen, confortable) sans prix inventés. Ne jamais inventer de tests de produits ni de caractéristiques. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
+      {
+        id: 'maison-fait-maison',
+        name: '🫙 Fait-maison & entretien',
+        badge: 'Cuisine & appareils',
+        profil: 'Amateur de fait-maison : batch cooking, conservation, entretien des appareils ménagers',
+        niveau: 'tous',
+        besoins: 'Gagner du temps en cuisine, conserver en sécurité, faire durer ses appareils',
+        frustrations: 'Les règles d\'hygiène approximatives, les notices ignorées',
+        ton: 'Chaleureux',
+        consigne:
+          'Rédige des guides pas-à-pas : organisation de la cuisine, batch cooking, conservation en respectant les règles d\'hygiène reconnues, entretien des appareils en renvoyant à la notice du fabricant. Aucune caractéristique ni prix inventés. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
     ],
   },
   {
@@ -538,6 +610,30 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         consigne:
           'Rédige des guides de voyage structurés : présentation, meilleure période, itinéraires, transports, types d’hébergement, conseils pratiques et culturels. N’invente jamais de tarifs, d’horaires, d’adresses ni de formalités : invite le lecteur à vérifier auprès des sources officielles avant le départ.',
       },
+      {
+        id: 'voyages-independant',
+        name: '🗺️ Voyageur indépendant',
+        badge: 'Road-trip & budget',
+        profil: 'Voyageur qui organise seul son séjour : budget, transports, hébergements, itinéraire',
+        niveau: 'tous',
+        besoins: 'Préparer de A à Z, comparer, construire un itinéraire réaliste, maîtriser son budget',
+        frustrations: 'Les infos périmées, les budgets irréalistes',
+        ton: 'Inspirant et concret',
+        consigne:
+          'Rédige des guides de préparation : choix de destination, budget indicatif clairement signalé comme tel, réservations, documents, itinéraire, imprévus, checklists avant départ. Formalités, prix et horaires à vérifier auprès des sources officielles. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
+      {
+        id: 'voyages-famille',
+        name: '👨‍👩‍👧 Voyage en famille serein',
+        badge: 'Sérénité & logistique',
+        profil: 'Parents qui voyagent avec des enfants et veulent anticiper santé, sécurité et logistique',
+        niveau: 'debutant',
+        besoins: 'Valises, documents des enfants, rythme adapté, santé en voyage, plan B',
+        frustrations: 'Le stress des oublis, les itinéraires trop chargés',
+        ton: 'Rassurant',
+        consigne:
+          'Rédige des checklists et plannings adaptés aux familles : documents, santé, bagages, rythme, activités, gestion des imprévus. Toute formalité ou recommandation de santé doit être vérifiée auprès des autorités officielles et d\'un professionnel de santé. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
     ],
   },
   {
@@ -556,6 +652,30 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
         ton: 'Pédagogique',
         consigne:
           'Rédige des guides pratiques, fiches espèces et ebooks complets centrés sur les besoins réels et le bien-être des poissons : démarrage et cycle de l’azote, paramètres de l’eau, compatibilités, plantes, matériel, alimentation, reproduction, entretien et prévention sanitaire. Ne jamais inventer de paramètres de maintenance, de compatibilités ou de traitements : donne uniquement des valeurs reconnues et vérifiables, présentées comme des fourchettes indicatives, et recommande de consulter un vétérinaire ou un professionnel en cas de maladie.',
+      },
+      {
+        id: 'aquario-premier-bac',
+        name: '🐟 Débutant premier aquarium',
+        badge: 'Premier bac sans pertes',
+        profil: 'Débutant qui installe son premier aquarium de 60 à 120 litres',
+        niveau: 'debutant',
+        besoins: 'Choisir le bac, installer filtration et chauffage, réussir le cycle de l\'azote, choisir des poissons faciles',
+        frustrations: 'Les pertes de poissons, les conseils contradictoires des forums',
+        ton: 'Pédagogique',
+        consigne:
+          'Rédige pas à pas : matériel, installation, démarrage et cycle de l\'azote, tests de l\'eau, poissons faciles et compatibles, entretien hebdomadaire, checklist. Paramètres en fourchettes reconnues et vérifiables ; le bien-être des poissons est prioritaire. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
+      },
+      {
+        id: 'aquario-plante',
+        name: '🌿 Aquarium planté & communautaire',
+        badge: 'Aquascaping',
+        profil: 'Aquariophile qui veut un bac planté harmonieux avec une population communautaire équilibrée',
+        niveau: 'intermediaire',
+        besoins: 'Plantes, éclairage, fertilisation, CO2, compatibilités, prévention des algues',
+        frustrations: 'Les algues, les associations d\'espèces incompatibles',
+        ton: 'Passionné',
+        consigne:
+          'Rédige des fiches pratiques : choix des plantes, éclairage, fertilisation, compatibilités d\'espèces en tableau, maintenance, prévention des algues et maladies. Ne jamais inventer de paramètres, compatibilités ou traitements ; consulter un vétérinaire en cas de maladie. Aucun personnage fictif, aucune intrigue : guide pratique uniquement.',
       },
     ],
   },

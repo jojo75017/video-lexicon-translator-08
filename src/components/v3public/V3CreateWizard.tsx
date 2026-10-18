@@ -1,5 +1,6 @@
 import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { BOOK_TYPES, readBookType, writeBookType, bookTypeLabel, isFictionType, outlineRulesFor, looksLikeFictionOutline, type BookTypeId } from '@/lib/v3/bookType';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
 import { toast } from 'sonner';
@@ -160,11 +161,11 @@ function isGenericTitle(value: unknown) {
     || /^l[’']aboutissement\b/i.test(normalized);
 }
 
-function buildFallbackOutline(title: string, category: string, count: number): OutlineChapter[] {
+function buildFallbackOutline(title: string, category: string, count: number, bookType: BookTypeId = 'roman'): OutlineChapter[] {
   const subject = cleanText(title) || cleanText(category) || 'le projet';
   void subject;
 
-  const isFiction = /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
+  const isFiction = isFictionType(bookType) && /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
   const fictionTemplates = [
     ['L’appel de Montferrand', 'Ouvrir le récit par une image forte, un lieu, une attente et une tension immédiate.'],
     ['La première fissure', 'Faire apparaître le premier signe que l’équilibre du héros est menacé.'],
@@ -400,6 +401,7 @@ export default function V3CreateWizard() {
         if (match) setCategory(match);
         else { setCategory('Autre'); setCustomCategory(String(wGenre)); }
       }
+      if (w.bookType && BOOK_TYPES.some((t) => t.id === w.bookType)) setBookType(w.bookType);
       if (w.tone) setTone(w.tone);
       if (w.numberOfChapters || w.chapters) setChapters(clampNumber(Number(w.numberOfChapters || w.chapters), 3, 60, 12));
       if (w.wordsPerChapter) setWordsPerChapter(Number(w.wordsPerChapter));
@@ -480,6 +482,8 @@ export default function V3CreateWizard() {
 
   const [category, setCategory] = useState(startingBrief.category || startingBrief.genre || hub.genre || 'Roman');
   const [customCategory, setCustomCategory] = useState('');
+  const [bookType, setBookTypeState] = useState<BookTypeId>(() => readBookType());
+  const setBookType = (id: BookTypeId) => { setBookTypeState(id); writeBookType(id); };
   const [tone, setTone] = useState('Inspirant');
   const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 60, 12));
   const [wordsPerChapter, setWordsPerChapter] = useState(
@@ -982,14 +986,14 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
   const normalizedOutline = (startsFromExistingOutline
     ? outline
-    : outline.concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters).slice(outline.length)).slice(0, chapters))
+    : outline.concat(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType).slice(outline.length)).slice(0, chapters))
     .map((item, index) => {
       const cleanedTitle = cleanText(item.titre);
       const fallbackTitle = startsFromExistingOutline
         ? (cleanedTitle || `Chapitre ${index + 1}`)
         : cleanedTitle && !isGenericTitle(cleanedTitle)
         ? cleanedTitle
-        : buildFallbackOutline(finalTitle || title, effectiveCategory, chapters)[index]?.titre || `Chapitre ${index + 1} — ${cleanText(finalTitle || title || effectiveCategory)}`;
+        : buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType)[index]?.titre || `Chapitre ${index + 1} — ${cleanText(finalTitle || title || effectiveCategory)}`;
       return { ...item, numero: index + 1, titre: fallbackTitle, objectif: cleanText(item.objectif) };
     });
 
@@ -1111,7 +1115,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
   /** Sommaire complet, en gardant intacts les chapitres déjà retouchés. */
   const completedOutline = () =>
-    mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType));
 
   /** Vrai si l'auteur a déjà modifié au moins un titre de chapitre. */
   const outlineWasEdited = hasEditedOutlineTitles(outline);
@@ -1119,7 +1123,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
   useEffect(() => {
     if (startsFromExistingOutline) return;
     if (!hasRepeatedFallbackTitles(outline, chapters)) return;
-    const merged = mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+    const merged = mergeOutlineWithFallback(outline, buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType));
     // Comparaison pour éviter une boucle si le sommaire de l'auteur est déjà stable.
     if (JSON.stringify(merged) !== JSON.stringify(outline)) setOutline(merged);
   }, [chapters, effectiveCategory, finalTitle, title, outline, startsFromExistingOutline]);
@@ -1148,6 +1152,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     const latestBrief = readBookBrief();
     const retainedNarrative = String(narrativeForBook(latestBrief) || sourceText).trim();
     return [
+    `TYPE DE LIVRE : ${bookTypeLabel(bookType)}`,
     description.trim(),
     retainedNarrative
       ? `✍️ MATIÈRE VALIDÉE DE L'AUTEUR — version corrigée approuvée quand elle existe. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors) :\n"""${retainedNarrative}"""`
@@ -1334,7 +1339,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     const provider = getProvider();
     const key = getProviderKey(provider);
     if (!key || !validateKeyFormat(provider, key)) {
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType));
       toast.success('Sommaire préparé — tu peux modifier chaque chapitre.');
       return;
     }
@@ -1344,8 +1349,10 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       const prompt = `Tu es directeur éditorial KDP. Crée une table des matières professionnelle en français.
 Titre : ${finalTitle || title}
 Sous-titre : ${subtitle || 'Non défini'}
+Type de livre : ${bookTypeLabel(bookType)}
 Catégorie : ${effectiveCategory}
 Ton : ${tone}
+Persona lecteur : ${avatarConsigne || cibleProfil || 'non précisé'}
 Synopsis : ${description}
 Nombre exact de chapitres : ${chapters}
 Mots par chapitre : ${wordsPerChapter}
@@ -1365,7 +1372,8 @@ Règles :
 - interdiction de répéter "L'aboutissement" ou une formule de conclusion sur plusieurs chapitres ;
 - 100 % en français courant, aucun mot latin ni étranger ;
 - aucun bloc markdown, aucune balise json ;
-- titres courts, vendeurs, cohérents avec le synopsis.`;
+- titres courts, vendeurs, cohérents avec le synopsis.
+${outlineRulesFor(bookType)}`;
       const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + chapters * 180) });
       let parsed: any = null;
       try { parsed = JSON.parse(raw); } catch {
@@ -1386,11 +1394,12 @@ Règles :
         return true;
       }).slice(0, chapters);
       if (nextOutline.length !== chapters) throw new Error('Sommaire incomplet');
+      if (!isFictionType(bookType) && looksLikeFictionOutline(nextOutline.map((c: OutlineChapter) => c.titre))) throw new Error('Sommaire romanesque refusé pour un livre non-fiction');
       setOutline(nextOutline);
       toast.success('Sommaire généré — relis puis valide avant de lancer.');
     } catch (error) {
       console.error('Outline generation failed:', error);
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters));
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType));
       toast.warning('Sommaire robuste préparé — tu peux le modifier avant génération.');
     } finally {
       setOutlineLoading(false);
@@ -1611,7 +1620,7 @@ Règles :
     const baseOutline = outlineOverride && outlineOverride.length >= 3 ? outlineOverride : normalizedOutline;
     const safeOutline = baseOutline.length >= 3
       ? baseOutline
-      : buildFallbackOutline(safeTitle, effectiveCategory, chapters);
+      : buildFallbackOutline(safeTitle, effectiveCategory, chapters, bookType);
     if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
     if (authorName.trim() !== safeAuthor) setAuthorName(safeAuthor);
     if (baseOutline.length < 3) {
@@ -1648,6 +1657,7 @@ Règles :
       localStorage.setItem(TARGET_WORDS_KEY, String(wordsPerChapter));
       localStorage.setItem(WIZARD_KEY, JSON.stringify({
         ...config,
+        bookType,
         cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarId, avatarConsigne,
         promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
         bibleUnivers, arbreNarratif,
@@ -2302,6 +2312,23 @@ Règles :
               style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
             />
           </label>
+          <div className="space-y-2">
+            <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Type de livre</span>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-5">
+              {BOOK_TYPES.map((t) => (
+                <button
+                  key={t.id}
+                  type="button"
+                  onClick={() => setBookType(t.id)}
+                  className="rounded-2xl border px-3 py-2 text-left text-xs"
+                  style={{ borderColor: bookType === t.id ? 'var(--v3-orange-600)' : 'var(--v3-border)', background: bookType === t.id ? 'var(--v3-orange-50)' : 'var(--v3-paper)', color: 'var(--v3-ink)' }}
+                >
+                  <strong className="block text-sm">{t.label}</strong>
+                  <span style={{ color: 'var(--v3-muted)' }}>{t.hint}</span>
+                </button>
+              ))}
+            </div>
+          </div>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="block space-y-2">
               <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Catégorie ({CATEGORIES.length} disponibles)</span>

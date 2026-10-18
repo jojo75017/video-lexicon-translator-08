@@ -4,10 +4,10 @@
 - V3 navigation groups category buttons separately from neutral admin actions, with scoped toolbar tokens so unrelated page controls retain their existing styles.
 - Separate wrap image exports crop the shared full-cover renderer at each zone’s finished dimensions, preserving artwork and text without printing editor guides.
 - Wrap layout templates transform existing text elements locally and preview through the export renderer, preserving content, private images, image adjustments and KDP geometry.
-- Cover brightness limits must match controls, persistence and export filters, so stronger brightening survives reload and printing.
-- Wrap text formatting uses a shared canvas renderer for justification and underline across exports and thumbnails, so printable output retains editable block styles.
+- Cover brightness limits match across controls, saving and export, so brightening survives printing.
+- Wrap text formatting uses one shared canvas renderer, so exports and thumbnails keep block styles.
 
-- Full-wrap illustrations use an optional persisted imageCoverage field and the same placement calculation in previews and exports, preserving legacy front-only covers.
+- Full-wrap illustrations use optional imageCoverage with shared preview/export placement, preserving front-only covers.
 
 - HumanizeAI conserve la route `/v3/outils/humanizer` et centralise humanisation et audit stylométrique, afin de préserver les liens existants et une seule porte d’entrée.
 - Studio Micro-Séries utilise le pack `micro_series` et le droit `micro-series`, vendus séparément de tous les forfaits, afin que la précommande V4 ouvre automatiquement l'accès futur.
@@ -30,3 +30,4 @@
 - New-customer offers (Auteur yearly, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), so historical 47 € and subscription rights stay untouched.
 - JVZoo sales enter through the jvzoo-ipn function (JVZIPN v2 cverify, product filter, unique event key) and only grant or revoke Auteur rights JVZoo itself created, so Stripe and other rights are never overwritten.
 - Starter uses isStarter locks, never V2/Pro rights; /lancement and /lancement/offres reuse StarterPage and preserve payment query parameters to avoid divergent funnels.
+- Book type reaches workflow robots as a 'TYPE DE LIVRE :' intro line, so non-fiction gets no characters or plots without schema changes.

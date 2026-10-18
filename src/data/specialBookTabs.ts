@@ -1,4 +1,5 @@
 export const SPECIAL_BOOK_TABS: { slug: string; label: string }[] = [
+  { slug: 'guides-pratiques', label: 'Guides pratiques (Potager, Bricolage, Maison, Voyages, Aquariophilie)' },
   { slug: 'roman', label: 'Roman' },
   { slug: 'cuisine', label: 'Cuisine' },
   { slug: 'voyage', label: 'Voyage' },
