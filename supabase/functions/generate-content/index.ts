@@ -1,6 +1,7 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { comicTextProvider } from '../_shared/comicTextProvider.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -472,15 +473,20 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
 
     // ====== COMIC SCENARIO ======
     if (type === 'comic-scenario') {
-      console.log('Processing comic scenario generation (Gemini)...');
+      const auth = req.headers.get('Authorization');
+      if (!auth) return new Response(JSON.stringify({ error: 'Connectez-vous pour générer votre scénario.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const client = createClient(Deno.env.get('SUPABASE_URL') || '', Deno.env.get('SUPABASE_ANON_KEY') || '', { global: { headers: { Authorization: auth } } });
+      const { data: session, error: authError } = await client.auth.getUser();
+      if (authError || !session.user) return new Response(JSON.stringify({ error: 'Votre session a expiré. Reconnectez-vous.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       const comicSystemPrompt = `Tu es un scénariste expert de bandes dessinées pour enfants et adolescents. 
 Tu crées des scénarios visuels riches et des dialogues percutants adaptés à l'âge du public.
 CHAQUE PAGE doit avoir une description visuelle UNIQUE et des dialogues DIFFÉRENTS.
 Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans \`\`\`, sans commentaires.`;
 
-      const res = await callGemini(comicSystemPrompt, prompt, { maxOutputTokens: 4000, timeoutMs: 120000 });
-      if (res.error) return geminiError(res);
-      return jsonSuccess({ content: res.text });
+      const response = await comicTextProvider(body, comicSystemPrompt);
+      const headers = new Headers(response.headers);
+      Object.entries(corsHeaders).forEach(([name, value]) => headers.set(name, value));
+      return new Response(response.body, { status: response.status, headers });
     }
 
     // ====== ENCYCLOPEDIA / ATLAS ======

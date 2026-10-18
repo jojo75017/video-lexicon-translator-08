@@ -1,6 +1,6 @@
 # Architecture
 - JVZoo review access uses admin-only creation of a new Auteur subscriber and an immutable auth app-metadata marker for scoped revocation, never payment records or existing customer updates.
-- The public partner-tool catalogue uses /outils-partenaires as a standalone presentation-only page; /partenaires retains the affiliate programme, so external recommendations never replace the programme or change customer entitlements or payment flows.
+- /outils-partenaires is presentation-only; /partenaires retains the affiliate programme. Neither changes entitlements or payments.
 - V3 navigation groups category buttons separately from neutral admin actions, with scoped toolbar tokens so unrelated page controls retain their existing styles.
 - Separate wrap image exports crop the shared full-cover renderer at each zone’s finished dimensions, preserving artwork and text without printing editor guides.
 - Wrap layout templates transform existing text elements locally and preview through the export renderer, preserving content, private images, image adjustments and KDP geometry.
@@ -13,7 +13,8 @@
 - Studio Micro-Séries utilise le pack `micro_series` et le droit `micro-series`, vendus séparément de tous les forfaits, afin que la précommande V4 ouvre automatiquement l'accès futur.
 - Le Studio Album Illustré 3–6 ans reste un module séparé des Histoires courtes et utilise un brouillon dédié, afin de préserver les recueils existants et la continuité d’une histoire unique jusqu’à 30 pages.
 - The V3 home page exposes “Commence ici” as the primary subscriber entry point, so users reach specialist selection without searching through tools.
-- V3 specialist cards use a shared editorial-android portrait set through `AgentPortrait`, so the team stays visually consistent with Hector and Margaux.
+- V3 cards use `AgentPortrait` for consistent editorial-android portraits.
+- BD scenarios read current writing-provider settings through a BYOK dispatcher with no provider switching; upstream failures stop generation and expose their safe reason.
 - “Écrire un livre” uses the dedicated `/v3/lancer` direct-writing flow, while “Je raconte un livre” uses `/v3/create`, so their steps never appear identical.
 - Launch emails share a Paris-date guard; audience counters use the sending function's status mode to preserve exclusions.
 - The authenticated V3 home excludes acquisition content and groups every paid add-on after the useful studio sections, so subscribers see a workspace overview before optional purchases.
