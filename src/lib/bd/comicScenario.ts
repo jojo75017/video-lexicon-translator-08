@@ -8,6 +8,7 @@
  */
 
 import { supabase } from '@/integrations/supabase/client';
+import { getProvider, getProviderKey, getOpenRouterModel } from '@/services/aiWritingService';
 
 export interface ComicScenarioPanel {
   description: string;
@@ -63,12 +64,16 @@ export async function buildComicScenario(
 ): Promise<ComicScenarioPage[]> {
   const {
     title, description, genre, audience, heroName, characterDescription,
-    setting, structure, numberOfPages, panelCount, useOpenAI, openaiApiKey, onProgress,
+    setting, structure, numberOfPages, panelCount, onProgress,
   } = opts;
 
   const pages: ComicScenarioPage[] = [];
   const seenDialogues = new Set<string>();
   const seenDescriptions = new Set<string>();
+  // Read current settings at request time, not a stale image-provider hook.
+  const provider = getProvider();
+  const userKey = getProviderKey(provider);
+  const model = provider === 'openrouter' ? getOpenRouterModel() : undefined;
 
   for (let start = 0; start < numberOfPages; start += CHUNK) {
     const end = Math.min(start + CHUNK, numberOfPages);
@@ -123,15 +128,23 @@ Réponds uniquement en JSON :
           prompt: attempt === 0
             ? prompt
             : `${prompt}\n\nATTENTION : ta réponse précédente était invalide ou répétitive (${lastError}). Recommence avec du contenu entièrement nouveau et un JSON strictement valide.`,
-          useOpenAI: useOpenAI || undefined,
-          openaiApiKey: openaiApiKey || undefined,
+          provider,
+          model,
+          userApiKey: userKey || undefined,
         },
       });
 
       if (error) {
         lastError = (error as Error)?.message || 'appel IA échoué';
-        continue;
+        const context = (error as { context?: Response }).context;
+        if (context && typeof context.clone === 'function') {
+          const details = await context.clone().json().catch(() => null);
+          if (typeof details?.error === 'string') lastError = details.error;
+          else if (typeof details?.message === 'string') lastError = details.message;
+        }
+        throw new Error(`Scénario interrompu aux pages ${start + 1}-${end} : ${lastError}`);
       }
+      if (data?.error) throw new Error(`Scénario interrompu aux pages ${start + 1}-${end} : ${data.error}`);
 
       try {
         const raw = String(data?.content ?? data?.text ?? '');
