@@ -50,7 +50,7 @@ export default function V3PracticalGuidesPage() {
   const start = (g: GuideTemplate) => {
     try { RESET_KEYS.forEach((k) => localStorage.removeItem(k)); } catch { /* ignore */ }
     writeBookType('guide');
-    writeBookBrief({ title: g.title, subtitle: g.subtitle, category: g.category, description: g.synopsis });
+    writeBookBrief({ title: g.title, subtitle: g.subtitle, category: g.category, genre: g.category, description: g.synopsis });
     navigate('/v3/lancer');
   };
 

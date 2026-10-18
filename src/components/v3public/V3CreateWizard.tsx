@@ -506,7 +506,14 @@ export default function V3CreateWizard() {
       titre: chapter.titre,
       objectif: chapter.objectif || '',
     }));
-    return buildFallbackOutline(hub.title || '', hub.genre || 'Roman', clampNumber(Number(hub.numberOfChapters), 3, 60, 12));
+    // Un guide pratique ne doit jamais hériter d'un sommaire romanesque : on reprend
+    // la catégorie réelle du projet et le type de livre choisi, jamais le défaut « Roman ».
+    return buildFallbackOutline(
+      hub.title || '',
+      startingBrief.category || startingBrief.genre || hub.genre || 'Roman',
+      clampNumber(Number(hub.numberOfChapters), 3, 60, 12),
+      readBookType(),
+    );
   });
   const [finalTitle, setFinalTitle] = useState(startingBrief.title || hub.title || '');
   const [subtitle, setSubtitle] = useState(startingBrief.subtitle || hub.subtitle || '');
