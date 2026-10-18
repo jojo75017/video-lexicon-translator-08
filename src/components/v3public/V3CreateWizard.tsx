@@ -763,6 +763,10 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
 
   /** Remplace le titre, le sous-titre et le synopsis du livre par l'idée choisie. */
   const applyIdea = (idea: TitleIdea) => {
+    // Nouveau livre choisi : le sommaire d'un livre précédent ne doit jamais réapparaître.
+    if (cleanText(idea.title).toLowerCase() !== cleanText(finalTitle || title).toLowerCase()) {
+      setOutline([]);
+    }
     setTitle(idea.title);
     setFinalTitle(idea.title);
     setSubtitle(idea.subtitle);
