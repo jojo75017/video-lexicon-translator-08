@@ -401,6 +401,7 @@ export default function V3CreateWizard() {
         if (match) setCategory(match);
         else { setCategory('Autre'); setCustomCategory(String(wGenre)); }
       }
+      if (w.bookType && BOOK_TYPES.some((t) => t.id === w.bookType)) setBookType(w.bookType);
       if (w.tone) setTone(w.tone);
       if (w.numberOfChapters || w.chapters) setChapters(clampNumber(Number(w.numberOfChapters || w.chapters), 3, 60, 12));
       if (w.wordsPerChapter) setWordsPerChapter(Number(w.wordsPerChapter));
