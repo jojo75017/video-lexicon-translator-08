@@ -464,6 +464,110 @@ export const V3_BOOK_AVATARS: BookAvatarCategory[] = [
       },
     ],
   },
+  {
+    id: 'bricolage',
+    label: 'Bricolage & rénovation',
+    matches: ['Maison, Bricolage & Rénovation'],
+    avatars: [
+      {
+        id: 'expert-bricolage',
+        name: '🔨 Expert Bricolage & Rénovation',
+        badge: 'Guides pas-à-pas sécurisés',
+        profil: 'Bricoleur débutant à intermédiaire ou propriétaire rénovateur : menuiserie, ébénisterie, pose de cuisine, réparations domestiques, aménagement',
+        niveau: 'intermediaire',
+        besoins: 'Listes précises d’outils et de matériaux, étapes numérotées, astuces d’atelier, consignes de sécurité, pièges fréquents à éviter',
+        frustrations: 'Les étapes sautées, les outils oubliés, les conseils dangereux ou vagues',
+        ton: 'Pédagogique',
+        consigne:
+          'Rédige des guides pratiques méthodiques : pour chaque chantier, liste les outils et matériaux, puis des étapes numérotées concrètes, des conseils de professionnel et des précautions de sécurité obligatoires (protections, coupure électrique, ventilation). Recommande un professionnel pour l’électricité, le gaz ou la structure. N’invente jamais de normes, de dosages ou de références produits.',
+      },
+    ],
+  },
+  {
+    id: 'jardinage',
+    label: 'Jardinage & potager naturel',
+    matches: ['Jardinage, Potager & Nature'],
+    avatars: [
+      {
+        id: 'expert-jardinage',
+        name: '🌿 Expert Jardinage & Potager Naturel',
+        badge: 'Calendriers & fiches de culture',
+        profil: 'Jardinier débutant à confirmé : semis, cultures potagères, sol vivant, compostage, paillage, jardinage écologique',
+        niveau: 'tous',
+        besoins: 'Calendriers de saison, fiches pratiques par plante, techniques naturelles sans chimie, explications du pourquoi et du comment',
+        frustrations: 'Le jargon agronomique opaque, les calendriers faux, les conseils inadaptés au climat',
+        ton: 'Inspirant',
+        consigne:
+          'Rédige avec un ton bienveillant et passionné : organise le contenu par saison ou par fiche de culture (semis, plantation, entretien, récolte), explique le pourquoi et le comment sans jargon, privilégie les méthodes naturelles. Précise que les dates varient selon la région et le climat. N’invente jamais de variétés, de dates ou de traitements.',
+      },
+    ],
+  },
+  {
+    id: 'maison-cuisine',
+    label: 'Maison, cuisine & équipements',
+    matches: ['Maison, Cuisine & Équipements'],
+    avatars: [
+      {
+        id: 'expert-maison-cuisine',
+        name: '🏡 Expert Maison & Cuisine',
+        badge: 'Guides d’usage & comparatifs',
+        profil: 'Particulier qui équipe ou organise son logement : électroménager, ustensiles, organisation domestique, aménagement intérieur',
+        niveau: 'tous',
+        besoins: 'Guides d’utilisation clairs, conseils d’entretien, critères de choix, comparatifs équilibrés',
+        frustrations: 'Les faux tests, les publicités déguisées, les caractéristiques inventées',
+        ton: 'Expert',
+        consigne:
+          'Rédige des guides d’utilisation et d’entretien concrets et des comparatifs équilibrés fondés sur des critères de choix (usage, entretien, encombrement, consommation). N’invente jamais de tests, de marques, de prix ni de caractéristiques techniques : invite le lecteur à vérifier la notice du fabricant.',
+      },
+    ],
+  },
+  {
+    id: 'voyages',
+    label: 'Voyages & tourisme',
+    matches: ['Voyages, Tourisme & Découvertes'],
+    avatars: [
+      {
+        id: 'expert-voyages',
+        name: '✈️ Expert Voyages & Tourisme',
+        badge: 'Guides de destination',
+        profil: 'Voyageur qui prépare un séjour : destinations, itinéraires, transports, hébergements, conseils pratiques',
+        niveau: 'tous',
+        besoins: 'Itinéraires structurés jour par jour, informations pratiques, incontournables et bons plans, conseils de préparation',
+        frustrations: 'Les tarifs ou horaires faux, les descriptions de brochure, les guides sans organisation',
+        ton: 'Inspirant',
+        consigne:
+          'Rédige des guides de voyage structurés : présentation, meilleure période, itinéraires, transports, types d’hébergement, conseils pratiques et culturels. N’invente jamais de tarifs, d’horaires, d’adresses ni de formalités : invite le lecteur à vérifier auprès des sources officielles avant le départ.',
+      },
+    ],
+  },
+  {
+    id: 'aquariophilie',
+    label: 'Aquariophilie d’eau douce',
+    matches: ['Aquariophilie & Poissons d\'eau douce', 'Aquariophilie & Poissons d’eau douce'],
+    avatars: [
+      {
+        id: 'expert-aquariophilie',
+        name: '🐠 Expert Aquariophilie d’eau douce',
+        badge: 'Guides, fiches espèces & bien-être',
+        profil: 'Aquariophile débutant ou confirmé : installation, cycle de l’azote, paramètres de l’eau, espèces, plantes, filtration, chauffage, éclairage, alimentation, reproduction, biotopes',
+        niveau: 'tous',
+        besoins: 'Démarrer un bac sans pertes, choisir des espèces compatibles, entretenir l’eau, prévenir les maladies, réussir un aquarium planté ou communautaire',
+        frustrations: 'Les paramètres approximatifs, les associations d’espèces incompatibles, les traitements hasardeux',
+        ton: 'Pédagogique',
+        consigne:
+          'Rédige des guides pratiques, fiches espèces et ebooks complets centrés sur les besoins réels et le bien-être des poissons : démarrage et cycle de l’azote, paramètres de l’eau, compatibilités, plantes, matériel, alimentation, reproduction, entretien et prévention sanitaire. Ne jamais inventer de paramètres de maintenance, de compatibilités ou de traitements : donne uniquement des valeurs reconnues et vérifiables, présentées comme des fourchettes indicatives, et recommande de consulter un vétérinaire ou un professionnel en cas de maladie.',
+      },
+    ],
+  },
+];
+
+/** Catégories ajoutées en extension : chacune possède son univers d'avatars dédié. */
+export const V3_EXTRA_CATEGORIES = [
+  'Maison, Bricolage & Rénovation',
+  'Jardinage, Potager & Nature',
+  'Maison, Cuisine & Équipements',
+  'Voyages, Tourisme & Découvertes',
+  'Aquariophilie & Poissons d’eau douce',
 ];
 
 /** Trouve l'univers d'avatars correspondant à une catégorie du parcours de création. */

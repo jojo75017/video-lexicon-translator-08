@@ -17,7 +17,7 @@ const CATEGORIES = [
   'Voyage / Guide', 'Enfants / Jeunesse', 'Livre illustré 3-7 ans', 'Éducation / Pédagogie',
   'Parentalité / Famille', 'Spiritualité', 'Psychologie / Relations', 'Histoire / Culture',
   'Nature / Animaux', 'Loisirs créatifs / DIY', 'Informatique / IA', 'Carnet / Journal / Cahier',
-  'Poésie', 'Autre',
+  'Poésie', ...V3_EXTRA_CATEGORIES, 'Autre',
 ];
 
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];

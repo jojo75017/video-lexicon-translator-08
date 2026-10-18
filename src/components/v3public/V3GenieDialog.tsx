@@ -35,7 +35,8 @@ import {
 const CATEGORIES = [
   'Roman', 'Thriller / Policier', 'Romance', 'Fantasy / Fantastique', 'Science-fiction',
   'Développement personnel', 'Business / Entrepreneuriat', 'Santé / Bien-être',
-  'Cuisine / Recettes', 'Voyage / Guide', 'Enfants / Jeunesse', 'Histoire / Culture', 'Autre',
+  'Cuisine / Recettes', 'Voyage / Guide', 'Enfants / Jeunesse', 'Histoire / Culture',
+  ...V3_EXTRA_CATEGORIES, 'Autre',
 ];
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
 
