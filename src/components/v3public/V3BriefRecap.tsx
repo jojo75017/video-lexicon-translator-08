@@ -1,3 +1,4 @@
+import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ListOrdered, Rocket, UserRound, Save, Check, ArrowRight } from 'lucide-react';

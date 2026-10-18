@@ -1,3 +1,4 @@
+import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
