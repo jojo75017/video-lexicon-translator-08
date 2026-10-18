@@ -1,3 +1,4 @@
+import { canResumeBook } from '../../../supabase/functions/_shared/bookWritingPolicy';
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getFriendlyError, isCreditsExhaustedError } from '@/lib/errorMessages';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -379,6 +380,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       if (!saved) return;
 
       const data: WorkflowProgress = JSON.parse(saved);
+      if (initialTitle && !canResumeBook(initialTitle, initialBookIntroduction, data.title || '', data.bookIntroduction || '')) return;
       setSavedProgressSnapshot(data);
       if (data.currentStepIndex >= 0 && Object.keys(data.stepResults || {}).length > 0) {
         setHasSavedProgress(true);
@@ -388,7 +390,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setSubtitle(data.subtitle || '');
         setCategory(data.category || '');
         setAuthorName(data.authorName || '');
-        setBookIntroduction(data.bookIntroduction || '');
+        setBookIntroduction(initialBookIntroduction || data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
         setNumberOfChapters(data.numberOfChapters || 8);
         setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
@@ -526,7 +528,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const data: WorkflowProgress = JSON.parse(saved);
-        setSavedProgressSnapshot(data);
+        if (initialTitle && !canResumeBook(initialTitle, initialBookIntroduction, data.title || '', data.bookIntroduction || '')) return;
+      setSavedProgressSnapshot(data);
         setTitle(data.title);
         setSubtitle(data.subtitle);
         setCategory(data.category);

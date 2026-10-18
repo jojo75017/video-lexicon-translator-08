@@ -1,10 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-};
+import { detectBookType, nonFictionProductionPrompt } from '../_shared/bookWritingPolicy.ts';
+import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 const requireUser = async (req: Request) => {
   const authHeader = req.headers.get('Authorization');
@@ -440,22 +437,6 @@ async function callLovableAI(systemPrompt: string, userPrompt: string, maxTokens
 
 let activeBookTypeDirective = '';
 let activeIsNonFiction = false;
-
-/** Type de livre transmis par le parcours V3 (ligne « TYPE DE LIVRE : … »). */
-function detectBookType(intro: string): { label: string; nonFiction: boolean; directive: string } {
-  const m = /TYPE DE LIVRE\s*:\s*([^\n]+)/i.exec(String(intro || ''));
-  const label = (m?.[1] || '').trim();
-  const nonFiction = /guide|tutoriel|documentaire|informatif|professionnel|formation|biographie|t[ée]moignage/i.test(label);
-  if (!nonFiction) return { label, nonFiction: false, directive: '' };
-  const isGuide = /guide|tutoriel/i.test(label);
-  const isBio = /biographie|t[ée]moignage/i.test(label);
-  const directive = `TYPE DE LIVRE IMPOSÉ : ${label}. CE N'EST PAS UN ROMAN.
-INTERDICTIONS ABSOLUES : aucune intrigue, aucun personnage fictif, aucun dialogue romanesque, aucun suspense, aucun rebondissement, aucun cliffhanger, aucun titre de chapitre façon roman.${isBio ? ' Seules les personnes réelles citées par l\'auteur peuvent apparaître.' : ''}
-${isGuide ? `STRUCTURE PÉDAGOGIQUE DE CHAQUE CHAPITRE (quand c'est pertinent) : objectif clair ; introduction courte ; sous-titres ## et ### ; explications concrètes ; étapes numérotées ; liste du matériel ou des équipements ; tableau pratique en Markdown ; exemples réels et vérifiables ; encadrés « 💡 Conseil », « ⚠️ Attention » et « 📌 À retenir » ; erreurs à éviter ; précautions de sécurité ; checklist récapitulative (- [ ]) ; courte conclusion.
-Titres de chapitres descriptifs et utiles (ex. « Comment préparer sa terre avant les premières plantations »), progression du plus simple au plus avancé.` : 'Structure informative claire : sous-titres ## et ###, paragraphes courts, faits vérifiables, exemples réels, encadrés « À retenir ».'}
-N'invente jamais de chiffres, prix, paramètres techniques, horaires ou réglementations : donne des fourchettes indicatives reconnues et invite à vérifier auprès de sources fiables.`;
-  return { label, nonFiction: true, directive };
-}
 
 async function callAI(systemPrompt: string, userPrompt: string, maxTokens = 4000): Promise<string> {
   const userKey = activeApiKey?.trim();
@@ -1672,7 +1653,7 @@ RÈGLE DE CONCISION ABSOLUE :
 - Retourne un JSON compact, sans texte hors JSON
 - Chaque champ textuel = 1 phrase utile maximum quand c'est possible
 - Pas de paragraphes longs dans les descriptions`,
-          `Structure ce livre selon les normes KDP PRO en ${numberOfChapters} chapitres ET crée les personnages :
+          `Structure ce livre selon les normes KDP PRO en ${numberOfChapters} chapitres${activeIsNonFiction ? ', sans personnages ni intrigue' : ' ET crée les personnages'} :
 ${bookContext}
 DESCRIPTION : ${descriptionGeneree}${matiereAuteurP3}
 INTRODUCTION PRÉ-GÉNÉRÉE : ${introductionGeneree ? 'OUI (sera intégrée automatiquement)' : 'NON'}
@@ -1804,7 +1785,7 @@ Format JSON :
         const lecteurCible = previousContext.P1?.lecteurCible || '';
         const structureGlobale = previousContext.P3?.structureGlobale || '';
         const matiereAuteurP4 = bookIntroduction
-          ? `\n\nMATIÈRE DE L'AUTEUR (texte réel de l'auteur — SOURCE DE VÉRITÉ ABSOLUE) :\n"""\n${String(bookIntroduction).slice(0, 24000)}\n"""\nRÈGLES : reprends les faits, lieux, prénoms et dates exactement comme ci-dessus ; développe et enrichis ce matériau en scènes complètes, sans jamais le résumer, le raccourcir ni inventer d'éléments absents.`
+          ? `\n\nMATIÈRE DE L'AUTEUR (texte réel de l'auteur — SOURCE DE VÉRITÉ ABSOLUE) :\n"""\n${String(bookIntroduction).slice(0, 24000)}\n"""\nRÈGLES : reprends les faits, lieux, prénoms et dates exactement comme ci-dessus ; ${activeIsNonFiction ? 'développe ce matériau en explications pédagogiques et étapes concrètes, sans scènes ni dialogues inventés.' : 'développe et enrichis ce matériau en scènes complètes, sans jamais le résumer, le raccourcir ni inventer d’éléments absents.'}`
           : '';
 
         const personnagesP3 = previousContext.P3?.personnages || [];
@@ -1846,7 +1827,7 @@ Format JSON :
               .slice(useSegmentedMode ? -2 : -3)
               .map((ch: any) => `Ch.${ch.numero} "${ch.titre}": ${(ch.contenu || '').substring(0, p4Settings.previousChapterChars)}...`);
             if (resumesList.length > 0) {
-              resumeChapitresPrecedents = `\n\nCHAPITRES PRÉCÉDENTS (continuité narrative) :\n${resumesList.join('\n\n')}`;
+              resumeChapitresPrecedents = `\n\nCHAPITRES PRÉCÉDENTS (${activeIsNonFiction ? 'progression pédagogique' : 'continuité narrative'}) :\n${resumesList.join('\n\n')}`;
             }
           }
 
@@ -1863,7 +1844,9 @@ Format JSON :
             : transitionVers;
           const segmentSectionsText = (segmentSections.length > 0 ? segmentSections : (chapitre.sousSections || []))
             .join(', ');
-          const p4SystemPrompt = totalParts > 1
+          const p4SystemPrompt = activeIsNonFiction
+            ? nonFictionProductionPrompt(activeBookTypeDirective, totalParts > 1)
+            : totalParts > 1
             ? `Tu es un AUTEUR-ÉDITEUR expert du genre "${category}". Tu rédiges un segment de chapitre dense, fluide et crédible.
 
 RÈGLES STRICTES :
@@ -1919,7 +1902,7 @@ LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
 DESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}
 LECTEUR CIBLE : ${lecteurCible}
-ARC GLOBAL : ${structureGlobale}
+${activeIsNonFiction ? 'PROGRESSION PÉDAGOGIQUE' : 'ARC GLOBAL'} : ${structureGlobale}
 PLAN GLOBAL (compact) : ${planComplet}
 ${resumeChapitresPrecedents}${previousPartsSection}${personnagesSection}
 
@@ -1945,7 +1928,7 @@ LIVRE : "${fullTitle}"
 CATÉGORIE : ${category}
 DESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}
 LECTEUR CIBLE : ${lecteurCible}
-ARC GLOBAL : ${structureGlobale}
+${activeIsNonFiction ? 'PROGRESSION PÉDAGOGIQUE' : 'ARC GLOBAL'} : ${structureGlobale}
 PLAN : ${planComplet}
 ${resumeChapitresPrecedents}${personnagesSection}
 
@@ -2066,7 +2049,7 @@ ${LANGUE_RULE}`,
           const transition = chapSuivant ? `Termine en amenant vers "${chapSuivant.titre}".` : 'Dernier chapitre, conclusion forte.';
 
           const chapterContent = await callAI(
-            `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}
+            `${activeIsNonFiction ? nonFictionProductionPrompt(activeBookTypeDirective) : `Tu es un AUTEUR BEST-SELLER. Chapitres EXCEPTIONNELS dans "${category}". TON : ${tonEditorial}${personnagesSection}`}
 ${LANGUE_RULE}`,
             `LIVRE : "${fullTitle}"\nDESCRIPTION : ${descriptionGeneree}${matiereAuteurP4}\nPLAN : ${planComplet}${resumePrecedents}${personnagesSection}\n\nCHAPITRE ${chapitre.numero}/${structure.length} : "${chapitre.titre}"\nSOUS-SECTIONS : ${(chapitre.sousSections || []).join(', ')}\n${transition}\n\nJSON :\n{"numero": ${chapitre.numero}, "titre": "${chapitre.titre}", "contenu": "...", "nombreMots": 3000}`,
             6000

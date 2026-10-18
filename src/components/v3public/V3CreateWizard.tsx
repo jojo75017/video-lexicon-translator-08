@@ -1,3 +1,4 @@
+import { canResumeBook, wizardStepAfter } from '../../../supabase/functions/_shared/bookWritingPolicy';
 import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BOOK_TYPES, readBookType, writeBookType, bookTypeLabel, isFictionType, outlineRulesFor, looksLikeFictionOutline, type BookTypeId } from '@/lib/v3/bookType';
@@ -416,7 +417,7 @@ export default function V3CreateWizard() {
         }));
         const restoredCount = clampNumber(Number(w.numberOfChapters || w.chapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
         setOutline(hasRepeatedFallbackTitles(restoredOutline, restoredCount)
-          ? buildFallbackOutline(w.title || title, wGenre || effectiveCategory, restoredCount)
+          ? buildFallbackOutline(w.title || title, wGenre || effectiveCategory, restoredCount, w.bookType || readBookType())
           : restoredOutline);
       }
       if (w.cibleProfil) setCibleProfil(w.cibleProfil);
@@ -483,7 +484,15 @@ export default function V3CreateWizard() {
   const [category, setCategory] = useState(startingBrief.category || startingBrief.genre || hub.genre || 'Roman');
   const [customCategory, setCustomCategory] = useState('');
   const [bookType, setBookTypeState] = useState<BookTypeId>(() => readBookType());
-  const setBookType = (id: BookTypeId) => { setBookTypeState(id); writeBookType(id); };
+  const setBookType = (id: BookTypeId) => {
+    setBookTypeState(id); writeBookType(id);
+    if (!isFictionType(id)) {
+      if (step === 3) setStep(4);
+      if (looksLikeFictionOutline(outline.map((c) => c.titre))) {
+        setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, id));
+      }
+    }
+  };
   const [tone, setTone] = useState('Inspirant');
   const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 60, 12));
   const [wordsPerChapter, setWordsPerChapter] = useState(
@@ -698,6 +707,8 @@ export default function V3CreateWizard() {
       title.trim() && `Titre envisagé : ${title.trim()}`,
       subtitle.trim() && `Sous-titre envisagé : ${subtitle.trim()}`,
       description.trim() && `Informations et synopsis de l’auteur : ${description.trim()}`,
+      `TYPE DE LIVRE : ${bookTypeLabel(bookType)}`,
+      outlineRulesFor(bookType),
       effectiveCategory && `Catégorie choisie : ${effectiveCategory}`,
       cibleProfil.trim() && `Lecteur visé : ${cibleProfil.trim()}`,
       cibleBesoins.trim() && `Besoins du lecteur : ${cibleBesoins.trim()}`,
@@ -714,7 +725,7 @@ export default function V3CreateWizard() {
     setAiLoading(true);
     try {
       const dejaVus = allIdeas.map((idea) => `- ${idea.title}`).join('\n');
-       const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir des informations réelles données par l'auteur ci-dessous, propose CINQ livres différents et fidèles à son projet (angles réellement distincts : méthode, promesse émotionnelle, pas-à-pas, récit, guide express…).
+       const prompt = `Tu es un éditeur senior spécialisé Amazon KDP. À partir des informations réelles données par l'auteur ci-dessous, propose CINQ livres différents et fidèles à son projet (angles réellement distincts : ${isFictionType(bookType) ? 'méthode, promesse émotionnelle, pas-à-pas, récit' : 'méthode pratique, pas-à-pas, guide complet, fiches atelier, guide express'}).
  Informations de l'auteur :
  """${authorInformation}"""
 ${deeper ? `\nRecherche plus poussée : explore des angles, des promesses et des formats que l'on ne trouve pas dans les titres suivants, déjà proposés. Ne les reprends pas, ne les reformule pas :\n${dejaVus}\n` : ''}
@@ -809,6 +820,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     setRefineLoading(true);
     try {
       const prompt = `Tu es un éditeur senior Amazon KDP. Ajuste la proposition de livre ci-dessous selon la consigne de l'auteur.
+Type de livre : ${bookTypeLabel(bookType)}
+${outlineRulesFor(bookType)}
 Consigne : "${consigne}"
 
 Titre actuel : ${idea.title}
@@ -861,6 +874,8 @@ Réponds STRICTEMENT en JSON valide : {"title": "...", "subtitle": "...", "synop
     setProposalLoading(true);
     try {
       const prompt = `Tu es directeur éditorial senior spécialisé Amazon KDP. À partir de l'idée de l'auteur, propose un livre commercial complet, prêt à écrire.
+Type de livre imposé : ${bookTypeLabel(bookType)}
+${outlineRulesFor(bookType)}
 Idée / matière de l'auteur :
 """${seed.slice(0, 6000)}"""
 
@@ -1162,7 +1177,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     `TYPE DE LIVRE : ${bookTypeLabel(bookType)}`,
     description.trim(),
     retainedNarrative
-      ? `✍️ MATIÈRE VALIDÉE DE L'AUTEUR — version corrigée approuvée quand elle existe. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors) :\n"""${retainedNarrative}"""`
+      ? `✍️ MATIÈRE VALIDÉE DE L'AUTEUR — version corrigée approuvée quand elle existe. RÈGLE ABSOLUE : ne jamais résumer, raccourcir ni supprimer ces souvenirs. ${isFictionType(bookType) ? 'Chaque passage doit être DÉVELOPPÉ en scènes complètes (dialogues, sensations, décors)' : 'Chaque passage doit être développé en explications concrètes et pédagogiques, sans scènes ni dialogues inventés'} :\n"""${retainedNarrative}"""`
       : '',
     `Style demandé : ${tone}.`,
     `Format prévu : ${chapters} chapitres de ${wordsPerChapter} mots minimum chacun (développement obligatoire, jamais de résumé).`,
@@ -1171,8 +1186,8 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     workflowCharacters.length
       ? `Personnages fournis : ${workflowCharacters.map((character) => `${character.name} (${character.role}) — ${character.description}`).join(' | ')}`
       : '',
-    bibleUnivers.trim() ? `📚 BIBLE DE L'UNIVERS — cohérence obligatoire pour tous les agents :\n${bibleUnivers.trim()}` : '',
-    arbreNarratif.trim() ? `🌳 ARBRE NARRATIF — arcs, embranchements, chronologie :\n${arbreNarratif.trim()}` : '',
+    isFictionType(bookType) && bibleUnivers.trim() ? `📚 BIBLE DE L'UNIVERS — cohérence obligatoire pour tous les agents :\n${bibleUnivers.trim()}` : '',
+    isFictionType(bookType) && arbreNarratif.trim() ? `🌳 ARBRE NARRATIF — arcs, embranchements, chronologie :\n${arbreNarratif.trim()}` : '',
     targetPromiseBlock(),
     ].filter(Boolean).join('\n\n');
   };
@@ -1441,7 +1456,7 @@ ${outlineRulesFor(bookType)}`;
     }
     if (step === 3 && !finalTitle.trim()) setFinalTitle(title);
 
-    setStep((value) => Math.min(4, value + 1));
+    setStep((value) => wizardStepAfter(value, isFictionType(bookType), 1));
   };
 
   const updateCharacter = (id: string, field: keyof WizardCharacter, value: string) => {
@@ -1658,8 +1673,8 @@ ${outlineRulesFor(bookType)}`;
     // `ebook_workflow_progress` + `ebook_workflow_results`.
     try {
       const prevRaw = localStorage.getItem(WIZARD_KEY);
-      const prevTitle = prevRaw ? (JSON.parse(prevRaw)?.title || '') : '';
-      const sameBook = prevTitle && prevTitle.toLowerCase() === finalTitle.trim().toLowerCase();
+      const prev = prevRaw ? JSON.parse(prevRaw) : null;
+      const sameBook = prev && canResumeBook(safeTitle, workflowDescription, prev.title || '', prev.description || '');
       localStorage.setItem(CONFIG_KEY, JSON.stringify(config));
       localStorage.setItem(TARGET_WORDS_KEY, String(wordsPerChapter));
       localStorage.setItem(WIZARD_KEY, JSON.stringify({
@@ -1797,7 +1812,7 @@ ${outlineRulesFor(bookType)}`;
           <div className="space-y-5">
             <V3LiveBookProgress />
             <EbookCompleteWorkflow
-              key={`${finalTitle}-${chapters}-${wordsPerChapter}-${normalizedOutline.map((chapter) => chapter.titre).join('|')}`}
+              key={`${bookType}-${finalTitle}-${chapters}-${wordsPerChapter}-${normalizedOutline.map((chapter) => chapter.titre).join('|')}`}
               autoStart
               hideInputForm
               initialTitle={finalTitle.trim()}
@@ -1808,7 +1823,7 @@ ${outlineRulesFor(bookType)}`;
               initialWordsPerChapter={wordsPerChapter}
               initialTone={tone}
               characters={workflowCharacters}
-              initialOutline={startsFromExistingOutline ? normalizedOutline : undefined}
+              initialOutline={normalizedOutline}
               initialBookIntroduction={buildWorkflowDescription()}
               onComplete={handleWorkflowComplete}
             />
@@ -1987,7 +2002,9 @@ ${outlineRulesFor(bookType)}`;
   }
 
 
-  const steps = ['Fiche du livre', 'Style', 'Sommaire', 'Personnages', 'Titre'];
+  const steps = ['Fiche du livre', 'Style', 'Sommaire', 'Personnages', 'Titre']
+    .map((label, id) => ({ label, id }))
+    .filter(({ id }) => isFictionType(bookType) || id !== 3);
 
   return (
     <div className="space-y-8">
@@ -2264,9 +2281,9 @@ ${outlineRulesFor(bookType)}`;
         )}
       </div>
 
-      <div className="grid gap-2 sm:grid-cols-5">
+      <div className={`grid gap-2 ${isFictionType(bookType) ? 'sm:grid-cols-5' : 'sm:grid-cols-4'}`}>
 
-        {steps.map((label, index) => {
+        {steps.map(({ label, id: index }, displayIndex) => {
           const active = index === step;
           const done = index < step;
           return (
@@ -2281,7 +2298,7 @@ ${outlineRulesFor(bookType)}`;
                 color: active || done ? 'var(--v3-orange-600)' : 'var(--v3-muted)',
               }}
             >
-              <span className="block text-xs font-bold uppercase">Étape {index + 1}</span>
+              <span className="block text-xs font-bold uppercase">Étape {displayIndex + 1}</span>
               <span className="mt-1 block text-sm font-bold">{done ? '✓ ' : ''}{label}</span>
             </button>
           );
@@ -2557,7 +2574,7 @@ ${outlineRulesFor(bookType)}`;
                   <Sparkles className="h-3 w-3" /> Étape 3 · Sommaire
                 </span>
                 <h2 className="v3-serif mt-3 text-4xl font-bold leading-tight sm:text-5xl" style={{ color: 'var(--v3-ink)' }}>
-                  L'architecture<br/>de votre récit
+                  L'architecture<br/>{isFictionType(bookType) ? 'de votre récit' : bookType === 'guide' ? 'de votre guide pratique' : 'de votre livre'}
                 </h2>
                 <p className="mt-3 text-base leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
                   Chaque chapitre est une promesse faite au lecteur. Génère un sommaire cohérent, puis affine les titres et les objectifs — les agents suivront ta ligne éditoriale à la lettre.
@@ -2599,7 +2616,7 @@ ${outlineRulesFor(bookType)}`;
                 </button>
                 <button
                   type="button"
-                  onClick={() => { if (!finalTitle.trim()) setFinalTitle(title); setStep(3); }}
+                  onClick={() => { if (!finalTitle.trim()) setFinalTitle(title); setStep(isFictionType(bookType) ? 3 : 4); }}
                   className="text-xs font-bold underline"
                   style={{ color: 'var(--v3-muted)' }}
                   title="L'agent P3 « L'Architecte » reconstruira le sommaire automatiquement."
@@ -2788,7 +2805,7 @@ ${outlineRulesFor(bookType)}`;
 
 
 
-      {step === 3 && (
+      {step === 3 && isFictionType(bookType) && (
         <div className="space-y-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -2904,7 +2921,7 @@ ${outlineRulesFor(bookType)}`;
       )}
 
       <div className="flex items-center justify-between border-t pt-6" style={{ borderColor: 'var(--v3-border)' }}>
-        <button type="button" onClick={() => setStep((value) => Math.max(0, value - 1))} disabled={step === 0} className="v3-btn v3-btn-ghost disabled:opacity-40">
+        <button type="button" onClick={() => setStep((value) => wizardStepAfter(value, isFictionType(bookType), -1))} disabled={step === 0} className="v3-btn v3-btn-ghost disabled:opacity-40">
           <ArrowLeft className="h-4 w-4" /> Retour
         </button>
         {step < 4 ? (
