@@ -1161,7 +1161,7 @@ function buildFallbackP3Result(params: {
       promesse: introductionGeneree || descriptionGeneree || `Ce livre guide le lecteur pas à pas dans ${category || 'son sujet principal'}.`,
       elements: ['Contexte', 'Promesse', 'Résultat attendu'],
     },
-    personnages: buildFallbackP3Characters(category, characters),
+    personnages: activeIsNonFiction ? [] : buildFallbackP3Characters(category, characters),
     chapitres,
     blocsPratiques: {
       checklist: ['Point clé à retenir', 'Action immédiate', 'Vérification finale'],
