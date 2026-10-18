@@ -30,4 +30,4 @@
 - New-customer offers (Auteur yearly, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), so historical 47 € and subscription rights stay untouched.
 - JVZoo sales enter through the jvzoo-ipn function (JVZIPN v2 cverify, product filter, unique event key) and only grant or revoke Auteur rights JVZoo itself created, so Stripe and other rights are never overwritten.
 - Starter uses isStarter locks, never V2/Pro rights; /lancement and /lancement/offres reuse StarterPage and preserve payment query parameters to avoid divergent funnels.
-- Book type reaches workflow robots as a 'TYPE DE LIVRE :' intro line, so non-fiction gets no characters or plots without schema changes.
+- Shared writing policy separates guides from fiction; wizard outlines bypass P3 and resume checks include book type, preventing novel drift.
