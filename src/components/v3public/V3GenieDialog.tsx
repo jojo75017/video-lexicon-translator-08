@@ -1,3 +1,4 @@
+import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Sparkles, Wand2, ArrowRight, Check, Upload, FileText, RotateCcw, Loader2, Mic, Pencil, MessageSquare, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -35,7 +36,8 @@ import {
 const CATEGORIES = [
   'Roman', 'Thriller / Policier', 'Romance', 'Fantasy / Fantastique', 'Science-fiction',
   'Développement personnel', 'Business / Entrepreneuriat', 'Santé / Bien-être',
-  'Cuisine / Recettes', 'Voyage / Guide', 'Enfants / Jeunesse', 'Histoire / Culture', 'Autre',
+  'Cuisine / Recettes', 'Voyage / Guide', 'Enfants / Jeunesse', 'Histoire / Culture',
+  ...V3_EXTRA_CATEGORIES, 'Autre',
 ];
 const TONES = ['Inspirant', 'Pédagogique', 'Émotionnel', 'Direct', 'Humoristique', 'Premium', 'Romanesque', 'Expert'];
 

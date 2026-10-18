@@ -1,3 +1,4 @@
+import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Check, Copy, ExternalLink, ImageIcon, Loader2, Palette, Plus, RefreshCw, Rocket, Save, Sparkles, Trash2, UserRound, Wand2, FileDown, RotateCcw, Wrench } from 'lucide-react';
@@ -107,7 +108,7 @@ const CATEGORIES = [
   'Voyage / Guide', 'Enfants / Jeunesse', 'Livre illustré 3-7 ans', 'Éducation / Pédagogie',
   'Parentalité / Famille', 'Spiritualité', 'Psychologie / Relations', 'Histoire / Culture',
   'Nature / Animaux', 'Loisirs créatifs / DIY', 'Informatique / IA', 'Carnet / Journal / Cahier',
-  'Poésie', 'Autre',
+  'Poésie', ...V3_EXTRA_CATEGORIES, 'Autre',
 ];
 
 
