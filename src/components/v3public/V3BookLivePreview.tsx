@@ -5,13 +5,13 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Eye, EyeOff, FileDown, Loader2, Printer, Wand2 } from 'lucide-react';
+import { BookOpen, Eye, EyeOff, FileDown, Loader2, Printer, Trash2, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { validatedPassages, type BookBrief } from '@/lib/v3/bookBrief';
+import { resetBookProject, validatedPassages, type BookBrief } from '@/lib/v3/bookBrief';
 import { correctWholeBook } from '@/lib/v3/autoCorrectChapters';
 import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import {
-  readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
+  clearWrittenChapters, readWrittenProgress, WRITTEN_CHAPTERS_EVENT, type WrittenProgress,
 } from '@/lib/v3/writtenChapters';
 
 function paragraphsOf(text: string): string[] {
@@ -169,6 +169,16 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
   const firstError = progress.chapters.find((c) => c.status === 'failed' && c.error)?.error || '';
 
 
+  /** Efface le livre en cours (fiche, sommaire, chapitres) — jamais « Mes livres ». */
+  const eraseAll = () => {
+    if (!window.confirm('Tout effacer et repartir de zéro ?\n\nLe titre, le sommaire et les chapitres en cours seront effacés. Vos livres enregistrés dans « Mes livres » restent intacts.')) return;
+    resetBookProject();
+    try { clearWrittenChapters(); } catch { /* noop */ }
+    setProgress({ chapters: [], total: 0, activeIndex: -1 });
+    toast.success('Tout est effacé. Vous repartez d’une page blanche.');
+    setTimeout(() => window.location.reload(), 400);
+  };
+
   const fixAll = async () => {
     setFixing(true);
     try {
@@ -201,6 +211,11 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
               <FileDown className="h-3 w-3" /> {showExport ? 'Masquer l’export' : 'Exporter (tablette, Word, KDP…)'}
             </button>
           )}
+          <button type="button" onClick={eraseAll}
+            className="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-semibold"
+            style={{ borderColor: 'hsl(var(--destructive))', color: 'hsl(var(--destructive))' }}>
+            <Trash2 className="h-3 w-3" /> Effacer tout
+          </button>
           <button type="button" onClick={() => window.print()}
             className="inline-flex items-center gap-1 text-[11px] underline" style={{ color: 'var(--v3-muted)' }}>
             <Printer className="h-3 w-3" /> Imprimer
