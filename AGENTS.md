@@ -5,7 +5,7 @@
 - Separate wrap image exports crop the shared full-cover renderer at each zone’s finished dimensions, preserving artwork and text without printing editor guides.
 - Wrap layout templates transform existing text elements locally and preview through the export renderer, preserving content, private images, image adjustments and KDP geometry.
 - Cover brightness limits match across controls, saving and export, so brightening survives printing.
-- Wrap text formatting uses a shared canvas renderer for justification and underline across exports and thumbnails, so printable output retains editable block styles.
+- Wrap text formatting uses one shared canvas renderer, so exports and thumbnails keep block styles.
 
 - Full-wrap illustrations use optional imageCoverage with shared preview/export placement, preserving front-only covers.
 
