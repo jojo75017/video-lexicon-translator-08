@@ -11,7 +11,7 @@ import V3LiveBookProgress from '@/components/v3public/V3LiveBookProgress';
 import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 import { supabase } from '@/integrations/supabase/client';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
-import { publishWrittenChapters } from '@/lib/v3/writtenChapters';
+import { clearWrittenChapters, publishWrittenChapters } from '@/lib/v3/writtenChapters';
 
 import { proofreadChapters, type ChapterProofread } from '@/lib/correcteur/proofreadBook';
 
@@ -766,6 +766,8 @@ Réponds STRICTEMENT en JSON valide (sans balises, sans texte autour) avec ce sc
     // Nouveau livre choisi : le sommaire d'un livre précédent ne doit jamais réapparaître.
     if (cleanText(idea.title).toLowerCase() !== cleanText(finalTitle || title).toLowerCase()) {
       setOutline([]);
+      // Les chapitres rédigés pour l'ancien livre ne doivent pas s'afficher sous le nouveau titre.
+      try { clearWrittenChapters(); } catch { /* noop */ }
     }
     setTitle(idea.title);
     setFinalTitle(idea.title);
