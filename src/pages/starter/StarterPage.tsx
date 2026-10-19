@@ -94,7 +94,6 @@ export default function StarterPage({ offerOnly = false }: { offerOnly?: boolean
               </Button>
             </form>
             <Button asChild variant="outline" className="mt-4 w-full"><Link to={offersUrl}>Découvrir directement Starter à 27 €</Link></Button>
-            <p className="mt-4 text-center text-sm"><Link to="/connexion-abonne" className="text-primary underline">Déjà client ? Me connecter</Link></p>
             <p className="mt-4 flex items-center gap-2 text-xs text-muted-foreground"><ShieldCheck className="h-4 w-4" />Aucune carte demandée. Désinscription en un clic.</p>
           </div>
         </div>
