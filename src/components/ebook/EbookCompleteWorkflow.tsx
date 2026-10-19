@@ -171,7 +171,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   const [promesseDifferenciation, setPromesseDifferenciation] = useState('');
   const [promesseEmotion, setPromesseEmotion] = useState('');
   const [language, setLanguage] = useState<'fr' | 'en' | 'es' | 'it'>('fr');
-  const [numberOfChapters, setNumberOfChapters] = useState(() => Math.max(3, Math.min(60, Math.round(initialNumberOfChapters || 8))));
+  const [numberOfChapters, setNumberOfChapters] = useState(() => Math.max(3, Math.min(40, Math.round(initialNumberOfChapters || 8))));
   const [wordsPerChapter, setWordsPerChapter] = useState(() => Math.max(500, Math.min(8000, Math.round(initialWordsPerChapter || 3500))));
   const [hasReadSteps, setHasReadSteps] = useState(autoStart);
   const [autofillLoading, setAutofillLoading] = useState(false);
@@ -214,7 +214,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
     if (!authorName.trim() && initialAuthorName.trim()) setAuthorName(initialAuthorName);
     if (!bookIntroduction.trim() && initialBookIntroduction.trim()) setBookIntroduction(initialBookIntroduction);
     if (numberOfChapters === 8 && initialNumberOfChapters && initialNumberOfChapters !== 8) {
-      setNumberOfChapters(Math.max(3, Math.min(60, Math.round(initialNumberOfChapters))));
+      setNumberOfChapters(Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))));
     }
     if (wordsPerChapter === 3500 && initialWordsPerChapter && initialWordsPerChapter !== 3500) {
       setWordsPerChapter(Math.max(500, Math.min(8000, Math.round(initialWordsPerChapter))));
@@ -392,7 +392,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setAuthorName(data.authorName || '');
         setBookIntroduction(initialBookIntroduction || data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
-        setNumberOfChapters(data.numberOfChapters || 8);
+        setNumberOfChapters(autoStart && initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
         setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
@@ -1629,8 +1629,17 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   };
 
   useEffect(() => {
-    if (!autoStart || autoStartTriggeredRef.current || isGenerating || currentStepIndex >= 0) return;
+    if (!autoStart || autoStartTriggeredRef.current || isGenerating) return;
     if (!title.trim() || !authorName.trim() || !category || !bookIntroduction.trim()) return;
+    // Livre déjà commencé : on reprend automatiquement à l'étape enregistrée
+    // au lieu de rester bloqué sans lancer les agents.
+    if (currentStepIndex >= 0) {
+      if (currentStepIndex >= WORKFLOW_STEPS.length - 1 || waitingForCharacterValidation) return;
+      autoStartTriggeredRef.current = true;
+      setHasReadSteps(true);
+      generateCompleteBook(Math.max(1, currentStepIndex));
+      return;
+    }
     autoStartTriggeredRef.current = true;
     setHasReadSteps(true);
     generateCompleteBook(0);
