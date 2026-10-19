@@ -1368,7 +1368,7 @@ serve(async (req) => {
     activeLanguageDirective = languageDirective;
     // Le navigateur signale que le quota journalier de cette clé Gemini est déjà
     // épuisé pendant ce livre : on passe directement au relais, sans attente.
-    if (activeApiKey && normalizedProvider === 'gemini' && body?.geminiQuotaExhausted === true) {
+    if (activeApiKey && normalizedProvider === 'gemini' && payload?.geminiQuotaExhausted === true) {
       exhaustedGeminiKeys.set(activeApiKey.slice(-12), Date.now() + 3600 * 1000);
       geminiDailyQuotaHit = true;
     }
