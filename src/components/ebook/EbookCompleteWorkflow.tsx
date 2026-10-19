@@ -1538,7 +1538,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       // ⏯️ AUTO-REPRISE : si l'erreur est transitoire (rate limit, surcharge, timeout), on relance tout seul
       const msg = String(err?.message || err || '');
       const isUserCancelled = msg.includes('USER_CANCELLED');
-      const isTransient = !isUserCancelled && /503|429|overload|surcharg|RATE_LIMIT|TIMEOUT|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|segment vide|Erreur inconnue|fetch|network/i.test(msg);
+      const isTransient = !isUserCancelled && /503|504|546|429|overload|surcharg|RATE_LIMIT|TIMEOUT|délai|trop de temps|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|segment vide|Erreur inconnue|non-2xx|WORKER_LIMIT|fetch|network|temporairement/i.test(msg);
       const MAX_AUTO_RESUME = 8;
 
       if (isTransient && autoResumeCountRef.current < MAX_AUTO_RESUME) {
