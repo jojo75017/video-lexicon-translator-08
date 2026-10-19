@@ -142,6 +142,27 @@ let totalTokenUsage = {
   totalTokens: 0
 };
 
+// Clés Gemini dont le quota journalier est épuisé (mémoire de l'instance) :
+// on évite de reperdre ~30 s d'attente à chaque segment de chapitre.
+const exhaustedGeminiKeys = new Map<string, number>();
+
+function isDailyQuotaError(errText: string): boolean {
+  return /PerDay|per day|free_tier_requests/i.test(errText) || /retry in \d+h/i.test(errText);
+}
+
+function markGeminiKeyExhausted(key: string, errText: string) {
+  const m = errText.match(/"retryDelay"\s*:\s*"(\d+)s"/);
+  const seconds = m ? Math.min(parseInt(m[1]), 6 * 3600) : 3600;
+  exhaustedGeminiKeys.set(key.slice(-12), Date.now() + seconds * 1000);
+}
+
+function isGeminiKeyExhausted(key: string): boolean {
+  const until = exhaustedGeminiKeys.get(sanitizeApiKey(key).slice(-12));
+  if (!until) return false;
+  if (Date.now() > until) { exhaustedGeminiKeys.delete(sanitizeApiKey(key).slice(-12)); return false; }
+  return true;
+}
+
 async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTokens: number, apiKey: string, retryCount = 0): Promise<string> {
   const MAX_RETRIES = 1;
   const cleanKey = sanitizeApiKey(apiKey);
@@ -149,6 +170,10 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
   // Pre-flight: vérifier le format de la clé Gemini
   if (!isValidGoogleKey(cleanKey)) {
     throw new Error('INVALID_API_KEY: Clé API Gemini invalide. Collez la clé complète depuis Google AI Studio.');
+  }
+
+  if (isGeminiKeyExhausted(cleanKey)) {
+    throw new Error('RATE_LIMIT: DAILY_QUOTA Quota journalier Gemini déjà atteint sur cette clé.');
   }
   
   console.log(`[Gemini] Using subscriber key (length=${cleanKey.length}), retry=${retryCount}`);
@@ -186,13 +211,20 @@ async function callGeminiDirect(systemPrompt: string, userPrompt: string, maxTok
     const errText = await response.text();
     console.error(`Gemini direct error ${status}: ${errText}`);
     
+    // Quota JOURNALIER épuisé : inutile d'attendre, Google ne répondra pas avant
+    // plusieurs heures. On mémorise et on passe directement au relais.
+    if (status === 429 && isDailyQuotaError(errText)) {
+      markGeminiKeyExhausted(cleanKey, errText);
+      throw new Error('RATE_LIMIT: DAILY_QUOTA Quota journalier Gemini atteint sur cette clé.');
+    }
+
     // Retry automatique sur 429/503/500 avec délai exponentiel.
     // Les gros appels P4 sont maintenant segmentés avec moins de tokens pour laisser
     // assez de marge au retry sans bloquer l'étape entière.
     if ((status === 429 || status === 503 || status === 500) && retryCount < MAX_RETRIES) {
       const retryMatch = errText.match(/retry(?:\s+in|Delay"\s*:\s*")?\s*(\d+)/i);
       const baseWait = status === 503 ? 20 : 30;
-      const waitSeconds = retryMatch ? parseInt(retryMatch[1]) + 5 : Math.min(baseWait * Math.pow(2, retryCount), 60);
+      const waitSeconds = retryMatch ? Math.min(parseInt(retryMatch[1]) + 5, 30) : Math.min(baseWait * Math.pow(2, retryCount), 60);
       console.log(`⏳ Gemini ${status} - retry ${retryCount + 1}/${MAX_RETRIES} dans ${waitSeconds}s...`);
       await new Promise(resolve => setTimeout(resolve, waitSeconds * 1000));
       return await callGeminiDirect(systemPrompt, userPrompt, maxTokens, apiKey, retryCount + 1);
