@@ -182,6 +182,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
   const cancelRef = useRef(false);
   const autoStartTriggeredRef = useRef(false);
   const autoResumeCountRef = useRef(0);
+  // Quota journalier Gemini épuisé pendant ce livre : on prévient le moteur
+  // pour qu'il passe directement au relais au lieu d'attendre à chaque segment.
+  const geminiQuotaUntilRef = useRef(0);
   const autoResumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentStepIndex, setCurrentStepIndex] = useState(-1);
   const [activeStepProgress, setActiveStepProgress] = useState(0);
@@ -896,6 +899,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       provider: activeProvider,
       openrouterModel: getOpenRouterModel(),
       quality: proWorkflow ? 'pro' : 'core',
+      geminiQuotaExhausted: geminiQuotaUntilRef.current > Date.now(),
       ...extraBody,
     };
 
@@ -939,8 +943,10 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         throw new Error(realMessage);
       }
       if (data?.error) throw new Error(data.error);
-
-
+      if (data?.geminiQuotaExhausted && geminiQuotaUntilRef.current <= Date.now()) {
+        geminiQuotaUntilRef.current = Date.now() + 60 * 60 * 1000;
+        toast.info('Votre clé Gemini a atteint son quota du jour : l’écriture continue avec le relais, sans interruption.', { duration: 6000 });
+      }
 
       return {
         result: data.result,
@@ -1311,6 +1317,9 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
 
             const chapitreGenere = mergeChapterSegments(chapitre, generatedSegments);
             if (chapitreGenere) chapitresComplets.push(chapitreGenere);
+            // Un chapitre terminé = progrès réel : on remet à zéro le compteur de
+            // reprises automatiques pour qu'un long livre ne s'arrête pas au 7e incident.
+            autoResumeCountRef.current = 0;
 
             console.log(`✅ [P4] Chapitre ${chapitresComplets.length}/${retryStructure.length} terminé : « ${chapitreGenere?.titre || ''} »`);
             toast.success(`✅ Chapitre ${chapitresComplets.length}/${retryStructure.length} rédigé`, { duration: 2000 });
@@ -1529,8 +1538,8 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
       // ⏯️ AUTO-REPRISE : si l'erreur est transitoire (rate limit, surcharge, timeout), on relance tout seul
       const msg = String(err?.message || err || '');
       const isUserCancelled = msg.includes('USER_CANCELLED');
-      const isTransient = !isUserCancelled && /503|429|overload|surcharg|RATE_LIMIT|TIMEOUT|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|segment vide|Erreur inconnue|fetch|network/i.test(msg);
-      const MAX_AUTO_RESUME = 6;
+      const isTransient = !isUserCancelled && /503|504|546|429|overload|surcharg|RATE_LIMIT|TIMEOUT|délai|trop de temps|GEMINI_OVERLOAD|CREDITS_EXHAUSTED|segment vide|Erreur inconnue|non-2xx|WORKER_LIMIT|fetch|network|temporairement/i.test(msg);
+      const MAX_AUTO_RESUME = 8;
 
       if (isTransient && autoResumeCountRef.current < MAX_AUTO_RESUME) {
         autoResumeCountRef.current += 1;
