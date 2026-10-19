@@ -404,7 +404,7 @@ export default function V3CreateWizard() {
       }
       if (w.bookType && BOOK_TYPES.some((t) => t.id === w.bookType)) setBookType(w.bookType);
       if (w.tone) setTone(w.tone);
-      if (w.numberOfChapters || w.chapters) setChapters(clampNumber(Number(w.numberOfChapters || w.chapters), 3, 60, 12));
+      if (w.numberOfChapters || w.chapters) setChapters(clampNumber(Number(w.numberOfChapters || w.chapters), 3, 40, 12));
       if (w.wordsPerChapter) setWordsPerChapter(Number(w.wordsPerChapter));
       if (Array.isArray(w.characters) && w.characters.length) {
         setCharacters(w.characters.map((c: any) => ({
@@ -415,7 +415,7 @@ export default function V3CreateWizard() {
         const restoredOutline = w.outline.map((o: any, i: number) => ({
           id: makeId(), numero: o.numero || i + 1, titre: o.titre || `Chapitre ${i + 1}`, objectif: o.objectif || '', sources: Array.isArray(o.sources) ? o.sources : undefined,
         }));
-        const restoredCount = clampNumber(Number(w.numberOfChapters || w.chapters || restoredOutline.length), 3, 60, restoredOutline.length || 12);
+        const restoredCount = clampNumber(Number(w.numberOfChapters || w.chapters || restoredOutline.length), 3, 40, restoredOutline.length || 12);
         setOutline(hasRepeatedFallbackTitles(restoredOutline, restoredCount)
           ? buildFallbackOutline(w.title || title, wGenre || effectiveCategory, restoredCount, w.bookType || readBookType())
           : restoredOutline);
@@ -494,7 +494,7 @@ export default function V3CreateWizard() {
     }
   };
   const [tone, setTone] = useState('Inspirant');
-  const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 60, 12));
+  const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 40, 12));
   const [wordsPerChapter, setWordsPerChapter] = useState(
     clampNumber(Number(startingBrief.wordsPerChapter), 500, 5000, 2500),
   );
@@ -520,7 +520,7 @@ export default function V3CreateWizard() {
     return buildFallbackOutline(
       hub.title || '',
       startingBrief.category || startingBrief.genre || hub.genre || 'Roman',
-      clampNumber(Number(hub.numberOfChapters), 3, 60, 12),
+      clampNumber(Number(hub.numberOfChapters), 3, 40, 12),
       readBookType(),
     );
   });
@@ -623,7 +623,7 @@ export default function V3CreateWizard() {
       const savedImages = Array.isArray(saved.ebook_images) ? saved.ebook_images : [];
       const savedCover = savedImages.find((image: any) => image?.type === 'front_cover')?.url || saved.cover_concepts || null;
       const savedSubtitle = String(saved.narrative_format || '').replace(/^Sous-titre\s*:\s*/i, '');
-      const savedChapterCount = clampNumber(Number(saved.number_of_chapters || savedChapters.length), 3, 60, 12);
+      const savedChapterCount = clampNumber(Number(saved.number_of_chapters || savedChapters.length), 3, 40, 12);
 
       restoreRef.current = true;
       syncProjectId(saved.id);
@@ -892,7 +892,7 @@ Réponds STRICTEMENT en JSON valide (aucun markdown, aucun texte autour) :
   "categories": ["3 catégories Amazon FR, la plus pertinente en premier"],
   "description": "synopsis vendeur de 150 à 200 mots",
   "tone": "un seul ton parmi : ${TONES.join(', ')}",
-  "chapters": nombre entier entre 8 et 30,
+  "chapters": nombre entier entre 8 et 40,
   "wordsPerChapter": nombre entier entre 1500 et 3500,
   "characters": [{"name":"","role":"","traits":""}],
   "outline": [{"numero":1,"titre":"titre spécifique jamais générique","objectif":"objectif éditorial en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]
@@ -927,7 +927,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       }
       if (parsed.tone && TONES.includes(String(parsed.tone))) { setTone(String(parsed.tone)); filled.push('Ton'); }
 
-      const proposedChapters = clampNumber(Number(parsed.chapters), 3, 60, chapters);
+      const proposedChapters = clampNumber(Number(parsed.chapters), 3, 40, chapters);
       const proposedOutline: OutlineChapter[] = (Array.isArray(parsed.outline) ? parsed.outline : [])
         .map((item: any, index: number) => ({
           id: makeId(),
@@ -936,7 +936,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
           objectif: cleanText(String(item?.objectif || item?.goal || '')),
         }))
         .filter((item: OutlineChapter) => item.titre && !isGenericTitle(item.titre))
-        .slice(0, 60);
+        .slice(0, 40);
 
       if (proposedOutline.length >= 3) {
         setOutline(proposedOutline);
@@ -1098,14 +1098,14 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       toast.error('Aucun chapitre détecté dans ce sommaire.');
       return;
     }
-    const capped = imported.slice(0, 60);
+    const capped = imported.slice(0, 40);
     setOutline(capped.map((chapter, index) => ({
       id: makeId(),
       numero: index + 1,
       titre: cleanText(chapter.titre) || `Chapitre ${index + 1}`,
       objectif: cleanText(chapter.objectif || ''),
     })));
-    setChapters(clampNumber(capped.length, 3, 60, capped.length));
+    setChapters(clampNumber(capped.length, 3, 40, capped.length));
     toast.success(`${capped.length} chapitres importés (${sourceLabel}) ✓`);
   };
 
@@ -1479,7 +1479,7 @@ ${outlineRulesFor(bookType)}`;
   const addOutlineChapter = () => {
     setOutline((items) => {
       const next = [...items, { id: makeId(), numero: items.length + 1, titre: `Nouvelle partie — ${title || effectiveCategory}`, objectif: 'Définir le rôle précis de ce chapitre dans la progression du livre.' }];
-      setChapters(clampNumber(next.length, 3, 60, 12));
+      setChapters(clampNumber(next.length, 3, 40, 12));
       return next;
     });
   };
@@ -2534,10 +2534,10 @@ ${outlineRulesFor(bookType)}`;
             <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
               <div className="flex items-center justify-between gap-3">
                 <span className="text-sm font-bold" style={{ color: 'var(--v3-ink)' }}>Nombre de chapitres</span>
-                <input type="number" min={3} max={60} value={chapters} onChange={(event) => setChapters(clampNumber(Number(event.target.value), 3, 60, 12))} className="w-20 rounded-xl border px-2 py-2 text-right font-bold outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }} />
+                <input type="number" min={3} max={40} value={chapters} onChange={(event) => setChapters(clampNumber(Number(event.target.value), 3, 40, 12))} className="w-20 rounded-xl border px-2 py-2 text-right font-bold outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }} />
               </div>
-              <input type="range" min={3} max={60} value={chapters} onChange={(event) => setChapters(Number(event.target.value))} className="mt-5 w-full" />
-              <div className="mt-2 flex justify-between text-xs" style={{ color: 'var(--v3-muted)' }}><span>3</span><span>60 chapitres max</span></div>
+              <input type="range" min={3} max={40} value={chapters} onChange={(event) => setChapters(Number(event.target.value))} className="mt-5 w-full" />
+              <div className="mt-2 flex justify-between text-xs" style={{ color: 'var(--v3-muted)' }}><span>3</span><span>40 chapitres max</span></div>{chapters > 30 && <p className="mt-2 text-xs font-semibold" style={{ color: "var(--v3-orange-600)" }}>Au-delà de 30 chapitres, la rédaction est plus longue : vérifiez votre quota de clé IA.</p>}
             </div>
             <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
               <div className="flex items-center justify-between gap-3">
@@ -2740,7 +2740,7 @@ ${outlineRulesFor(bookType)}`;
             </div>
           </div>
 
-          {chapters < 60 && (
+          {chapters < 40 && (
             <button type="button" onClick={addOutlineChapter} className="v3-btn v3-btn-outline mx-auto flex">
               <Plus className="h-4 w-4" /> Ajouter un chapitre
             </button>
