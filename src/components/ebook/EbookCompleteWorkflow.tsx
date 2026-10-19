@@ -395,7 +395,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setAuthorName(data.authorName || '');
         setBookIntroduction(initialBookIntroduction || data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
-        setNumberOfChapters(autoStart && initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
+        setNumberOfChapters(initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
         setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
@@ -537,7 +537,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setSubtitle(data.subtitle);
         setCategory(data.category);
         setAuthorName(data.authorName);
-        setNumberOfChapters(data.numberOfChapters);
+        setNumberOfChapters(initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
         setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
@@ -1392,7 +1392,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
           // Dans le parcours « J'ai déjà mon sommaire », P3 ne doit surtout pas
           // inventer un autre plan. Le sommaire validé devient directement la
           // structure officielle transmise à la rédaction chapitre par chapitre.
-          const result = step.id === 'P3' && initialOutline.length >= 3 && initialOutline.length >= numberOfChapters
+          const result = step.id === 'P3' && initialOutline.length >= 3
             ? {
                 result: {
                   structureGlobale: `Sommaire fourni et validé par l'auteur pour « ${title} ».`,
