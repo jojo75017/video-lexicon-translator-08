@@ -2537,7 +2537,7 @@ ${outlineRulesFor(bookType)}`;
                 <input type="number" min={3} max={40} value={chapters} onChange={(event) => setChapters(clampNumber(Number(event.target.value), 3, 40, 12))} className="w-20 rounded-xl border px-2 py-2 text-right font-bold outline-none" style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)' }} />
               </div>
               <input type="range" min={3} max={40} value={chapters} onChange={(event) => setChapters(Number(event.target.value))} className="mt-5 w-full" />
-              <div className="mt-2 flex justify-between text-xs" style={{ color: 'var(--v3-muted)' }}><span>3</span><span>60 chapitres max</span></div>
+              <div className="mt-2 flex justify-between text-xs" style={{ color: 'var(--v3-muted)' }}><span>3</span><span>40 chapitres max</span></div>{chapters > 30 && <p className="mt-2 text-xs font-semibold" style={{ color: "var(--v3-orange-600)" }}>Au-delà de 30 chapitres, la rédaction est plus longue : vérifiez votre quota de clé IA.</p>}<div className="hidden"></div>
             </div>
             <div className="rounded-2xl border p-4" style={{ borderColor: 'var(--v3-border)', background: 'var(--v3-paper)' }}>
               <div className="flex items-center justify-between gap-3">
@@ -2740,7 +2740,7 @@ ${outlineRulesFor(bookType)}`;
             </div>
           </div>
 
-          {chapters < 60 && (
+          {chapters < 40 && (
             <button type="button" onClick={addOutlineChapter} className="v3-btn v3-btn-outline mx-auto flex">
               <Plus className="h-4 w-4" /> Ajouter un chapitre
             </button>
