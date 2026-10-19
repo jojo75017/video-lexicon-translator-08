@@ -683,8 +683,7 @@ export default function V3CreateWizard() {
               titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
               contenu: String(chapter.content || chapter.contenu || ''),
             }));
-          const written = (progChapters.length > cloudWritten.length ? progChapters : cloudWritten)
-            .slice(0, Math.max(0, structure.length - 1));
+          const written = progChapters.length > cloudWritten.length ? progChapters : cloudWritten;
           const p3 = { chapitres: structure };
           const p4 = { chapitres: written, nombreChapitres: written.length };
           const keptResults: Record<string, any> = {};
@@ -1396,8 +1395,9 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     restoreRef.current = true; // évite qu'un effet de reprise ne recharge l'ancien brouillon
     setResumeInfo(null);
     // L'adresse « ?projectId=… » rouvrait l'ancien livre : on la retire.
-    if (searchParams.get('projectId')) {
-      const next = new URLSearchParams(searchParams);
+    const currentParams = new URLSearchParams(window.location.search);
+    if (currentParams.get('projectId')) {
+      const next = currentParams;
       next.delete('projectId');
       setSearchParams(next, { replace: true });
     }
