@@ -655,7 +655,59 @@ export default function V3CreateWizard() {
       const hasManuscript = savedChapters.some((chapter: any) =>
         String(chapter?.content || chapter?.contenu || '').trim().length > 0
       );
-      if (hasManuscript) {
+      const writtenCount = savedChapters.filter((chapter: any) =>
+        String(chapter?.content || chapter?.contenu || '').trim().length > 200
+      ).length;
+      const isIncomplete = hasManuscript && writtenCount < savedChapterCount;
+      if (isIncomplete) {
+        // Livre commencé mais pas fini (ex. 8 chapitres écrits sur 30) : on ne
+        // l'affiche PAS comme terminé. On prépare la reprise à P4 avec les
+        // chapitres déjà écrits, puis l'abonné clique « Reprendre le workflow ».
+        try {
+          const progRaw = localStorage.getItem('ebook_workflow_progress');
+          const prog = progRaw ? JSON.parse(progRaw) : null;
+          const sameTitle = prog && String(prog.title || '').trim().toLowerCase() === String(saved.title || '').trim().toLowerCase();
+          const progWritten = Array.isArray(prog?.allContext?.P4?.chapitres) ? prog.allContext.P4.chapitres.length : 0;
+          if (!sameTitle || progWritten < writtenCount) {
+            const structure = savedChapters.slice(0, savedChapterCount).map((chapter: any, index: number) => ({
+              numero: index + 1,
+              titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
+              objectif: cleanText(chapter.objectif || chapter.goal || ''),
+            }));
+            const written = savedChapters
+              .slice(0, writtenCount)
+              .map((chapter: any, index: number) => ({
+                numero: index + 1,
+                titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
+                contenu: String(chapter.content || chapter.contenu || ''),
+              }));
+            const p3 = { chapitres: structure };
+            const p4 = { chapitres: written, nombreChapitres: written.length };
+            localStorage.setItem('ebook_workflow_progress', JSON.stringify({
+              title: saved.title || '',
+              subtitle: savedSubtitle === 'Workflow V3 complet' ? '' : savedSubtitle,
+              category: String(saved.kdp_categories || '').split('|')[0].trim() || 'Autre',
+              authorName: saved.author_name || 'Auteur Ebookstudio',
+              bookIntroduction: (prog && sameTitle && prog.bookIntroduction) || '',
+              hasReadSteps: true,
+              numberOfChapters: savedChapterCount,
+              currentStepIndex: 3,
+              stepResults: {
+                ...(sameTitle ? prog?.stepResults || {} : {}),
+                P3: { result: p3, displayContent: `Sommaire : ${structure.length} chapitres.` },
+                P4: { result: p4, displayContent: `**📄 Chapitres rédigés : ${written.length}/${structure.length}**` },
+              },
+              allContext: { ...(sameTitle ? prog?.allContext || {} : {}), P3: p3, P4: p4 },
+              savedAt: new Date().toISOString(),
+            }));
+          }
+        } catch (e) {
+          console.warn('Préparation de la reprise impossible :', e);
+        }
+        setResumeInfo({ title: saved.title || 'Mon livre', lastStep: `P4 (${writtenCount}/${savedChapterCount} chapitres écrits)` });
+        setStep(2);
+        setLaunched(false);
+      } else if (hasManuscript) {
         setCompletedBook({
           chapters: savedChapters,
           conclusion: saved.conclusion || '',

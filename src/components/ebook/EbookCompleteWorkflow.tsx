@@ -1289,6 +1289,13 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             }
           }
 
+          // Sommaire plus long que demandé (ex. 35 pour 30) : on s'arrête au nombre choisi.
+          const alreadyWritten = (context.P4?.chapitres || []).length;
+          if (retryStructure.length > requestedCount && alreadyWritten <= requestedCount) {
+            retryStructure = retryStructure.slice(0, requestedCount);
+            context.P3 = { ...(context.P3 || {}), chapitres: retryStructure };
+          }
+
           // Récupérer les chapitres déjà générés (si reprise)
           const existingChapters = context.P4?.chapitres || [];
           const chapitresComplets: any[] = [...existingChapters];
