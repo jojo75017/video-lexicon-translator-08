@@ -395,7 +395,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setAuthorName(data.authorName || '');
         setBookIntroduction(initialBookIntroduction || data.bookIntroduction || '');
         setHasReadSteps(Boolean(data.hasReadSteps));
-        setNumberOfChapters(autoStart && initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
+        setNumberOfChapters(initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
         setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
@@ -537,7 +537,7 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         setSubtitle(data.subtitle);
         setCategory(data.category);
         setAuthorName(data.authorName);
-        setNumberOfChapters(data.numberOfChapters);
+        setNumberOfChapters(initialNumberOfChapters ? Math.max(3, Math.min(40, Math.round(initialNumberOfChapters))) : (data.numberOfChapters || 8));
         setWordsPerChapter(data.wordsPerChapter || initialWordsPerChapter || 3500);
         const restoredStepIndex = data.currentStepIndex === 0 && Boolean(data.stepResults?.P1 || data.allContext?.P1)
           ? 1
@@ -1262,7 +1262,32 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
             }
           }
 
-          const retryStructure = normalizeP3Structure(context.P3?.chapitres || []);
+          let retryStructure = normalizeP3Structure(context.P3?.chapitres || []);
+
+          // Le sommaire doit compter le nombre de chapitres demandé (ex. 30).
+          // Un ancien sommaire plus court (ex. 8) est complété : on garde les
+          // chapitres existants et P3 fournit la suite, sans rien réécrire.
+          const requestedCount = Math.max(3, Math.min(40, Math.round(numberOfChapters || retryStructure.length)));
+          if (retryStructure.length < requestedCount) {
+            toast.info(`📚 Le sommaire n'a que ${retryStructure.length} chapitres : ajout des chapitres manquants pour atteindre ${requestedCount}…`);
+            try {
+              const p3Full = await runStepWithRetry('P3', { ...context, P3: undefined }, {}, {}, 2);
+              const fullStructure = normalizeP3Structure(p3Full?.result?.chapitres || []);
+              if (fullStructure.length > retryStructure.length) {
+                const merged = [
+                  ...retryStructure,
+                  ...fullStructure.slice(retryStructure.length, requestedCount),
+                ].map((ch: any, idx: number) => ({ ...ch, numero: idx + 1 }));
+                retryStructure = merged;
+                context.P3 = { ...(context.P3 || {}), chapitres: merged };
+                setAllContext(prev => ({ ...prev, P3: context.P3 }));
+                setStepResults(prev => ({ ...prev, P3: { result: context.P3, displayContent: `Sommaire complété : ${merged.length} chapitres.` } }));
+                saveStepResult('P3', context.P3, `Sommaire complété : ${merged.length} chapitres.`);
+              }
+            } catch (e) {
+              console.warn('Complément du sommaire impossible, on continue avec le sommaire existant.', e);
+            }
+          }
 
           // Récupérer les chapitres déjà générés (si reprise)
           const existingChapters = context.P4?.chapitres || [];
