@@ -993,7 +993,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
 
 
-  const effectiveCategory = category === 'Autre' ? (customCategory.trim() || 'Autre') : category;
+  const effectiveCategory = (category === 'Autre' ? (customCategory.trim() || 'Autre') : category) || 'Autre';
   const totalWords = chapters * wordsPerChapter;
   const estimatedPages = Math.ceil(totalWords / 250);
   const descriptionWords = description.trim().split(/\s+/).filter(Boolean).length;
