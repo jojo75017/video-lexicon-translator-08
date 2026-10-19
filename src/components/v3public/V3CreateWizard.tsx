@@ -279,7 +279,7 @@ function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: numbe
 }
 
 export default function V3CreateWizard() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const requestedProjectId = searchParams.get('projectId');
   const isDirectWritingPath = searchParams.get('ecrire') === '1';
   const hub = useMemo(readHubConfig, []);
@@ -1394,6 +1394,13 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       PROJECT_ID_KEY,
     ].forEach((k) => localStorage.removeItem(k));
     restoreRef.current = true; // évite qu'un effet de reprise ne recharge l'ancien brouillon
+    setResumeInfo(null);
+    // L'adresse « ?projectId=… » rouvrait l'ancien livre : on la retire.
+    if (searchParams.get('projectId')) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('projectId');
+      setSearchParams(next, { replace: true });
+    }
   };
 
   const resetWizard = () => {
