@@ -936,7 +936,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
           objectif: cleanText(String(item?.objectif || item?.goal || '')),
         }))
         .filter((item: OutlineChapter) => item.titre && !isGenericTitle(item.titre))
-        .slice(0, 60);
+        .slice(0, 40);
 
       if (proposedOutline.length >= 3) {
         setOutline(proposedOutline);
@@ -1098,7 +1098,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       toast.error('Aucun chapitre détecté dans ce sommaire.');
       return;
     }
-    const capped = imported.slice(0, 60);
+    const capped = imported.slice(0, 40);
     setOutline(capped.map((chapter, index) => ({
       id: makeId(),
       numero: index + 1,
