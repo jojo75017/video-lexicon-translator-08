@@ -279,7 +279,7 @@ function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: numbe
 }
 
 export default function V3CreateWizard() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const requestedProjectId = searchParams.get('projectId');
   const isDirectWritingPath = searchParams.get('ecrire') === '1';
   const hub = useMemo(readHubConfig, []);
@@ -667,40 +667,52 @@ export default function V3CreateWizard() {
           const progRaw = localStorage.getItem('ebook_workflow_progress');
           const prog = progRaw ? JSON.parse(progRaw) : null;
           const sameTitle = prog && String(prog.title || '').trim().toLowerCase() === String(saved.title || '').trim().toLowerCase();
-          const progWritten = Array.isArray(prog?.allContext?.P4?.chapitres) ? prog.allContext.P4.chapitres.length : 0;
-          if (!sameTitle || progWritten < writtenCount) {
-            const structure = savedChapters.slice(0, savedChapterCount).map((chapter: any, index: number) => ({
+          const progChapters = sameTitle && Array.isArray(prog?.allContext?.P4?.chapitres) ? prog.allContext.P4.chapitres : [];
+          // Toujours reconstruire la progression d'un livre incomplet : une
+          // ancienne sauvegarde pouvait marquer P4 « terminé » avec 8 chapitres
+          // et faire repartir le workflow à P5, sans jamais écrire la suite.
+          const structure = savedChapters.slice(0, savedChapterCount).map((chapter: any, index: number) => ({
+            numero: index + 1,
+            titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
+            objectif: cleanText(chapter.objectif || chapter.goal || ''),
+          }));
+          const cloudWritten = savedChapters
+            .slice(0, writtenCount)
+            .map((chapter: any, index: number) => ({
               numero: index + 1,
               titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
-              objectif: cleanText(chapter.objectif || chapter.goal || ''),
+              contenu: String(chapter.content || chapter.contenu || ''),
             }));
-            const written = savedChapters
-              .slice(0, writtenCount)
-              .map((chapter: any, index: number) => ({
-                numero: index + 1,
-                titre: cleanText(chapter.title || chapter.titre || `Chapitre ${index + 1}`),
-                contenu: String(chapter.content || chapter.contenu || ''),
-              }));
-            const p3 = { chapitres: structure };
-            const p4 = { chapitres: written, nombreChapitres: written.length };
-            localStorage.setItem('ebook_workflow_progress', JSON.stringify({
-              title: saved.title || '',
-              subtitle: savedSubtitle === 'Workflow V3 complet' ? '' : savedSubtitle,
-              category: String(saved.kdp_categories || '').split('|')[0].trim() || 'Autre',
-              authorName: saved.author_name || 'Auteur Ebookstudio',
-              bookIntroduction: (prog && sameTitle && prog.bookIntroduction) || '',
-              hasReadSteps: true,
-              numberOfChapters: savedChapterCount,
-              currentStepIndex: 3,
-              stepResults: {
-                ...(sameTitle ? prog?.stepResults || {} : {}),
-                P3: { result: p3, displayContent: `Sommaire : ${structure.length} chapitres.` },
-                P4: { result: p4, displayContent: `**📄 Chapitres rédigés : ${written.length}/${structure.length}**` },
-              },
-              allContext: { ...(sameTitle ? prog?.allContext || {} : {}), P3: p3, P4: p4 },
-              savedAt: new Date().toISOString(),
-            }));
+          const written = progChapters.length > cloudWritten.length ? progChapters : cloudWritten;
+          const p3 = { chapitres: structure };
+          const p4 = { chapitres: written, nombreChapitres: written.length };
+          const keptResults: Record<string, any> = {};
+          const keptContext: Record<string, any> = {};
+          if (sameTitle) {
+            for (const id of ['P1', 'P2']) {
+              if (prog?.stepResults?.[id]) keptResults[id] = prog.stepResults[id];
+              if (prog?.allContext?.[id]) keptContext[id] = prog.allContext[id];
+            }
           }
+          localStorage.setItem('ebook_workflow_progress', JSON.stringify({
+            title: saved.title || '',
+            subtitle: savedSubtitle === 'Workflow V3 complet' ? '' : savedSubtitle,
+            category: String(saved.kdp_categories || '').split('|')[0].trim() || 'Autre',
+            authorName: saved.author_name || 'Auteur Ebookstudio',
+            bookIntroduction: (sameTitle && prog?.bookIntroduction) || '',
+            hasReadSteps: true,
+            numberOfChapters: savedChapterCount,
+            wordsPerChapter: (sameTitle && prog?.wordsPerChapter) || undefined,
+            currentStepIndex: 3,
+            stepResults: {
+              ...keptResults,
+              P3: { result: p3, displayContent: `Sommaire : ${structure.length} chapitres.` },
+              P4: { result: p4, displayContent: `**📄 Chapitres rédigés : ${written.length}/${structure.length}**` },
+            },
+            allContext: { ...keptContext, P3: p3, P4: p4 },
+            savedAt: new Date().toISOString(),
+          }));
+          localStorage.removeItem('ebook_workflow_results');
         } catch (e) {
           console.warn('Préparation de la reprise impossible :', e);
         }
@@ -1381,6 +1393,14 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
       PROJECT_ID_KEY,
     ].forEach((k) => localStorage.removeItem(k));
     restoreRef.current = true; // évite qu'un effet de reprise ne recharge l'ancien brouillon
+    setResumeInfo(null);
+    // L'adresse « ?projectId=… » rouvrait l'ancien livre : on la retire.
+    const currentParams = new URLSearchParams(window.location.search);
+    if (currentParams.get('projectId')) {
+      const next = currentParams;
+      next.delete('projectId');
+      setSearchParams(next, { replace: true });
+    }
   };
 
   const resetWizard = () => {

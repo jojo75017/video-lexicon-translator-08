@@ -176,7 +176,12 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
     try { clearWrittenChapters(); } catch { /* noop */ }
     setProgress({ chapters: [], total: 0, activeIndex: -1 });
     toast.success('Tout est effacé. Vous repartez d’une page blanche.');
-    setTimeout(() => window.location.reload(), 400);
+    setTimeout(() => {
+      // Sans « projectId » dans l'adresse, sinon le livre enregistré se rouvre.
+      const url = new URL(window.location.href);
+      url.searchParams.delete('projectId');
+      window.location.replace(url.toString());
+    }, 400);
   };
 
   const fixAll = async () => {
