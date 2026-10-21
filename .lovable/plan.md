@@ -5,7 +5,8 @@ Rien n'est activé automatiquement : chaque étape se termine par votre validati
 ## Étape 1 — Inventaire complet (lecture seule)
 - Relever chaque onglet et chaque page réellement présents : menu du haut, barre latérale, Livres spéciaux, KDP, Outils, Studios, Compte, pages publiques.
 - Pour chaque ligne, indiquer : nom affiché, adresse, à quoi ça sert, accès actuel (inclus / option payante / admin), utilisé ou non.
-- Livrable : un tableau Word et PDF à étudier ligne par ligne, dans vos Fichiers.
+- Livrable : **une grille des 3 formules** (Starter 27 € / Auteur 97 € / Édition 197 €), en Word et PDF dans vos Fichiers, listant **tous** les onglets regroupés par famille (écrire, livres spéciaux, couverture, Ebookstudio KDP, vendre, audio, compte), avec une coche ou un cadenas par formule. Vous vous prononcez ensuite ligne par ligne.
+- L’onglet « KDP » sera renommé **« Ebookstudio KDP »** (seulement le nom affiché, les adresses restent identiques) — appliqué à l’étape 4 après votre accord.
 
 ## Étape 2 — Proposition Starter / Auteur / Édition
 Chaque ligne du tableau reçoit une colonne de décision : **Starter 27 €**, **Auteur 97 €**, **Édition 197 €**, **Option à part**, **Admin seulement** ou **Page à supprimer**.
