@@ -33,3 +33,4 @@
 - Starter uses isStarter locks, never V2/Pro rights; /lancement and /lancement/offres reuse StarterPage and preserve payment query parameters to avoid divergent funnels.
 - Shared writing policy separates guides from fiction; wizard outlines bypass P3 and resume checks include book type, preventing novel drift.
 - VC Books uses a presentation-only home banner with the existing mascot until its dedicated studio is implemented, so announcements never imply active generation or alter entitlements.
+- VC Books images live at /v3/vc-books/images and reuse the included generate-ai-cover endpoint with a dedicated explicit illustration prompt, bypassing photographic concept generation without consuming Cover Pro credits or changing other studios.
