@@ -26,7 +26,7 @@ export const VC_BOOKS_TITLE_IDEAS: VCBookTitleIdea[] = [
     subtitle: 'Des faits étonnants à lire en 2 minutes',
     theme: 'curiosités courtes à raconter autour de soi',
     description:
-      "Mille faits étonnants classés par主题 thmes de conversation : le corps humain, les animaux, les pays, la nourriture, l’espace. Une à trois lignes par curiosité, une pause après dix faits, et une page de récapitulatif à la fin pour ne rien oublier de ce que vous avez à raconter.",
+      "Mille faits étonnants classés par thèmes de conversation : le corps humain, les animaux, les pays, la nourriture, l’espace. Une à trois lignes par curiosité, une pause après dix faits, et une page de récapitulatif à la fin pour ne rien oublier de ce que vous avez à raconter.",
     categories: ['Curiosités et faits étonnants', 'Blagues, devinettes et énigmes', 'Humour général'],
   },
   {
