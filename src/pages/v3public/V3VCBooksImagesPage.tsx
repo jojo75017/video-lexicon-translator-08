@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Download, ImagePlus, Loader2, Sparkles, ArrowLeft } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { BookMarked, Download, ImagePlus, Loader2, Sparkles, ArrowLeft } from 'lucide-react';
 import { saveAs } from 'file-saver';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -15,8 +15,12 @@ import reference from '@/assets/vc-books/style-reference.png.asset.json';
 import robot from '@/assets/plans/vc-books-robot.png';
 
 interface GeneratedImage { id: string; url: string; title: string; kind: VCImageKind }
+interface VCBookRef { id: string; title: string; author_name: string; theme: string; cover_url: string | null }
 
 export default function V3VCBooksImagesPage() {
+  const [params] = useSearchParams();
+  const bookId = params.get('livre');
+  const [book, setBook] = useState<VCBookRef | null>(null);
   const [kind, setKind] = useState<VCImageKind>('cover');
   const [scene, setScene] = useState('Un poulpe orange à lunettes lit un livre aux toilettes, entouré d’un globe, d’une loupe et d’objets insolites. Expression curieuse et amusante.');
   const [title, setTitle] = useState('');
@@ -24,10 +28,50 @@ export default function V3VCBooksImagesPage() {
   const [author, setAuthor] = useState('');
   const [withText, setWithText] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [savingCover, setSavingCover] = useState(false);
   const [error, setError] = useState('');
   const [images, setImages] = useState<GeneratedImage[]>([]);
   const [selected, setSelected] = useState<string | null>(null);
   const current = images.find((image) => image.id === selected) ?? images[0];
+
+  useEffect(() => {
+    if (!bookId) return;
+    let cancelled = false;
+    void (async () => {
+      const { data } = await supabase
+        .from('vc_books')
+        .select('id, title, author_name, theme, cover_url')
+        .eq('id', bookId)
+        .maybeSingle();
+      if (cancelled || !data) return;
+      setBook(data);
+      setTitle(data.title);
+      setAuthor(data.author_name);
+      setWithText(true);
+      if (data.theme) setScene(`Illustration humoristique sur le thème : ${data.theme}. Personnage amusant aux toilettes, entouré d’objets insolites liés au thème.`);
+      if (data.cover_url) {
+        const cover: GeneratedImage = { id: 'cover-actuelle', url: data.cover_url, title: data.title, kind: 'cover' };
+        setImages((previous) => [cover, ...previous]);
+        setSelected(cover.id);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [bookId]);
+
+  async function saveAsCover(image: GeneratedImage) {
+    if (!book || savingCover) return;
+    setSavingCover(true);
+    try {
+      const { error: updateError } = await supabase.from('vc_books').update({ cover_url: image.url }).eq('id', book.id);
+      if (updateError) throw updateError;
+      setBook({ ...book, cover_url: image.url });
+      toast.success('Couverture enregistrée sur le livre.');
+    } catch {
+      toast.error('Impossible d’enregistrer la couverture.');
+    } finally {
+      setSavingCover(false);
+    }
+  }
 
   async function generate() {
     if (busy) return;
