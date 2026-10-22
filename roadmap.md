@@ -10,3 +10,7 @@
 - [x] Empêcher la reprise d'un roman pour un guide de même titre.
 - [x] Tester les règles (10 tests) et un chapitre réel potager (764 mots, étapes et checklist, sans intrigue). Fonction de rédaction déployée ; site non publié.
 - [ ] Vérifier le parcours complet à l'écran : session renouvelée toujours redirigée vers la connexion, vérification bloquée par l'authentification de l'aperçu.
+
+# VC Books
+- [ ] Ajouter le robot VC Books sur l’accueil V3, sans modifier les paiements ni les droits.
+- [ ] Préparer le module VC Books : 80–150 pages, édition spéciale plus longue, correction automatique et exports justifiés en demi-lettre ou poche avec marges de 1,9 cm.

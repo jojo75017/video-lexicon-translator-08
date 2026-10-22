@@ -32,3 +32,4 @@
 - JVZoo sales enter through the jvzoo-ipn function (JVZIPN v2 cverify, product filter, unique event key) and only grant or revoke Auteur rights JVZoo itself created, so Stripe and other rights are never overwritten.
 - Starter uses isStarter locks, never V2/Pro rights; /lancement and /lancement/offres reuse StarterPage and preserve payment query parameters to avoid divergent funnels.
 - Shared writing policy separates guides from fiction; wizard outlines bypass P3 and resume checks include book type, preventing novel drift.
+- VC Books uses a presentation-only home banner with the existing mascot until its dedicated studio is implemented, so announcements never imply active generation or alter entitlements.
