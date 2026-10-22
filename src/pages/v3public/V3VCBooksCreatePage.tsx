@@ -13,6 +13,7 @@ import {
   parseVCBookCategories,
   VC_BOOKS_CATEGORIES,
   VC_BOOKS_TITLE_IDEAS,
+  type VCBookTitleIdea,
 } from '@/data/vcBooksIdeas';
 import robot from '@/assets/plans/vc-books-robot.png';
 
@@ -66,9 +67,12 @@ export default function V3VCBooksCreatePage() {
     return () => { cancelled = true; };
   }, [editId]);
 
-  function applyIdea(ideaTitle: string, ideaSubtitle: string) {
-    setTitle(ideaTitle);
-    setSubtitle((previous) => previous.trim() || ideaSubtitle);
+  function applyIdea(idea: VCBookTitleIdea) {
+    setTitle(idea.title);
+    setSubtitle(idea.subtitle);
+    setTheme(idea.theme);
+    setDescription(idea.description);
+    setCategories(idea.categories);
   }
 
   function toggleCategory(category: string) {
@@ -141,14 +145,15 @@ export default function V3VCBooksCreatePage() {
             <Input id="vc-book-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} required placeholder="Ex. Le Petit Cabinet des grandes curiosités" />
             <div className="rounded-lg border border-border bg-muted/40 p-3">
               <p className="flex items-center gap-2 text-xs font-semibold text-foreground">
-                <Lightbulb className="h-3.5 w-3.5 text-primary" />Idées de titres — cliquez pour remplir le titre et le sous-titre
+                <Lightbulb className="h-3.5 w-3.5 text-primary" />Idées de livres — cliquez pour remplir toute la fiche
               </p>
               <div className="mt-2 flex flex-wrap gap-2">
                 {VC_BOOKS_TITLE_IDEAS.map((idea) => (
                   <button
                     key={idea.title}
                     type="button"
-                    onClick={() => applyIdea(idea.title, idea.subtitle)}
+                    onClick={() => applyIdea(idea)}
+                    title={`${idea.title} — ${idea.subtitle}`}
                     className="rounded-full border border-border bg-card px-3 py-1.5 text-left text-xs text-foreground transition hover:border-primary hover:text-primary"
                   >
                     {idea.title}
