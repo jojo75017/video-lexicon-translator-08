@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Lock, Crown, Feather, Rocket, ArrowRight, Sparkles } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
@@ -190,7 +191,7 @@ export default function V3PlansPage() {
                   <th className="px-4 py-4 text-left text-white">Onglets & outils</th>
                   {PLANS.map(p => (
                     <th key={p.name} className="px-3 py-4 text-center text-white" style={{ width: 110 }}>
-                      <span className="block text-base font-bold">{p.name}</span>
+                      <span className="block text-base font-bold" style={{ color: '#ffffff' }}>{p.name}</span>
                       <span className="block text-xs font-medium" style={{ color: '#FF9E2D' }}>{p.price} {p.period}</span>
                     </th>
                   ))}
@@ -198,8 +199,8 @@ export default function V3PlansPage() {
               </thead>
               <tbody>
                 {FAMILIES.map(f => (
-                  <>
-                    <tr key={f.title} style={{ background: 'var(--v3-cream, #f6f1e7)' }}>
+                  <Fragment key={f.title}>
+                    <tr style={{ background: 'var(--v3-cream, #f6f1e7)' }}>
                       <td colSpan={4} className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide" style={{ color: '#008296' }}>
                         {f.emoji} {f.title}
                       </td>
@@ -216,7 +217,7 @@ export default function V3PlansPage() {
                         <Cell row={r} level={2} />
                       </tr>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
