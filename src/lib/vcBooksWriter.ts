@@ -6,10 +6,24 @@
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey, getOpenRouterModel } from '@/services/aiWritingService';
 
+/**
+ * Une pause = une page du modèle « Petit Cabinet » : PAUSE 001 / 100, rubrique
+ * (groupe de 10), titre, 3 paragraphes, encart gris (sourire ou indice),
+ * question, puis réponse regroupée en fin de livre.
+ */
 export interface VCPause {
+  section?: string;
+  kind?: 'curiosite' | 'jeu';
   title: string;
   text: string;
   encart: string;
+  question?: string;
+  answer?: string;
+}
+
+/** Les 60 % premières pauses sont des curiosités, les suivantes des jeux (mots, calculs, logique). */
+export function pauseKind(index: number, total: number): 'curiosite' | 'jeu' {
+  return index < Math.round(total * 0.6) ? 'curiosite' : 'jeu';
 }
 
 export interface VCBookBrief {
@@ -38,29 +52,45 @@ export function parsePauses(raw: string): VCPause[] {
   const list = Array.isArray(parsed?.pauses) ? parsed.pauses : [];
   return list
     .map((p: Record<string, unknown>) => ({
+      section: String(p?.section ?? '').trim(),
       title: String(p?.title ?? '').trim(),
       text: String(p?.text ?? '').trim(),
       encart: String(p?.encart ?? '').trim(),
+      question: String(p?.question ?? '').trim(),
+      answer: String(p?.answer ?? '').trim(),
     }))
     .filter((p: VCPause) => p.title && p.text);
 }
 
-export function buildPausesPrompt(brief: VCBookBrief, from: number, count: number, seenTitles: string[]): string {
+export function buildPausesPrompt(brief: VCBookBrief, from: number, count: number, seenTitles: string[], total = 100, usedSections: string[] = []): string {
+  const kind = pauseKind(from - 1, total);
+  const kindRules = kind === 'curiosite'
+    ? `TYPE : CURIOSITÉS (faits vrais et vérifiables : animaux, ciel, plantes, science de la maison, Terre, histoire des objets… selon le thème).
+- "encart" = « Le sourire du cabinet » : une petite scène humoristique imaginaire de 2 à 3 phrases (guichet, formulaire, client…), bienveillante.`
+    : `TYPE : JEUX (jeux de mots, anagrammes, petits calculs, logique, observation), avec une vraie solution unique.
+- "encart" = « Un petit coup de pouce » : commence par « Indice facultatif : », puis 1 à 2 phrases avec une touche d'humour.`;
   return `LANGUE : français courant uniquement, orthographe impeccable, ponctuation française. Interdit : latin, pseudo-langues, mots inventés, anglicismes décoratifs.
 
-LIVRE
+LIVRE (modèle « Le Petit Cabinet des grandes curiosités » : pauses de culture générale aux toilettes)
 - Titre : "${brief.title}"${brief.subtitle ? `\n- Sous-titre : ${brief.subtitle}` : ''}
-- Thème : ${brief.theme || 'pauses humoristiques variées'}
+- Thème : ${brief.theme || 'culture générale, faits insolites, humour et petits défis'}
 ${brief.description ? `- Description : ${brief.description}` : ''}
 
-MISSION : écris les pauses n°${from} à n°${from + count - 1} (${count} pauses).
-- Chaque pause : un titre court et accrocheur, un texte de 120 à 200 mots, et un "encart" d'une phrase (le saviez-vous, petite blague ou question quiz).
-- Varie les formats : anecdote, record, quiz, devinette, top 3, fait étonnant.
-- Ne reprends JAMAIS un sujet déjà traité :
+MISSION : écris les pauses n°${from} à n°${from + count - 1} sur ${total}.
+Ces ${count} pauses forment UNE rubrique : donne-lui un nom court et drôle (ex. « Les animaux ont leurs méthodes », « Les nombres gardent leur calme ») et répète-le dans "section" pour chacune.
+${usedSections.length ? `Rubriques déjà utilisées (ne pas reprendre) : ${usedSections.join(' ; ')}` : ''}
+${kindRules}
+
+CHAQUE PAUSE :
+- "title" : titre court, malicieux (ex. « Le poulpe et son service cardiologie »).
+- "text" : exactement 3 paragraphes séparés par une ligne vide, 180 à 240 mots au total, ton complice et précis ; le 3e paragraphe nuance ou corrige une idée reçue.
+- "question" : une question de fin (choix multiple, vrai/faux ou énigme) liée au texte.
+- "answer" : la réponse en 1 à 2 phrases, commençant par la bonne réponse (ex. « Le cuivre. L'hémocyanine… »).
+Ne reprends JAMAIS un sujet déjà traité :
 ${seenTitles.length ? seenTitles.slice(-80).map((t) => `  • ${t}`).join('\n') : '  (aucun pour l’instant)'}
 
 Réponds uniquement en JSON :
-{"pauses":[{"title":"...","text":"...","encart":"..."}]}`;
+{"pauses":[{"section":"...","title":"...","text":"...","encart":"...","question":"...","answer":"..."}]}`;
 }
 
 export async function writeVCPauses(
@@ -83,7 +113,7 @@ export async function writeVCPauses(
     const { data, error } = await supabase.functions.invoke('generate-content', {
       body: {
         type: 'vc-books-pauses',
-        prompt: buildPausesPrompt(brief, pauses.length + 1, count, pauses.map((p) => p.title)),
+        prompt: buildPausesPrompt(brief, pauses.length + 1, count, pauses.map((p) => p.title), total, [...new Set(pauses.map((p) => p.section).filter(Boolean) as string[])]),
         provider, model, userApiKey: userKey,
       },
     });
@@ -100,7 +130,8 @@ export async function writeVCPauses(
     let batch: VCPause[];
     try { batch = parsePauses(String(data?.content ?? '')); }
     catch { throw new Error(`Réponse illisible du moteur à la pause ${pauses.length + 1}. Relancez pour continuer.`); }
-    const fresh = batch.filter((p) => { const k = norm(p.title); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, count);
+    const start = pauses.length;
+    const fresh = batch.filter((p) => { const k = norm(p.title); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, count).map((p, k) => ({ ...p, kind: pauseKind(start + k, total) }));
     if (!fresh.length) throw new Error('Le moteur n’a renvoyé que des pauses en double. Relancez pour continuer.');
     pauses.push(...fresh);
     onProgress?.([...pauses]);
