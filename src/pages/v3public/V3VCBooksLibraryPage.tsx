@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, BookPlus, ImagePlus, Loader2, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, BookPlus, ImagePlus, Loader2, Pencil, PenLine, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
@@ -99,6 +99,10 @@ export default function V3VCBooksLibraryPage() {
               <p className="text-xs text-muted-foreground">{FORMAT_LABELS[book.format] ?? book.format} · {book.target_pages} pages visées</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <Button asChild size="sm">
+                  <Link to={`/v3/vc-books/rediger?livre=${book.id}`}><PenLine className="mr-2 h-4 w-4" />Rédiger et exporter</Link>
+
+                </Button>
+                <Button asChild size="sm" variant="outline">
                   <Link to={`/v3/vc-books/images?livre=${book.id}`}><ImagePlus className="mr-2 h-4 w-4" />Ouvrir dans l’atelier</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
