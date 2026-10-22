@@ -535,6 +535,56 @@ export default function V3MainTabs() {
           </div>
         </div>
       )}
+
+      {/* Fenêtre d'upgrade — clic sur un onglet hors forfait */}
+      {lockedLink && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center px-4"
+          style={{ background: 'rgba(20, 25, 22, 0.55)' }}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Fonction réservée"
+          onClick={() => setLockedLink(null)}
+        >
+          <div
+            className="max-w-md w-full rounded-3xl bg-white p-7 text-center"
+            style={{ border: '1px solid var(--v3-line)', boxShadow: 'var(--v3-shadow-menu)' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div
+              className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full"
+              style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-emerald)' }}
+            >
+              <Lock className="h-5 w-5" />
+            </div>
+            <div className="v3-serif text-[19px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
+              « {lockedLink.label} » est réservé au plan {PLAN_TIER_META[lockedLink.required].label}
+            </div>
+            <p className="mt-2 text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              Passez au plan {PLAN_TIER_META[lockedLink.required].label} ({PLAN_TIER_META[lockedLink.required].price} €)
+              pour débloquer cet outil et toutes les fonctions des niveaux inférieurs.
+            </p>
+            <div className="mt-5 flex flex-col items-center gap-2">
+              <Link
+                to="/v3/plans"
+                onClick={() => setLockedLink(null)}
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white"
+                style={{ background: 'var(--v3-emerald)' }}
+              >
+                Comparer les 3 plans <ArrowRight className="h-4 w-4" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => setLockedLink(null)}
+                className="text-[12px] font-semibold underline underline-offset-4"
+                style={{ color: 'var(--v3-muted)' }}
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
