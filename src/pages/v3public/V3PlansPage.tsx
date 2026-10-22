@@ -7,6 +7,7 @@ import { usePageMeta } from '@/hooks/usePageMeta';
 import plansHero from '@/assets/plans/plans-hero.jpg';
 import plansFooter from '@/assets/plans/plans-footer.jpg';
 import vcRobot from '@/assets/plans/vc-books-robot.png';
+import { V3StarterKdpPilotBanner } from '@/components/v3public/V3StarterKdpPilotBanner';
 
 type Level = 0 | 1 | 2; // 0 = Starter, 1 = Auteur, 2 = Édition
 
@@ -160,6 +161,7 @@ export default function V3PlansPage() {
         </section>
 
         {/* ── Encart VC Books ── */}
+        <V3StarterKdpPilotBanner />
         <section aria-label="VC Books" className="mt-12 overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #e5e0d0' }}>
           <div className="grid items-center gap-6 p-6 sm:grid-cols-[auto_1fr] sm:p-8">
             <img src={vcRobot} alt="Le robot VC Books, assis en train de lire un livre" width={816} height={816}

@@ -2,6 +2,7 @@ import { ArrowRight, Check, Crown, Feather, Gift, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { V2_ACCESS_NOTE } from '@/data/v3Pricing';
 import { Button } from '@/components/ui/button';
+import { V3StarterKdpPilotBanner } from '@/components/v3public/V3StarterKdpPilotBanner';
 
 /**
  * Les 3 formules validées par Georges (22/10/2026) :
@@ -102,6 +103,7 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
       <p className="mt-4 text-center text-xs text-muted-foreground">
         Auteur et Édition : paiement comptant, en 2 ou 3 fois, sans frais et sans renouvellement automatique.
       </p>
+      <V3StarterKdpPilotBanner />
       <section className="mt-6 border-y py-5 text-foreground">
         <Gift className="h-6 w-6 text-primary" />
         <h3 className="mt-3 text-xl font-semibold">Déjà client ? Vous gardez vos droits</h3>
