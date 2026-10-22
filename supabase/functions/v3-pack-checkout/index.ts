@@ -40,11 +40,11 @@ const PLANS: Record<
   // Nouvelles offres (nouveaux clients, à partir du 16/10/2026).
   auteur97_1x: { label: "EbookStudio Auteur — 97 € par an", total: 9700, installments: 1, monthly: 9700 },
   auteur97_3x: { label: "EbookStudio Auteur — 1 an (3 échéances, total 97 €)", total: 9700, installments: 3, monthly: 3233, first: 1 },
-  edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 49700, installments: 1, monthly: 49700 },
-  edition247_3x: { label: "EbookStudio Édition — accès à vie (3 échéances, total 497 €)", total: 49700, installments: 3, monthly: 16566, first: 2 },
+  edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 19700, installments: 1, monthly: 19700 },
+  edition247_3x: { label: "EbookStudio Édition — accès à vie (3 échéances, total 197 €)", total: 19700, installments: 3, monthly: 6566, first: 2 },
   // EbookStudio Starter : 27 € à vie, accès limité (validé par Georges le 17/10/2026).
   starter27_1x: { label: "EbookStudio Starter — accès à vie", total: 2700, installments: 1, monthly: 2700 },
-  edition247_6x: { label: "EbookStudio Édition — accès à vie (6 échéances, total 497 €)", total: 49700, installments: 6, monthly: 8283, first: 2 },
+  edition247_6x: { label: "EbookStudio Édition — accès à vie (6 échéances, total 197 €)", total: 19700, installments: 6, monthly: 3283, first: 2 },
 };
 
 // Les nouvelles offres restent fermées en production tant que Georges n'a pas

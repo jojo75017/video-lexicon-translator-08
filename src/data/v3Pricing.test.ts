@@ -32,18 +32,18 @@ describe('one-time offers and historical subscriptions', () => {
 });
 
 import { V3_NEW_OFFERS as NEW } from "./v3Pricing";
-describe("Nouvelles offres 97 € / 497 €", () => {
+describe("Nouvelles offres 97 € / 197 €", () => {
   it("Auteur coûte 97 € par an, payable en 1 ou 3 fois", () => {
     expect(NEW.auteur.price).toBe(97);
     expect(NEW.auteur.options.map(o => o.installments)).toEqual([1, 3]);
   });
-  it("Édition à vie coûte 497 €, payable en 1, 3 ou 6 fois", () => {
-    expect(NEW.edition.price).toBe(497);
+  it("Édition à vie coûte 197 €, payable en 1, 3 ou 6 fois", () => {
+    expect(NEW.edition.price).toBe(197);
     expect(NEW.edition.options.map(o => o.installments)).toEqual([1, 3, 6]);
   });
   it("les échéances couvrent le prix", () => {
     for (const o of [...NEW.auteur.options, ...NEW.edition.options]) {
-      const base = o.plan.startsWith("auteur") ? 97 : 497;
+      const base = o.plan.startsWith("auteur") ? 97 : 197;
       expect(Math.round(((o.first ?? o.amount) + o.amount * (o.installments - 1)) * 100)).toBe(Math.round(base * 100));
     }
   });

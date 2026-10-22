@@ -21,9 +21,9 @@ type VerifyResult = {
 const PLANS: Record<string, { name: string; label: string; amount: number }> = {
   starter27_1x: { name: "EbookStudio Starter", label: "27 € à vie", amount: 27 },
   auteur97_1x: { name: "EbookStudio Auteur", label: "97 € par an", amount: 97 },
-  edition247_1x: { name: "EbookStudio Édition", label: "497 € à vie", amount: 497 },
-  edition247_3x: { name: "EbookStudio Édition", label: "497 € à vie (en 3 fois)", amount: 497 },
-  edition247_6x: { name: "EbookStudio Édition", label: "497 € à vie (en 6 fois)", amount: 497 },
+  edition247_1x: { name: "EbookStudio Édition", label: "197 € à vie", amount: 197 },
+  edition247_3x: { name: "EbookStudio Édition", label: "197 € à vie (en 3 fois)", amount: 197 },
+  edition247_6x: { name: "EbookStudio Édition", label: "197 € à vie (en 6 fois)", amount: 197 },
 };
 
 const PaymentSuccessPage = () => {
