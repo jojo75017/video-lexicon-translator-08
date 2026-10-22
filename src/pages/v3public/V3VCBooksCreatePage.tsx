@@ -26,7 +26,7 @@ export default function V3VCBooksCreatePage() {
   const [theme, setTheme] = useState('');
   const [description, setDescription] = useState('');
   const [format, setFormat] = useState<string>('poche');
-  const [pages, setPages] = useState('120');
+  const [pages, setPages] = useState('200');
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(Boolean(editId));
   const [error, setError] = useState('');
@@ -142,6 +142,7 @@ export default function V3VCBooksCreatePage() {
             <div className="space-y-2">
               <Label htmlFor="vc-book-pages">Nombre de pages visé</Label>
               <Input id="vc-book-pages" type="number" min={40} max={300} value={pages} onChange={(e) => setPages(e.target.value)} />
+              <p className="text-xs text-muted-foreground">De 40 à 300 pages — un livre de 200 pages et plus est accepté.</p>
             </div>
           </div>
           {error && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{error}</p>}

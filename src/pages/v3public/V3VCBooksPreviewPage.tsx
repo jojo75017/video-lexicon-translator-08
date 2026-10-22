@@ -35,7 +35,7 @@ export default function V3VCBooksPreviewPage() {
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">Culture générale, anecdotes, quiz et jeux pour de petites pauses pleines de curiosité.</p>
           </div>
           <dl className="divide-y divide-border border-y border-border text-sm">
-            <div className="py-3"><dt className="font-semibold text-foreground">Livre compact</dt><dd className="mt-1 text-muted-foreground">Poche ou demi-lettre · 6 × 9 pouces (15,2 × 22,9 cm) · 80 à 150 pages</dd></div>
+            <div className="py-3"><dt className="font-semibold text-foreground">Livre compact</dt><dd className="mt-1 text-muted-foreground">Poche ou demi-lettre · 6 × 9 pouces (15,2 × 22,9 cm) · 80 à 200 pages et plus</dd></div>
             <div className="py-3"><dt className="font-semibold text-foreground">Présentation prévue</dt><dd className="mt-1 text-muted-foreground">Pauses numérotées, texte justifié, encarts humoristiques et réponses regroupées</dd></div>
             <div className="py-3"><dt className="font-semibold text-foreground">Sorties prévues</dt><dd className="mt-1 text-muted-foreground">Word modifiable · PDF broché · Dossier KDP séparé</dd></div>
           </dl>
@@ -50,7 +50,7 @@ export default function V3VCBooksPreviewPage() {
             <h2 className="text-base font-semibold text-foreground">Comment faire ce livre, étape par étape</h2>
             <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground">
               <li><strong className="text-foreground">Choisir le thème</strong> : culture générale, animaux, histoire, sport… un sujet par livre.</li>
-              <li><strong className="text-foreground">Écrire le contenu</strong> : 60 à 120 « pauses » courtes (anecdote, quiz, devinette), avec l’outil « Écrire un livre » en indiquant « livre humoristique de pauses toilettes ».</li>
+              <li><strong className="text-foreground">Écrire le contenu</strong> : 60 à 200 « pauses » courtes (anecdote, quiz, devinette), avec l’outil « Écrire un livre » en indiquant « livre humoristique de pauses toilettes ».</li>
               <li><strong className="text-foreground">Créer la couverture</strong> dans l’atelier ci-dessous : couleur pour la couverture, noir et blanc pour les dessins intérieurs.</li>
               <li><strong className="text-foreground">Mettre en page</strong> au format 6 × 9 pouces, texte justifié, réponses regroupées à la fin.</li>
               <li><strong className="text-foreground">Préparer la fiche KDP</strong> : titre, sous-titre, 7 mots-clés, catégories et description, comme le dossier modèle.</li>
