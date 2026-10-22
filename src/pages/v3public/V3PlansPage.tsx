@@ -191,7 +191,7 @@ export default function V3PlansPage() {
                   <th className="px-4 py-4 text-left text-white">Onglets & outils</th>
                   {PLANS.map(p => (
                     <th key={p.name} className="px-3 py-4 text-center text-white" style={{ width: 110 }}>
-                      <span className="block text-base font-bold">{p.name}</span>
+                      <span className="block text-base font-bold" style={{ color: '#ffffff' }}>{p.name}</span>
                       <span className="block text-xs font-medium" style={{ color: '#FF9E2D' }}>{p.price} {p.period}</span>
                     </th>
                   ))}
