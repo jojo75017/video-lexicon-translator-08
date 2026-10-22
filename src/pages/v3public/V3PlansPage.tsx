@@ -217,7 +217,7 @@ export default function V3PlansPage() {
                         <Cell row={r} level={2} />
                       </tr>
                     ))}
-                  </>
+                  </Fragment>
                 ))}
               </tbody>
             </table>
