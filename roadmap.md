@@ -12,5 +12,6 @@
 - [ ] Vérifier le parcours complet à l'écran : session renouvelée toujours redirigée vers la connexion, vérification bloquée par l'authentification de l'aperçu.
 
 # VC Books
+- [ ] Créer un atelier d’images dédié au style illustré humoristique du modèle fourni, sans modifier les autres studios ni les paiements.
 - [x] Ajouter le robot VC Books sur l’accueil V3, sans modifier les paiements ni les droits ; image chargée et lien vers les formules vérifiés à l’écran.
 - [x] Enregistrer les exigences du futur studio : 80–150 pages, édition spéciale plus longue, correction automatique, texte justifié, demi-lettre ou poche 5 × 8 pouces, marges 1,9 cm ; référence originale analysée et réutilisations étudiées. Le générateur et ses exports ne sont pas encore construits.
