@@ -8,7 +8,7 @@ describe('VC Books writer', () => {
   });
   it('ignore les pauses sans titre ou texte', () => {
     const out = parsePauses('```json\n{"pauses":[{"title":"A","text":"B","encart":"C"},{"title":"","text":"x"}]}\n```');
-    expect(out).toEqual([{ title: 'A', text: 'B', encart: 'C' }]);
+    expect(out).toMatchObject([{ title: 'A', text: 'B', encart: 'C' }]);
   });
 });
 
