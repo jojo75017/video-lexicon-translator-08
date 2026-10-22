@@ -1,3 +1,7 @@
+# Achats des nouvelles formules
+- [ ] Brancher les boutons, proposer 1/2/3 fois pour Auteur et Édition et supprimer le 6 fois des nouvelles ventes.
+- [ ] Préserver les abonnements historiques et vérifier les formulaires Stripe sans débit réel ni email.
+
 # Correction scénario BD
 - [x] Transmettre la clé et le moteur de rédaction sélectionnés dans les deux parcours BD.
 - [x] Afficher la cause réelle et arrêter les appels répétés après un refus ou un quota atteint.
