@@ -331,19 +331,20 @@ export default function V3MainTabs() {
             <div className="px-3 pb-3 grid gap-1" style={{ gridTemplateColumns: `repeat(${openCols}, minmax(0, 1fr))` }}>
               {columnize(openCatData.links, openCols).map((col, ci) => (
                 <ul key={ci} className="space-y-0.5">
-                  {col.map((l) => (
-                    <li key={l.to + l.label}>
-                      <NavLink
-                        to={l.to}
-                        className="flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors group"
-                        style={{ color: 'var(--v3-ink)' }}
-                        onMouseOver={(e) => (e.currentTarget as HTMLElement).style.background = 'var(--v3-gold-soft)'}
-                        onMouseOut={(e) => (e.currentTarget as HTMLElement).style.background = ''}
-                      >
+                  {col.map((l) => {
+                    const locked = isPathLockedForTier(l.to, planTier);
+                    const required = locked ? minTierOf(l.to) : null;
+                    const inner = (
+                      <>
                         <span className="flex-1 min-w-0">
                           <span className="flex items-center gap-2 text-[13px] font-semibold">
                             <span>{l.label}</span>
-                            {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
+                            {locked && required && (
+                              <span className="v3-badge inline-flex items-center gap-1" style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-emerald)' }}>
+                                <Lock className="w-3 h-3" /> {PLAN_TIER_META[required].label}
+                              </span>
+                            )}
+                            {!locked && (isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
                           </span>
                           {l.desc && (
                             <span className="block text-[11.5px] mt-0.5 leading-snug" style={{ color: 'var(--v3-muted)' }}>
@@ -352,9 +353,35 @@ export default function V3MainTabs() {
                           )}
                         </span>
                         <ArrowRight className="w-3.5 h-3.5 mt-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: 'var(--v3-emerald)' }} />
-                      </NavLink>
-                    </li>
-                  ))}
+                      </>
+                    );
+                    return (
+                      <li key={l.to + l.label}>
+                        {locked && required ? (
+                          <button
+                            type="button"
+                            onClick={() => setLockedLink({ label: l.label, required })}
+                            className="flex w-full items-start gap-3 rounded-lg px-3 py-2.5 text-left transition-colors group"
+                            style={{ color: 'var(--v3-ink)' }}
+                            onMouseOver={(e) => (e.currentTarget as HTMLElement).style.background = 'var(--v3-gold-soft)'}
+                            onMouseOut={(e) => (e.currentTarget as HTMLElement).style.background = ''}
+                          >
+                            {inner}
+                          </button>
+                        ) : (
+                          <NavLink
+                            to={l.to}
+                            className="flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors group"
+                            style={{ color: 'var(--v3-ink)' }}
+                            onMouseOver={(e) => (e.currentTarget as HTMLElement).style.background = 'var(--v3-gold-soft)'}
+                            onMouseOut={(e) => (e.currentTarget as HTMLElement).style.background = ''}
+                          >
+                            {inner}
+                          </NavLink>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               ))}
             </div>
