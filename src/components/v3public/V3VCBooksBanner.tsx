@@ -2,11 +2,12 @@ import { ArrowRight, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import vcRobot from '@/assets/plans/vc-books-robot.png';
+import reference from '@/assets/vc-books/style-reference.png.asset.json';
 
 export default function V3VCBooksBanner() {
   return (
     <section id="vc-books" aria-labelledby="vc-books-home-title" className="scroll-mt-40 border-y border-border bg-background">
-      <div className="v3-shell grid items-center gap-6 py-8 sm:grid-cols-[180px_1fr] md:gap-10">
+      <div className="v3-shell grid items-center gap-6 py-8 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_160px] md:gap-10">
         <img
           src={vcRobot}
           alt="La mascotte robot VC Books, installée aux petits coins avec son livre"
@@ -27,6 +28,9 @@ export default function V3VCBooksBanner() {
           </p>
           <p className="mt-2 text-sm text-muted-foreground">Rédaction et exports du livre : bientôt disponibles.</p>
           <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild variant="outline">
+              <Link to="/v3/vc-books/apercu">Voir la page et le modèle <ArrowRight aria-hidden="true" /></Link>
+            </Button>
             <Button asChild>
               <Link to="/v3/vc-books/images">Studio de couverture VC Books <ArrowRight aria-hidden="true" /></Link>
             </Button>
@@ -35,6 +39,9 @@ export default function V3VCBooksBanner() {
             </Button>
           </div>
         </div>
+        <Link to="/v3/vc-books/apercu" className="mx-auto block w-40 sm:col-start-2 lg:col-start-auto" aria-label="Voir le modèle VC Books">
+          <img src={reference.url} alt="Le Petit Cabinet des grandes curiosités : votre modèle de couverture" className="aspect-[2/3] w-full rounded-md object-contain" loading="lazy" />
+        </Link>
       </div>
     </section>
   );
