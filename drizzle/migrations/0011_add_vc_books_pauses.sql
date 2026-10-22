@@ -1,0 +1,1 @@
+ALTER TABLE public.vc_books ADD COLUMN IF NOT EXISTS pauses jsonb NOT NULL DEFAULT '[]'::jsonb;
