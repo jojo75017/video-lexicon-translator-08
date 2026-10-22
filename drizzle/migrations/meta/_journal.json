@@ -64,6 +64,13 @@
       "when": 1792652305489,
       "tag": "0008_create_vc_books",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1792655998696,
+      "tag": "0009_vc_books_target_pages_default_200",
+      "breakpoints": true
     }
   ]
 }
