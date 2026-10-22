@@ -4,7 +4,7 @@ import { ChevronDown, LayoutGrid, Menu, X, ArrowRight, Sparkles, Lock } from 'lu
 import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
 import usePlanTier from '@/hooks/usePlanTier';
-import { isPathLockedForTier, requiredPlanLabel, PLAN_TIER_META, type V3PlanTier } from '@/data/v3PlanTiers';
+import { isPathLockedForTier, minTierForPath, PLAN_TIER_META, type V3PlanTier } from '@/data/v3PlanTiers';
 import useV3Open from '@/hooks/useV3Open';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
@@ -333,7 +333,7 @@ export default function V3MainTabs() {
                 <ul key={ci} className="space-y-0.5">
                   {col.map((l) => {
                     const locked = isPathLockedForTier(l.to, planTier);
-                    const required = locked ? minTierOf(l.to) : null;
+                    const required = locked ? minTierForPath(l.to) : null;
                     const inner = (
                       <>
                         <span className="flex-1 min-w-0">
