@@ -123,11 +123,15 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     emoji: '📚',
     color: '#064e3b',
     tagline: 'Les formats dédiés',
-    links: SPECIAL_BOOK_TABS.map((t) => ({
+    links: [
+      { label: 'VC Books — livres humoristiques', to: '/v3#vc-books', desc: 'La collection des petits coins ; rédaction dédiée bientôt disponible' },
+      { label: 'VC Books — studio de couverture', to: '/v3/vc-books/images', badge: 'Nouveau', desc: 'Couvertures couleur et illustrations intérieures en noir et blanc' },
+      ...SPECIAL_BOOK_TABS.map((t) => ({
       label: t.label,
       to: `/v3/livres/${t.slug}`,
       desc: `Modèle et workflow ${t.label.toLowerCase()}`,
-    })),
+      })),
+    ],
   },
   {
     key: 'plans',
