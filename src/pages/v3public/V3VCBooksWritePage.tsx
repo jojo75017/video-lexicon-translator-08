@@ -84,7 +84,7 @@ export default function V3VCBooksWritePage() {
       </header>
 
       <section className="mb-6 rounded-lg border border-border bg-card p-5">
-        <p className="mb-3 text-sm text-muted-foreground">Le robot écrit les pauses 10 par 10 avec votre clé de rédaction (« Choisir mon IA »), sans jamais répéter un sujet. Tout est enregistré au fur et à mesure.</p>
+        <p className="mb-3 text-sm text-muted-foreground">Le robot suit votre modèle « Petit Cabinet » : rubriques de 10 pauses, 3 paragraphes, encart gris, question et réponses regroupées à la fin. Il écrit les pauses 10 par 10 avec votre clé de rédaction (« Choisir mon IA »), sans jamais répéter un sujet. Tout est enregistré au fur et à mesure.</p>
         <div className="flex flex-wrap items-end gap-3">
           <label className="text-sm">Nombre de pauses ({VC_PAUSES_MIN} à {VC_PAUSES_MAX})
             <Input type="number" min={VC_PAUSES_MIN} max={VC_PAUSES_MAX} value={total} disabled={writing}
@@ -115,8 +115,11 @@ export default function V3VCBooksWritePage() {
               <Input value={p.title} onChange={(e) => update(i, 'title', e.target.value)} aria-label={`Titre pause ${i + 1}`} />
               <Button size="sm" variant="ghost" aria-label={`Supprimer pause ${i + 1}`} onClick={() => setPauses((prev) => prev.filter((_, j) => j !== i))}><Trash2 className="h-4 w-4" /></Button>
             </div>
-            <Textarea rows={5} value={p.text} onChange={(e) => update(i, 'text', e.target.value)} aria-label={`Texte pause ${i + 1}`} />
-            <Input className="mt-2" value={p.encart} placeholder="Encart (le saviez-vous, blague…)" onChange={(e) => update(i, 'encart', e.target.value)} aria-label={`Encart pause ${i + 1}`} />
+            <Input className="mb-2" value={p.section ?? ''} placeholder="Rubrique (ex. Les animaux ont leurs méthodes)" onChange={(e) => update(i, 'section', e.target.value)} aria-label={`Rubrique pause ${i + 1}`} />
+            <Textarea rows={8} value={p.text} onChange={(e) => update(i, 'text', e.target.value)} aria-label={`Texte pause ${i + 1}`} />
+            <Input className="mt-2" value={p.encart} placeholder={i >= Math.round(pauses.length * 0.6) ? 'Un petit coup de pouce (indice)' : 'Le sourire du cabinet (scène drôle)'} onChange={(e) => update(i, 'encart', e.target.value)} aria-label={`Encart pause ${i + 1}`} />
+            <Input className="mt-2" value={p.question ?? ''} placeholder="Question de fin" onChange={(e) => update(i, 'question', e.target.value)} aria-label={`Question pause ${i + 1}`} />
+            <Input className="mt-2" value={p.answer ?? ''} placeholder="Réponse (regroupée en fin de livre)" onChange={(e) => update(i, 'answer', e.target.value)} aria-label={`Réponse pause ${i + 1}`} />
           </article>
         ))}
       </div>
