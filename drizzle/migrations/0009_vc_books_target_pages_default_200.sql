@@ -1,0 +1,1 @@
+ALTER TABLE public.vc_books ALTER COLUMN target_pages SET DEFAULT 200;
