@@ -3253,12 +3253,14 @@ export type Database = {
       vc_books: {
         Row: {
           author_name: string
+          categories: string
           cover_url: string | null
           created_at: string
           description: string
           format: string
           id: string
           status: string
+          subtitle: string
           target_pages: number
           theme: string
           title: string
@@ -3267,12 +3269,14 @@ export type Database = {
         }
         Insert: {
           author_name?: string
+          categories?: string
           cover_url?: string | null
           created_at?: string
           description?: string
           format?: string
           id?: string
           status?: string
+          subtitle?: string
           target_pages?: number
           theme?: string
           title: string
@@ -3281,12 +3285,14 @@ export type Database = {
         }
         Update: {
           author_name?: string
+          categories?: string
           cover_url?: string | null
           created_at?: string
           description?: string
           format?: string
           id?: string
           status?: string
+          subtitle?: string
           target_pages?: number
           theme?: string
           title?: string

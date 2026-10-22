@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, BookOpen, Loader2, Save } from 'lucide-react';
+import { ArrowLeft, BookOpen, Lightbulb, Loader2, Save, Tags } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  formatVCBookCategories,
+  parseVCBookCategories,
+  VC_BOOKS_CATEGORIES,
+  VC_BOOKS_TITLE_IDEAS,
+} from '@/data/vcBooksIdeas';
 import robot from '@/assets/plans/vc-books-robot.png';
 
 const FORMATS = [
@@ -22,9 +28,11 @@ export default function V3VCBooksCreatePage() {
   const editId = params.get('livre');
 
   const [title, setTitle] = useState('');
+  const [subtitle, setSubtitle] = useState('');
   const [author, setAuthor] = useState('');
   const [theme, setTheme] = useState('');
   const [description, setDescription] = useState('');
+  const [categories, setCategories] = useState<string[]>([]);
   const [format, setFormat] = useState<string>('poche');
   const [pages, setPages] = useState('200');
   const [busy, setBusy] = useState(false);
@@ -37,7 +45,7 @@ export default function V3VCBooksCreatePage() {
     void (async () => {
       const { data, error: loadError } = await supabase
         .from('vc_books')
-        .select('title, author_name, theme, description, format, target_pages')
+        .select('title, subtitle, author_name, theme, description, categories, format, target_pages')
         .eq('id', editId)
         .maybeSingle();
       if (cancelled) return;
@@ -45,9 +53,11 @@ export default function V3VCBooksCreatePage() {
         setError('Impossible de charger ce livre.');
       } else {
         setTitle(data.title);
+        setSubtitle(data.subtitle ?? '');
         setAuthor(data.author_name);
         setTheme(data.theme);
         setDescription(data.description);
+        setCategories(parseVCBookCategories(data.categories));
         setFormat(data.format);
         setPages(String(data.target_pages));
       }
@@ -55,6 +65,17 @@ export default function V3VCBooksCreatePage() {
     })();
     return () => { cancelled = true; };
   }, [editId]);
+
+  function applyIdea(ideaTitle: string, ideaSubtitle: string) {
+    setTitle(ideaTitle);
+    setSubtitle((previous) => previous.trim() || ideaSubtitle);
+  }
+
+  function toggleCategory(category: string) {
+    setCategories((previous) =>
+      previous.includes(category) ? previous.filter((c) => c !== category) : [...previous, category],
+    );
+  }
 
   async function save() {
     if (busy) return;
@@ -72,9 +93,11 @@ export default function V3VCBooksCreatePage() {
       if (!userId) throw new Error('Connectez-vous pour enregistrer votre livre.');
       const payload = {
         title: title.trim(),
+        subtitle: subtitle.trim(),
         author_name: author.trim(),
         theme: theme.trim(),
         description: description.trim(),
+        categories: formatVCBookCategories(categories),
         format,
         target_pages: targetPages,
       };
@@ -116,6 +139,28 @@ export default function V3VCBooksCreatePage() {
           <div className="space-y-2">
             <Label htmlFor="vc-book-title">Titre du livre</Label>
             <Input id="vc-book-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} required placeholder="Ex. Le Petit Cabinet des grandes curiosités" />
+            <div className="rounded-lg border border-border bg-muted/40 p-3">
+              <p className="flex items-center gap-2 text-xs font-semibold text-foreground">
+                <Lightbulb className="h-3.5 w-3.5 text-primary" />Idées de titres — cliquez pour remplir le titre et le sous-titre
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {VC_BOOKS_TITLE_IDEAS.map((idea) => (
+                  <button
+                    key={idea.title}
+                    type="button"
+                    onClick={() => applyIdea(idea.title, idea.subtitle)}
+                    className="rounded-full border border-border bg-card px-3 py-1.5 text-left text-xs text-foreground transition hover:border-primary hover:text-primary"
+                  >
+                    {idea.title}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="vc-book-subtitle">Sous-titre</Label>
+            <Input id="vc-book-subtitle" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} maxLength={200} placeholder="Ex. 100 découvertes étonnantes à lire en 2 minutes" />
+            <p className="text-xs text-muted-foreground">Facultatif — il complète le titre sur la couverture et la fiche Amazon.</p>
           </div>
           <div className="space-y-2">
             <Label htmlFor="vc-book-author">Nom d’auteur</Label>
@@ -127,7 +172,30 @@ export default function V3VCBooksCreatePage() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="vc-book-desc">Description</Label>
-            <Textarea id="vc-book-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} maxLength={2000} placeholder="De quoi parle le livre ? Quel ton, quel public ?" />
+            <Textarea id="vc-book-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={4} maxLength={2000} placeholder="De quoi parle le livre ? Quel ton, quel public ? C’est cette description que vous recopierez sur Amazon." />
+          </div>
+          <div className="space-y-2">
+            <Label>Catégories KDP</Label>
+            <div className="flex flex-wrap gap-2">
+              {VC_BOOKS_CATEGORIES.map((category) => {
+                const selected = categories.includes(category);
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => toggleCategory(category)}
+                    className={`rounded-full border px-3 py-1.5 text-xs transition ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground hover:border-primary'}`}
+                  >
+                    {category}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Tags className="h-3.5 w-3.5" />
+              Choisissez 2 ou 3 catégories — KDP demande 3 choix, vous les recopierez dans votre tableau de bord.
+            </p>
           </div>
           <div className="grid gap-5 sm:grid-cols-2">
             <div className="space-y-2">
