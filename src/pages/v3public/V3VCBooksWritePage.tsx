@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
-import robot from '@/assets/plans/vc-books-robot.png';
+import robot from '@/assets/plans/vc-books-robot-writing.png';
 import { defaultPauseCount, writeVCPauses, VC_PAUSES_MAX, VC_PAUSES_MIN, type VCPause } from '@/lib/vcBooksWriter';
 import { buildVCDocx, buildVCPdf, downloadBlob, vcFileName, VC_FORMATS } from '@/lib/vcBooksExport';
 
@@ -75,7 +75,7 @@ export default function V3VCBooksWritePage() {
     <main className="v3-shell py-8">
       <Button asChild variant="ghost" size="sm"><Link to="/v3/vc-books/bibliotheque"><ArrowLeft className="mr-2 h-4 w-4" />Ma bibliothèque</Link></Button>
       <header className="mb-6 mt-4 flex flex-wrap items-center gap-4 border-b border-border pb-6">
-        <img src={robot} alt="Robot VC Books" className="h-20 w-20 object-contain" />
+        <img src={robot} alt="Robot VC Books en train de rédiger sur les toilettes" className="h-24 w-24 object-contain" />
         <div>
           <p className="text-sm font-semibold text-primary">Robot d’écriture VC Books</p>
           <h1 className="v3-serif text-3xl text-foreground">{book.title}</h1>
