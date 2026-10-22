@@ -38,6 +38,7 @@ const ROUTE_MIN_TIER: { prefix: string; tier: V3PlanTier }[] = [
   { prefix: '/v3/outils/audiobook', tier: 'edition' }, // Audiolivres
 
   // — Auteur et Édition —
+  { prefix: '/v3/vc-books', tier: 'auteur' },
   { prefix: '/bd-studio', tier: 'auteur' }, // BD Studio
   { prefix: '/v3/livres/bd', tier: 'auteur' }, // Livres spéciaux BD / Manga
   { prefix: '/v3/corriger', tier: 'auteur' }, // Correction éditoriale

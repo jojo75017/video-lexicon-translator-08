@@ -63,6 +63,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Studio de couverture', to: '/v3/studio-v4', badge: 'V4', desc: 'Le studio professionnel visible dans votre maison d’édition : titres, styles, images et variantes' },
       { label: 'BD Studio', to: '/bd-studio', desc: 'Bandes dessinées et albums illustrés' },
       { label: 'Illustrations intérieures', to: '/v3/create/illustre', desc: 'Images cohérentes pour chapitres et sections' },
+      { label: 'VC Books — atelier d’images', to: '/v3/vc-books/images', badge: 'Nouveau', desc: 'Couvertures illustrées humoristiques et dessins intérieurs en noir et blanc' },
       { label: 'Documentation Studio', to: '/v3/outils', desc: 'Docs, annexes, glossaires' },
       { label: 'Signature auteur', to: '/signature', desc: 'Blocs signature et biographies prêts à coller' },
     ],

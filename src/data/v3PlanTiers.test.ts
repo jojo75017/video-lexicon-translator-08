@@ -2,6 +2,12 @@ import { describe, expect, it } from 'vitest';
 import { isPathLockedForTier, minTierForPath, requiredPlanLabel } from './v3PlanTiers';
 
 describe('Grille des 3 formules (Starter 27 € / Auteur 97 € / Édition 197 €)', () => {
+  it('VC Books images est ouvert à Auteur et Édition, pas Starter, sans retirer les droits historiques', () => {
+    expect(isPathLockedForTier('/v3/vc-books/images', 'starter')).toBe(true);
+    expect(isPathLockedForTier('/v3/vc-books/images', 'auteur')).toBe(false);
+    expect(isPathLockedForTier('/v3/vc-books/images', 'edition')).toBe(false);
+    expect(isPathLockedForTier('/v3/vc-books/images', null)).toBe(false);
+  });
   it('BD Studio est interdit à Starter, ouvert à Auteur et Édition', () => {
     expect(isPathLockedForTier('/bd-studio', 'starter')).toBe(true);
     expect(isPathLockedForTier('/bd-studio', 'auteur')).toBe(false);
