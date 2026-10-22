@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, LayoutGrid, Menu, X, ArrowRight, Sparkles } from 'lucide-react';
+import { ChevronDown, LayoutGrid, Menu, X, ArrowRight, Sparkles, Lock } from 'lucide-react';
 import { isRouteNouveau } from '@/data/v3Nouveautes';
 import { V3_HEADER_MENU, type MenuCategory } from '@/data/v3HeaderMenu';
+import usePlanTier from '@/hooks/usePlanTier';
+import { isPathLockedForTier, requiredPlanLabel, PLAN_TIER_META, type V3PlanTier } from '@/data/v3PlanTiers';
 import useV3Open from '@/hooks/useV3Open';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
@@ -35,6 +37,8 @@ export default function V3MainTabs() {
   const navigate = useNavigate();
   const { open: v3Open } = useV3Open();
   const { isAdmin } = useIsAdmin();
+  const { tier: planTier } = usePlanTier();
+  const [lockedLink, setLockedLink] = useState<{ label: string; required: V3PlanTier } | null>(null);
   // Avant l'ouverture, un visiteur (non admin) contemple la V3 sans pouvoir
   // ouvrir les onglets : la barre reste visible mais totalement inactive.
   const tabsLocked = v3Open === false && (isAdmin === false || (isAdmin === true && isPreviewingAsSubscriber()));
