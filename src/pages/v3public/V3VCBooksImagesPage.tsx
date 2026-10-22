@@ -113,11 +113,13 @@ export default function V3VCBooksImagesPage() {
   }
 
   return <main className="v3-shell py-8">
-    <Button asChild variant="ghost" size="sm"><Link to="/v3"><ArrowLeft className="mr-2 h-4 w-4" />Accueil</Link></Button>
+    <Button asChild variant="ghost" size="sm"><Link to="/v3/vc-books/bibliotheque"><ArrowLeft className="mr-2 h-4 w-4" />Bibliothèque VC Books</Link></Button>
     <header className="mb-8 mt-4 flex items-center gap-4 border-b border-border pb-6">
       <img src={robot} alt="Robot VC Books" className="h-20 w-20 object-contain" />
       <div><p className="text-sm font-semibold text-primary">VC Books</p><h1 className="v3-serif text-3xl text-foreground">Atelier d’images</h1><p className="mt-1 text-sm text-muted-foreground">Couvertures humoristiques · Illustrations intérieures</p></div>
     </header>
+    {book && <p className="mb-6 flex items-center gap-2 rounded-md border border-primary/40 bg-primary/5 p-3 text-sm text-foreground"><BookMarked className="h-4 w-4 text-primary" />Livre sélectionné : <strong>{book.title}</strong>{book.author_name ? ` — ${book.author_name}` : ''}. L’atelier a repris son titre, son auteur et son thème.</p>}
+    {!book && <p className="mb-6 rounded-md border border-dashed border-border p-3 text-sm text-muted-foreground">Aucun livre sélectionné. <Link to="/v3/vc-books/bibliotheque" className="font-medium text-primary underline">Choisissez un livre dans votre bibliothèque</Link> pour que l’atelier le reprenne tout seul, ou créez une illustration libre ci-dessous.</p>}
     <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,380px)_minmax(0,1fr)]">
       <form className="space-y-5" onSubmit={(event) => { event.preventDefault(); void generate(); }}>
         <Tabs value={kind} onValueChange={(value) => setKind(value as VCImageKind)}><TabsList className="grid w-full grid-cols-2"><TabsTrigger value="cover">Couverture couleur</TabsTrigger><TabsTrigger value="interior">Intérieur N&B</TabsTrigger></TabsList></Tabs>
@@ -135,7 +137,7 @@ export default function V3VCBooksImagesPage() {
         <div className="flex min-h-[500px] items-center justify-center rounded-md border border-border bg-muted p-4">
           {current ? <img src={current.url} alt={current.title} className="max-h-[650px] max-w-full object-contain" /> : <div className="text-center"><ImagePlus className="mx-auto mb-3 h-10 w-10 text-muted-foreground" /><p className="text-sm text-muted-foreground">Aucune illustration créée</p></div>}
         </div>
-        {current && <div className="mt-3 flex flex-wrap gap-3"><Button variant="outline" onClick={() => void download(current)}><Download className="mr-2 h-4 w-4" />Télécharger l’image</Button><Button asChild variant="ghost"><Link to="/v3/mes-couvertures">Mes couvertures</Link></Button></div>}
+        {current && <div className="mt-3 flex flex-wrap gap-3"><Button variant="outline" onClick={() => void download(current)}><Download className="mr-2 h-4 w-4" />Télécharger l’image</Button>{book && current.kind === 'cover' && current.id !== 'cover-actuelle' && <Button variant="outline" onClick={() => void saveAsCover(current)} disabled={savingCover}>{savingCover ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookMarked className="mr-2 h-4 w-4" />}Définir comme couverture du livre</Button>}<Button asChild variant="ghost"><Link to="/v3/mes-couvertures">Mes couvertures</Link></Button></div>}
         {images.length > 1 && <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4">{images.map((image, index) => <Button key={image.id} variant="outline" onClick={() => setSelected(image.id)} aria-label={`Voir l’illustration ${index + 1}`} className="h-36 p-1"><img src={image.url} alt="" className="h-full w-full object-contain" /></Button>)}</div>}
       </section>
     </div>
