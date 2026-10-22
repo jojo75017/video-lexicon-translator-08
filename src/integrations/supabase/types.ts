@@ -3259,6 +3259,7 @@ export type Database = {
           description: string
           format: string
           id: string
+          pauses: Json
           status: string
           subtitle: string
           target_pages: number
@@ -3275,6 +3276,7 @@ export type Database = {
           description?: string
           format?: string
           id?: string
+          pauses?: Json
           status?: string
           subtitle?: string
           target_pages?: number
@@ -3291,6 +3293,7 @@ export type Database = {
           description?: string
           format?: string
           id?: string
+          pauses?: Json
           status?: string
           subtitle?: string
           target_pages?: number
