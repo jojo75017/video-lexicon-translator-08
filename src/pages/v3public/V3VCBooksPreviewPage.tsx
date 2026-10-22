@@ -38,14 +38,13 @@ export default function V3VCBooksPreviewPage() {
             <div className="py-3"><dt className="font-semibold text-foreground">Livre compact</dt><dd className="mt-1 text-muted-foreground">Poche ou demi-lettre · 6 × 9 pouces (15,2 × 22,9 cm) · 80 à 150 pages</dd></div>
             <div className="py-3"><dt className="font-semibold text-foreground">Présentation prévue</dt><dd className="mt-1 text-muted-foreground">Pauses numérotées, texte justifié, encarts humoristiques et réponses regroupées</dd></div>
             <div className="py-3"><dt className="font-semibold text-foreground">Sorties prévues</dt><dd className="mt-1 text-muted-foreground">Word modifiable · PDF broché · Dossier KDP séparé</dd></div>
-            <div className="py-3"><dt className="font-semibold text-foreground">Prix public constaté</dt><dd className="mt-1 text-muted-foreground">12,99 € TTC sur Amazon (TVA incluse)</dd></div>
           </dl>
           <div className="rounded-md border border-primary/30 bg-primary/5 p-4">
-            <h2 className="text-base font-semibold text-foreground">Votre livre en ligne</h2>
-            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Le Petit Cabinet des grandes curiosités · Georges Boubet · 100 pauses au format 6 × 9 pouces.</p>
+            <h2 className="text-base font-semibold text-foreground">Le prix, c’est KDP qui l’affiche</h2>
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground">Vous fixez le prix dans votre tableau de bord KDP et Amazon l’affiche sur la fiche du livre. Il n’est jamais imprimé dans la couverture ni dans les images de l’atelier.</p>
             <p className="mt-3 text-2xl font-semibold text-foreground">12,99 € <span className="text-sm font-normal text-muted-foreground">TTC</span></p>
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">soit environ <strong className="text-foreground">5,21 €</strong> par exemplaire, coût d’impression et commission KDP déduits.</p>
-            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Prix constaté sur le livre de Georges Boubet, encore en cours de révision chez KDP. Vos propres réglages de prix, de format et de royalties restent les vôtres.</p>
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">prix constaté sur la fiche du Petit Cabinet des grandes curiosités (Georges Boubet, 100 pauses, 6 × 9 pouces), soit environ <strong className="text-foreground">5,21 €</strong> par exemplaire, coût d’impression et commission KDP déduits.</p>
+            <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Exemple réel, encore en cours de révision chez KDP. Vos propres réglages de prix, de format et de royalties restent les vôtres.</p>
           </div>
           <div className="rounded-md border border-border bg-card p-4">
             <h2 className="text-base font-semibold text-foreground">Comment faire ce livre, étape par étape</h2>
