@@ -18,7 +18,7 @@
 - [ ] Vérifier le parcours complet à l'écran : session renouvelée toujours redirigée vers la connexion, vérification bloquée par l'authentification de l'aperçu.
 
 # VC Books
-- [ ] Ajouter un encart avec le modèle fourni et une page d’aperçu VC Books (couverture, intérieur et dossier KDP réels), sans annoncer la rédaction ou les exports comme disponibles.
+- [x] Ajouter un encart avec le modèle fourni et une page d’aperçu `/v3/vc-books/apercu` (couverture, intérieur et dossier KDP réels), sans annoncer la rédaction ou les exports comme disponibles. Parcours encart → page → trois onglets vérifié ; images hébergées chargées via relais de test pour localhost, aucun débordement mobile, compilation OK. Rien publié.
 - [x] Rendre VC Books et son atelier de couvertures visibles dans Livres spéciaux et la barre latérale (raccourci avec robot toujours visible), avec accès direct depuis le bandeau d’accueil ; liens vérifiés à l’écran et 16 tests réussis. Ouverture connectée toujours bloquée par la redirection de l’aperçu vers /v3/auth, même après renouvellement de session. Les 6 anciens tests V3Header échouent faute de fournisseur AdminAccess dans leur configuration ; compilation OK. Rien publié.
 - [x] Créer l’atelier `/v3/vc-books/images` : couvertures couleur, intérieurs noir et blanc, texte de couverture optionnel, téléchargement et lien dans Habiller ; 16 tests réussis, compilation OK, paiements et autres studios inchangés.
 - [ ] Vérifier une illustration réelle dans l’atelier : aperçu redirigé vers la connexion malgré la session renouvelée ; création et téléchargement à l’écran non vérifiés.
