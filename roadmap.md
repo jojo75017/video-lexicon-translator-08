@@ -18,6 +18,7 @@
 - [ ] Vérifier le parcours complet à l'écran : session renouvelée toujours redirigée vers la connexion, vérification bloquée par l'authentification de l'aperçu.
 
 # VC Books
+- [ ] Rendre VC Books et son atelier de couvertures visibles dans Livres spéciaux, la barre latérale et l’accueil abonné ; vérifier les liens sans modifier les droits.
 - [x] Créer l’atelier `/v3/vc-books/images` : couvertures couleur, intérieurs noir et blanc, texte de couverture optionnel, téléchargement et lien dans Habiller ; 16 tests réussis, compilation OK, paiements et autres studios inchangés.
 - [ ] Vérifier une illustration réelle dans l’atelier : aperçu redirigé vers la connexion malgré la session renouvelée ; création et téléchargement à l’écran non vérifiés.
 - [x] Ajouter le robot VC Books sur l’accueil V3, sans modifier les paiements ni les droits ; image chargée et lien vers les formules vérifiés à l’écran.
