@@ -36,3 +36,4 @@
 - VC Books images live at /v3/vc-books/images and reuse the included generate-ai-cover endpoint with a dedicated explicit illustration prompt, bypassing photographic concept generation without consuming Cover Pro credits or changing other studios.
 
 - New-offer checkout amounts live in _shared/newOfferPayments.ts with finite monthly installments; existing six-installment orders remain supported by the webhook but cannot be sold again.
+- Installment invoices are claimed once through a service-role-only atomic function because Stripe can send both invoice.paid and invoice.payment_succeeded for one charge; orders are completed before cancellation to preserve access.

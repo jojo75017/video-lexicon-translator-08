@@ -513,6 +513,14 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   // La 1re échéance est déjà comptée au checkout ; on ignore la facture initiale.
   if (invoice.billing_reason === "subscription_create") return;
 
+  // Stripe peut livrer invoice.paid ET invoice.payment_succeeded pour la même facture.
+  // Une facture ne compte qu'une fois, sinon un échéancier 3× serait arrêté après 2 débits.
+  const { data: claimed, error: claimError } = await supabase.rpc('claim_installment_invoice', {
+    order_uuid: order.id, invoice_id: invoice.id,
+  });
+  if (claimError) throw claimError;
+  if (!claimed) return;
+
   // Auteur 97 €/an : chaque renouvellement annuel payé prolonge l'accès de 12 mois.
   if (String(order.plan ?? "") === "auteur97_1x") {
     await supabase.from("v3_installment_orders").update({ status: "active", grace_until: null }).eq("id", order.id);
@@ -525,17 +533,16 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
 
   if (paid >= total) {
     // Toutes les échéances réglées → annuler l'abonnement + accès à vie définitif.
+    // Marquer terminé AVANT l'annulation : subscription.deleted ne doit pas couper l'accès.
+    await supabase.from("v3_installment_orders").update({
+      status: "completed", installments_paid: total, grace_until: null,
+      completed_at: new Date().toISOString(),
+    }).eq("id", order.id);
     try {
       await stripeRequest(env, "DELETE", `/subscriptions/${subscriptionId}`);
     } catch (e) {
       console.error("Cancel subscription failed:", e);
     }
-    await supabase.from("v3_installment_orders").update({
-      status: "completed",
-      installments_paid: total,
-      grace_until: null,
-      completed_at: new Date().toISOString(),
-    }).eq("id", order.id);
     // Auteur 3× : l'accès reste de 12 mois (pas d'accès à vie).
     if (order.email && !String(order.plan ?? "").startsWith("auteur97_")) {
       await grantForPlan(String(order.plan ?? ""), order.email as string, String(subscriptionId), env);

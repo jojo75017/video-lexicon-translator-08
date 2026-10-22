@@ -1,6 +1,6 @@
 # Achats des nouvelles formules
-- [ ] Brancher les boutons, proposer 1/2/3 fois pour Auteur et Édition et supprimer le 6 fois des nouvelles ventes.
-- [ ] Préserver les abonnements historiques et vérifier les formulaires Stripe sans débit réel ni email.
+- [x] Brancher les boutons, proposer 1/2/3 fois pour Auteur et Édition et supprimer le 6 fois des nouvelles ventes.
+- [x] Préserver les abonnements historiques (marqueur des nouveaux achats), 28 tests réussis et formulaires Stripe Auteur 2× / Édition 3× affichés en mode test, sans débit ni email. Site non publié ; encaissement et activation après achat non testés pour éviter un achat et un email.
 
 # Correction scénario BD
 - [x] Transmettre la clé et le moteur de rédaction sélectionnés dans les deux parcours BD.
