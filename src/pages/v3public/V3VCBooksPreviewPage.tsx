@@ -39,7 +39,17 @@ export default function V3VCBooksPreviewPage() {
             <div className="py-3"><dt className="font-semibold text-foreground">Présentation prévue</dt><dd className="mt-1 text-muted-foreground">Pauses numérotées, texte justifié, encarts humoristiques et réponses regroupées</dd></div>
             <div className="py-3"><dt className="font-semibold text-foreground">Sorties prévues</dt><dd className="mt-1 text-muted-foreground">Word modifiable · PDF broché · Dossier KDP séparé</dd></div>
           </dl>
-          <p className="text-sm text-muted-foreground">Rédaction et exports : bientôt disponibles. Les pages présentées sont celles de votre modèle, pas un nouveau livre généré.</p>
+          <div className="rounded-md border border-border bg-card p-4">
+            <h2 className="text-base font-semibold text-foreground">Comment faire ce livre, étape par étape</h2>
+            <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm leading-relaxed text-muted-foreground">
+              <li><strong className="text-foreground">Choisir le thème</strong> : culture générale, animaux, histoire, sport… un sujet par livre.</li>
+              <li><strong className="text-foreground">Écrire le contenu</strong> : 60 à 120 « pauses » courtes (anecdote, quiz, devinette), avec l’outil « Écrire un livre » en indiquant « livre humoristique de pauses toilettes ».</li>
+              <li><strong className="text-foreground">Créer la couverture</strong> dans l’atelier ci-dessous : couleur pour la couverture, noir et blanc pour les dessins intérieurs.</li>
+              <li><strong className="text-foreground">Mettre en page</strong> au format 6 × 9 pouces, texte justifié, réponses regroupées à la fin.</li>
+              <li><strong className="text-foreground">Préparer la fiche KDP</strong> : titre, sous-titre, 7 mots-clés, catégories et description, comme le dossier modèle.</li>
+            </ol>
+            <p className="mt-3 text-xs text-muted-foreground">La rédaction automatique et l’export Word/PDF dédiés VC Books arrivent bientôt ; les pages présentées sont celles de votre modèle.</p>
+          </div>
           <Button asChild className="h-auto w-full whitespace-normal py-3"><Link to="/v3/vc-books/images"><ImageIcon className="shrink-0" />Ouvrir l’atelier de couvertures<ArrowRight className="shrink-0" /></Link></Button>
         </section>
         <section aria-label="Aperçu du modèle VC Books" className="min-w-0">
