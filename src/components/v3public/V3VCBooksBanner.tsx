@@ -26,7 +26,7 @@ export default function V3VCBooksBanner() {
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             Anecdotes, quiz, histoires courtes et jeux : des livres humoristiques à savourer une petite pause à la fois.
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">Rédaction et exports du livre : bientôt disponibles.</p>
+          <p className="mt-2 text-sm text-muted-foreground">Robot d’écriture et exports Word / PDF inclus.</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button asChild>
               <Link to="/v3/vc-books/creer">Créer mon livre VC Books <ArrowRight aria-hidden="true" /></Link>

@@ -55,7 +55,7 @@ export default function V3VCBooksPreviewPage() {
               <li><strong className="text-foreground">Mettre en page</strong> au format 6 × 9 pouces, texte justifié, réponses regroupées à la fin.</li>
               <li><strong className="text-foreground">Préparer la fiche KDP</strong> : titre, sous-titre, 7 mots-clés, catégories et description, comme le dossier modèle.</li>
             </ol>
-            <p className="mt-3 text-xs text-muted-foreground">La rédaction automatique et l’export Word/PDF dédiés VC Books arrivent bientôt ; les pages présentées sont celles de votre modèle.</p>
+            <p className="mt-3 text-xs text-muted-foreground">Le robot d’écriture rédige les pauses depuis votre bibliothèque (« Rédiger et exporter »), puis exporte le livre en Word et en PDF intérieur.</p>
           </div>
           <div className="flex flex-col gap-3">
             <Button asChild className="h-auto w-full whitespace-normal py-3"><Link to="/v3/vc-books/creer"><BookOpen className="shrink-0" />Créer mon livre VC Books<ArrowRight className="shrink-0" /></Link></Button>
