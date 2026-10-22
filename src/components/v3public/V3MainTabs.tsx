@@ -485,25 +485,50 @@ export default function V3MainTabs() {
                   <ChevronDown className="w-4 h-4 opacity-60" />
                 </summary>
                 <ul className="px-2 pb-2 space-y-0.5">
-                  {cat.links.map((l) => (
-                    <li key={l.to + l.label}>
-                      <NavLink
-                        to={l.to}
-                        className="block px-3 py-2 rounded-md text-[13px]"
-                        style={{ color: 'var(--v3-ink)' }}
-                      >
+                  {cat.links.map((l) => {
+                    const locked = isPathLockedForTier(l.to, planTier);
+                    const required = locked ? minTierForPath(l.to) : null;
+                    const inner = (
+                      <>
                         <span className="flex items-center gap-2">
                           {l.label}
-                          {(isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
+                          {locked && required && (
+                            <span className="v3-badge inline-flex items-center gap-1" style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-emerald)' }}>
+                              <Lock className="w-3 h-3" /> {PLAN_TIER_META[required].label}
+                            </span>
+                          )}
+                          {!locked && (isRouteNouveau(l.to) ? 'Nouveau' : l.badge) && <span className="v3-badge">{isRouteNouveau(l.to) ? 'Nouveau' : l.badge}</span>}
                         </span>
                         {l.desc && (
                           <span className="block text-[11px] mt-0.5" style={{ color: 'var(--v3-muted)' }}>
                             {l.desc}
                           </span>
                         )}
-                      </NavLink>
-                    </li>
-                  ))}
+                      </>
+                    );
+                    return (
+                      <li key={l.to + l.label}>
+                        {locked && required ? (
+                          <button
+                            type="button"
+                            onClick={() => { setMobileOpen(false); setLockedLink({ label: l.label, required }); }}
+                            className="block w-full text-left px-3 py-2 rounded-md text-[13px]"
+                            style={{ color: 'var(--v3-ink)' }}
+                          >
+                            {inner}
+                          </button>
+                        ) : (
+                          <NavLink
+                            to={l.to}
+                            className="block px-3 py-2 rounded-md text-[13px]"
+                            style={{ color: 'var(--v3-ink)' }}
+                          >
+                            {inner}
+                          </NavLink>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </details>
             ))}
