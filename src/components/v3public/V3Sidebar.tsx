@@ -84,7 +84,7 @@ const NAV: NavSection[] = [
   {
     section: 'Livres spéciaux',
     items: [
-      { to: '/v3#vc-books', label: 'VC Books — livres humoristiques', icon: BookOpen, end: true },
+      { to: '/v3/vc-books/apercu', label: 'VC Books — livres humoristiques', icon: BookOpen, end: true },
       { to: '/v3/vc-books/images', label: 'VC Books — studio de couverture', icon: ImageIcon, badge: 'Nouveau' },
     ],
   },

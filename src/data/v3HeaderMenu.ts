@@ -124,7 +124,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#064e3b',
     tagline: 'Les formats dédiés',
     links: [
-      { label: 'VC Books — livres humoristiques', to: '/v3#vc-books', desc: 'La collection des petits coins ; rédaction dédiée bientôt disponible' },
+      { label: 'VC Books — livres humoristiques', to: '/v3/vc-books/apercu', desc: 'Aperçu de la page et du modèle ; rédaction dédiée bientôt disponible' },
       { label: 'VC Books — studio de couverture', to: '/v3/vc-books/images', badge: 'Nouveau', desc: 'Couvertures couleur et illustrations intérieures en noir et blanc' },
       ...SPECIAL_BOOK_TABS.map((t) => ({
       label: t.label,
