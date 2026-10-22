@@ -44,7 +44,7 @@ const FAMILIES: Family[] = [
       { label: 'Fiches KDP enrichies', min: 1 },
       { label: 'Recherche de niches avancée', min: 1 },
       { label: 'Traducteur 10 langues', min: 0 },
-      { label: 'KDP étranger (publication multi-pays)', min: 2 },
+      { label: 'KDP étranger (publication multi-pays)', min: 1 },
       { label: 'Amazon Spy & audit de marché', min: 2 },
     ],
   },
