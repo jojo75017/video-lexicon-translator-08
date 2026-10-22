@@ -1,6 +1,6 @@
 # Achats des nouvelles formules
 - [x] Ajouter le bandeau KDP Pilot pour Starter sur les deux pages d’offres ; lien partenaire ouvert et rendu vérifiés. Aucun paiement KDP Pilot interne : abonnement indépendant, paiement final chez le partenaire non testé.
-- [ ] Publier les offres Starter/Auteur/Édition et le bandeau KDP Pilot après contrôle de sécurité.
+- [x] Demander la publication des offres Starter/Auteur/Édition et du bandeau KDP Pilot : publication programmée vers ebookstudio.fr ; fin du déploiement et achat réel non confirmés. Contrôle de sécurité sans alerte critique, 28 tests réussis.
 - [x] Brancher les boutons, proposer 1/2/3 fois pour Auteur et Édition et supprimer le 6 fois des nouvelles ventes.
 - [x] Préserver les abonnements historiques (marqueur des nouveaux achats), 28 tests réussis et formulaires Stripe Auteur 2× / Édition 3× affichés en mode test, sans débit ni email. Site non publié ; encaissement et activation après achat non testés pour éviter un achat et un email.
 
