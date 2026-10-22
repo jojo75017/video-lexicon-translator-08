@@ -1,4 +1,6 @@
 # Achats des nouvelles formules
+- [ ] Ajouter le bandeau KDP Pilot pour Starter sur les offres, réutiliser son paiement existant et vérifier le parcours.
+- [ ] Publier les offres Starter/Auteur/Édition et le bandeau KDP Pilot après contrôle de sécurité.
 - [x] Brancher les boutons, proposer 1/2/3 fois pour Auteur et Édition et supprimer le 6 fois des nouvelles ventes.
 - [x] Préserver les abonnements historiques (marqueur des nouveaux achats), 28 tests réussis et formulaires Stripe Auteur 2× / Édition 3× affichés en mode test, sans débit ni email. Site non publié ; encaissement et activation après achat non testés pour éviter un achat et un email.
 
