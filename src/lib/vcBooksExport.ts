@@ -137,7 +137,7 @@ export async function buildVCDocx(book: VCExportBook): Promise<Blob> {
   const doc = new Document({
     styles: { default: { document: { run: { font: 'Georgia', size: 22 } } } },
     sections: [{
-      properties: { page: { size: { width: mmToTwip(f.w), height: mmToTwip(f.h) }, margin: { top: mmToTwip(VC_MARGINS.top), bottom: mmToTwip(VC_MARGINS.bottom), left: mmToTwip(VC_MARGINS.inside), right: mmToTwip(VC_MARGINS.outside), gutter: 0, mirror: true } } },
+      properties: { page: { size: { width: mmToTwip(f.w), height: mmToTwip(f.h) }, margin: { top: mmToTwip(VC_MARGINS.top), bottom: mmToTwip(VC_MARGINS.bottom), left: mmToTwip(VC_MARGINS.inside), right: mmToTwip(VC_MARGINS.outside), gutter: 0 } } },
       children,
     }],
   });
