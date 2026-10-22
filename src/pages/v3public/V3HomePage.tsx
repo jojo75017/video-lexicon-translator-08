@@ -82,6 +82,9 @@ export default function V3HomePage() {
 
   return (
     <div className="v3-home pb-4">
+      {/* VC Books — encart placé tout en haut, juste sous la barre des robots. */}
+      <V3VCBooksBanner />
+
       {/* 1. LANCEMENT — bande fine */}
       {user ? (
         <V3SubscriberHome user={user} />
@@ -93,8 +96,8 @@ export default function V3HomePage() {
       ) : null}
 
       {/* BANDEAUX DÉFILANTS — tout ce qu'on peut créer */}
-      <V3VCBooksBanner />
       <V3FormatsMarquee />
+
 
       {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
       {user && <V3SubscriberZoomHelp />}
