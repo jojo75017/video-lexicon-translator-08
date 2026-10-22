@@ -471,6 +471,22 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
       return jsonSuccess({ content: res.text });
     }
 
+    // ====== VC BOOKS PAUSES (BYOK, same dispatcher as BD) ======
+    if (type === 'vc-books-pauses') {
+      const auth = req.headers.get('Authorization');
+      if (!auth) return new Response(JSON.stringify({ error: 'Connectez-vous pour rédiger votre livre.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const client = createClient(Deno.env.get('SUPABASE_URL') || '', Deno.env.get('SUPABASE_ANON_KEY') || '', { global: { headers: { Authorization: auth } } });
+      const { data: session, error: authError } = await client.auth.getUser();
+      if (authError || !session.user) return new Response(JSON.stringify({ error: 'Votre session a expiré. Reconnectez-vous.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const vcSystemPrompt = `Tu es un auteur humoristique français spécialisé dans les livres de pauses toilettes (anecdotes insolites, records absurdes, quiz, devinettes, faits surprenants).
+Chaque pause tient sur une page, se lit en une à deux minutes, est drôle, bienveillante et VRAISEMBLABLE. Pas de vulgarité.
+Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans commentaires.`;
+      const response = await comicTextProvider(body, vcSystemPrompt);
+      const headers = new Headers(response.headers);
+      Object.entries(corsHeaders).forEach(([name, value]) => headers.set(name, value));
+      return new Response(response.body, { status: response.status, headers });
+    }
+
     // ====== COMIC SCENARIO ======
     if (type === 'comic-scenario') {
       const auth = req.headers.get('Authorization');
