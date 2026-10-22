@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { buildVCImagePrompt, type VCImageKind } from '@/lib/vcBooksImages';
 import reference from '@/assets/vc-books/style-reference.png.asset.json';
 import robot from '@/assets/plans/vc-books-robot.png';
+import V3VCBooksKdpSheet from '@/components/v3public/V3VCBooksKdpSheet';
 
 interface GeneratedImage { id: string; url: string; title: string; kind: VCImageKind }
 interface VCBookRef { id: string; title: string; author_name: string; theme: string; cover_url: string | null }
@@ -141,5 +142,6 @@ export default function V3VCBooksImagesPage() {
         {images.length > 1 && <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4">{images.map((image, index) => <Button key={image.id} variant="outline" onClick={() => setSelected(image.id)} aria-label={`Voir l’illustration ${index + 1}`} className="h-36 p-1"><img src={image.url} alt="" className="h-full w-full object-contain" /></Button>)}</div>}
       </section>
     </div>
+    <V3VCBooksKdpSheet key={book?.id ?? 'free'} title={title} author={author} theme={book?.theme ?? ''} />
   </main>;
 }
