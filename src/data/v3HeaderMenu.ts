@@ -69,7 +69,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
   },
   {
     key: 'kdp',
-    label: 'KDP',
+    label: 'Ebookstudio KDP',
     emoji: '📦',
     color: '#064e3b',
     tagline: 'Votre fiche Amazon',

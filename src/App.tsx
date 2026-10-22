@@ -9,6 +9,7 @@ import { SubscriberGate } from '@/components/auth/SubscriberGate';
 import { AdminGate } from '@/components/auth/AdminGate';
 import { V3Gate } from '@/components/auth/V3Gate';
 import { V3LockedGate } from '@/components/v3/V3LockedGate';
+import PlanGuard from '@/components/v3/PlanGuard';
 import V3PaidModuleRoute from '@/components/v3/V3PaidModuleRoute';
 import { TrialGate } from '@/components/auth/TrialGate';
 import { TrialBookLimitGate } from '@/components/auth/TrialBookLimitGate';
@@ -695,7 +696,7 @@ const App = () => {
             <Route path="/10-niches-offertes" element={<Niches10OffertesPage />} />
             <Route path="/quiz" element={<QuizPage />} />
             <Route path="/signature" element={<SignaturePage />} />
-            <Route path="/bd-studio" element={<BDStudioPage />} />
+            <Route path="/bd-studio" element={<PlanGuard><BDStudioPage /></PlanGuard>} />
             {/* Tunnel Studio BD & Jeunesse : vente 17 € → upsell Pro 47 € → studio */}
             <Route path="/bd-offre" element={<BDOffrePage />} />
             <Route path="/bd-upsell" element={<BDUpsellPage />} />
@@ -718,16 +719,16 @@ const App = () => {
             />
             <Route path="/kdp-keywords" element={gated(<KdpKeywordResearchPage />)} />
             <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
-            <Route path="/bookperfect" element={<BookPerfectGate><BookPerfectPage /></BookPerfectGate>} />
+            <Route path="/bookperfect" element={<PlanGuard><BookPerfectGate><BookPerfectPage /></BookPerfectGate></PlanGuard>} />
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
             <Route path="/v3/cover-studio-pro" element={<Navigate to="/v3/mes-couvertures" replace />} />
             <Route path="/v3/cover-studio-pro/edit" element={<Navigate to="/v3/mes-couvertures" replace />} />
             <Route path="/v3/couverture-express" element={gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)} />
-            <Route path="/v3/studio-v4" element={gated(<TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate>)} />
+            <Route path="/v3/studio-v4" element={gated(<PlanGuard><TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate></PlanGuard>)} />
             <Route path="/v3/mes-couvertures" element={gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)} />
             <Route path="/v3/mes-couvertures/:id" element={gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)} />
             {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}
-            <Route path="/v3/cover-pro" element={gated(<TrialGate label="Cover Studio KDP Pro"><CoverProPage /></TrialGate>)} />
+            <Route path="/v3/cover-pro" element={gated(<PlanGuard><TrialGate label="Cover Studio KDP Pro"><CoverProPage /></TrialGate></PlanGuard>)} />
             <Route path="/v3/paiements" element={gated(<TrialGate label="Mes paiements"><PaiementsCouverturesPage /></TrialGate>)} />
             <Route path="/admin/cover-pro" element={<AdminGate><AdminCoverProPage /></AdminGate>} />
 
@@ -801,8 +802,8 @@ const App = () => {
 
 
               {/* Routes verrouillées jusqu'au 1er octobre 2026 (admins exceptés) */}
-              <Route path="create" element={<V3LockedGate><TrialBookLimitGate><V3CreatePage /></TrialBookLimitGate></V3LockedGate>} />
-              <Route path="create/album-illustre" element={<V3LockedGate><TrialGate label="Album illustré 3–6 ans"><V3IllustratedAlbumPage /></TrialGate></V3LockedGate>} />
+              <Route path="create" element={<V3LockedGate><PlanGuard><TrialBookLimitGate><V3CreatePage /></TrialBookLimitGate></PlanGuard></V3LockedGate>} />
+              <Route path="create/album-illustre" element={<V3LockedGate><PlanGuard><TrialGate label="Album illustré 3–6 ans"><V3IllustratedAlbumPage /></TrialGate></PlanGuard></V3LockedGate>} />
               {/* Parcours direct « comme la V2, en mieux » : fiche + workflow 15 agents */}
               <Route path="lancer" element={<V3LockedGate><TrialBookLimitGate><V3LaunchBookPage /></TrialBookLimitGate></V3LockedGate>} />
 
@@ -835,12 +836,12 @@ const App = () => {
               <Route path="assistant" element={<V3LockedGate><V3AssistantPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3PaidModuleRoute><V3TranslatorPage /></V3PaidModuleRoute>} />
-              <Route path="corriger" element={<V3PaidModuleRoute><V3CorrecteurPage /></V3PaidModuleRoute>} />
+              <Route path="corriger" element={<PlanGuard><V3PaidModuleRoute><V3CorrecteurPage /></V3PaidModuleRoute></PlanGuard>} />
               <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
               <Route path="posts" element={<V3PaidModuleRoute><V3PostsPage /></V3PaidModuleRoute>} />
               <Route path="acquisition" element={<V3PaidModuleRoute><V3AcquisitionPage /></V3PaidModuleRoute>} />
               <Route path="kit-demarrage" element={<V3LockedGate><V3KitDemarragePage /></V3LockedGate>} />
-              <Route path="studio" element={<V3LockedGate><TrialGate label="Studio Pro"><V3StudioProPage /></TrialGate></V3LockedGate>} />
+              <Route path="studio" element={<V3LockedGate><PlanGuard><TrialGate label="Studio Pro"><V3StudioProPage /></TrialGate></PlanGuard></V3LockedGate>} />
 
               <Route path="compte" element={<V3LockedGate><V3ComptePage /></V3LockedGate>} />
               {/* Page des 2 forfaits : toujours visible (vitrine tarifaire) */}
@@ -859,10 +860,10 @@ const App = () => {
               <Route path="outils/offerts" element={<V3LockedGate><V3OutilsOffertsPage /></V3LockedGate>} />
               <Route path="nouveautes" element={<V3LockedGate><V3NouveautesPage /></V3LockedGate>} />
               <Route path="outils/royalties" element={<V3PaidModuleRoute><V3RoyaltiesPage /></V3PaidModuleRoute>} />
-              <Route path="outils/humanizer" element={<V3LockedGate><TrialGate label="HumanizeAI"><V3HumanizerPage /></TrialGate></V3LockedGate>} />
+              <Route path="outils/humanizer" element={<V3LockedGate><PlanGuard><TrialGate label="HumanizeAI"><V3HumanizerPage /></TrialGate></PlanGuard></V3LockedGate>} />
               <Route path="outils/mockup-3d" element={<V3LockedGate><TrialGate label="Mockup 3D"><V3MockupPage /></TrialGate></V3LockedGate>} />
               <Route path="version-audio" element={<V3LockedGate><V3VersionAudioPage /></V3LockedGate>} />
-              <Route path="outils/audiobook" element={<V3PaidModuleRoute><V3AudiobookPage /></V3PaidModuleRoute>} />
+              <Route path="outils/audiobook" element={<PlanGuard><V3PaidModuleRoute><V3AudiobookPage /></V3PaidModuleRoute></PlanGuard>} />
               <Route path="outils/editeur" element={<V3LockedGate><V3EditorPage /></V3LockedGate>} />
 
               <Route path="hub" element={<V3LockedGate><V3HubAdminOnly><V3Gate><V3HubPage /></V3Gate></V3HubAdminOnly></V3LockedGate>} />
