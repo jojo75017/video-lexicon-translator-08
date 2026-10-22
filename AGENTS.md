@@ -28,9 +28,12 @@
 - Public pricing uses V3_LIFETIME_OFFERS while V3_PLANS remains historical subscription data, so new offers do not alter existing subscriber rights or billing.
 - Home engine module badges reuse findPaidModuleForPath and useModuleAccess without granting rights; administrator access is distinguished from customer inclusion to avoid misleading paid-option labels.
 - Dark homepage feature panels show access information immediately below their titles, separating included workflows from paid extensions through the shared access badge without changing permissions.
-- New-customer offers (Auteur yearly, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), so historical 47 € and subscription rights stay untouched.
+- New-customer offers (Auteur one-time, Édition lifetime) are sold through v3-pack-checkout plan ids and granted by payments-webhook (grantForPlan), with purchase_model=one_time on new sessions, so historical 47 € and annual subscription rights stay untouched.
 - JVZoo sales enter through the jvzoo-ipn function (JVZIPN v2 cverify, product filter, unique event key) and only grant or revoke Auteur rights JVZoo itself created, so Stripe and other rights are never overwritten.
 - Starter uses isStarter locks, never V2/Pro rights; /lancement and /lancement/offres reuse StarterPage and preserve payment query parameters to avoid divergent funnels.
 - Shared writing policy separates guides from fiction; wizard outlines bypass P3 and resume checks include book type, preventing novel drift.
 - VC Books uses a presentation-only home banner with the existing mascot until its dedicated studio is implemented, so announcements never imply active generation or alter entitlements.
 - VC Books images live at /v3/vc-books/images and reuse the included generate-ai-cover endpoint with a dedicated explicit illustration prompt, bypassing photographic concept generation without consuming Cover Pro credits or changing other studios.
+
+- New-offer checkout amounts live in _shared/newOfferPayments.ts with finite monthly installments; existing six-installment orders remain supported by the webhook but cannot be sold again.
+- Installment invoices are claimed once through a service-role-only atomic function because Stripe can send both invoice.paid and invoice.payment_succeeded for one charge; orders are completed before cancellation to preserve access.

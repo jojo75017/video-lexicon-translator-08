@@ -3,6 +3,7 @@
 // The DB trigger handle_funnel_order_paid creates the affiliate commission automatically.
 // Sends an access email via Resend.
 
+import { isOneTimeAuteur } from "../_shared/newOfferPayments.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { type StripeEnv, verifyWebhook, stripeRequest } from "../_shared/stripe.ts";
 import { EMAIL_SENDING_ENABLED } from "../_shared/emailSendingGuard.ts";
@@ -281,8 +282,19 @@ async function grantStarter(email: string) {
   return accessCode;
 }
 
-async function grantForPlan(plan: string, email: string, sessionId: string, env: StripeEnv) {
+async function grantAuteurLifetime(email: string) {
+  const supabase = getSupabase();
+  const { data: existing } = await supabase.from('subscribers').select('access_code, plan_tier, plan_type').eq('email', email).maybeSingle();
+  const code = existing?.access_code || generateAccessCode();
+  if (existing?.plan_type === 'lifetime' && existing?.plan_tier !== 'auteur') return code;
+  const { error } = await supabase.from('subscribers').upsert({ email, access_code: code, status: 'active', plan_type: 'lifetime', plan_tier: 'auteur', expires_at: null, trial_ends_at: null }, { onConflict: 'email' });
+  if (error) throw error;
+  return code;
+}
+
+async function grantForPlan(plan: string, email: string, sessionId: string, env: StripeEnv, purchaseModel?: string) {
   if (plan.startsWith("starter27_")) return grantStarter(email);
+  if (isOneTimeAuteur(plan, purchaseModel)) return grantAuteurLifetime(email);
   if (plan.startsWith("auteur97_")) return grantV3Annual(email);
   if (plan.startsWith("edition247_")) return grantEdition247(email, sessionId, env);
   return grantV3Lifetime(email);
@@ -417,7 +429,7 @@ async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
       // Abonnement annuel (auteur97_1x) : lien requis pour les renouvellements.
       ...(subscriptionId ? { stripe_subscription_id: subscriptionId } : {}),
     }).eq("id", orderId);
-    if (email) accessCode = await grantForPlan(plan, email, session.id, env);
+    if (email) accessCode = await grantForPlan(plan, email, session.id, env, session.metadata?.purchase_model);
   } else {
     // Échéancier : 1re échéance encaissée, accès ouvert dès maintenant.
     await supabase.from("v3_installment_orders").update({
@@ -426,7 +438,7 @@ async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
       stripe_subscription_id: subscriptionId,
       grace_until: null,
     }).eq("id", orderId);
-    if (email) accessCode = await grantForPlan(plan, email, session.id, env);
+    if (email) accessCode = await grantForPlan(plan, email, session.id, env, session.metadata?.purchase_model);
   }
 
   if (email && (plan.startsWith("edition247_") || plan.startsWith("starter27_"))) {
@@ -477,7 +489,7 @@ async function handleV3SubscriptionCompleted(session: any) {
 
 
 async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
-  const subscriptionId = invoice.subscription;
+  const subscriptionId = invoice.subscription || invoice.parent?.subscription_details?.subscription;
   if (!subscriptionId) return;
   const supabase = getSupabase();
   const { data: order } = await supabase
@@ -501,6 +513,14 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
   // La 1re échéance est déjà comptée au checkout ; on ignore la facture initiale.
   if (invoice.billing_reason === "subscription_create") return;
 
+  // Stripe peut livrer invoice.paid ET invoice.payment_succeeded pour la même facture.
+  // Une facture ne compte qu'une fois, sinon un échéancier 3× serait arrêté après 2 débits.
+  const { data: claimed, error: claimError } = await supabase.rpc('claim_installment_invoice', {
+    order_uuid: order.id, invoice_id: invoice.id,
+  });
+  if (claimError) throw claimError;
+  if (!claimed) return;
+
   // Auteur 97 €/an : chaque renouvellement annuel payé prolonge l'accès de 12 mois.
   if (String(order.plan ?? "") === "auteur97_1x") {
     await supabase.from("v3_installment_orders").update({ status: "active", grace_until: null }).eq("id", order.id);
@@ -513,17 +533,16 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
 
   if (paid >= total) {
     // Toutes les échéances réglées → annuler l'abonnement + accès à vie définitif.
+    // Marquer terminé AVANT l'annulation : subscription.deleted ne doit pas couper l'accès.
+    await supabase.from("v3_installment_orders").update({
+      status: "completed", installments_paid: total, grace_until: null,
+      completed_at: new Date().toISOString(),
+    }).eq("id", order.id);
     try {
       await stripeRequest(env, "DELETE", `/subscriptions/${subscriptionId}`);
     } catch (e) {
       console.error("Cancel subscription failed:", e);
     }
-    await supabase.from("v3_installment_orders").update({
-      status: "completed",
-      installments_paid: total,
-      grace_until: null,
-      completed_at: new Date().toISOString(),
-    }).eq("id", order.id);
     // Auteur 3× : l'accès reste de 12 mois (pas d'accès à vie).
     if (order.email && !String(order.plan ?? "").startsWith("auteur97_")) {
       await grantForPlan(String(order.plan ?? ""), order.email as string, String(subscriptionId), env);
@@ -538,7 +557,7 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
 }
 
 async function handleV3InvoiceFailed(invoice: any) {
-  const subscriptionId = invoice.subscription;
+  const subscriptionId = invoice.subscription || invoice.parent?.subscription_details?.subscription;
   if (!subscriptionId) return;
   const supabase = getSupabase();
   const graceUntil = new Date();

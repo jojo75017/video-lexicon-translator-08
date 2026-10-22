@@ -20,7 +20,10 @@ type VerifyResult = {
 // Offres du tunnel /paiement-offre : affichage adapté à la formule achetée.
 const PLANS: Record<string, { name: string; label: string; amount: number }> = {
   starter27_1x: { name: "EbookStudio Starter", label: "27 € à vie", amount: 27 },
-  auteur97_1x: { name: "EbookStudio Auteur", label: "97 € par an", amount: 97 },
+  auteur97_1x: { name: "EbookStudio Auteur", label: "97 € paiement unique", amount: 97 },
+  auteur97_2x: { name: "EbookStudio Auteur", label: "97 € en 2 fois", amount: 97 },
+  auteur97_3x: { name: "EbookStudio Auteur", label: "97 € en 3 fois", amount: 97 },
+  edition247_2x: { name: "EbookStudio Édition", label: "197 € à vie (en 2 fois)", amount: 197 },
   edition247_1x: { name: "EbookStudio Édition", label: "197 € à vie", amount: 197 },
   edition247_3x: { name: "EbookStudio Édition", label: "197 € à vie (en 3 fois)", amount: 197 },
   edition247_6x: { name: "EbookStudio Édition", label: "197 € à vie (en 6 fois)", amount: 197 },

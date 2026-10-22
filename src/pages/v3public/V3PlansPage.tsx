@@ -1,3 +1,4 @@
+import { Button } from '@/components/ui/button';
 import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, Lock, Crown, Feather, Rocket, ArrowRight, Sparkles } from 'lucide-react';
@@ -78,19 +79,19 @@ const PLANS = [
     name: 'Starter', price: '27 €', period: 'à vie', Icon: Rocket,
     color: '#008296', soft: 'rgba(0,130,150,0.10)',
     tagline: 'Créez et publiez votre premier ebook, sans abonnement.',
-    cta: { label: 'Découvrir Starter', to: '/starter' },
+    cta: { label: 'Acheter Starter', to: '/paiement-offre?plan=starter27_1x' },
   },
   {
     name: 'Auteur', price: '97 €', period: 'paiement unique', Icon: Feather,
     color: '#0b6e4c', soft: 'rgba(11,110,76,0.10)', popular: true,
     tagline: 'Tous les genres de livres, la BD, la correction et les outils d’auteur.',
-    cta: { label: 'Choisir Auteur', to: '/v3/forfaits' },
+    cta: { label: 'Choisir Auteur', to: '/paiement-offre?plan=auteur97_1x' },
   },
   {
     name: 'Édition', price: '197 €', period: 'à vie', Icon: Crown,
     color: '#b8860b', soft: 'rgba(184,134,11,0.12)',
     tagline: 'Publiez comme un éditeur : broché KDP, albums illustrés, audio.',
-    cta: { label: 'Choisir Édition', to: '/v3/forfaits' },
+    cta: { label: 'Choisir Édition', to: '/paiement-offre?plan=edition247_1x' },
   },
 ];
 
@@ -150,11 +151,10 @@ export default function V3PlansPage() {
                 <span className="ml-2 text-sm font-medium text-neutral-500">{p.period}</span>
               </p>
               <p className="mt-2 flex-1 text-sm text-neutral-600">{p.tagline}</p>
-              <Link to={p.cta.to}
-                className="mt-5 inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-bold text-white transition hover:opacity-90"
-                style={{ background: p.color }}>
+              <Button asChild className="mt-5"><Link to={p.cta.to}>
                 {p.cta.label} <ArrowRight className="h-4 w-4" />
-              </Link>
+              </Link></Button>
+              {p.name !== 'Starter' && <p className="mt-2 text-center text-xs text-muted-foreground">Comptant, en 2 ou 3 fois — sans frais</p>}
             </article>
           ))}
         </section>

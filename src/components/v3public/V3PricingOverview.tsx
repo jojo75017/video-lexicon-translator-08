@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button';
  * Les 3 formules validées par Georges (22/10/2026) :
  * Starter 27 € à vie · Auteur 97 € (paiement unique) · Édition 197 € à vie.
  *
- * Paiements : seul le tunnel Starter 27 € (existant) est branché.
- * Les paiements Auteur 97 € et Édition 197 € seront activés uniquement
- * après validation explicite de Georges — leurs boutons mènent à la
- * page de comparaison en attendant.
+ * Paiements Stripe validés : comptant ou 2/3 fois pour Auteur et Édition.
  */
 const PLANS = [
   {
@@ -50,7 +47,7 @@ const PLANS = [
       'KDP étranger (publication multi-pays)',
       'Recherche de niches avancée',
     ],
-    cta: { label: 'Voir le plan Auteur', to: '/v3/plans', external: false },
+    cta: { label: 'Acheter Auteur à 97 €', to: '/paiement-offre?plan=auteur97_1x', external: false },
     secondary: { label: 'Comparer les 3 plans', to: '/v3/plans' },
   },
   {
@@ -69,7 +66,7 @@ const PLANS = [
       'Amazon Spy et audit de marché',
       'Brand Book et outils d’éditeur',
     ],
-    cta: { label: 'Voir le plan Édition', to: '/v3/plans', external: false },
+    cta: { label: 'Acheter Édition à 197 €', to: '/paiement-offre?plan=edition247_1x', external: false },
     secondary: { label: 'Comparer les 3 plans', to: '/v3/plans' },
   },
 ];
@@ -103,7 +100,7 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
         ))}
       </div>
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        Les paiements des plans Auteur et Édition seront activés au lancement officiel — Starter est déjà disponible.
+        Auteur et Édition : paiement comptant, en 2 ou 3 fois, sans frais et sans renouvellement automatique.
       </p>
       <section className="mt-6 border-y py-5 text-foreground">
         <Gift className="h-6 w-6 text-primary" />

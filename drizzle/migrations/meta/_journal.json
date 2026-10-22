@@ -43,6 +43,20 @@
       "when": 1792230855095,
       "tag": "0005_starter27_plan",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792649662175,
+      "tag": "0006_new_offer_two_installments",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792649834075,
+      "tag": "0007_deduplicate_installment_invoices",
+      "breakpoints": true
     }
   ]
 }

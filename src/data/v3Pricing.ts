@@ -322,13 +322,14 @@ export const V3_NEW_OFFERS = {
   auteur: {
     title: "EbookStudio Auteur",
     price: 97,
-    period: "par an",
-    renewal: "Renouvellement automatique chaque année, résiliable à tout moment.",
+    period: "paiement unique",
+    renewal: "Aucun renouvellement automatique : paiement comptant ou en 2/3 fois.",
     booksPerMonth: 10,
     chaptersMax: 40,
     options: [
-      { plan: "auteur97_1x", label: "97 € par an", installments: 1, amount: 97 },
-      { plan: "auteur97_3x", label: "3 fois : 32,34 € puis 2 × 32,33 € (1 an d'accès)", installments: 3, amount: 32.33, first: 32.34 },
+      { plan: "auteur97_1x", label: "97 € en une fois", installments: 1, amount: 97 },
+      { plan: "auteur97_2x", label: "2 × 48,50 €", installments: 2, amount: 48.50 },
+      { plan: "auteur97_3x", label: "3 fois : 32,34 € puis 2 × 32,33 € (total 97 €)", installments: 3, amount: 32.33, first: 32.34 },
     ] as V3NewOfferOption[],
     features: [
       "Les 4 parcours : Écrire un livre, Je raconte un livre, Je raconte ma vie, J'ai déjà mon sommaire",
@@ -353,8 +354,8 @@ export const V3_NEW_OFFERS = {
     // Les identifiants de plan (edition247_*) sont des clés de synchronisation permanentes : ne pas les renommer.
     options: [
       { plan: "edition247_1x", label: "197 € en une fois", installments: 1, amount: 197 },
+      { plan: "edition247_2x", label: "2 × 98,50 €", installments: 2, amount: 98.50 },
       { plan: "edition247_3x", label: "3 fois : 65,68 € puis 2 × 65,66 €", installments: 3, amount: 65.66, first: 65.68 },
-      { plan: "edition247_6x", label: "6 fois : 32,85 € puis 5 × 32,83 €", installments: 6, amount: 32.83, first: 32.85 },
     ] as V3NewOfferOption[],
     features: [
       "Tout le contenu de l'offre Auteur",
