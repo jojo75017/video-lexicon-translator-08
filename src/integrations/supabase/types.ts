@@ -3250,6 +3250,51 @@ export type Database = {
         }
         Relationships: []
       }
+      vc_books: {
+        Row: {
+          author_name: string
+          cover_url: string | null
+          created_at: string
+          description: string
+          format: string
+          id: string
+          status: string
+          target_pages: number
+          theme: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          format?: string
+          id?: string
+          status?: string
+          target_pages?: number
+          theme?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string
+          format?: string
+          id?: string
+          status?: string
+          target_pages?: number
+          theme?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       workflow_results: {
         Row: {
           created_at: string

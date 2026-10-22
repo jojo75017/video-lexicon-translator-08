@@ -28,14 +28,17 @@ export default function V3VCBooksBanner() {
           </p>
           <p className="mt-2 text-sm text-muted-foreground">Rédaction et exports du livre : bientôt disponibles.</p>
           <div className="mt-4 flex flex-wrap gap-3">
+            <Button asChild>
+              <Link to="/v3/vc-books/creer">Créer mon livre VC Books <ArrowRight aria-hidden="true" /></Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/v3/vc-books/bibliotheque">Ma bibliothèque <ArrowRight aria-hidden="true" /></Link>
+            </Button>
             <Button asChild variant="outline">
               <Link to="/v3/vc-books/apercu">Voir la page et le modèle <ArrowRight aria-hidden="true" /></Link>
             </Button>
-            <Button asChild>
-              <Link to="/v3/vc-books/images">Studio de couverture VC Books <ArrowRight aria-hidden="true" /></Link>
-            </Button>
             <Button asChild variant="outline">
-              <Link to="/v3/plans">Découvrir les formules <ArrowRight aria-hidden="true" /></Link>
+              <Link to="/v3/vc-books/images">Studio de couverture VC Books <ArrowRight aria-hidden="true" /></Link>
             </Button>
           </div>
         </div>

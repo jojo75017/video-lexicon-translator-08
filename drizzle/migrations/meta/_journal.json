@@ -57,6 +57,13 @@
       "when": 1792649834075,
       "tag": "0007_deduplicate_installment_invoices",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792652305489,
+      "tag": "0008_create_vc_books",
+      "breakpoints": true
     }
   ]
 }

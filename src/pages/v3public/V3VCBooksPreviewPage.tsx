@@ -50,7 +50,11 @@ export default function V3VCBooksPreviewPage() {
             </ol>
             <p className="mt-3 text-xs text-muted-foreground">La rédaction automatique et l’export Word/PDF dédiés VC Books arrivent bientôt ; les pages présentées sont celles de votre modèle.</p>
           </div>
-          <Button asChild className="h-auto w-full whitespace-normal py-3"><Link to="/v3/vc-books/images"><ImageIcon className="shrink-0" />Ouvrir l’atelier de couvertures<ArrowRight className="shrink-0" /></Link></Button>
+          <div className="flex flex-col gap-3">
+            <Button asChild className="h-auto w-full whitespace-normal py-3"><Link to="/v3/vc-books/creer"><BookOpen className="shrink-0" />Créer mon livre VC Books<ArrowRight className="shrink-0" /></Link></Button>
+            <Button asChild variant="outline" className="h-auto w-full whitespace-normal py-3"><Link to="/v3/vc-books/bibliotheque"><BookOpen className="shrink-0" />Ma bibliothèque VC Books<ArrowRight className="shrink-0" /></Link></Button>
+            <Button asChild variant="outline" className="h-auto w-full whitespace-normal py-3"><Link to="/v3/vc-books/images"><ImageIcon className="shrink-0" />Ouvrir l’atelier de couvertures<ArrowRight className="shrink-0" /></Link></Button>
+          </div>
         </section>
         <section aria-label="Aperçu du modèle VC Books" className="min-w-0">
           <Tabs value={view} onValueChange={(value) => { if (value in PREVIEWS) setView(value as keyof typeof PREVIEWS); }}>
