@@ -14,6 +14,7 @@ import { isTrialLockedPath } from '@/lib/trialLockedPaths';
 import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
 import { setSpaceChoice } from '@/lib/v3OpenState';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
+import vcRobot from '@/assets/plans/vc-books-robot.png';
 
 /**
  * Sidebar V3 — espace personnel, organisée en sections repliables.
@@ -78,6 +79,13 @@ const NAV: NavSection[] = [
       { to: '/v3/tutoriels-v3', label: 'Tutoriels V3 (25)', icon: Video, badge: 'Nouveau' },
       { to: '/v3/outils/editeur', label: 'Éditeur WYSIWYG', icon: FileText },
       { to: '/v3/outils/traduction', label: 'Traduction 10 langues', icon: ListTree },
+    ],
+  },
+  {
+    section: 'Livres spéciaux',
+    items: [
+      { to: '/v3#vc-books', label: 'VC Books — livres humoristiques', icon: BookOpen, end: true },
+      { to: '/v3/vc-books/images', label: 'VC Books — studio de couverture', icon: ImageIcon, badge: 'Nouveau' },
     ],
   },
   {
@@ -274,6 +282,15 @@ export default function V3Sidebar() {
               <span className="rounded bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase">V4</span>
             </>
           )}
+        </NavLink>
+        <NavLink
+          to="/v3/vc-books/images"
+          title="VC Books — studio de couverture"
+          aria-label="VC Books — studio de couverture"
+          className="mt-2 flex min-h-12 items-center gap-2 rounded-md border border-border bg-accent px-2.5 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-muted"
+        >
+          <img src={vcRobot} alt="" className="h-9 w-9 shrink-0 object-contain" />
+          {!collapsed && <span className="min-w-0"><span className="block">VC Books</span><span className="block text-xs font-normal">Studio de couverture</span></span>}
         </NavLink>
       </div>
 
