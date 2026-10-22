@@ -1,4 +1,5 @@
 # Architecture
+- Offer-page KDP Pilot upgrades reuse the shared external partner URL and promotion code, keeping partner subscriptions separate from EbookStudio checkout and entitlements.
 - JVZoo review access uses admin-only creation of a new Auteur subscriber and an immutable auth app-metadata marker for scoped revocation, never payment records or existing customer updates.
 - /outils-partenaires is presentation-only; /partenaires retains the affiliate programme. Neither changes entitlements or payments.
 - V3 navigation groups category buttons separately from neutral admin actions, with scoped toolbar tokens so unrelated page controls retain their existing styles.
