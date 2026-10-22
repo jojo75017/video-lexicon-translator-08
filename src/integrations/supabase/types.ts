@@ -3134,6 +3134,7 @@ export type Database = {
           installments_paid: number
           installments_total: number
           metadata: Json | null
+          paid_invoice_ids: string[]
           plan: string
           status: string
           stripe_customer_id: string | null
@@ -3153,6 +3154,7 @@ export type Database = {
           installments_paid?: number
           installments_total?: number
           metadata?: Json | null
+          paid_invoice_ids?: string[]
           plan: string
           status?: string
           stripe_customer_id?: string | null
@@ -3172,6 +3174,7 @@ export type Database = {
           installments_paid?: number
           installments_total?: number
           metadata?: Json | null
+          paid_invoice_ids?: string[]
           plan?: string
           status?: string
           stripe_customer_id?: string | null
@@ -3304,6 +3307,10 @@ export type Database = {
         }[]
       }
       can_create_vip: { Args: never; Returns: boolean }
+      claim_installment_invoice: {
+        Args: { invoice_id: string; order_uuid: string }
+        Returns: boolean
+      }
       count_vip_subscribers: { Args: never; Returns: number }
       cover_pro_grant_included_credits: {
         Args: { _amount?: number; _user_id: string }
