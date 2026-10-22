@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
+import V3VCBooksBanner from '@/components/v3public/V3VCBooksBanner';
 import {
   ArrowRight,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
@@ -92,6 +93,7 @@ export default function V3HomePage() {
       ) : null}
 
       {/* BANDEAUX DÉFILANTS — tout ce qu'on peut créer */}
+      <V3VCBooksBanner />
       <V3FormatsMarquee />
 
       {/* AIDE HUMAINE — visible uniquement pour les abonnés connectés */}
