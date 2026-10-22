@@ -3,6 +3,7 @@
 // is a Lovable connection identifier, NOT a real Stripe sk_xxx key.
 // All Stripe calls must be proxied through the gateway with two headers.
 
+import Stripe from "https://esm.sh/stripe@22.0.2";
 import { encodeHex } from "https://deno.land/std@0.224.0/encoding/hex.ts";
 
 export type StripeEnv = "sandbox" | "live";
@@ -47,7 +48,7 @@ function encodeForm(params: any): string {
 
 export async function stripeRequest<T = any>(
   envName: StripeEnv,
-  method: "GET" | "POST",
+  method: "GET" | "POST" | "DELETE",
   path: string,
   params?: Record<string, any>,
 ): Promise<T> {
@@ -121,4 +122,24 @@ export async function verifyWebhook(
   if (!v1Signatures.includes(expected)) throw new Error("Invalid webhook signature");
 
   return JSON.parse(body);
+}
+
+export function createStripeClient(environment: StripeEnv): Stripe {
+  const connectionApiKey = getApiKey(environment);
+  const lovableApiKey = env('LOVABLE_API_KEY');
+  return new Stripe(connectionApiKey, {
+    apiVersion: '2026-03-25.dahlia',
+    httpClient: Stripe.createFetchHttpClient((input, init) => {
+      const stripeUrl = input instanceof Request ? input.url : input.toString();
+      const gatewayUrl = stripeUrl.replace('https://api.stripe.com', GATEWAY);
+      return fetch(gatewayUrl, {
+        ...init,
+        headers: {
+          ...Object.fromEntries(new Headers(init?.headers ?? (input instanceof Request ? input.headers : undefined)).entries()),
+          'X-Connection-Api-Key': connectionApiKey,
+          'Lovable-API-Key': lovableApiKey,
+        },
+      });
+    }),
+  });
 }

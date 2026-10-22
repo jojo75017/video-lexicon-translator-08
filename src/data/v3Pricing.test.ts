@@ -33,13 +33,13 @@ describe('one-time offers and historical subscriptions', () => {
 
 import { V3_NEW_OFFERS as NEW } from "./v3Pricing";
 describe("Nouvelles offres 97 € / 197 €", () => {
-  it("Auteur coûte 97 € par an, payable en 1 ou 3 fois", () => {
+  it("Auteur coûte 97 € sans renouvellement, payable en 1, 2 ou 3 fois", () => {
     expect(NEW.auteur.price).toBe(97);
-    expect(NEW.auteur.options.map(o => o.installments)).toEqual([1, 3]);
+    expect(NEW.auteur.options.map(o => o.installments)).toEqual([1, 2, 3]);
   });
-  it("Édition à vie coûte 197 €, payable en 1, 3 ou 6 fois", () => {
+  it("Édition à vie coûte 197 €, payable en 1, 2 ou 3 fois", () => {
     expect(NEW.edition.price).toBe(197);
-    expect(NEW.edition.options.map(o => o.installments)).toEqual([1, 3, 6]);
+    expect(NEW.edition.options.map(o => o.installments)).toEqual([1, 2, 3]);
   });
   it("les échéances couvrent le prix", () => {
     for (const o of [...NEW.auteur.options, ...NEW.edition.options]) {
@@ -50,5 +50,28 @@ describe("Nouvelles offres 97 € / 197 €", () => {
   it("quotas : Auteur 10 livres/40 ch., Édition 20 livres/60 ch.", () => {
     expect([NEW.auteur.booksPerMonth, NEW.auteur.chaptersMax]).toEqual([10, 40]);
     expect([NEW.edition.booksPerMonth, NEW.edition.chaptersMax]).toEqual([20, 60]);
+  });
+});
+
+import { NEW_OFFER_PAYMENTS, isOneTimeAuteur } from '../../supabase/functions/_shared/newOfferPayments';
+describe('Stripe new offer rules', () => {
+  it('Auteur has exactly 1/2/3 installments totaling 9700 cents', () => {
+    const plans = Object.entries(NEW_OFFER_PAYMENTS).filter(([id]) => id.startsWith('auteur97_'));
+    expect(plans.map(([, p]) => p.installments)).toEqual([1, 2, 3]);
+    for (const [, p] of plans) expect(p.monthly * p.installments + (p.first ?? 0)).toBe(9700);
+    expect(NEW_OFFER_PAYMENTS.auteur97_2x.monthly).toBe(4850);
+  });
+  it('Edition has exactly 1/2/3 installments totaling 19700 cents', () => {
+    const plans = Object.entries(NEW_OFFER_PAYMENTS).filter(([id]) => id.startsWith('edition247_'));
+    expect(plans.map(([, p]) => p.installments)).toEqual([1, 2, 3]);
+    for (const [, p] of plans) expect(p.monthly * p.installments + (p.first ?? 0)).toBe(19700);
+    expect(NEW_OFFER_PAYMENTS.edition247_2x.monthly).toBe(9850);
+    expect(NEW_OFFER_PAYMENTS.edition247_6x).toBeUndefined();
+  });
+  it('only new marked Auteur purchases are one-time; old annual purchases stay annual', () => {
+    expect(isOneTimeAuteur('auteur97_1x', 'one_time')).toBe(true);
+    expect(isOneTimeAuteur('auteur97_3x', 'one_time')).toBe(true);
+    expect(isOneTimeAuteur('auteur97_1x')).toBe(false);
+    expect(isOneTimeAuteur('auteur97_3x')).toBe(false);
   });
 });

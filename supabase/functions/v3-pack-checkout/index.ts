@@ -4,7 +4,7 @@
 // `payments-webhook` annule l'abonnement et bascule en accès à vie une fois
 // toutes les échéances payées (voir métadonnées installments_total).
 
-import { type StripeEnv, stripeRequest } from "../_shared/stripe.ts";
+import { type StripeEnv, createStripeClient } from "../_shared/stripe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -14,15 +14,19 @@ const corsHeaders = {
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { getFondateurStatus } from "../_shared/offreFondateur.ts";
 
+function requiredEnv(key: string) { const value = Deno.env.get(key); if (!value) throw new Error(`${key} is not configured`); return value; }
+
 function getSupabase() {
   return createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    requiredEnv("SUPABASE_URL"),
+    requiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
   );
 }
 
 // `first` = surplus en centimes ajouté à la 1re échéance seulement, pour que
 // le total payé soit exactement le prix rond (ex. 32,34 + 32,33 + 32,33 = 97,00).
+import { NEW_OFFER_PAYMENTS } from "../_shared/newOfferPayments.ts";
+
 const PLANS: Record<
   string,
   { label: string; total: number; installments: number; monthly: number; first?: number }
@@ -37,20 +41,30 @@ const PLANS: Record<
   v2_1x: { label: "EbookStudio Pro — accès à vie (paiement unique)", total: 4700, installments: 1, monthly: 4700 },
   v2_2x: { label: "EbookStudio Pro — accès à vie (2× 25€)", total: 5000, installments: 2, monthly: 2500 },
   v2_3x: { label: "EbookStudio Pro — accès à vie (3× 18€)", total: 5400, installments: 3, monthly: 1800 },
-  // Nouvelles offres (nouveaux clients, à partir du 16/10/2026).
-  auteur97_1x: { label: "EbookStudio Auteur — 97 € par an", total: 9700, installments: 1, monthly: 9700 },
-  auteur97_3x: { label: "EbookStudio Auteur — 1 an (3 échéances, total 97 €)", total: 9700, installments: 3, monthly: 3233, first: 1 },
-  edition247_1x: { label: "EbookStudio Édition — accès à vie", total: 19700, installments: 1, monthly: 19700 },
-  edition247_3x: { label: "EbookStudio Édition — accès à vie (3 échéances, total 197 €)", total: 19700, installments: 3, monthly: 6566, first: 2 },
-  // EbookStudio Starter : 27 € à vie, accès limité (validé par Georges le 17/10/2026).
-  starter27_1x: { label: "EbookStudio Starter — accès à vie", total: 2700, installments: 1, monthly: 2700 },
-  edition247_6x: { label: "EbookStudio Édition — accès à vie (6 échéances, total 197 €)", total: 19700, installments: 6, monthly: 3283, first: 2 },
+  ...NEW_OFFER_PAYMENTS,
 };
 
-// Les nouvelles offres restent fermées en production tant que Georges n'a pas
-// validé le basculement. Le mode test reste toujours ouvert pour les essais.
-const NEW_OFFERS_LIVE_ENABLED = false;
 
+async function resolveOrCreateCustomer(
+  stripe: ReturnType<typeof createStripeClient>,
+  options: { email?: string; userId?: string },
+): Promise<string> {
+  if (options.userId && !/^[a-zA-Z0-9_-]+$/.test(options.userId)) throw new Error("Invalid userId");
+  if (options.userId) {
+    const found = await stripe.customers.search({ query: `metadata['userId']:'${options.userId}'`, limit: 1 });
+    if (found.data.length) return found.data[0].id;
+  }
+  if (options.email) {
+    const existing = await stripe.customers.list({ email: options.email, limit: 1 });
+    if (existing.data.length) {
+      const customer = existing.data[0];
+      if (options.userId && customer.metadata?.userId !== options.userId) await stripe.customers.update(customer.id, { metadata: { ...customer.metadata, userId: options.userId } });
+      return customer.id;
+    }
+  }
+  const created = await stripe.customers.create({ ...(options.email && { email: options.email }), ...(options.userId && { metadata: { userId: options.userId } }) });
+  return created.id;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
@@ -63,7 +77,9 @@ Deno.serve(async (req) => {
   try {
     const { plan, email, environment, returnUrl, src, ref } = await req.json();
 
-    const env: StripeEnv = environment === "live" ? "live" : "sandbox";
+    if (environment !== "live" && environment !== "sandbox") throw new Error("Environnement de paiement invalide");
+    const env: StripeEnv = environment;
+    const stripe = createStripeClient(env);
     const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       throw new Error("Email valide requis");
@@ -79,18 +95,12 @@ Deno.serve(async (req) => {
     }
 
     const isNewOffer = normalizedPlan.startsWith("auteur97_") || normalizedPlan.startsWith("edition247_");
-    if (isNewOffer && env === "live" && !NEW_OFFERS_LIVE_ENABLED) {
-      throw new Error("Cette offre ouvre le 16 octobre 2026. Merci de revenir à cette date.");
-    }
-
-    // Résoudre / créer le client Stripe (via gateway).
-    const found = await stripeRequest(env, "GET", "/customers", { email: trimmedEmail, limit: 1 });
-    const customerId: string = found?.data?.[0]?.id
-      ?? (await stripeRequest(env, "POST", "/customers", { email: trimmedEmail })).id;
+    const supabase = getSupabase();
+    const token = req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+    const { data: authData } = token ? await supabase.auth.getUser(token) : { data: { user: null } };
+    const customerId = await resolveOrCreateCustomer(stripe, { email: trimmedEmail, userId: authData.user?.id });
 
     // Enregistrer la commande (suivi des échéances).
-    const supabase = getSupabase();
-
     // Anti double débit : si la même personne a déjà une session ouverte pour
     // la même formule (actualisation, retour arrière), on la réutilise.
     if (isNewOffer) {
@@ -105,8 +115,8 @@ Deno.serve(async (req) => {
       }
       if (prev?.stripe_session_id) {
         try {
-          const s = await stripeRequest(env, "GET", `/checkout/sessions/${prev.stripe_session_id}`);
-          if (s?.status === "open" && s.client_secret) {
+          const s = await stripe.checkout.sessions.retrieve(prev.stripe_session_id);
+          if (s?.status === "open" && s.client_secret && s.metadata?.purchase_model === "one_time") {
             return new Response(JSON.stringify({ clientSecret: s.client_secret, orderId: prev.id, reused: true }),
               { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
           }
@@ -161,36 +171,16 @@ Deno.serve(async (req) => {
       order_id: orderId,
       installments_total: String(planDef.installments),
       plan_label: planDef.label,
+      ...(isNewOffer ? { purchase_model: "one_time" } : {}),
+      ...(authData.user ? { userId: authData.user.id } : {}),
     };
     const srcTag = clean(src);
     const refTag = clean(ref);
     if (srcTag) commonMeta.src = srcTag;
     if (refTag) commonMeta.ref = refTag;
 
-    let sessionParams: Record<string, any>;
-    if (normalizedPlan === "auteur97_1x") {
-      // Abonnement annuel renouvelé automatiquement chaque année.
-      sessionParams = {
-        mode: "subscription",
-        ui_mode: "embedded_page",
-        locale: "fr",
-        customer: customerId,
-        return_url: returnUrl,
-        line_items: [{
-          quantity: 1,
-          price_data: {
-            currency: "eur",
-            unit_amount: planDef.monthly,
-            recurring: { interval: "year" },
-            product_data: { name: planDef.label },
-          },
-        }],
-        "subscription_data[metadata][order_id]": orderId,
-        "subscription_data[metadata][kind]": "v3_full_pack",
-        "subscription_data[metadata][installments_total]": "1",
-        metadata: commonMeta,
-      };
-    } else if (planDef.installments === 1) {
+    let sessionParams: Parameters<typeof stripe.checkout.sessions.create>[0];
+    if (planDef.installments === 1) {
       // Paiement unique 547€.
       sessionParams = {
         mode: "payment",
@@ -198,8 +188,7 @@ Deno.serve(async (req) => {
         locale: "fr",
         // PayPal forcé explicitement : la configuration dynamique de moyens
         // de paiement du compte ne le remontait pas sur /commander.
-        "payment_method_types[0]": "card",
-        "payment_method_types[1]": "paypal",
+        payment_method_types: ["card", "paypal"],
         customer: customerId,
         return_url: returnUrl,
         line_items: [{
@@ -210,8 +199,7 @@ Deno.serve(async (req) => {
             product_data: { name: planDef.label },
           },
         }],
-        "payment_intent_data[description]": planDef.label,
-        "payment_intent_data[metadata][order_id]": orderId,
+        payment_intent_data: { description: planDef.label, metadata: { order_id: orderId } },
         metadata: commonMeta,
       };
     } else {
@@ -239,14 +227,12 @@ Deno.serve(async (req) => {
             product_data: { name: "Ajustement d'arrondi (1re échéance)" },
           },
         }] : [])],
-        "subscription_data[metadata][order_id]": orderId,
-        "subscription_data[metadata][kind]": "v3_full_pack",
-        "subscription_data[metadata][installments_total]": String(planDef.installments),
+        subscription_data: { metadata: commonMeta },
         metadata: commonMeta,
       };
     }
 
-    const session = await stripeRequest(env, "POST", "/checkout/sessions", sessionParams);
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     await supabase
       .from("v3_installment_orders")
