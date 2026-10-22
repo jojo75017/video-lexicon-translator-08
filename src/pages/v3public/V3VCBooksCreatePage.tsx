@@ -16,6 +16,7 @@ import {
   type VCBookTitleIdea,
 } from '@/data/vcBooksIdeas';
 import robot from '@/assets/plans/vc-books-robot.png';
+import robotWriting from '@/assets/plans/vc-books-robot-writing.png';
 
 const FORMATS = [
   { value: 'poche', label: 'Poche (12,7 × 20,3 cm)' },
@@ -81,7 +82,7 @@ export default function V3VCBooksCreatePage() {
     );
   }
 
-  async function save() {
+  async function save(mode: 'library' | 'write' = 'library') {
     if (busy) return;
     setError('');
     const targetPages = Number.parseInt(pages, 10);
@@ -105,16 +106,19 @@ export default function V3VCBooksCreatePage() {
         format,
         target_pages: targetPages,
       };
+      let bookId = editId;
       if (editId) {
         const { error: updateError } = await supabase.from('vc_books').update(payload).eq('id', editId);
         if (updateError) throw updateError;
         toast.success('Livre mis à jour.');
       } else {
-        const { error: insertError } = await supabase.from('vc_books').insert({ ...payload, user_id: userId });
+        const { data: inserted, error: insertError } = await supabase
+          .from('vc_books').insert({ ...payload, user_id: userId }).select('id').single();
         if (insertError) throw insertError;
+        bookId = inserted.id;
         toast.success('Livre enregistré dans votre bibliothèque VC Books.');
       }
-      navigate('/v3/vc-books/bibliotheque');
+      navigate(mode === 'write' && bookId ? `/v3/vc-books/rediger?livre=${bookId}` : '/v3/vc-books/bibliotheque');
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'L’enregistrement a échoué.');
     } finally {
@@ -219,10 +223,16 @@ export default function V3VCBooksCreatePage() {
             </div>
           </div>
           {error && <p role="alert" className="rounded-md border border-destructive p-3 text-sm text-destructive">{error}</p>}
-          <Button type="submit" disabled={busy || !title.trim()} className="w-full sm:w-auto">
-            {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
-            {busy ? 'Enregistrement…' : editId ? 'Enregistrer les modifications' : 'Enregistrer le livre'}
-          </Button>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button type="submit" disabled={busy} className="w-full sm:w-auto">
+              {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
+              {busy ? 'Enregistrement…' : editId ? 'Enregistrer les modifications' : 'Enregistrer le livre'}
+            </Button>
+            <Button type="button" variant="secondary" disabled={busy} className="w-full sm:w-auto h-auto py-2" onClick={() => void save('write')}>
+              <img src={robotWriting} alt="" className="mr-2 h-10 w-10 object-contain" />
+              Enregistrer et rédiger avec le robot
+            </Button>
+          </div>
           <p className="flex items-center gap-2 text-xs text-muted-foreground">
             <BookOpen className="h-3.5 w-3.5" />
             Après l’enregistrement, retrouvez le livre dans la bibliothèque et ouvrez-le dans l’atelier d’images.
