@@ -97,7 +97,7 @@ serve(async (req) => {
       });
     }
 
-    // Offres v3-pack (Starter 27 €, Auteur 97 €/an, Édition 497 €) : les droits
+    // Offres v3-pack (Starter 27 €, Auteur 97 €/an, Édition 197 €) : les droits
     // sont attribués par payments-webhook (source de vérité). On ne réécrit
     // jamais plan_type / status / expires_at ici, pour ne pas écraser un accès
     // annuel ou Starter correctement attribué.
@@ -107,7 +107,7 @@ serve(async (req) => {
         ? "EbookStudio Starter — 27 € à vie"
         : packPlan.startsWith("auteur97_")
           ? "EbookStudio Auteur — 97 €/an"
-          : "EbookStudio Édition — 497 € à vie";
+          : "EbookStudio Édition — 197 € à vie";
 
       const { data: packSubscriber } = await supabase
         .from("subscribers")
