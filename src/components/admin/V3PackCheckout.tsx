@@ -31,9 +31,9 @@ const PLANS_BY_PRODUCT: Record<Product, { title: string; options: { id: PlanId; 
   edition247: {
     title: 'EbookStudio Édition — accès à vie',
     options: [
-      { id: 'edition247_1x', label: '1 × 497 €', sub: 'Paiement unique · accès à vie' },
-      { id: 'edition247_3x', label: '165,68 € puis 2 × 165,66 €', sub: 'Échéancier mensuel' },
-      { id: 'edition247_6x', label: '82,85 € puis 5 × 82,83 €', sub: 'Échéancier mensuel' },
+      { id: 'edition247_1x', label: '1 × 197 €', sub: 'Paiement unique · accès à vie' },
+      { id: 'edition247_3x', label: '65,68 € puis 2 × 65,66 €', sub: 'Échéancier mensuel' },
+      { id: 'edition247_6x', label: '32,85 € puis 5 × 32,83 €', sub: 'Échéancier mensuel' },
     ],
   },
   base: {
