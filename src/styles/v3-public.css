@@ -470,30 +470,30 @@
    Boutons lisibles partout : fond bleu robot, texte blanc
    (harmonisé avec les onglets « Écrire » bleu #1D4ED8)
    ============================================================ */
-.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub a.v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn-primary:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn-gold:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn-action-orange:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn-outline:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn-ghost:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn),
-.v3pub .v3-btn-on-dark:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn) {
+.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub a.v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn-primary:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn-gold:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn-action-orange:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn-outline:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn-ghost:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle),
+.v3pub .v3-btn-on-dark:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle) {
   background: #1D4ED8 !important;
   color: #ffffff !important;
   border-color: #1D4ED8 !important;
 }
-.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub a.v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn-primary:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn-gold:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn-action-orange:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn-outline:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn-ghost:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover,
-.v3pub .v3-btn-on-dark:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):hover {
+.v3pub button:not(:disabled):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub [role="button"]:not([aria-disabled="true"]):not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub a.v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn-primary:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn-gold:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn-action-orange:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn-outline:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn-ghost:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover,
+.v3pub .v3-btn-on-dark:not([data-v3-nav] *):not(.v3-avatar-card):not(.v3-flat-btn):not(.v3-chip-toggle):hover {
   background: #1e40af !important;
   color: #ffffff !important;
   border-color: #1e40af !important;
@@ -732,3 +732,26 @@
 .partner-tools h1,.partner-tools h2{color:var(--partner-text);font-family:inherit;font-style:normal;letter-spacing:0}
 .partner-tools-footer p{color:var(--partner-muted)}
 .partner-tools-card > span{color:var(--partner-stripe);font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif}
+
+/* ============================================================
+   Puces de sélection (catégories KDP des fiches VC Books) :
+   l'état choisi doit se voir — puce carte au repos, couleur du
+   thème quand elle est active. Hors du bleu robot général.
+   ============================================================ */
+.v3pub button.v3-chip-toggle:not(:disabled) {
+  background: hsl(var(--card));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+.v3pub button.v3-chip-toggle:not(:disabled):hover {
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary));
+}
+.v3pub button.v3-chip-toggle[aria-pressed="true"]:not(:disabled) {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border-color: hsl(var(--primary));
+}
+.v3pub button.v3-chip-toggle[aria-pressed="true"]:not(:disabled):hover {
+  filter: brightness(0.94);
+}

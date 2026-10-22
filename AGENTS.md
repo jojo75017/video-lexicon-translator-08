@@ -37,6 +37,8 @@
 - VC Books images live at /v3/vc-books/images and reuse the included generate-ai-cover endpoint with a dedicated explicit illustration prompt, bypassing photographic concept generation without consuming Cover Pro credits or changing other studios.
 - VC Books books are stored in the user-scoped `vc_books` table; the creation form (/v3/vc-books/creer) and library (/v3/vc-books/bibliotheque) feed the image studio via ?livre=<id>, which prefills title/author/theme and can save the generated cover back onto the book.
 - VC Books KDP sheets are editable client-side drafts populated from the selected book, separate from image prompts and checkout prices, so metadata never changes artwork or billing.
+- VC Books creation form offers fixed editorial idea chips from src/data/vcBooksIdeas.ts that fill the whole sheet (title, subtitle, theme, description, categories) on one click, so ideas stay hand-written lists and never generate content randomly.
+- Toggle chips on V3 public pages carry `.v3-chip-toggle` (styled in src/styles/v3-public.css) because the blanket `.v3pub button` blue rule would otherwise paint selected and unselected states identically.
 
 - New-offer checkout amounts live in _shared/newOfferPayments.ts with finite monthly installments; existing six-installment orders remain supported by the webhook but cannot be sold again.
 - Installment invoices are claimed once through a service-role-only atomic function because Stripe can send both invoice.paid and invoice.payment_succeeded for one charge; orders are completed before cancellation to preserve access.
