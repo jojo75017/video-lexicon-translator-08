@@ -190,7 +190,7 @@ export default function V3VCBooksCreatePage() {
                     type="button"
                     aria-pressed={selected}
                     onClick={() => toggleCategory(category)}
-                    className={`rounded-full border px-3 py-1.5 text-xs transition ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground hover:border-primary'}`}
+                    className={`v3-chip-toggle rounded-full border px-3 py-1.5 text-xs transition ${selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-card text-foreground hover:border-primary'}`}
                   >
                     {category}
                   </button>
