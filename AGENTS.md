@@ -1,4 +1,5 @@
 # Architecture
+- KDP launch plans reuse listMyBooks for saved manuscript metadata and the ASIN library for published books; only the title is required, so missing categories never block preparation or carry another book's metadata.
 - Amazon Ads plans reuse the existing KDP advertising route and BYOK writing service, enforce three Sponsored Products campaign types and user-supplied competitor ASINs, and calculate optional simulations from explicit assumptions only, so preparation never starts spend or fabricates performance.
 - Offer-page KDP Pilot upgrades reuse the shared external partner URL and promotion code, keeping partner subscriptions separate from EbookStudio checkout and entitlements.
 - JVZoo review access uses admin-only creation of a new Auteur subscriber and an immutable auth app-metadata marker for scoped revocation, never payment records or existing customer updates.

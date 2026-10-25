@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, CalendarCheck, Copy, Download, Loader2, Rocket, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import SelecteurLivreBiblio from '@/components/kdp/SelecteurLivreBiblio';
+import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
+import { lienAmazon } from '@/lib/kdp/bibliotheque';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,8 +67,17 @@ export default function V3KdpLancementPage() {
   const [erreur, setErreur] = useState<string | null>(null);
   const [courant, setCourant] = useState<StoredPlan | null>(null);
   const [plans, setPlans] = useState<StoredPlan[]>([]);
+  const [livres, setLivres] = useState<MyBookOption[]>([]);
+  const [livreChoisi, setLivreChoisi] = useState('');
 
   useEffect(() => { setPlans(lire()); }, []);
+  useEffect(() => {
+    let actif = true;
+    listMyBooks().then((liste) => { if (actif) setLivres(liste); }).catch(() => {
+      if (actif) toast.error('Impossible de charger vos livres. Vous pouvez utiliser un ASIN ou remplir la fiche.');
+    });
+    return () => { actif = false; };
+  }, []);
 
   const occupe = etape !== 'repos';
   const majBrief = (champ: keyof LaunchBrief, valeur: string) => setBrief((b) => ({ ...b, [champ]: valeur }));
@@ -97,12 +108,14 @@ export default function V3KdpLancementPage() {
       setAsin(code);
       setBrief((b) => ({
         ...b,
-        titre: livre.title || b.titre,
-        genre: livre.categories?.[0] || b.genre,
-        resume: (livre.description || b.resume).slice(0, RESUME_LIMIT),
-        prix: livre.price != null ? String(livre.price) : b.prix,
-        lienVente: livre.amazonUrl || b.lienVente,
+        titre: livre.title || '',
+        sousTitre: '',
+        genre: livre.categories?.[0] || '',
+        resume: (livre.description || '').slice(0, RESUME_LIMIT),
+        prix: livre.price != null ? String(livre.price) : '',
+        lienVente: livre.amazonUrl || '',
       }));
+      setLivreChoisi('');
       toast.success('Fiche Amazon lue — vérifiez et complétez les champs.');
     } catch (e: any) {
       setErreur(e?.message || "Ce livre n'a pas été trouvé sur ce marché. Vérifiez l'ASIN et le pays choisi, ou remplissez le formulaire à la main.");
@@ -112,8 +125,8 @@ export default function V3KdpLancementPage() {
   };
 
   const creerPlan = async () => {
-    if (!brief.titre.trim() || !brief.genre.trim()) {
-      setErreur('Le titre et le sujet principal sont nécessaires pour créer le plan.');
+    if (!brief.titre.trim()) {
+      setErreur('Choisissez un livre, chargez sa fiche ASIN ou indiquez son titre pour créer le plan.');
       return;
     }
     if (!isAIConfigured()) {
@@ -129,7 +142,7 @@ Livre :
 Titre : ${brief.titre}
 ${brief.sousTitre ? `Sous-titre : ${brief.sousTitre}` : ''}
 Type : ${brief.type}
-Sujet principal : ${brief.genre}
+${brief.genre.trim() ? `Sujet principal : ${brief.genre}` : 'Sujet principal non renseigné : oriente le plan uniquement à partir du titre, du sous-titre et du résumé fournis, sans inventer le contenu du livre.'}
 ${brief.resume ? `Résumé : ${brief.resume}` : ''}
 ${brief.dateSortie ? `Date de sortie : ${brief.dateSortie}` : ''}
 ${brief.prix ? `Prix : ${brief.prix} €` : ''}
@@ -248,18 +261,53 @@ Réponds uniquement avec ce JSON :
         </p>
       </header>
 
+      {livres.length > 0 && (
+        <div className="mb-4">
+          <Label htmlFor="launch-book">Choisir un livre Ebookstudio</Label>
+          <select
+            id="launch-book"
+            value={livreChoisi}
+            className="mt-1 h-10 w-full rounded-md border border-[var(--v3-line)] bg-[var(--v3-paper)] px-3 text-sm text-[var(--v3-ink)]"
+            onChange={(e) => {
+              const valeur = e.target.value;
+              setLivreChoisi(valeur);
+              const livre = livres.find((l) => `${l.kind}:${l.id}` === valeur);
+              if (!livre) return;
+              setAsin('');
+              setErreur(null);
+              setBrief({
+                ...LAUNCH_BRIEF_VIDE,
+                titre: livre.title,
+                sousTitre: livre.subtitle,
+                genre: livre.genre,
+                resume: livre.synopsis.slice(0, RESUME_LIMIT),
+              });
+            }}
+          >
+            <option value="">— Choisir mon livre —</option>
+            {livres.map((livre) => (
+              <option key={`${livre.kind}:${livre.id}`} value={`${livre.kind}:${livre.id}`}>{livre.title}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
       <SelecteurLivreBiblio
         asinSaisi={asin}
         marketplaceSaisi={marketplace}
         onChoisir={(l) => {
           setAsin(l.asin);
           setMarketplace(l.marketplace);
-          setBrief((b) => ({
-            ...b,
-            titre: l.titre || b.titre,
-            genre: l.genre || b.genre,
-            resume: l.description || b.resume,
-          }));
+          setLivreChoisi('');
+          setErreur(null);
+          setBrief({
+            ...LAUNCH_BRIEF_VIDE,
+            titre: l.titre || '',
+            genre: l.genre || l.categories?.[0] || '',
+            resume: (l.description || '').slice(0, RESUME_LIMIT),
+            prix: l.prix != null ? String(l.prix) : '',
+            lienVente: lienAmazon(l),
+          });
         }}
       />
 
@@ -315,7 +363,7 @@ Réponds uniquement avec ce JSON :
             </select>
           </div>
           <div>
-            <Label className="text-xs">Sujet principal *</Label>
+            <Label className="text-xs">Sujet principal (facultatif)</Label>
             <Input value={brief.genre} onChange={(e) => majBrief('genre', e.target.value)} placeholder="Gestion du stress, romance historique…" />
           </div>
           <div className="sm:col-span-2">
