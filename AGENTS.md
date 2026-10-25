@@ -1,4 +1,5 @@
 # Architecture
+- Amazon Ads plans reuse the existing KDP advertising route and BYOK writing service, enforce three Sponsored Products campaign types and user-supplied competitor ASINs, and calculate optional simulations from explicit assumptions only, so preparation never starts spend or fabricates performance.
 - Offer-page KDP Pilot upgrades reuse the shared external partner URL and promotion code, keeping partner subscriptions separate from EbookStudio checkout and entitlements.
 - JVZoo review access uses admin-only creation of a new Auteur subscriber and an immutable auth app-metadata marker for scoped revocation, never payment records or existing customer updates.
 - /outils-partenaires is presentation-only; /partenaires retains the affiliate programme. Neither changes entitlements or payments.
