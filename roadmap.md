@@ -1,3 +1,7 @@
+# Amazon Ads dans Ebookstudio KDP
+- [ ] Adapter la page Publicité au modèle : trois campagnes, budget réparti, niveaux, copie et historique.
+- [ ] Ajouter une simulation transparente à partir des hypothèses saisies et tester le parcours livre/ASIN sans lancer de publicité.
+
 # Achats des nouvelles formules
 - [x] Ajouter le bandeau KDP Pilot pour Starter sur les deux pages d’offres ; lien partenaire ouvert et rendu vérifiés. Aucun paiement KDP Pilot interne : abonnement indépendant, paiement final chez le partenaire non testé.
 - [x] Demander la publication des offres Starter/Auteur/Édition et du bandeau KDP Pilot : publication programmée vers ebookstudio.fr ; fin du déploiement et achat réel non confirmés. Contrôle de sécurité sans alerte critique, 28 tests réussis.
