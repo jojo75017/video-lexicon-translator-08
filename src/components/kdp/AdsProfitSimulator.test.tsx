@@ -11,6 +11,6 @@ describe('Ads simulation entered assumptions', () => {
     expect(screen.getByText(/-59,25/)).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText('Gain KDP par exemplaire (€)'), { target: { value: '6' } });
     expect(screen.queryByText(/-59,25/)).not.toBeInTheDocument();
-    expect(screen.getByText(/0,00\s*€/)).toBeInTheDocument();
+    expect(screen.getByText(/^0,00\s*€$/)).toBeInTheDocument();
   });
 });
