@@ -407,7 +407,8 @@ Réponds uniquement avec ce JSON :
                   key={v}
                   size="sm"
                   variant={niveau === v ? 'default' : 'outline'}
-                  className={`v3-chip-toggle ${niveau === v ? btn : btnContour}`}
+                  aria-pressed={niveau === v}
+                  className="v3-chip-toggle h-10"
                   onClick={() => setNiveau(v)}
                 >
                   {l}
