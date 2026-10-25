@@ -10,6 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { MARKETPLACES, fetchAmazonBook } from '@/components/admin/market/marketShared';
+import AdsProfitSimulator from '@/components/kdp/AdsProfitSimulator';
+import { ADS_CAMPAIGN_TYPES, ADS_LEVELS, approvedCompetitorAsins, splitDailyBudget, type AdsLevel } from '@/lib/kdp/adsPlan';
 import { callAIWriting, isAIConfigured } from '@/services/aiWritingService';
 
 /** Historique local (10 derniers résumés publicitaires). */
@@ -45,6 +47,8 @@ interface StoredResume {
   marche: string;
   date: string;
   resume: Resume;
+  dailyBudget?: number;
+  level?: AdsLevel;
 }
 
 const lire = (): StoredResume[] => {
@@ -97,7 +101,8 @@ export default function V3KdpPublicitePage() {
   const [asin, setAsin] = useState('');
   const [concurrents, setConcurrents] = useState('');
   const [marche, setMarche] = useState('fr');
-  const [niveau, setNiveau] = useState<'simple' | 'complet'>('simple');
+  const [niveau, setNiveau] = useState<AdsLevel>('debutant');
+  const [budget, setBudget] = useState('');
   const [etape, setEtape] = useState<'repos' | 'lecture' | 'analyse'>('repos');
   const [erreur, setErreur] = useState<string | null>(null);
   const [courant, setCourant] = useState<StoredResume | null>(null);
@@ -136,6 +141,10 @@ export default function V3KdpPublicitePage() {
       setErreur('Décrivez votre livre en quelques phrases (au moins 40 caractères) : sujet, lecteur visé, bénéfice.');
       return;
     }
+    let budgets: number[];
+    try { budgets = splitDailyBudget(Number(budget)); } catch (error) {
+      setErreur(error instanceof Error ? error.message : 'Budget invalide.'); return;
+    }
     if (!isAIConfigured()) {
       setErreur("Aucune clé IA valide enregistrée. Ouvrez « Paramétrage des clés » puis revenez ici.");
       return;
@@ -146,13 +155,7 @@ export default function V3KdpPublicitePage() {
     setEtape('analyse');
 
     try {
-      const rivaux = concurrents
-        .split(/[\s,;\n]+/)
-        .map((x) => x.trim().toUpperCase())
-        .filter((x) => /^[A-Z0-9]{10}$/.test(x))
-        .slice(0, 10);
-
-      const nbCampagnes = niveau === 'simple' ? '3' : '5';
+      const rivaux = approvedCompetitorAsins(concurrents).slice(0, 30);
       const prompt = `Tu es consultant en publicité Amazon Ads pour des auteurs indépendants, marché ${paysLabel}.
 Écris en français courant uniquement : jamais de latin, jamais de mot inventé, jamais de mot étranger décoratif.
 N'invente aucune donnée mesurée : pas de volume de recherche, pas de nombre de ventes, pas de taux de clic, pas de pourcentage chiffré. Les budgets et enchères sont des fourchettes de départ prudentes présentées comme des suggestions à ajuster (en euros par jour pour le budget, en euros par clic pour l'enchère).
@@ -163,9 +166,11 @@ Description : ${d}
 ${a ? `ASIN du livre : ${a}` : ''}
 ${rivaux.length ? `ASIN de livres concurrents fournis par l'auteur : ${rivaux.join(', ')}` : ''}
 
-Prépare un résumé publicitaire avec exactement ${nbCampagnes} campagnes complémentaires (par exemple ciblage automatique, mots-clés exacts, expressions, produits/ASIN concurrents, marque de l'auteur).
+Prépare un résumé publicitaire avec exactement 3 campagnes Sponsored Products dans cet ordre : automatique, mots-clés exacts, produits/ASIN concurrents. Niveau de conseils : ${ADS_LEVELS[niveau]} (ce niveau ne change ni le budget ni le nombre de campagnes).
+Budget TOTAL demandé par l'auteur : ${budget} EUR/jour, réparti ${budgets.join(' / ')} EUR/jour. Ne le multiplie pas par 3. Aucun lancement automatique.
+Pour les mots-clés exacts, propose 25 expressions pertinentes sans prétendre connaître leur volume de recherche. Pour les produits, utilise exclusivement les ASIN fournis ; sans ASIN, liste vide et conseil d'en sélectionner dans Amazon Ads. Ne propose pas Sponsored Brands.
 
-Pour chaque campagne : "nom" (nom clair à recopier dans Amazon Ads), "ciblage" (automatique, mots-clés exacts, expression, large, ou produits), "objectif" (une phrase : ce que cette campagne va chercher), "motsCles" (8 à 15 expressions, vide pour une campagne automatique), "asins" (ASIN concurrents à cibler quand c'est une campagne produits, sinon vide — n'utilise que des ASIN fournis par l'auteur, n'en invente aucun), "budgetJour" (fourchette de départ), "enchere" (fourchette de départ), "aSurveiller" (la seule chose à regarder dans cette campagne).
+Pour chaque campagne : "nom" (nom clair à recopier dans Amazon Ads), "ciblage" (automatique, mots-clés exacts, expression, large, ou produits), "objectif" (une phrase : ce que cette campagne va chercher), "motsCles" (25 expressions, vide pour une campagne automatique), "asins" (ASIN concurrents à cibler quand c'est une campagne produits, sinon vide — n'utilise que des ASIN fournis par l'auteur, n'en invente aucun), "budgetJour" (montant attribué parmi les trois budgets indiqués), "enchere" (fourchette de départ), "aSurveiller" (la seule chose à regarder dans cette campagne).
 
 Ajoute aussi :
 - "promesse" : en une phrase, l'argument de vente que la publicité doit porter.
@@ -182,19 +187,20 @@ Réponds uniquement avec ce JSON :
       if (!bloc) throw new Error('Réponse illisible du moteur IA. Relancez la préparation.');
       const parsed = JSON.parse(bloc[0]);
 
+      if (!Array.isArray(parsed.campagnes) || parsed.campagnes.length !== 3) throw new Error('Le moteur doit fournir les trois campagnes. Relancez la préparation.');
       const resume: Resume = {
         livre: t,
         asin: a,
         promesse: nettoyer(parsed.promesse),
         lecteur: nettoyer(parsed.lecteur),
         campagnes: (parsed.campagnes || [])
-          .map((c: any) => ({
+          .map((c: any, index: number) => ({
             nom: nettoyer(c?.nom),
-            ciblage: nettoyer(c?.ciblage),
+            ciblage: ADS_CAMPAIGN_TYPES[index],
             objectif: nettoyer(c?.objectif),
-            motsCles: liste(c?.motsCles, 15),
-            asins: liste(c?.asins, 10).filter((x) => /^[A-Z0-9]{10}$/.test(x.toUpperCase())),
-            budgetJour: nettoyer(c?.budgetJour),
+            motsCles: index === 1 ? liste(c?.motsCles, 25) : [],
+            asins: index === 2 ? rivaux : [],
+            budgetJour: `${budgets[index].toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €/jour`,
             enchere: nettoyer(c?.enchere),
             aSurveiller: nettoyer(c?.aSurveiller),
           }))
@@ -204,9 +210,9 @@ Réponds uniquement avec ce JSON :
         prudence: nettoyer(parsed.prudence),
       };
 
-      if (!resume.campagnes.length) throw new Error('Le résumé reçu est vide. Relancez la préparation.');
+      if (resume.campagnes.length !== 3) throw new Error('Le résumé reçu est vide. Relancez la préparation.');
 
-      sauver({ id: `${Date.now()}`, titre: t, marche, date: new Date().toISOString(), resume });
+      sauver({ id: `${Date.now()}`, titre: t, marche, date: new Date().toISOString(), resume, dailyBudget: Number(budget), level: niveau });
     } catch (e: any) {
       setErreur(e?.message || "La préparation n'a pas abouti. Relancez-la.");
     } finally {
@@ -303,11 +309,11 @@ Réponds uniquement avec ce JSON :
         <p className="text-[10px] font-semibold uppercase tracking-[0.22em]" style={{ color: 'var(--v3-gold-600)' }}>
           Espace KDP · page 4
         </p>
-        <h1 className="v3-serif text-[30px] font-semibold" style={{ color: 'var(--v3-ink)' }}>Publicité Amazon (KDP Ads)</h1>
+        <h1 className="v3-serif text-[30px] font-semibold" style={{ color: 'var(--v3-ink)' }}>Amazon Ads — plan de trois campagnes</h1>
         <p className="mt-1 max-w-2xl text-[14px]" style={{ color: 'var(--v3-muted)' }}>
           Partez de votre livre ou de son ASIN : vous recevez un résumé de publicité prêt à recopier dans Amazon Ads —
           campagnes, mots-clés, ASIN concurrents à cibler, budgets de départ et mots-clés à exclure.
-          Aucun chiffre de performance n'est inventé : les budgets sont des fourchettes prudentes à ajuster.
+          Plans à recopier : aucune campagne n’est lancée et aucune dépense n’est engagée depuis cette page.
         </p>
       </header>
 
@@ -329,7 +335,7 @@ Réponds uniquement avec ce JSON :
         onChange={setConcurrents}
       />
 
-      <section className="mb-4 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+      <section className="mb-4 rounded-lg border p-5" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
         <div className="mb-3 flex flex-wrap gap-2">
           <Button size="sm" className={mode === 'livre' ? btn : btnContour} variant={mode === 'livre' ? 'default' : 'outline'} onClick={() => setMode('livre')}>
             <Megaphone className="h-3.5 w-3.5" /> Décrire mon livre
@@ -345,7 +351,7 @@ Réponds uniquement avec ce JSON :
             <select
               value={marche}
               onChange={(e) => setMarche(e.target.value)}
-              className="h-10 w-full rounded-md border bg-white px-3 text-sm"
+              className="h-10 w-full rounded-md border bg-background px-3 text-sm"
               style={{ borderColor: 'var(--v3-line)' }}
             >
               {MARKETPLACES.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
@@ -394,14 +400,14 @@ Réponds uniquement avec ce JSON :
 
         <div className="mt-3 flex flex-wrap items-end gap-3">
           <div>
-            <Label className="text-xs">Ampleur des campagnes</Label>
+            <Label className="text-xs">Niveau des conseils</Label>
             <div className="mt-1 flex gap-2">
-              {([['simple', 'Pour démarrer · 3 campagnes'], ['complet', 'Couverture large · 5 campagnes']] as const).map(([v, l]) => (
+              {(Object.entries(ADS_LEVELS) as [AdsLevel, string][]).map(([v, l]) => (
                 <Button
                   key={v}
                   size="sm"
                   variant={niveau === v ? 'default' : 'outline'}
-                  className={niveau === v ? btn : btnContour}
+                  className={`v3-chip-toggle ${niveau === v ? btn : btnContour}`}
                   onClick={() => setNiveau(v)}
                 >
                   {l}
@@ -409,12 +415,14 @@ Réponds uniquement avec ce JSON :
               ))}
             </div>
           </div>
+          <div><Label htmlFor="ads-budget">Budget total des 3 campagnes (€ / jour)</Label><Input id="ads-budget" type="number" min="0.03" step="0.01" value={budget} onChange={e => setBudget(e.target.value)} placeholder="Votre budget total" /></div>
           <Button onClick={() => (mode === 'asin' ? void depuisAsin() : void preparer())} disabled={occupe} className={btn}>
             {occupe ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
             <span className="ml-1.5">Préparer mes publicités</span>
           </Button>
         </div>
 
+        <p className="mt-3 text-xs text-muted-foreground">Le budget est réparti entre les trois campagnes. C’est un montant quotidien moyen, pas un plafond garanti ; vérifiez les règles Amazon avant activation. Un test de 30 jours est conseillé, sans garantie de vente.</p>
         {occupe && (
           <p className="mt-2 text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>
             {etape === 'lecture' ? 'Lecture de la fiche Amazon…' : 'Préparation des campagnes…'}
@@ -422,7 +430,7 @@ Réponds uniquement avec ce JSON :
         )}
 
         {erreur && (
-          <div className="mt-3 rounded-lg border px-3 py-2 text-[13px]" style={{ borderColor: '#f3c2c2', background: '#fdf3f3', color: '#8a2222' }}>
+          <div className="mt-3 rounded-lg border px-3 py-2 text-[13px]" style={{ borderColor: 'hsl(var(--destructive))', background: 'hsl(var(--background))', color: 'hsl(var(--destructive))' }}>
             {erreur}
           </div>
         )}
@@ -434,15 +442,15 @@ Réponds uniquement avec ce JSON :
             </p>
             <div className="flex flex-wrap gap-1.5">
               {plans.slice(0, 6).map((p, i) => (
-                <button
+                <Button variant="outline" size="sm"
                   key={`${p.titre}-${i}`}
                   type="button"
                   onClick={() => { setMode('livre'); setTitre(p.titre); setGenre(p.genre); setDescription(p.resume); }}
                   className="rounded-full border px-2.5 py-1 text-[11.5px]"
-                  style={{ borderColor: 'var(--v3-line)', background: '#fff', color: 'var(--v3-ink)' }}
+                  style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}
                 >
                   {p.titre}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -455,15 +463,15 @@ Réponds uniquement avec ce JSON :
             </p>
             <div className="flex flex-wrap gap-1.5">
               {historique.map((r) => (
-                <button
+                <Button variant="outline" size="sm"
                   key={r.id}
                   type="button"
-                  onClick={() => { setCourant(r); setTitre(r.titre); setMarche(r.marche); }}
+                  onClick={() => { setCourant(r); setTitre(r.titre); setMarche(r.marche); if (r.dailyBudget) setBudget(String(r.dailyBudget)); }}
                   className="rounded-full border px-2.5 py-1 text-[11.5px]"
-                  style={{ borderColor: 'var(--v3-line)', background: '#fff', color: 'var(--v3-ink)' }}
+                  style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}
                 >
                   {r.titre}
-                </button>
+                </Button>
               ))}
             </div>
           </div>
@@ -472,13 +480,13 @@ Réponds uniquement avec ce JSON :
 
       {courant && (
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-cream)' }}>
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border p-4" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-cream)' }}>
             <div>
               <p className="text-[13.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
-                Résumé de publicité — « {courant.resume.livre} »{courant.resume.asin ? ` · ${courant.resume.asin}` : ''}
+                Plan de campagnes généré — « {courant.resume.livre} »{courant.resume.asin ? ` · ${courant.resume.asin}` : ''}
               </p>
               <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
-                {MARKETPLACES.find((m) => m.id === courant.marche)?.label || courant.marche} · {courant.resume.campagnes.length} campagnes
+                {MARKETPLACES.find((m) => m.id === courant.marche)?.label || courant.marche} · {courant.resume.campagnes.length} campagnes · {courant.dailyBudget ? `${courant.dailyBudget} €/jour au total · Test conseillé : 30 jours` : 'Ancien plan enregistré'} · {ADS_LEVELS[courant.level ?? 'debutant']}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -491,13 +499,14 @@ Réponds uniquement avec ce JSON :
             </div>
           </div>
 
+          <div role="note" className="border-l-4 border-primary bg-secondary/40 p-4 text-sm">Aucune performance n’est garantie. Vérifiez les mots-clés, les ASIN et les enchères dans Amazon Ads. Les campagnes préparées ici ne sont pas des campagnes actives.</div>
           {(courant.resume.promesse || courant.resume.lecteur) && (
             <section className="grid gap-4 sm:grid-cols-2">
               {[
                 { t: 'La promesse à porter', v: courant.resume.promesse },
                 { t: 'Le lecteur visé', v: courant.resume.lecteur },
               ].map((b) => b.v && (
-                <div key={b.t} className="rounded-2xl border bg-white p-5" style={{ borderColor: 'var(--v3-line)' }}>
+                <div key={b.t} className="rounded-lg border bg-background p-5" style={{ borderColor: 'var(--v3-line)' }}>
                   <h2 className="v3-serif mb-1 text-[18px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>{b.t}</h2>
                   <p className="text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>{b.v}</p>
                 </div>
@@ -505,9 +514,9 @@ Réponds uniquement avec ce JSON :
             </section>
           )}
 
-          <section className="space-y-3">
+          <section className="grid items-start gap-4 md:grid-cols-2">
             {courant.resume.campagnes.map((c, i) => (
-              <div key={i} className="rounded-2xl border bg-white p-5" style={{ borderColor: 'var(--v3-line)' }}>
+              <div key={i} className="rounded-lg border bg-background p-5" style={{ borderColor: 'var(--v3-line)' }}>
                 <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <h2 className="v3-serif text-[19px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>{c.nom}</h2>
@@ -563,7 +572,7 @@ Réponds uniquement avec ce JSON :
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {c.asins.map((a, n) => (
-                        <span key={n} className="rounded-full border px-2.5 py-1 font-mono text-[12px]" style={{ borderColor: 'var(--v3-gold)', background: '#fff', color: 'var(--v3-ink)' }}>
+                        <span key={n} className="rounded-full border px-2.5 py-1 font-mono text-[12px]" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-paper)', color: 'var(--v3-ink)' }}>
                           {a}
                         </span>
                       ))}
@@ -571,6 +580,9 @@ Réponds uniquement avec ce JSON :
                   </div>
                 )}
 
+                {c.ciblage === 'automatique' && <p className="mb-3 text-sm text-muted-foreground">Amazon sélectionne les recherches à partir de la fiche du livre. Aucun mot-clé à saisir pour ce ciblage.</p>}
+                {c.ciblage === 'produits' && !c.asins.length && <p className="mb-3 text-sm text-muted-foreground">Aucun ASIN concurrent fourni. Choisissez des livres réellement comparables dans votre bibliothèque ou dans Amazon Ads avant de lancer cette campagne.</p>}
+                <p className="mb-3 text-xs text-muted-foreground">Enchères suggérées, non mesurées. Vérifiez les réglages d’enchères dans Amazon Ads.</p>
                 {c.aSurveiller && (
                   <p className="text-[12.5px]" style={{ color: 'var(--v3-muted)' }}>
                     À surveiller : {c.aSurveiller}
@@ -581,7 +593,7 @@ Réponds uniquement avec ce JSON :
           </section>
 
           {courant.resume.negatifs.length > 0 && (
-            <section className="rounded-2xl border bg-white p-5" style={{ borderColor: 'var(--v3-line)' }}>
+            <section className="rounded-lg border bg-background p-5" style={{ borderColor: 'var(--v3-line)' }}>
               <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                 <h2 className="v3-serif text-[19px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>Mots-clés à exclure</h2>
                 <Button variant="outline" size="sm" className={btnContour} onClick={() => copier(courant.resume.negatifs.join('\n'), 'Liste copiée')}>
@@ -590,7 +602,7 @@ Réponds uniquement avec ce JSON :
               </div>
               <div className="flex flex-wrap gap-1.5">
                 {courant.resume.negatifs.map((n, i) => (
-                  <span key={i} className="rounded-full border px-2.5 py-1 text-[12px]" style={{ borderColor: '#f0d2d2', background: '#fdf6f6', color: '#8a2222' }}>
+                  <span key={i} className="rounded-full border px-2.5 py-1 text-[12px]" style={{ borderColor: 'hsl(var(--destructive))', background: 'hsl(var(--background))', color: 'hsl(var(--destructive))' }}>
                     {n}
                   </span>
                 ))}
@@ -599,7 +611,7 @@ Réponds uniquement avec ce JSON :
           )}
 
           {courant.resume.etapes.length > 0 && (
-            <section className="rounded-2xl border bg-white p-5" style={{ borderColor: 'var(--v3-line)' }}>
+            <section className="rounded-lg border bg-background p-5" style={{ borderColor: 'var(--v3-line)' }}>
               <h2 className="v3-serif mb-2 text-[19px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>Dans quel ordre avancer</h2>
               <ol className="space-y-1.5 text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>
                 {courant.resume.etapes.map((e, i) => (
@@ -612,8 +624,10 @@ Réponds uniquement avec ce JSON :
             </section>
           )}
 
+          {courant.dailyBudget && <AdsProfitSimulator key={courant.id} daily={courant.dailyBudget} />}
+          <nav className="flex flex-wrap gap-4 text-sm text-primary"><Link to="/v3/kdp/fiche-audit">Audit de la fiche produit →</Link><Link to="/v3/kdp/mots-cles">Analyse des mots-clés →</Link><Link to="/v3/kdp/lancement">Plan de lancement →</Link></nav>
           {courant.resume.prudence && (
-            <section className="rounded-2xl border p-5" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-cream)' }}>
+            <section className="rounded-lg border p-5" style={{ borderColor: 'var(--v3-gold)', background: 'var(--v3-cream)' }}>
               <h2 className="v3-serif mb-1 text-[18px] font-semibold" style={{ color: 'var(--v3-ink)' }}>À garder en tête</h2>
               <p className="text-[13.5px]" style={{ color: 'var(--v3-muted)' }}>{courant.resume.prudence}</p>
             </section>
