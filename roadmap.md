@@ -1,6 +1,7 @@
 # Amazon Ads dans Ebookstudio KDP
-- [ ] Adapter la page Publicité au modèle : trois campagnes, budget réparti, niveaux, copie et historique.
-- [ ] Ajouter une simulation transparente à partir des hypothèses saisies et tester le parcours livre/ASIN sans lancer de publicité.
+- [x] Adapter la page Publicité au modèle : trois campagnes Sponsored Products, budget réparti, niveaux Débutant/Intermédiaire/Expert, copie et historique conservés, lien Ebookstudio KDP mis à jour.
+- [x] Ajouter une simulation transparente à partir des hypothèses saisies ; six tests réussis, formulaire connecté et message de clé manquante vérifiés, aucun débordement mobile ni erreur JavaScript. Rien publié.
+- [ ] Vérifier une génération réelle des trois campagnes et la lecture d’un ASIN jusqu’au résultat : clé IA personnelle absente de la session de test ; aucune campagne Amazon lancée.
 
 # Achats des nouvelles formules
 - [x] Ajouter le bandeau KDP Pilot pour Starter sur les deux pages d’offres ; lien partenaire ouvert et rendu vérifiés. Aucun paiement KDP Pilot interne : abonnement indépendant, paiement final chez le partenaire non testé.
