@@ -41,9 +41,9 @@ export const KDP_TAB_PAGES: KdpTabPage[] = [
     maison: true,
   },
   {
-    label: 'Publicité Amazon — vos campagnes prêtes à recopier',
+    label: 'Amazon Ads — vos 3 campagnes',
     to: '/v3/kdp/publicite',
-    desc: 'Votre livre ou son ASIN : un résumé de publicité avec campagnes, mots-clés, ASIN concurrents à cibler et budgets de départ',
+    desc: 'Livre ou ASIN : ciblage automatique, mots-clés exacts et produits concurrents, budget réparti et simulation de rentabilité',
     badge: 'Nouveau',
     maison: true,
   },
