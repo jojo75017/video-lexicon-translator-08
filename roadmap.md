@@ -1,5 +1,6 @@
 # Correction plan de lancement
-- [ ] Utiliser les informations du livre sélectionné et ne plus exiger un sujet principal ; vérifier les champs et le passage à la rédaction.
+- [x] Utiliser les informations du livre sélectionné et ne plus exiger un sujet principal ; deux tests réussis (préremplissage et changement de livre), compilation OK. Rien publié.
+- [ ] Vérifier le plan complet à l’écran : aperçu redirigé vers la connexion malgré une session renouvelée ; génération réelle non vérifiée.
 
 # Amazon Ads dans Ebookstudio KDP
 - [x] Adapter la page Publicité au modèle : trois campagnes Sponsored Products, budget réparti, niveaux Débutant/Intermédiaire/Expert, copie et historique conservés, lien Ebookstudio KDP mis à jour.
