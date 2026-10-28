@@ -66,7 +66,27 @@ Rédige le chapitre ${index + 1} « ${c.title} » : ${c.summary}
 Réponds uniquement en JSON : {"text":"...","caption":"..."}`;
 }
 
+/** Surcharge temporaire du fournisseur (429/503, « high demand », « overloaded ») : seule erreur relancée. */
+export function isTransientOverload(msg: string): boolean {
+  return /high demand|overloaded|try again later|rate.?limit|\b(429|500|502|503|504)\b|unavailable|surcharg/i.test(msg);
+}
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
+const RETRY_DELAYS = [4000, 10000, 20000];
+
 async function callWriter(prompt: string, where: string): Promise<string> {
+  for (let attempt = 0; ; attempt++) {
+    try { return await callWriterOnce(prompt, where); }
+    catch (e) {
+      const msg = (e as Error).message;
+      if (attempt >= RETRY_DELAYS.length || !isTransientOverload(msg)) {
+        throw new Error(isTransientOverload(msg) ? `${where} : le moteur IA de votre clé est saturé en ce moment. Patientez quelques minutes puis relancez.` : msg);
+      }
+      await wait(RETRY_DELAYS[attempt] + Math.random() * 1000);
+    }
+  }
+}
+
+async function callWriterOnce(prompt: string, where: string): Promise<string> {
   const provider = getProvider();
   const userKey = getProviderKey(provider);
   if (!userKey) throw new Error('Enregistrez votre clé de rédaction dans « Choisir mon IA · Clés API » avant de lancer le robot.');
