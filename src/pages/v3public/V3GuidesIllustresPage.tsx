@@ -82,7 +82,14 @@ export default function V3GuidesIllustresPage() {
       setGuide({ ...guide, cover_url: url }); toast.success(`Couverture créée — ${photoCredit(p)}`);
     } else {
       const i = picker.target; const chapters = [...guide.chapters];
-      chapters[i] = { ...chapters[i], imageUrl: p.full, caption: `${chapters[i].caption ? chapters[i].caption + ' — ' : ''}${photoCredit(p)}` };
+      // Les liens Pixabay expirent : la photo choisie est recopiée dans l'espace de l'auteur.
+      const { data: u } = await supabase.auth.getUser(); if (!u.user) throw new Error('Connectez-vous.');
+      const res = await fetch(p.full); if (!res.ok) throw new Error('Téléchargement de la photo impossible.');
+      const path = `${u.user.id}/guides/${guide.id}-ch${i + 1}-${Date.now()}.jpg`;
+      const { error: ue } = await supabase.storage.from('ebook-images').upload(path, await res.blob(), { contentType: 'image/jpeg', upsert: true });
+      if (ue) throw new Error('Enregistrement de la photo impossible.');
+      const url = supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
+      chapters[i] = { ...chapters[i], imageUrl: url, caption: `${chapters[i].caption ? chapters[i].caption + ' — ' : ''}${photoCredit(p)}` };
       await persist({ ...guide, chapters }); toast.success('Photo ajoutée au chapitre.');
     }
     setPicker(null);
