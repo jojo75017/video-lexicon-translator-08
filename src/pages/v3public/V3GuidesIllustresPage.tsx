@@ -96,7 +96,7 @@ export default function V3GuidesIllustresPage() {
     const { error: ue } = await supabase.storage.from('ebook-images').upload(path, await res.blob(), { contentType: 'image/jpeg', upsert: true });
     if (ue) throw new Error('Enregistrement de la photo impossible.');
     const url = supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
-    return { ...c, imageUrl: url, caption: `${c.caption ? c.caption + ' — ' : ''}${photoCredit(p)}` };
+    return { ...c, imageUrl: url, caption: `${c.caption ? c.caption + ' · ' : ''}${photoCredit(p)}` };
   }
   const photosForAll = () => run('photos-all', async () => {
     if (!guide) return; const g = { ...guide, chapters: [...guide.chapters] }; let added = 0;
