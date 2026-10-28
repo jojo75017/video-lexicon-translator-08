@@ -1,6 +1,10 @@
+# Accueil bloqué
+- [x] Déverrouiller la V3 dans le code (`V3_LAUNCH_UNLOCKED = true`) : l'interrupteur en base reste la source, mais une base en pause ne fait plus retomber le site en « Mode contemplation ».
+- [x] Corriger la racine « / » : les visiteurs étaient renvoyés vers l'ancien tunnel externe Landaa (offre 47 €, mort → page 404) ; ils arrivent désormais sur le tunnel interne /commander. Vérifié au navigateur, build OK. Rien publié.
+
 # Emails et ebook illustré
-- [ ] Vérifier que les emails de service partent après le passage de Resend en gratuit : backend en pause, envoi de test impossible.
-- [ ] Vérifier si l'on peut rédiger un ebook illustré type « L'aquarium de A à Z ».
+- [ ] Vérifier que les emails de service partent après le passage de Resend en gratuit : base de nouveau en ligne, envoi de test à refaire.
+- [ ] Construire le studio de guides illustrés (texte + images par chapitre, export Word/PDF KDP) : approuvé, interrompu par le blocage de l'accueil.
 
 # Correction plan de lancement
 - [x] Utiliser les informations du livre sélectionné et ne plus exiger un sujet principal ; deux tests réussis (préremplissage et changement de livre), compilation OK. Rien publié.
