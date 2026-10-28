@@ -45,3 +45,4 @@
 - New-offer checkout amounts live in _shared/newOfferPayments.ts with finite monthly installments; existing six-installment orders remain supported by the webhook but cannot be sold again.
 - Installment invoices are claimed once through a service-role-only atomic function because Stripe can send both invoice.paid and invoice.payment_succeeded for one charge; orders are completed before cancellation to preserve access.
 - VC Books writing uses the `vc-books-pauses` branch of generate-content with the shared BYOK comic dispatcher, storing pauses in `vc_books.pauses`; Word/PDF exports are generated client-side at the book's KDP trim size and model margins.
+- The "/" root route sends visitors to the internal /commander tunnel, never to the dead external Landaa 47 EUR funnel; only authenticated users are routed to their space.
