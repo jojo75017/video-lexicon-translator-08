@@ -3,7 +3,7 @@
  * chapitre par chapitre avec la clé du client (BYOK), une illustration par
  * chapitre, export Word/PDF au format KDP. Aucun contenu de secours.
  */
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun, BorderStyle, ShadingType } from 'docx';
 import { jsPDF } from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey, getOpenRouterModel } from '@/services/aiWritingService';
