@@ -29,21 +29,33 @@ function extractJson(raw: string): Record<string, unknown> {
   return JSON.parse(body);
 }
 
+/** Nettoie le texte : plus jamais de tiret cadratin (—) ni demi-cadratin (–) dans les livres. */
+export function stripCadratins(t: string): string {
+  return t
+    .replace(/(\d)\s*[—–]\s*(\d)/g, '$1 à $2')
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/,\s*(?=[).!?])/g, '')
+    .replace(/,\s*,/g, ',')
+    .replace(/ +,/g, ',')
+    .replace(/,\s*$/, '.')
+    .trim();
+}
+
 export function parseOutline(raw: string): GuideChapter[] {
   const list = (extractJson(raw).chapters as unknown[]) ?? [];
   return (Array.isArray(list) ? list : [])
-    .map((c) => { const o = c as Record<string, unknown>; return { title: String(o.title ?? '').trim(), summary: String(o.summary ?? '').trim(), text: '', imagePrompt: String(o.imagePrompt ?? '').trim() }; })
+    .map((c) => { const o = c as Record<string, unknown>; return { title: stripCadratins(String(o.title ?? '')), summary: stripCadratins(String(o.summary ?? '')), text: '', imagePrompt: String(o.imagePrompt ?? '').trim() }; })
     .filter((c) => c.title);
 }
 
 export function parseChapter(raw: string): { text: string; caption: string } {
   const o = extractJson(raw);
-  const text = String(o.text ?? '').trim();
+  const text = stripCadratins(String(o.text ?? ''));
   if (!text) throw new Error('chapitre vide');
-  return { text, caption: String(o.caption ?? '').trim() };
+  return { text, caption: stripCadratins(String(o.caption ?? '')) };
 }
 
-const LANG = 'LANGUE : français courant uniquement, orthographe impeccable. Interdit : latin, pseudo-langues, mots inventés, anglicismes décoratifs. GUIDE PRATIQUE : aucun personnage, aucune intrigue, aucune fiction.';
+const LANG = 'LANGUE : français courant uniquement, orthographe impeccable. Interdit : latin, pseudo-langues, mots inventés, anglicismes décoratifs. GUIDE PRATIQUE : aucun personnage, aucune intrigue, aucune fiction. PONCTUATION : jamais de tiret cadratin (—) ni de demi-cadratin (–) ; remplace-les par une virgule, un point ou des deux-points.';
 
 export function buildOutlinePrompt(b: GuideBrief): string {
   return `${LANG}
@@ -119,7 +131,7 @@ Réponds uniquement en JSON : {"subtitle":"...","author_name":"...","subject":".
 
 export function parseSheet(raw: string): GuideSheet {
   const o = extractJson(raw);
-  const g = (k: string) => String(o[k] ?? '').trim();
+  const g = (k: string) => stripCadratins(String(o[k] ?? ''));
   const sheet = { subtitle: g('subtitle'), author_name: g('author_name'), subject: g('subject'), audience: g('audience'), description: g('description'), categories: g('categories') };
   if (!sheet.description || !sheet.subtitle) throw new Error('fiche incomplète');
   return sheet;
