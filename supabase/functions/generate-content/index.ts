@@ -480,7 +480,7 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
       if (authError || !session.user) return new Response(JSON.stringify({ error: 'Votre session a expiré. Reconnectez-vous.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       const sys = `Tu es un auteur français de guides pratiques illustrés pour adultes (documentaires, guides de A à Z). Contenu exact, pédagogique, concret, sans fiction, sans personnage ni intrigue.
 Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans commentaires.`;
-      const response = await comicTextProvider(body, sys);
+      const response = await comicTextProvider(body, sys, 12000);
       const headers = new Headers(response.headers);
       Object.entries(corsHeaders).forEach(([name, value]) => headers.set(name, value));
       return new Response(response.body, { status: response.status, headers });
