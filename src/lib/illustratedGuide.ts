@@ -11,7 +11,8 @@ import { VC_FORMATS, VC_MARGINS } from './vcBooksExport';
 
 export interface GuideChapter { title: string; summary: string; text: string; imagePrompt: string; imageUrl?: string; caption?: string }
 export interface GuideBrief { title: string; subtitle: string; subject: string; audience: string; image_style: string; chapter_count: number }
-export interface GuideBook extends GuideBrief { author_name: string; format: string; chapters: GuideChapter[] }
+export interface GuideBook extends GuideBrief { author_name: string; format: string; chapters: GuideChapter[]; description?: string; categories?: string; cover_url?: string | null }
+export interface GuideSheet { subtitle: string; author_name: string; subject: string; audience: string; description: string; categories: string }
 
 export const GUIDE_CHAPTERS_MIN = 3;
 export const GUIDE_CHAPTERS_MAX = 30;
@@ -79,6 +80,78 @@ async function callWriter(prompt: string, where: string): Promise<string> {
   }
   if (data?.error) throw new Error(`${where} : ${data.error}`);
   return String(data?.content ?? '');
+}
+
+export function buildSheetPrompt(title: string): string {
+  return `${LANG}
+À partir du seul titre de guide pratique illustré « ${title} », prépare la fiche éditoriale KDP en français :
+- "subtitle" : sous-titre vendeur et précis (max 15 mots).
+- "author_name" : un nom de plume français crédible et neutre (prénom + nom), modifiable par l'auteur.
+- "subject" : sujet et contenu attendu (2 phrases).
+- "audience" : public visé (quelques mots).
+- "description" : description Amazon d'environ 150 mots (140 à 170), sans promesse mensongère, sans prix.
+- "categories" : 3 catégories KDP françaises pertinentes, séparées par " ; " (ex. « Animaux > Poissons et aquariums »).
+Réponds uniquement en JSON : {"subtitle":"...","author_name":"...","subject":"...","audience":"...","description":"...","categories":"..."}`;
+}
+
+export function parseSheet(raw: string): GuideSheet {
+  const o = extractJson(raw);
+  const g = (k: string) => String(o[k] ?? '').trim();
+  const sheet = { subtitle: g('subtitle'), author_name: g('author_name'), subject: g('subject'), audience: g('audience'), description: g('description'), categories: g('categories') };
+  if (!sheet.description || !sheet.subtitle) throw new Error('fiche incomplète');
+  return sheet;
+}
+
+export async function writeSheet(title: string): Promise<GuideSheet> {
+  if (!title.trim()) throw new Error('Indiquez d’abord le titre du guide.');
+  const raw = await callWriter(buildSheetPrompt(title.trim()), 'Fiche interrompue');
+  try { return parseSheet(raw); } catch { throw new Error('Fiche illisible. Relancez.'); }
+}
+
+export function buildGuideCoverPrompt(b: { title: string; subtitle: string; author_name: string; subject: string; image_style: string }): string {
+  const art = b.image_style === 'schema' || b.image_style === 'aquarelle'
+    ? 'Couverture de guide documentaire, illustration réaliste aquarellée haut de gamme.'
+    : 'Couverture de guide pratique haut de gamme, photographie réaliste professionnelle, lumière soignée.';
+  return `${art} Sujet visuel : ${b.subject || b.title}. Format vertical 6×9, composition éditoriale claire avec zones calmes pour le texte.
+Typographie française parfaitement lisible. Reproduire uniquement ces textes à l’identique : titre « ${b.title} » en haut, grand ; ${b.subtitle ? `sous-titre « ${b.subtitle} » sous le titre ; ` : ''}${b.author_name ? `auteur « ${b.author_name} » en bas. ` : ''}Aucun autre mot, aucun faux texte, sans prix, sans logo, sans filigrane, sans livre en perspective.`;
+}
+
+export async function generateGuideCover(b: { title: string; subtitle: string; author_name: string; subject: string; image_style: string }): Promise<string> {
+  const prompt = buildGuideCoverPrompt(b);
+  const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
+    body: { title: b.title, subtitle: b.subtitle, author: b.author_name, format: 'kindle', userPrompt: prompt, customPrompt: prompt, genre: 'Guide pratique illustré' },
+  });
+  if (error) {
+    let msg = error.message;
+    if (error.context instanceof Response) { const d = await error.context.clone().json().catch(() => null); if (typeof d?.error === 'string') msg = d.error; }
+    throw new Error(msg);
+  }
+  if (data?.error) throw new Error(data.error);
+  if (typeof data?.imageUrl !== 'string' || !data.imageUrl) throw new Error('Aucune couverture reçue.');
+  return data.imageUrl;
+}
+
+/** Mockup 3D (livre broché en perspective + ombre) dessiné à partir de la vraie couverture, PNG transparent pour les tunnels de vente. */
+export async function buildBookMockup(coverUrl: string): Promise<Blob> {
+  const blob = await (await fetch(coverUrl)).blob();
+  const src = URL.createObjectURL(blob);
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('couverture illisible')); i.src = src; });
+    const W = 1600, H = 1600, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const ctx = c.getContext('2d'); if (!ctx) throw new Error('canvas indisponible');
+    const bh = 1180, bw = Math.round(bh * 2 / 3), x = (W - bw) / 2 + 40, y = (H - bh) / 2, spine = 46;
+    ctx.save(); ctx.filter = 'blur(28px)'; ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.beginPath(); ctx.ellipse(x + bw / 2, y + bh + 20, bw * 0.62, 46, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+    ctx.fillStyle = '#e9e5dc'; ctx.beginPath(); ctx.moveTo(x + bw, y + 8); ctx.lineTo(x + bw + 18, y + 22); ctx.lineTo(x + bw + 18, y + bh + 6); ctx.lineTo(x + bw, y + bh - 4); ctx.fill();
+    ctx.drawImage(img, x, y, bw, bh);
+    const g = ctx.createLinearGradient(x, 0, x + spine, 0);
+    g.addColorStop(0, 'rgba(0,0,0,0.45)'); g.addColorStop(0.5, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.fillRect(x, y, spine, bh);
+    const sh = ctx.createLinearGradient(x, y, x + bw, y + bh);
+    sh.addColorStop(0, 'rgba(255,255,255,0.12)'); sh.addColorStop(0.5, 'rgba(255,255,255,0)'); sh.addColorStop(1, 'rgba(0,0,0,0.12)');
+    ctx.fillStyle = sh; ctx.fillRect(x, y, bw, bh);
+    return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('mockup impossible'))), 'image/png'));
+  } finally { URL.revokeObjectURL(src); }
 }
 
 export async function writeOutline(b: GuideBrief): Promise<GuideChapter[]> {
