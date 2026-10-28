@@ -8,6 +8,7 @@ import { jsPDF } from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey, getOpenRouterModel } from '@/services/aiWritingService';
 import { VC_FORMATS, VC_MARGINS } from './vcBooksExport';
+import { getIsCurrentSessionAdmin } from './adminAccess';
 
 export interface GuideChapter { title: string; summary: string; text: string; imagePrompt: string; imageUrl?: string; caption?: string }
 export interface GuideBrief { title: string; subtitle: string; subject: string; audience: string; image_style: string; chapter_count: number }
@@ -87,10 +88,11 @@ async function callWriter(prompt: string, where: string): Promise<string> {
 }
 
 async function callWriterOnce(prompt: string, where: string): Promise<string> {
-  // OpenRouter en priorité dès qu'une clé sk-or- est enregistrée (Gemini abandonné).
-  const provider = getProviderKey('openrouter') ? 'openrouter' : getProvider();
+  // Administrateur : OpenRouter en priorité. Abonnés : le moteur qu'ils ont choisi (Gemini par défaut).
+  const admin = await getIsCurrentSessionAdmin().catch(() => false);
+  const provider = admin && getProviderKey('openrouter') ? 'openrouter' : getProvider();
   const userKey = getProviderKey(provider);
-  if (!userKey) throw new Error('Enregistrez votre clé OpenRouter (sk-or-) dans « Choisir mon IA · Clés API » avant de lancer le robot.');
+  if (!userKey) throw new Error('Enregistrez votre clé de rédaction dans « Choisir mon IA · Clés API » avant de lancer le robot.');
   const model = provider === 'openrouter' ? getOpenRouterModel() : undefined;
   const { data, error } = await supabase.functions.invoke('generate-content', { body: { type: 'illustrated-guide', prompt, provider, model, userApiKey: userKey } });
   if (error) {
