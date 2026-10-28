@@ -38,7 +38,7 @@ export default function V3GuidesIllustresPage() {
     setList((data ?? []) as unknown as Row[]);
   }
   useEffect(() => { void loadList(); }, []);
-  useEffect(() => { console.log('[GI] id =', id, '| search =', window.location.search); }, [id]);
+  useEffect(() => { console.log('[GI] id =', id); if (!id) return; supabase.from('illustrated_guides').select('id,title').eq('id', id).maybeSingle().then((r) => console.log('[GI] res', JSON.stringify(r.data?.title ?? null), r.error ? r.error.message : 'ok')).catch((e) => console.log('[GI] err', String(e))); }, [id]);
   useEffect(() => {
     if (!id) { setGuide(null); return; }
     void supabase.from('illustrated_guides').select('*').eq('id', id).maybeSingle().then(async ({ data }) => {
