@@ -30,8 +30,9 @@ function extractJson(raw: string): Record<string, unknown> {
 }
 
 /** Nettoie le texte : plus jamais de tiret cadratin (—) ni demi-cadratin (–) dans les livres. */
-export function stripCadratins(t: string): string {
-  return t
+export function stripCadratins(t: unknown): string {
+  const s = String(t ?? '');
+  return s
     .replace(/(\d)\s*[—–]\s*(\d)/g, '$1 à $2')
     .replace(/\s*[—–]\s*/g, ', ')
     .replace(/,\s*(?=[).!?])/g, '')
