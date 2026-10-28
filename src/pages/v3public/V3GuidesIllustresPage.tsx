@@ -82,17 +82,36 @@ export default function V3GuidesIllustresPage() {
       setGuide({ ...guide, cover_url: url }); toast.success(`Couverture créée — ${photoCredit(p)}`);
     } else {
       const i = picker.target; const chapters = [...guide.chapters];
-      // Les liens Pixabay expirent : la photo choisie est recopiée dans l'espace de l'auteur.
-      const { data: u } = await supabase.auth.getUser(); if (!u.user) throw new Error('Connectez-vous.');
-      const res = await fetch(p.full); if (!res.ok) throw new Error('Téléchargement de la photo impossible.');
-      const path = `${u.user.id}/guides/${guide.id}-ch${i + 1}-${Date.now()}.jpg`;
-      const { error: ue } = await supabase.storage.from('ebook-images').upload(path, await res.blob(), { contentType: 'image/jpeg', upsert: true });
-      if (ue) throw new Error('Enregistrement de la photo impossible.');
-      const url = supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
-      chapters[i] = { ...chapters[i], imageUrl: url, caption: `${chapters[i].caption ? chapters[i].caption + ' — ' : ''}${photoCredit(p)}` };
+      chapters[i] = await savePhotoToChapter(guide.id, i, chapters[i], p);
       await persist({ ...guide, chapters }); toast.success('Photo ajoutée au chapitre.');
     }
     setPicker(null);
+  });
+
+  async function savePhotoToChapter(gid: string, i: number, c: GuideChapter, p: StockPhoto): Promise<GuideChapter> {
+    // Les liens Pixabay expirent : la photo choisie est recopiée dans l'espace de l'auteur.
+    const { data: u } = await supabase.auth.getUser(); if (!u.user) throw new Error('Connectez-vous.');
+    const res = await fetch(p.full); if (!res.ok) throw new Error('Téléchargement de la photo impossible.');
+    const path = `${u.user.id}/guides/${gid}-ch${i + 1}-${Date.now()}.jpg`;
+    const { error: ue } = await supabase.storage.from('ebook-images').upload(path, await res.blob(), { contentType: 'image/jpeg', upsert: true });
+    if (ue) throw new Error('Enregistrement de la photo impossible.');
+    const url = supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
+    return { ...c, imageUrl: url, caption: `${c.caption ? c.caption + ' — ' : ''}${photoCredit(p)}` };
+  }
+  const photosForAll = () => run('photos-all', async () => {
+    if (!guide) return; const g = { ...guide, chapters: [...guide.chapters] }; let added = 0;
+    const usedIds = new Set<string>();
+    for (let i = 0; i < g.chapters.length; i++) {
+      const c = g.chapters[i]; if (c.imageUrl) continue;
+      let photos = await searchStockPhotos(`${guide.title} ${c.title}`.slice(0, 90));
+      if (!photos.length) photos = await searchStockPhotos(c.title);
+      if (!photos.length) photos = await searchStockPhotos(guide.title);
+      const fresh = photos.filter((x) => !usedIds.has(x.id));
+      const p = fresh.find((x) => x.width >= x.height) ?? fresh[0]; if (!p) continue; usedIds.add(p.id);
+      trackStockPhoto(p); g.chapters[i] = await savePhotoToChapter(g.id, i, c, p); added++;
+      await persist({ ...g, chapters: [...g.chapters] });
+    }
+    toast.success(added ? `${added} photo(s) réaliste(s) ajoutée(s). Changez-les une à une si besoin.` : 'Tous les chapitres ont déjà une image.');
   });
 
   const makeCover = () => run('cover', async () => {
@@ -193,6 +212,7 @@ export default function V3GuidesIllustresPage() {
           ? <Button variant="outline" onClick={() => { stop.current.stopped = true; }}><Square className="mr-2 h-4 w-4" />Arrêter après ce chapitre</Button>
           : <Button onClick={writeAll} disabled={!!busy || written === guide.chapters.length}><PenLine className="mr-2 h-4 w-4" />2. Rédiger les chapitres</Button>)}
         {written > 0 && <>
+          <Button variant="secondary" onClick={photosForAll} disabled={!!busy || !guide.chapters.length}>{busy === 'photos-all' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}3. Photos réalistes pour tous les chapitres</Button>
           <Button variant="outline" onClick={() => exportAs('docx')} disabled={!!busy}><FileText className="mr-2 h-4 w-4" />Export Word</Button>
           <Button variant="outline" onClick={() => exportAs('pdf')} disabled={!!busy}><FileDown className="mr-2 h-4 w-4" />Export PDF</Button>
         </>}
