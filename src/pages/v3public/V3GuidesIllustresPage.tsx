@@ -11,6 +11,7 @@ import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
   guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, stripCadratins, type StockPhoto, type GuideBook, type GuideChapter,
+  boxKind,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
@@ -237,6 +238,10 @@ export default function V3GuidesIllustresPage() {
               <Label className="text-xs">Image souhaitée</Label>
               <Input value={c.imagePrompt} onChange={(e) => edit(i, { imagePrompt: e.target.value })} onBlur={() => persist(guide)} />
               <Textarea value={c.text} placeholder={c.summary} onChange={(e) => edit(i, { text: e.target.value })} onBlur={() => persist(guide)} rows={c.text ? 10 : 3} />
+              {c.text && <p className="text-xs text-muted-foreground">{c.text.split(/\s+/).filter(Boolean).length} mots</p>}
+              {c.text && <details className="text-sm"><summary className="cursor-pointer text-xs font-semibold text-muted-foreground">Aperçu mis en page (encarts gris)</summary>
+                <div className="mt-2 max-h-96 space-y-2 overflow-y-auto">{c.text.split(/\n\s*\n/).map((p, k) => p.startsWith('## ') ? <h4 key={k} className="font-semibold text-foreground">{p.slice(3)}</h4> : boxKind(p) ? <div key={k} className={`rounded-md border border-border bg-muted p-3 text-foreground ${boxKind(p) === 'quote' ? 'italic' : ''}`}>{p}</div> : <p key={k} className="text-foreground">{p}</p>)}</div>
+              </details>}
             </div>
           </div>
         </li>)}
