@@ -87,9 +87,10 @@ async function callWriter(prompt: string, where: string): Promise<string> {
 }
 
 async function callWriterOnce(prompt: string, where: string): Promise<string> {
-  const provider = getProvider();
+  // OpenRouter en priorité dès qu'une clé sk-or- est enregistrée (Gemini abandonné).
+  const provider = getProviderKey('openrouter') ? 'openrouter' : getProvider();
   const userKey = getProviderKey(provider);
-  if (!userKey) throw new Error('Enregistrez votre clé de rédaction dans « Choisir mon IA · Clés API » avant de lancer le robot.');
+  if (!userKey) throw new Error('Enregistrez votre clé OpenRouter (sk-or-) dans « Choisir mon IA · Clés API » avant de lancer le robot.');
   const model = provider === 'openrouter' ? getOpenRouterModel() : undefined;
   const { data, error } = await supabase.functions.invoke('generate-content', { body: { type: 'illustrated-guide', prompt, provider, model, userApiKey: userKey } });
   if (error) {
@@ -293,4 +294,49 @@ export async function buildGuidePdf(book: GuideBook): Promise<Blob> {
     }
   }
   return pdf.output('blob');
+}
+
+// ---------- Photos libres (Unsplash / Pixabay) ----------
+export interface StockPhoto { id: string; source: 'unsplash' | 'pixabay'; thumb: string; full: string; width: number; height: number; author: string; link: string; download?: string }
+
+export const photoCredit = (p: Pick<StockPhoto, 'author' | 'source'>) => `Photo : ${p.author} / ${p.source === 'unsplash' ? 'Unsplash' : 'Pixabay'}`;
+
+export async function searchStockPhotos(query: string): Promise<StockPhoto[]> {
+  if (!query.trim()) throw new Error('Indiquez des mots-clés.');
+  const { data, error } = await supabase.functions.invoke('stock-photos', { body: { query } });
+  if (error) {
+    let msg = error.message;
+    if (error.context instanceof Response) { const d = await error.context.clone().json().catch(() => null); if (typeof d?.error === 'string') msg = d.error; }
+    throw new Error(msg);
+  }
+  if (data?.error) throw new Error(data.error);
+  return Array.isArray(data?.photos) ? data.photos : [];
+}
+
+export function trackStockPhoto(p: StockPhoto) {
+  if (p.source === 'unsplash' && p.download) void supabase.functions.invoke('stock-photos', { body: { track: p.download } });
+}
+
+/** Couverture 6×9 composée à partir d'une vraie photo : photo plein cadre, bandeau titre, auteur. */
+export async function composePhotoCover(photoUrl: string, b: { title: string; subtitle: string; author_name: string }): Promise<Blob> {
+  const blob = await (await fetch(photoUrl)).blob();
+  const src = URL.createObjectURL(blob);
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error('photo illisible')); i.src = src; });
+    const W = 1800, H = 2700, c = document.createElement('canvas'); c.width = W; c.height = H;
+    const ctx = c.getContext('2d'); if (!ctx) throw new Error('canvas indisponible');
+    const s = Math.max(W / img.naturalWidth, H / img.naturalHeight);
+    ctx.drawImage(img, (W - img.naturalWidth * s) / 2, (H - img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
+    const top = ctx.createLinearGradient(0, 0, 0, H * 0.45); top.addColorStop(0, 'rgba(10,20,30,0.85)'); top.addColorStop(1, 'rgba(10,20,30,0)');
+    ctx.fillStyle = top; ctx.fillRect(0, 0, W, H * 0.45);
+    const bot = ctx.createLinearGradient(0, H * 0.78, 0, H); bot.addColorStop(0, 'rgba(10,20,30,0)'); bot.addColorStop(1, 'rgba(10,20,30,0.85)');
+    ctx.fillStyle = bot; ctx.fillRect(0, H * 0.78, W, H * 0.22);
+    ctx.fillStyle = '#ffffff'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    const wrap = (text: string, font: string, maxW: number) => { ctx.font = font; const out: string[] = []; let line = ''; for (const w of text.split(/\s+/)) { const t = line ? `${line} ${w}` : w; if (ctx.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; } if (line) out.push(line); return out; };
+    let y = 190;
+    for (const l of wrap(b.title.toUpperCase(), 'bold 150px Georgia, serif', W - 240)) { ctx.font = 'bold 150px Georgia, serif'; ctx.fillText(l, W / 2, y); y += 170; }
+    if (b.subtitle) { y += 30; for (const l of wrap(b.subtitle, 'italic 64px Georgia, serif', W - 300)) { ctx.font = 'italic 64px Georgia, serif'; ctx.fillText(l, W / 2, y); y += 80; } }
+    if (b.author_name) { ctx.font = '600 78px Georgia, serif'; ctx.textBaseline = 'bottom'; ctx.fillText(b.author_name, W / 2, H - 150); }
+    return await new Promise<Blob>((res, rej) => c.toBlob((x) => (x ? res(x) : rej(new Error('couverture impossible'))), 'image/jpeg', 0.92));
+  } finally { URL.revokeObjectURL(src); }
 }
