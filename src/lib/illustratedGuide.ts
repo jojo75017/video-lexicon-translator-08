@@ -92,7 +92,7 @@ Réponds uniquement en JSON : {"text":"...","caption":"..."}`;
 
 /** Surcharge temporaire du fournisseur (429/503, « high demand », « overloaded ») : seule erreur relancée. */
 export function isTransientOverload(msg: string): boolean {
-  return /high demand|overloaded|try again later|rate.?limit|\b(429|500|502|503|504)\b|unavailable|surcharg/i.test(msg);
+  return /high demand|overloaded|try again later|rate.?limit|\b(429|500|502|503|504)\b|unavailable|surcharg|provider returned error/i.test(msg);
 }
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const RETRY_DELAYS = [4000, 10000, 20000];
