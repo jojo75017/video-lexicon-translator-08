@@ -46,3 +46,4 @@
 - Installment invoices are claimed once through a service-role-only atomic function because Stripe can send both invoice.paid and invoice.payment_succeeded for one charge; orders are completed before cancellation to preserve access.
 - VC Books writing uses the `vc-books-pauses` branch of generate-content with the shared BYOK comic dispatcher, storing pauses in `vc_books.pauses`; Word/PDF exports are generated client-side at the book's KDP trim size and model margins.
 - The "/" root route sends visitors to the internal /commander tunnel, never to the dead external Landaa 47 EUR funnel; only authenticated users are routed to their space.
+- Illustrated adult guides live at /v3/guides-illustres in the user-scoped `illustrated_guides` table, writing via the `illustrated-guide` generate-content branch (BYOK) and images via the included generate-ai-cover engine, so no paid credits or other studios change.
