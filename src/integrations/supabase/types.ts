@@ -2114,6 +2114,54 @@ export type Database = {
         }
         Relationships: []
       }
+      illustrated_guides: {
+        Row: {
+          audience: string
+          author_name: string
+          chapter_count: number
+          chapters: Json
+          created_at: string
+          format: string
+          id: string
+          image_style: string
+          subject: string
+          subtitle: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          audience?: string
+          author_name?: string
+          chapter_count?: number
+          chapters?: Json
+          created_at?: string
+          format?: string
+          id?: string
+          image_style?: string
+          subject?: string
+          subtitle?: string
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          audience?: string
+          author_name?: string
+          chapter_count?: number
+          chapters?: Json
+          created_at?: string
+          format?: string
+          id?: string
+          image_style?: string
+          subject?: string
+          subtitle?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       jvzoo_access: {
         Row: {
           created_at: string
