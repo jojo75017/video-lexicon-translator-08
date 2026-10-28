@@ -31,6 +31,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Personnages', to: '/v3/create?step=3', desc: 'Créez et développez vos protagonistes' },
       { label: 'Importer un manuscrit', to: '/v3/create?import=1', desc: 'Reprenez un projet existant (DOCX, TXT)' },
       { label: 'VC Books — créer mon livre', to: '/v3/vc-books/creer', badge: 'Nouveau', desc: 'La fiche de votre livre humoristique : titre, auteur, thème, format — l’atelier la reprend tout seul' },
+      { label: 'Guides illustrés (type « L’aquarium de A à Z »)', to: '/v3/guides-illustres', badge: 'Nouveau', desc: 'Guide pratique complet, une image par chapitre, export Word/PDF KDP' },
       { label: 'VC Books — ma bibliothèque', to: '/v3/vc-books/bibliotheque', badge: 'Nouveau', desc: 'Retrouvez vos livres VC Books et ouvrez-les dans l’atelier d’images' },
       { label: "Générateur d'idées", to: '/ebook-ideas', desc: 'Trouvez des concepts rentables en un clic' },
       { label: 'Quiz Auteur', to: '/quiz', desc: 'Identifiez votre profil d’auteur en 2 minutes' },

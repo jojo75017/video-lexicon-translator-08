@@ -87,6 +87,7 @@ const NAV: NavSection[] = [
       { to: '/v3/vc-books/apercu', label: 'VC Books — livres humoristiques', icon: BookOpen, end: true },
       { to: '/v3/vc-books/creer', label: 'VC Books — créer un livre', icon: BookPlus, badge: 'Nouveau' },
       { to: '/v3/vc-books/bibliotheque', label: 'VC Books — ma bibliothèque', icon: LibraryBig, badge: 'Nouveau' },
+      { to: '/v3/guides-illustres', label: 'Guides illustrés de A à Z', icon: BookPlus, badge: 'Nouveau' },
       { to: '/v3/vc-books/images', label: 'VC Books — studio de couverture', icon: ImageIcon },
     ],
   },

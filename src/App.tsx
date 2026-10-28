@@ -126,6 +126,7 @@ const V3VCBooksPreviewPage = lazy(() => import('./pages/v3public/V3VCBooksPrevie
 const V3VCBooksCreatePage = lazy(() => import('./pages/v3public/V3VCBooksCreatePage'));
 const V3VCBooksLibraryPage = lazy(() => import('./pages/v3public/V3VCBooksLibraryPage'));
 const V3VCBooksWritePage = lazy(() => import('./pages/v3public/V3VCBooksWritePage'));
+const V3GuidesIllustresPage = lazy(() => import('./pages/v3public/V3GuidesIllustresPage'));
 const V3BookPage = lazy(() => import('./pages/v3public/V3BookPage'));
 const V3LibraryPage = lazy(() => import('./pages/v3public/V3LibraryPage'));
 const V3GalleryPage = lazy(() => import('./pages/v3public/V3GalleryPage'));
@@ -814,6 +815,7 @@ const App = () => {
               <Route path="vc-books/creer" element={<V3LockedGate><PlanGuard><V3VCBooksCreatePage /></PlanGuard></V3LockedGate>} />
               <Route path="vc-books/bibliotheque" element={<V3LockedGate><PlanGuard><V3VCBooksLibraryPage /></PlanGuard></V3LockedGate>} />
               <Route path="vc-books/rediger" element={<V3LockedGate><PlanGuard><V3VCBooksWritePage /></PlanGuard></V3LockedGate>} />
+              <Route path="guides-illustres" element={<V3LockedGate><PlanGuard><V3GuidesIllustresPage /></PlanGuard></V3LockedGate>} />
               <Route path="vc-books/apercu" element={<V3VCBooksPreviewPage />} />
               <Route path="book/:id" element={<V3LockedGate><V3BookPage /></V3LockedGate>} />
               <Route path="library" element={<V3LockedGate><V3LibraryPage /></V3LockedGate>} />
