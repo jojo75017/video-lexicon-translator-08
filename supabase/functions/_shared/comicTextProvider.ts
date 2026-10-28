@@ -1,5 +1,5 @@
 /** BD text only: selected BYOK provider, no shared-key or paid fallback. */
-export async function comicTextProvider(body: Record<string, unknown>, systemPrompt: string) {
+export async function comicTextProvider(body: Record<string, unknown>, systemPrompt: string, maxTokens = 6000) {
   const json = (data: unknown, status = 200, extra: Record<string, string> = {}) =>
     new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json', ...extra } });
   if (typeof body.prompt !== 'string' || !body.prompt.trim() || body.prompt.length > 100000) {
@@ -22,11 +22,11 @@ export async function comicTextProvider(body: Record<string, unknown>, systemPro
   else if (provider === 'claude') { headers['x-api-key'] = key; headers['anthropic-version'] = '2023-06-01'; }
   else headers.Authorization = `Bearer ${key}`;
   const payload = provider === 'gemini'
-    ? { system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: 'user', parts: [{ text: body.prompt }] }], generationConfig: { maxOutputTokens: 6000, temperature: 0.7, responseMimeType: 'application/json' } }
-    : provider === 'claude' ? { model, system: systemPrompt, messages: messages.slice(1), max_tokens: 6000 }
-    : { model, messages, max_tokens: 6000 };
+    ? { system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: 'user', parts: [{ text: body.prompt }] }], generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7, responseMimeType: 'application/json' } }
+    : provider === 'claude' ? { model, system: systemPrompt, messages: messages.slice(1), max_tokens: maxTokens }
+    : { model, messages, max_tokens: maxTokens };
   try {
-    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(120000) });
+    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(maxTokens > 6000 ? 145000 : 120000) });
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const message = typeof data?.error?.message === 'string' ? data.error.message.split(key).join('[clé masquée]') : `Erreur ${provider} (${response.status}).`;

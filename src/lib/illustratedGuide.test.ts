@@ -50,3 +50,19 @@ describe('surcharge du moteur IA', () => {
     expect(isTransientOverload('Clé API invalide')).toBe(false);
   });
 });
+
+import { boxKind as _boxKind, buildChapterPrompt as _bcp } from './illustratedGuide';
+describe('chapitres longs avec encarts', () => {
+  it('exige 2800 mots minimum, astuces, conseils et citations', () => {
+    const p = _bcp({ title: 'T', subject: 'S' } as never, [{ title: 'A', summary: 'B', imagePrompt: '' } as never], 0);
+    expect(p).toContain('AU MINIMUM 2800 mots');
+    expect(p).toContain('Astuce : ');
+    expect(p).toContain('Citation : ');
+  });
+  it('reconnaît les encarts gris', () => {
+    expect(_boxKind('Astuce : x')).toBe('tip');
+    expect(_boxKind('Conseil : x')).toBe('tip');
+    expect(_boxKind('Citation : x (Y)')).toBe('quote');
+    expect(_boxKind('Texte normal')).toBeNull();
+  });
+});

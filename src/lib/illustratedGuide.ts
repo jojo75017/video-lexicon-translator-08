@@ -3,7 +3,7 @@
  * chapitre par chapitre avec la clé du client (BYOK), une illustration par
  * chapitre, export Word/PDF au format KDP. Aucun contenu de secours.
  */
-import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun } from 'docx';
+import { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, ImageRun, BorderStyle, ShadingType } from 'docx';
 import { jsPDF } from 'jspdf';
 import { supabase } from '@/integrations/supabase/client';
 import { getProvider, getProviderKey, getOpenRouterModel } from '@/services/aiWritingService';
@@ -68,13 +68,23 @@ Pour chaque chapitre : "title" (court), "summary" (2 phrases), "imagePrompt" (de
 Réponds uniquement en JSON : {"chapters":[{"title":"...","summary":"...","imagePrompt":"..."}]}`;
 }
 
+/** Encart à fond gris (astuce, conseil, citation, à retenir). */
+export function boxKind(p: string): 'tip' | 'quote' | null {
+  if (/^Citation\s*:/i.test(p)) return 'quote';
+  if (/^(Astuce|Conseil|À retenir)\s*:/i.test(p)) return 'tip';
+  return null;
+}
+
 export function buildChapterPrompt(b: GuideBrief, chapters: GuideChapter[], index: number): string {
   const c = chapters[index];
   return `${LANG}
 GUIDE ILLUSTRÉ : "${b.title}" — sujet : ${b.subject || b.title}${b.audience ? ` — public : ${b.audience}` : ''}
 SOMMAIRE : ${chapters.map((x, i) => `${i + 1}. ${x.title}`).join(' ; ')}
 Rédige le chapitre ${index + 1} « ${c.title} » : ${c.summary}
-- "text" : 900 à 1300 mots, intertitres sur une ligne commençant par "## ", paragraphes séparés par une ligne vide, conseils concrets, chiffres exacts, encadré final commençant par "À retenir :".
+- "text" : AU MINIMUM 2800 mots (vise 2900 à 3200), au moins 6 intertitres sur une ligne commençant par "## ", paragraphes séparés par une ligne vide, conseils concrets, chiffres exacts.
+- Encarts (chacun seul dans son paragraphe) : au moins 3 paragraphes commençant par "Astuce : " et au moins 2 commençant par "Conseil : ", répartis dans le chapitre.
+- Citations : au moins 2 paragraphes commençant par "Citation : ", phrase réelle et vérifiable d'une personne connue liée au sujet, suivie de l'auteur entre parenthèses. Aucun guillemet. N'invente jamais une citation ni son auteur.
+- Termine par un encadré commençant par "À retenir :".
 - Ne répète pas les autres chapitres.
 - "caption" : légende de l'illustration (1 phrase).
 Réponds uniquement en JSON : {"text":"...","caption":"..."}`;
@@ -263,7 +273,12 @@ export async function buildGuideDocx(book: GuideBook): Promise<Blob> {
     }
     for (const p of paras(c.text)) {
       if (p.startsWith('## ')) ch.push(new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 200, after: 120 }, children: [new TextRun(p.slice(3))] }));
-      else ch.push(new Paragraph({ alignment: AlignmentType.LEFT, spacing: { after: 140 }, children: [new TextRun({ text: p, bold: p.startsWith('À retenir') })] }));
+      else if (boxKind(p)) {
+        const q = boxKind(p) === 'quote'; const label = p.match(/^[^:]+:/)?.[0] ?? ''; const body = p.slice(label.length).trim();
+        const bd = { style: BorderStyle.SINGLE, size: 6, color: 'D9D9D9', space: 6 };
+        ch.push(new Paragraph({ alignment: AlignmentType.LEFT, shading: { type: ShadingType.CLEAR, color: 'auto', fill: 'EDEDED' }, border: { top: bd, bottom: bd, left: bd, right: bd }, indent: { left: 120, right: 120 }, spacing: { before: 200, after: 240 }, children: q ? [new TextRun({ text: body, italics: true })] : [new TextRun({ text: label + ' ', bold: true }), new TextRun(body)] }));
+      }
+      else ch.push(new Paragraph({ alignment: AlignmentType.LEFT, spacing: { after: 140 }, children: [new TextRun({ text: p })] }));
     }
   }
   const doc = new Document({
@@ -289,6 +304,30 @@ export async function buildGuidePdf(book: GuideBook): Promise<Blob> {
     }
     y += after;
   };
+  const writeBox = (p: string) => {
+    const q = boxKind(p) === 'quote'; const label = p.match(/^[^:]+:/)?.[0] ?? '';
+    const t = q ? p.slice(label.length).trim() : p; const pad = 3, size = 10.5, lh = size * 0.42;
+    pdf.setFont('times', q ? 'italic' : 'normal'); pdf.setFontSize(size);
+    const lines = pdf.splitTextToSize(t, w - pad * 2) as string[];
+    y += 2;
+    let i = 0;
+    while (i < lines.length) {
+      if (y + pad * 2 + lh > maxY) newPage();
+      const fit = Math.max(1, Math.min(lines.length - i, Math.floor((maxY - y - pad * 2) / lh)));
+      pdf.setFillColor(237, 237, 237); pdf.setDrawColor(217, 217, 217);
+      pdf.rect(x, y, w, fit * lh + pad * 2, 'FD');
+      pdf.setTextColor(35, 47, 62);
+      for (let k = 0; k < fit; k++) {
+        const line = lines[i + k];
+        if (!q && i + k === 0 && line.startsWith(label)) {
+          pdf.setFont('times', 'bold'); pdf.text(label, x + pad, y + pad + lh * (k + 1) - 0.8);
+          const lw = pdf.getTextWidth(label + ' '); pdf.setFont('times', 'normal'); pdf.text(line.slice(label.length).trimStart(), x + pad + lw, y + pad + lh * (k + 1) - 0.8);
+        } else pdf.text(line, x + pad, y + pad + lh * (k + 1) - 0.8);
+      }
+      y += fit * lh + pad * 2; i += fit;
+    }
+    pdf.setTextColor(0, 0, 0); y += 4;
+  };
   y = f.h * 0.3; write(book.title, 22, 'bold', 'center', 6);
   if (book.subtitle) write(book.subtitle, 13, 'italic', 'center', 12);
   write(book.author_name || '', 13, 'normal', 'center');
@@ -305,7 +344,8 @@ export async function buildGuidePdf(book: GuideBook): Promise<Blob> {
     }
     for (const p of paras(c.text)) {
       if (p.startsWith('## ')) write(p.slice(3), 13, 'bold', 'left', 2);
-      else write(p, 11, p.startsWith('À retenir') ? 'bold' : 'normal', 'left', 3);
+      else if (boxKind(p)) writeBox(p);
+      else write(p, 11, 'normal', 'left', 3);
     }
   }
   return pdf.output('blob');
