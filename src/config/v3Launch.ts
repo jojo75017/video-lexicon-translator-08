@@ -12,8 +12,14 @@
  *    pour préparer et tester.
  *
  * Le 1er octobre 2026 : basculer sur `true`, republier.
+ *
+ * Depuis le 28/10/2026 : `true` définitivement. L'interrupteur en base
+ * (`launch_settings.v3_open`) reste la source principale ; cette constante
+ * n'est que le repli si la lecture échoue (base en pause, réseau coupé).
+ * Avec `false`, une simple indisponibilité de la base faisait retomber tout
+ * le site en « Mode contemplation » et bloquait l'accueil.
  */
-export const V3_LAUNCH_UNLOCKED = false;
+export const V3_LAUNCH_UNLOCKED = true;
 
 /** Date d'ouverture publique de la V3 (utilisée pour le compte à rebours). */
 export const V3_LAUNCH_DATE_ISO = "2026-10-01T08:00:00+02:00";

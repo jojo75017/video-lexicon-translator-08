@@ -37,7 +37,7 @@ import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
 import { captureUtmParams } from '@/lib/utmTracking';
 import { ADMIN_HOME_PATH, ADMIN_LOGIN_PATH } from '@/config/adminRoutes';
 import { getHomePath, SUBSCRIBER_HOME_PATH, type AccessState } from '@/lib/authDestination';
-import { launchTunnelUrl } from '@/data/externalLinks';
+import { COMMANDER_PATH } from '@/data/externalLinks';
 import { SUBSCRIBER_CHOICE_PATH, getSpaceChoice } from '@/lib/v3OpenState';
 import useV3Open from '@/hooks/useV3Open';
 import { useAdminAccess } from '@/contexts/AdminAccessContext';
@@ -45,13 +45,6 @@ import AdminQuickNav from '@/components/admin/AdminQuickNav';
 import { hasPersistedAdminHint } from '@/lib/adminAccess';
 import V3PublicLayout from './components/v3public/V3PublicLayout';
 
-/** Redirection externe (hors routeur) sans flash : remplace l'entrée d'historique. */
-function ExternalRedirect({ url }: { url: string }) {
-  useEffect(() => {
-    window.location.replace(url);
-  }, [url]);
-  return <PageLoader />;
-}
 
 // V2 — Ebook Planner + outils satellites
 const RedirectClickPage = lazy(() => import('./pages/RedirectClickPage'));
@@ -502,7 +495,9 @@ const App = () => {
             />
 
             {/* Accueil : admin vers le panneau admin, client vers son espace,
-                visiteur vers le tunnel de vente externe (Landaa).
+                visiteur vers le tunnel de commande interne (/commander).
+                L'ancien tunnel externe Landaa (offre 47 €) est mort : la racine
+                ne doit plus jamais y renvoyer.
                 Racine : on attend que la session soit connue avant de rediriger,
                 sinon un abonné / admin était envoyé sur la page de vente. */}
             <Route
@@ -511,7 +506,7 @@ const App = () => {
                 isCheckingAuth || !homePath
                   ? <AccessPendingFallback timedOut={adminTimedOut} onRetry={handleAdminRetry} />
                   : accessState === 'visitor'
-                    ? <ExternalRedirect url={launchTunnelUrl()} />
+                    ? <Navigate to={COMMANDER_PATH} replace />
                     : <Navigate to={homePath} replace />
               }
             />
