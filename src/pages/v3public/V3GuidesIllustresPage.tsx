@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
-  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, type StockPhoto, type GuideBook, type GuideChapter,
+  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, stripCadratins, type StockPhoto, type GuideBook, type GuideChapter,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
@@ -40,9 +40,14 @@ export default function V3GuidesIllustresPage() {
   useEffect(() => { void loadList(); }, []);
   useEffect(() => {
     if (!id) { setGuide(null); return; }
-    void supabase.from('illustrated_guides').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+    void supabase.from('illustrated_guides').select('*').eq('id', id).maybeSingle().then(async ({ data }) => {
       if (!data) { setError('Guide introuvable.'); return; }
-      setGuide({ ...(data as unknown as Row), chapters: Array.isArray(data.chapters) ? (data.chapters as unknown as GuideChapter[]) : [] });
+      // Nettoyage : jamais de tiret cadratin (—) ni demi-cadratin (–) dans les chapitres.
+      const chapters: GuideChapter[] = Array.isArray(data.chapters) ? (data.chapters as unknown as GuideChapter[]).map((c) => ({ ...c, title: stripCadratins(c.title), summary: stripCadratins(c.summary), text: stripCadratins(c.text), caption: stripCadratins(c.caption) })) : [];
+      const dirty = Array.isArray(data.chapters) && (data.chapters as unknown as GuideChapter[]).some((c, i) => c.title !== chapters[i]?.title || c.summary !== chapters[i]?.summary || c.text !== chapters[i]?.text || c.caption !== chapters[i]?.caption);
+      const row = { ...(data as unknown as Row), chapters };
+      setGuide(row);
+      if (dirty) await supabase.from('illustrated_guides').update({ chapters: chapters as unknown as never }).eq('id', id);
     });
   }, [id]);
 
