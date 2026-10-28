@@ -2118,9 +2118,12 @@ export type Database = {
         Row: {
           audience: string
           author_name: string
+          categories: string
           chapter_count: number
           chapters: Json
+          cover_url: string | null
           created_at: string
+          description: string
           format: string
           id: string
           image_style: string
@@ -2133,9 +2136,12 @@ export type Database = {
         Insert: {
           audience?: string
           author_name?: string
+          categories?: string
           chapter_count?: number
           chapters?: Json
+          cover_url?: string | null
           created_at?: string
+          description?: string
           format?: string
           id?: string
           image_style?: string
@@ -2148,9 +2154,12 @@ export type Database = {
         Update: {
           audience?: string
           author_name?: string
+          categories?: string
           chapter_count?: number
           chapters?: Json
+          cover_url?: string | null
           created_at?: string
+          description?: string
           format?: string
           id?: string
           image_style?: string

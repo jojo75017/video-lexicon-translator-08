@@ -92,6 +92,13 @@
       "when": 1793189968029,
       "tag": "0012_create_illustrated_guides",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1793190329329,
+      "tag": "0013_illustrated_guides_metadata_cover",
+      "breakpoints": true
     }
   ]
 }
