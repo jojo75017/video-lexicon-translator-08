@@ -1,3 +1,7 @@
+# Emails et ebook illustré
+- [ ] Vérifier que les emails de service partent après le passage de Resend en gratuit : backend en pause, envoi de test impossible.
+- [ ] Vérifier si l'on peut rédiger un ebook illustré type « L'aquarium de A à Z ».
+
 # Correction plan de lancement
 - [x] Utiliser les informations du livre sélectionné et ne plus exiger un sujet principal ; deux tests réussis (préremplissage et changement de livre), compilation OK. Rien publié.
 - [ ] Vérifier le plan complet à l’écran : aperçu redirigé vers la connexion malgré une session renouvelée ; génération réelle non vérifiée.
