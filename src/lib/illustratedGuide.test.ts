@@ -25,3 +25,11 @@ describe('fiche remplie par l’IA depuis le titre', () => {
     expect(() => parseSheet('{"subtitle":"x","description":""}')).toThrow();
   });
 });
+
+import { isTransientOverload } from './illustratedGuide';
+describe('surcharge du moteur IA', () => {
+  it('relance seulement les surcharges temporaires', () => {
+    expect(isTransientOverload('This model is currently experiencing high demand. Please try again later.')).toBe(true);
+    expect(isTransientOverload('Clé API invalide')).toBe(false);
+  });
+});
