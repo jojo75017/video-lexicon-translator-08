@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen } from 'lucide-react';
+import { Sparkles, Copy, ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,11 +10,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
-  guideFileName, writeChapter, writeOutline, type GuideBook, type GuideChapter,
+  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, type GuideBook, type GuideChapter,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
-const EMPTY = { title: '', subtitle: '', author_name: '', subject: '', audience: '', image_style: 'photo', format: '6x9', chapter_count: 12 };
+const EMPTY = { title: '', subtitle: '', author_name: '', subject: '', audience: '', description: '', categories: '', image_style: 'photo', format: '6x9', chapter_count: 12 };
 const sel = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
 
 function download(blob: Blob, name: string) {
@@ -34,7 +34,7 @@ export default function V3GuidesIllustresPage() {
   const stop = useRef({ stopped: false });
 
   async function loadList() {
-    const { data } = await supabase.from('illustrated_guides').select('id, title, subtitle, author_name, subject, audience, image_style, format, chapter_count, chapters, updated_at').order('updated_at', { ascending: false });
+    const { data } = await supabase.from('illustrated_guides').select('id, title, subtitle, author_name, subject, audience, image_style, format, chapter_count, chapters, cover_url, updated_at').order('updated_at', { ascending: false });
     setList((data ?? []) as unknown as Row[]);
   }
   useEffect(() => { void loadList(); }, []);
@@ -51,6 +51,27 @@ export default function V3GuidesIllustresPage() {
     const { error: e } = await supabase.from('illustrated_guides').update({ chapters: g.chapters as unknown as never }).eq('id', g.id);
     if (e) toast.error('Enregistrement impossible.');
   }
+
+  const [filling, setFilling] = useState(false);
+  async function fillWithAI() {
+    setError(''); setFilling(true);
+    try { const sh = await writeSheet(form.title); setForm((f) => ({ ...f, ...sh })); toast.success('Fiche remplie par l’IA — vous pouvez tout modifier.'); }
+    catch (e) { setError((e as Error).message); } finally { setFilling(false); }
+  }
+
+  const makeCover = () => run('cover', async () => {
+    if (!guide) return; const url = await generateGuideCover(guide);
+    const { error: e } = await supabase.from('illustrated_guides').update({ cover_url: url }).eq('id', guide.id);
+    if (e) throw new Error('Couverture créée mais non enregistrée.');
+    setGuide({ ...guide, cover_url: url }); toast.success('Couverture créée.');
+  });
+  const makeMockup = () => run('mockup', async () => {
+    if (!guide?.cover_url) return; download(await buildBookMockup(guide.cover_url), guideFileName(guide.title + '-mockup', 'png'));
+  });
+  const downloadCover = () => run('dlcover', async () => {
+    if (!guide?.cover_url) return; download(await (await fetch(guide.cover_url)).blob(), guideFileName(guide.title + '-couverture', 'png'));
+  });
+  const copy = (t: string) => { void navigator.clipboard.writeText(t); toast.success('Copié.'); };
 
   async function create() {
     if (!form.title.trim()) { toast.error('Indiquez le titre du guide.'); return; }
@@ -113,6 +134,21 @@ export default function V3GuidesIllustresPage() {
         {guide.subtitle && <p className="text-muted-foreground">{guide.subtitle}</p>}
         <p className="mt-2 text-sm text-muted-foreground">{guide.chapters.length} chapitres · {written} rédigés · {illustrated} illustrés</p>
       </header>
+      <section className="mb-6 grid gap-5 rounded-lg border border-border bg-card p-4 md:grid-cols-[220px_minmax(0,1fr)]">
+        <div className="space-y-2">
+          {guide.cover_url ? <img src={guide.cover_url} alt={`Couverture ${guide.title}`} className="w-full rounded-md border border-border" /> : <div className="flex aspect-[2/3] items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">Pas encore de couverture</div>}
+          <Button size="sm" className="w-full" onClick={makeCover} disabled={!!busy}>{busy === 'cover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{guide.cover_url ? 'Refaire la couverture' : 'Créer la couverture'}</Button>
+          {guide.cover_url && <>
+            <Button size="sm" variant="outline" className="w-full" onClick={downloadCover} disabled={!!busy}><FileDown className="mr-2 h-4 w-4" />Télécharger la couverture</Button>
+            <Button size="sm" variant="outline" className="w-full" onClick={makeMockup} disabled={!!busy}>{busy === 'mockup' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookOpen className="mr-2 h-4 w-4" />}Mockup 3D pour tunnel de vente</Button>
+          </>}
+        </div>
+        <div className="space-y-3 text-sm">
+          <h2 className="font-semibold text-foreground">Fiche KDP</h2>
+          {([['Titre', guide.title], ['Sous-titre', guide.subtitle], ['Auteur', guide.author_name], ['Catégories', guide.categories || ''], ['Description', guide.description || '']] as const).map(([k, v]) => v ? <div key={k} className="flex items-start justify-between gap-2 border-b border-border pb-2"><div className="min-w-0"><p className="text-xs font-semibold text-muted-foreground">{k}</p><p className="whitespace-pre-line text-foreground">{v}</p></div><Button size="icon" variant="ghost" aria-label={`Copier ${k}`} onClick={() => copy(v)}><Copy className="h-4 w-4" /></Button></div> : null)}
+          <p className="text-xs text-muted-foreground">Le prix et l’ISBN se renseignent directement sur KDP. Le mockup est un PNG transparent à poser dans vos pages de vente.</p>
+        </div>
+      </section>
       {error && <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">{error}</p>}
       <div className="mb-6 flex flex-wrap gap-2">
         <Button onClick={outline} disabled={!!busy}>{busy === 'outline' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookOpen className="mr-2 h-4 w-4" />}{guide.chapters.length ? 'Refaire le sommaire' : '1. Créer le sommaire'}</Button>
@@ -156,10 +192,14 @@ export default function V3GuidesIllustresPage() {
       <form className="space-y-4 rounded-lg border border-border bg-card p-5" onSubmit={(e) => { e.preventDefault(); void create(); }}>
         <h2 className="flex items-center gap-2 font-semibold"><Plus className="h-4 w-4" />Nouveau guide</h2>
         <div className="space-y-1"><Label htmlFor="g-title">Titre</Label><Input id="g-title" value={form.title} onChange={set('title')} placeholder="L’aquarium de A à Z" maxLength={200} /></div>
+        <Button type="button" variant="secondary" className="w-full" onClick={fillWithAI} disabled={filling || !form.title.trim()}>{filling ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Sparkles className="mr-2 h-4 w-4" />}Remplir toute la fiche avec l’IA</Button>
+        {error && !guide && <p className="rounded-md border border-destructive/40 bg-destructive/5 p-2 text-sm text-destructive">{error}</p>}
         <div className="space-y-1"><Label htmlFor="g-sub">Sous-titre</Label><Input id="g-sub" value={form.subtitle} onChange={set('subtitle')} maxLength={250} /></div>
         <div className="space-y-1"><Label htmlFor="g-author">Auteur</Label><Input id="g-author" value={form.author_name} onChange={set('author_name')} maxLength={120} /></div>
         <div className="space-y-1"><Label htmlFor="g-subject">Sujet et contenu attendu</Label><Textarea id="g-subject" value={form.subject} onChange={set('subject')} rows={3} placeholder="Installer, peupler et entretenir un aquarium d’eau douce" /></div>
         <div className="space-y-1"><Label htmlFor="g-aud">Public</Label><Input id="g-aud" value={form.audience} onChange={set('audience')} placeholder="Débutants adultes" /></div>
+        <div className="space-y-1"><Label htmlFor="g-desc">Description Amazon (≈ 150 mots)</Label><Textarea id="g-desc" value={form.description} onChange={set('description')} rows={6} /></div>
+        <div className="space-y-1"><Label htmlFor="g-cat">Catégories KDP</Label><Input id="g-cat" value={form.categories} onChange={set('categories')} /></div>
         <div className="grid grid-cols-3 gap-2">
           <div className="space-y-1"><Label htmlFor="g-n">Chapitres</Label><Input id="g-n" type="number" min={GUIDE_CHAPTERS_MIN} max={GUIDE_CHAPTERS_MAX} value={form.chapter_count} onChange={(e) => setForm({ ...form, chapter_count: Number(e.target.value) })} /></div>
           <div className="space-y-1"><Label htmlFor="g-style">Images</Label><select id="g-style" className={sel} value={form.image_style} onChange={set('image_style')}>{Object.entries(GUIDE_IMAGE_STYLES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></div>
