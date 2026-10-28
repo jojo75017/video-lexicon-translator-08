@@ -113,9 +113,9 @@ async function callWriter(prompt: string, where: string): Promise<string> {
 async function callWriterOnce(prompt: string, where: string): Promise<string> {
   // Administrateur : OpenRouter en priorité. Abonnés : le moteur qu'ils ont choisi (Gemini par défaut).
   const admin = await getIsCurrentSessionAdmin().catch(() => false);
-  const provider = admin && getProviderKey('openrouter') ? 'openrouter' : getProvider();
-  const userKey = getProviderKey(provider);
-  if (!userKey) throw new Error('Enregistrez votre clé de rédaction dans « Choisir mon IA · Clés API » avant de lancer le robot.');
+  const provider = admin ? 'openrouter' : getProvider();
+  const userKey = getProviderKey(provider) || '';
+  if (!userKey && !admin) throw new Error('Enregistrez votre clé de rédaction dans « Choisir mon IA · Clés API » avant de lancer le robot.');
   const model = provider === 'openrouter' ? getOpenRouterModel() : undefined;
   const { data, error } = await supabase.functions.invoke('generate-content', { body: { type: 'illustrated-guide', prompt, provider, model, userApiKey: userKey } });
   if (error) {

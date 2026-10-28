@@ -480,7 +480,13 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
       if (authError || !session.user) return new Response(JSON.stringify({ error: 'Votre session a expiré. Reconnectez-vous.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       const sys = `Tu es un auteur français de guides pratiques illustrés pour adultes (documentaires, guides de A à Z). Contenu exact, pédagogique, concret, sans fiction, sans personnage ni intrigue.
 Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans commentaires.`;
-      const response = await comicTextProvider(body, sys, 12000);
+      // Administrateur : toujours OpenRouter avec la clé du projet (jamais Gemini).
+      const { data: isAdmin } = await client.rpc('has_role', { _user_id: session.user.id, _role: 'admin' });
+      const projectOr = Deno.env.get('OPENROUTER_API_KEY');
+      const callBody = isAdmin && projectOr
+        ? { ...body, provider: 'openrouter', userApiKey: (typeof body.userApiKey === 'string' && body.userApiKey.startsWith('sk-or-')) ? body.userApiKey : projectOr }
+        : body;
+      const response = await comicTextProvider(callBody, sys, 12000);
       const headers = new Headers(response.headers);
       Object.entries(corsHeaders).forEach(([name, value]) => headers.set(name, value));
       return new Response(response.body, { status: response.status, headers });
