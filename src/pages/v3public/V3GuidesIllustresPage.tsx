@@ -100,12 +100,14 @@ export default function V3GuidesIllustresPage() {
   }
   const photosForAll = () => run('photos-all', async () => {
     if (!guide) return; const g = { ...guide, chapters: [...guide.chapters] }; let added = 0;
+    const usedIds = new Set<string>();
     for (let i = 0; i < g.chapters.length; i++) {
       const c = g.chapters[i]; if (c.imageUrl) continue;
       let photos = await searchStockPhotos(`${guide.title} ${c.title}`.slice(0, 90));
       if (!photos.length) photos = await searchStockPhotos(c.title);
       if (!photos.length) photos = await searchStockPhotos(guide.title);
-      const p = photos.find((x) => x.width >= x.height) ?? photos[0]; if (!p) continue;
+      const fresh = photos.filter((x) => !usedIds.has(x.id));
+      const p = fresh.find((x) => x.width >= x.height) ?? fresh[0]; if (!p) continue; usedIds.add(p.id);
       trackStockPhoto(p); g.chapters[i] = await savePhotoToChapter(g.id, i, c, p); added++;
       await persist({ ...g, chapters: [...g.chapters] });
     }
