@@ -39,6 +39,7 @@ const ROUTE_MIN_TIER: { prefix: string; tier: V3PlanTier }[] = [
 
   // — Auteur et Édition —
   { prefix: '/v3/vc-books', tier: 'auteur' },
+  { prefix: '/v3/guides-illustres', tier: 'auteur' },
   { prefix: '/bd-studio', tier: 'auteur' }, // BD Studio
   { prefix: '/v3/livres/bd', tier: 'auteur' }, // Livres spéciaux BD / Manga
   { prefix: '/v3/corriger', tier: 'auteur' }, // Correction éditoriale

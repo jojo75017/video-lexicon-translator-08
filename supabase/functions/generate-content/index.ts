@@ -472,6 +472,20 @@ Réponds UNIQUEMENT avec un JSON valide (sans markdown) dans ce format exact:
     }
 
     // ====== VC BOOKS PAUSES (BYOK, same dispatcher as BD) ======
+    if (type === 'illustrated-guide') {
+      const auth = req.headers.get('Authorization');
+      if (!auth) return new Response(JSON.stringify({ error: 'Connectez-vous pour rédiger votre guide.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const client = createClient(Deno.env.get('SUPABASE_URL') || '', Deno.env.get('SUPABASE_ANON_KEY') || '', { global: { headers: { Authorization: auth } } });
+      const { data: session, error: authError } = await client.auth.getUser();
+      if (authError || !session.user) return new Response(JSON.stringify({ error: 'Votre session a expiré. Reconnectez-vous.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      const sys = `Tu es un auteur français de guides pratiques illustrés pour adultes (documentaires, guides de A à Z). Contenu exact, pédagogique, concret, sans fiction, sans personnage ni intrigue.
+Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans commentaires.`;
+      const response = await comicTextProvider(body, sys);
+      const headers = new Headers(response.headers);
+      Object.entries(corsHeaders).forEach(([name, value]) => headers.set(name, value));
+      return new Response(response.body, { status: response.status, headers });
+    }
+
     if (type === 'vc-books-pauses') {
       const auth = req.headers.get('Authorization');
       if (!auth) return new Response(JSON.stringify({ error: 'Connectez-vous pour rédiger votre livre.' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });

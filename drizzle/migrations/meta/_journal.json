@@ -85,6 +85,13 @@
       "when": 1792682877078,
       "tag": "0011_add_vc_books_pauses",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793189968029,
+      "tag": "0012_create_illustrated_guides",
+      "breakpoints": true
     }
   ]
 }
