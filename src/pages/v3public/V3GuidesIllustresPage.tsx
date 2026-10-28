@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Sparkles, Copy, ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen } from 'lucide-react';
+import { Search, Sparkles, Copy, ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
-  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, type GuideBook, type GuideChapter,
+  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, type StockPhoto, type GuideBook, type GuideChapter,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
@@ -58,6 +58,35 @@ export default function V3GuidesIllustresPage() {
     try { const sh = await writeSheet(form.title); setForm((f) => ({ ...f, ...sh })); toast.success('Fiche remplie par l’IA — vous pouvez tout modifier.'); }
     catch (e) { setError((e as Error).message); } finally { setFilling(false); }
   }
+
+  // Sélecteur de photos Unsplash / Pixabay : target = index du chapitre ou 'cover'.
+  const [picker, setPicker] = useState<{ target: number | 'cover'; query: string; photos: StockPhoto[] } | null>(null);
+  const openPicker = (target: number | 'cover') => {
+    const q = target === 'cover' ? (guide?.title ?? '') : (guide?.chapters[target]?.title ?? '');
+    setPicker({ target, query: q, photos: [] }); void doSearch(target, q);
+  };
+  const doSearch = (target: number | 'cover', q: string) => run('search', async () => {
+    const photos = await searchStockPhotos(q); setPicker({ target, query: q, photos });
+    if (!photos.length) toast.info('Aucune photo trouvée, essayez d’autres mots-clés.');
+  });
+  const choosePhoto = (p: StockPhoto) => run('pick', async () => {
+    if (!guide || !picker) return; trackStockPhoto(p);
+    if (picker.target === 'cover') {
+      const { data: u } = await supabase.auth.getUser(); if (!u.user) throw new Error('Connectez-vous.');
+      const blob = await composePhotoCover(p.full, guide);
+      const path = `${u.user.id}/guides/${guide.id}-cover-${Date.now()}.jpg`;
+      const { error: ue } = await supabase.storage.from('ebook-images').upload(path, blob, { contentType: 'image/jpeg', upsert: true });
+      if (ue) throw new Error('Envoi de la couverture impossible.');
+      const url = supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
+      await supabase.from('illustrated_guides').update({ cover_url: url }).eq('id', guide.id);
+      setGuide({ ...guide, cover_url: url }); toast.success(`Couverture créée — ${photoCredit(p)}`);
+    } else {
+      const i = picker.target; const chapters = [...guide.chapters];
+      chapters[i] = { ...chapters[i], imageUrl: p.full, caption: `${chapters[i].caption ? chapters[i].caption + ' — ' : ''}${photoCredit(p)}` };
+      await persist({ ...guide, chapters }); toast.success('Photo ajoutée au chapitre.');
+    }
+    setPicker(null);
+  });
 
   const makeCover = () => run('cover', async () => {
     if (!guide) return; const url = await generateGuideCover(guide);
@@ -137,7 +166,8 @@ export default function V3GuidesIllustresPage() {
       <section className="mb-6 grid gap-5 rounded-lg border border-border bg-card p-4 md:grid-cols-[220px_minmax(0,1fr)]">
         <div className="space-y-2">
           {guide.cover_url ? <img src={guide.cover_url} alt={`Couverture ${guide.title}`} className="w-full rounded-md border border-border" /> : <div className="flex aspect-[2/3] items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">Pas encore de couverture</div>}
-          <Button size="sm" className="w-full" onClick={makeCover} disabled={!!busy}>{busy === 'cover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{guide.cover_url ? 'Refaire la couverture' : 'Créer la couverture'}</Button>
+          <Button size="sm" className="w-full" onClick={makeCover} disabled={!!busy}>{busy === 'cover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{guide.cover_url ? 'Refaire avec l’IA' : 'Couverture IA'}</Button>
+          <Button size="sm" variant="secondary" className="w-full" onClick={() => openPicker('cover')} disabled={!!busy}><Search className="mr-2 h-4 w-4" />Couverture avec une photo</Button>
           {guide.cover_url && <>
             <Button size="sm" variant="outline" className="w-full" onClick={downloadCover} disabled={!!busy}><FileDown className="mr-2 h-4 w-4" />Télécharger la couverture</Button>
             <Button size="sm" variant="outline" className="w-full" onClick={makeMockup} disabled={!!busy}>{busy === 'mockup' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookOpen className="mr-2 h-4 w-4" />}Mockup 3D pour tunnel de vente</Button>
@@ -167,7 +197,8 @@ export default function V3GuidesIllustresPage() {
           <div className="grid gap-4 md:grid-cols-[200px_minmax(0,1fr)]">
             <div className="space-y-2">
               {c.imageUrl ? <img src={c.imageUrl} alt={c.caption || c.title} className="w-full rounded-md border border-border object-cover" /> : <div className="flex aspect-[2/3] items-center justify-center rounded-md border border-dashed border-border text-xs text-muted-foreground">Pas encore d’image</div>}
-              <Button size="sm" variant="outline" className="w-full" onClick={() => illustrate(i)} disabled={!!busy}>{busy === `img-${i}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{c.imageUrl ? 'Refaire l’image' : 'Illustrer'}</Button>
+              <Button size="sm" variant="outline" className="w-full" onClick={() => illustrate(i)} disabled={!!busy}>{busy === `img-${i}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{c.imageUrl ? 'Refaire en image IA' : 'Image IA'}</Button>
+              <Button size="sm" variant="secondary" className="w-full" onClick={() => openPicker(i)} disabled={!!busy}><Search className="mr-2 h-4 w-4" />Photo Unsplash / Pixabay</Button>
             </div>
             <div className="space-y-2">
               <Input value={c.title} onChange={(e) => edit(i, { title: e.target.value })} onBlur={() => persist(guide)} className="font-semibold" aria-label={`Titre du chapitre ${i + 1}`} />
@@ -178,6 +209,23 @@ export default function V3GuidesIllustresPage() {
           </div>
         </li>)}
       </ol>
+      {picker && <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/50 p-4" onClick={() => setPicker(null)}>
+        <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-background p-5" onClick={(e) => e.stopPropagation()}>
+          <h2 className="mb-3 font-semibold">{picker.target === 'cover' ? 'Photo de couverture' : `Photo du chapitre ${picker.target + 1}`} · Unsplash et Pixabay</h2>
+          <form className="mb-4 flex gap-2" onSubmit={(e) => { e.preventDefault(); void doSearch(picker.target, picker.query); }}>
+            <Input value={picker.query} onChange={(e) => setPicker({ ...picker, query: e.target.value })} placeholder="poisson clown, aquarium récifal…" />
+            <Button type="submit" disabled={!!busy}>{busy === 'search' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}</Button>
+          </form>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+            {picker.photos.map((p) => <button key={p.id} type="button" disabled={!!busy} onClick={() => choosePhoto(p)} className="group overflow-hidden rounded-md border border-border text-left">
+              <img src={p.thumb} alt={photoCredit(p)} loading="lazy" className="aspect-[2/3] w-full object-cover transition group-hover:opacity-80" />
+              <span className="block truncate px-2 py-1 text-xs text-muted-foreground">{photoCredit(p)}</span>
+            </button>)}
+          </div>
+          {busy === 'pick' && <p className="mt-3 flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Préparation de la photo…</p>}
+          <div className="mt-4 text-right"><Button variant="ghost" onClick={() => setPicker(null)}>Fermer</Button></div>
+        </div>
+      </div>}
     </main>;
   }
 
