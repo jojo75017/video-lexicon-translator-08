@@ -29,21 +29,34 @@ function extractJson(raw: string): Record<string, unknown> {
   return JSON.parse(body);
 }
 
+/** Nettoie le texte : plus jamais de tiret cadratin (—) ni demi-cadratin (–) dans les livres. */
+export function stripCadratins(t: unknown): string {
+  const s = String(t ?? '');
+  return s
+    .replace(/(\d)\s*[—–]\s*(\d)/g, '$1 à $2')
+    .replace(/\s*[—–]\s*/g, ', ')
+    .replace(/,\s*(?=[).!?])/g, '')
+    .replace(/,\s*,/g, ',')
+    .replace(/ +,/g, ',')
+    .replace(/,\s*$/, '.')
+    .trim();
+}
+
 export function parseOutline(raw: string): GuideChapter[] {
   const list = (extractJson(raw).chapters as unknown[]) ?? [];
   return (Array.isArray(list) ? list : [])
-    .map((c) => { const o = c as Record<string, unknown>; return { title: String(o.title ?? '').trim(), summary: String(o.summary ?? '').trim(), text: '', imagePrompt: String(o.imagePrompt ?? '').trim() }; })
+    .map((c) => { const o = c as Record<string, unknown>; return { title: stripCadratins(String(o.title ?? '')), summary: stripCadratins(String(o.summary ?? '')), text: '', imagePrompt: String(o.imagePrompt ?? '').trim() }; })
     .filter((c) => c.title);
 }
 
 export function parseChapter(raw: string): { text: string; caption: string } {
   const o = extractJson(raw);
-  const text = String(o.text ?? '').trim();
+  const text = stripCadratins(String(o.text ?? ''));
   if (!text) throw new Error('chapitre vide');
-  return { text, caption: String(o.caption ?? '').trim() };
+  return { text, caption: stripCadratins(String(o.caption ?? '')) };
 }
 
-const LANG = 'LANGUE : français courant uniquement, orthographe impeccable. Interdit : latin, pseudo-langues, mots inventés, anglicismes décoratifs. GUIDE PRATIQUE : aucun personnage, aucune intrigue, aucune fiction.';
+const LANG = 'LANGUE : français courant uniquement, orthographe impeccable. Interdit : latin, pseudo-langues, mots inventés, anglicismes décoratifs. GUIDE PRATIQUE : aucun personnage, aucune intrigue, aucune fiction. PONCTUATION : jamais de tiret cadratin (—) ni de demi-cadratin (–) ; remplace-les par une virgule, un point ou des deux-points.';
 
 export function buildOutlinePrompt(b: GuideBrief): string {
   return `${LANG}
@@ -119,7 +132,7 @@ Réponds uniquement en JSON : {"subtitle":"...","author_name":"...","subject":".
 
 export function parseSheet(raw: string): GuideSheet {
   const o = extractJson(raw);
-  const g = (k: string) => String(o[k] ?? '').trim();
+  const g = (k: string) => stripCadratins(String(o[k] ?? ''));
   const sheet = { subtitle: g('subtitle'), author_name: g('author_name'), subject: g('subject'), audience: g('audience'), description: g('description'), categories: g('categories') };
   if (!sheet.description || !sheet.subtitle) throw new Error('fiche incomplète');
   return sheet;
@@ -218,7 +231,7 @@ export async function generateChapterImage(title: string, style: string, scene: 
 
 // ---------- Exports ----------
 const mmToTwip = (mm: number) => Math.round((mm / 25.4) * 1440);
-const paras = (s: string) => s.split(/\n\s*\n|\n/).map((x) => x.trim()).filter(Boolean);
+const paras = (s: string) => stripCadratins(s).split(/\n\s*\n|\n/).map((x) => x.trim()).filter(Boolean);
 export const guideFileName = (t: string, ext: string) => `${(t || 'guide').replace(/[^\p{L}\p{N} _-]+/gu, '').trim().replace(/\s+/g, '-').slice(0, 60) || 'guide'}.${ext}`;
 
 async function loadImage(url: string): Promise<{ data: Uint8Array; dataUrl: string; w: number; h: number; type: 'png' | 'jpg' } | null> {
@@ -241,16 +254,16 @@ export async function buildGuideDocx(book: GuideBook): Promise<Blob> {
     ...book.chapters.map((c, i) => new Paragraph({ children: [new TextRun(`${i + 1}. ${c.title}`)] })),
   ];
   for (const [i, c] of book.chapters.entries()) {
-    ch.push(new Paragraph({ heading: HeadingLevel.HEADING_1, pageBreakBefore: true, children: [new TextRun(`Chapitre ${i + 1} — ${c.title}`)] }));
+    ch.push(new Paragraph({ heading: HeadingLevel.HEADING_1, pageBreakBefore: true, children: [new TextRun(`Chapitre ${i + 1} : ${c.title}`)] }));
     const img = c.imageUrl ? await loadImage(c.imageUrl) : null;
     if (img) {
       const wPx = Math.round((textW / 25.4) * 96);
       ch.push(new Paragraph({ alignment: AlignmentType.CENTER, children: [new ImageRun({ type: img.type, data: img.data, transformation: { width: wPx, height: Math.round(wPx * img.h / img.w * 0.75) } })] }));
-      if (c.caption) ch.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 }, children: [new TextRun({ text: c.caption, italics: true, size: 18 })] }));
+      if (c.caption) ch.push(new Paragraph({ alignment: AlignmentType.CENTER, spacing: { after: 240 }, children: [new TextRun({ text: stripCadratins(c.caption), italics: true, size: 18 })] }));
     }
     for (const p of paras(c.text)) {
       if (p.startsWith('## ')) ch.push(new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 200, after: 120 }, children: [new TextRun(p.slice(3))] }));
-      else ch.push(new Paragraph({ alignment: AlignmentType.JUSTIFIED, spacing: { after: 140 }, children: [new TextRun({ text: p, bold: p.startsWith('À retenir') })] }));
+      else ch.push(new Paragraph({ alignment: AlignmentType.LEFT, spacing: { after: 140 }, children: [new TextRun({ text: p, bold: p.startsWith('À retenir') })] }));
     }
   }
   const doc = new Document({
@@ -282,13 +295,13 @@ export async function buildGuidePdf(book: GuideBook): Promise<Blob> {
   newPage(); write('Sommaire', 18, 'bold', 'left', 6);
   book.chapters.forEach((c, i) => write(`${i + 1}. ${c.title}`, 11));
   for (const [i, c] of book.chapters.entries()) {
-    newPage(); write(`Chapitre ${i + 1} — ${c.title}`, 16, 'bold', 'left', 5);
+    newPage(); write(`Chapitre ${i + 1} : ${c.title}`, 16, 'bold', 'left', 5);
     const img = c.imageUrl ? await loadImage(c.imageUrl) : null;
     if (img) {
       let ih = w * img.h / img.w; let iw = w;
       const maxH = (maxY - y) * 0.6; if (ih > maxH) { iw = iw * maxH / ih; ih = maxH; }
       pdf.addImage(img.dataUrl, img.type === 'png' ? 'PNG' : 'JPEG', x + (w - iw) / 2, y, iw, ih); y += ih + 3;
-      if (c.caption) write(c.caption, 9, 'italic', 'center', 5);
+      if (c.caption) write(stripCadratins(c.caption), 9, 'italic', 'center', 5);
     }
     for (const p of paras(c.text)) {
       if (p.startsWith('## ')) write(p.slice(3), 13, 'bold', 'left', 2);

@@ -10,7 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
-  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, type StockPhoto, type GuideBook, type GuideChapter,
+  guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, stripCadratins, type StockPhoto, type GuideBook, type GuideChapter,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
@@ -40,9 +40,14 @@ export default function V3GuidesIllustresPage() {
   useEffect(() => { void loadList(); }, []);
   useEffect(() => {
     if (!id) { setGuide(null); return; }
-    void supabase.from('illustrated_guides').select('*').eq('id', id).maybeSingle().then(({ data }) => {
+    void supabase.from('illustrated_guides').select('*').eq('id', id).maybeSingle().then(async ({ data }) => {
       if (!data) { setError('Guide introuvable.'); return; }
-      setGuide({ ...(data as unknown as Row), chapters: Array.isArray(data.chapters) ? (data.chapters as unknown as GuideChapter[]) : [] });
+      // Nettoyage : jamais de tiret cadratin (—) ni demi-cadratin (–) dans les chapitres.
+      const chapters: GuideChapter[] = Array.isArray(data.chapters) ? (data.chapters as unknown as GuideChapter[]).map((c) => ({ ...c, title: stripCadratins(c.title), summary: stripCadratins(c.summary), text: stripCadratins(c.text), caption: stripCadratins(c.caption) })) : [];
+      const dirty = Array.isArray(data.chapters) && (data.chapters as unknown as GuideChapter[]).some((c, i) => c.title !== chapters[i]?.title || c.summary !== chapters[i]?.summary || c.text !== chapters[i]?.text || c.caption !== chapters[i]?.caption);
+      const row = { ...(data as unknown as Row), chapters };
+      setGuide(row);
+      if (dirty) await supabase.from('illustrated_guides').update({ chapters: chapters as unknown as never }).eq('id', id);
     });
   }, [id]);
 
@@ -96,7 +101,7 @@ export default function V3GuidesIllustresPage() {
     const { error: ue } = await supabase.storage.from('ebook-images').upload(path, await res.blob(), { contentType: 'image/jpeg', upsert: true });
     if (ue) throw new Error('Enregistrement de la photo impossible.');
     const url = supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
-    return { ...c, imageUrl: url, caption: `${c.caption ? c.caption + ' — ' : ''}${photoCredit(p)}` };
+    return { ...c, imageUrl: url, caption: `${c.caption ? c.caption + ' · ' : ''}${photoCredit(p)}` };
   }
   const photosForAll = () => run('photos-all', async () => {
     if (!guide) return; const g = { ...guide, chapters: [...guide.chapters] }; let added = 0;
