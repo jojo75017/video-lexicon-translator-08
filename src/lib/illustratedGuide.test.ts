@@ -13,3 +13,15 @@ describe('guides illustrés', () => {
     expect(() => buildGuideImagePrompt('photo', ' ')).toThrow();
   });
 });
+
+import { buildSheetPrompt, parseSheet } from './illustratedGuide';
+describe('fiche remplie par l’IA depuis le titre', () => {
+  it('demande une description d’environ 150 mots et 3 catégories', () => {
+    const p = buildSheetPrompt('L’aquarium de A à Z');
+    expect(p).toContain('150 mots');
+    expect(p).toContain('3 catégories');
+  });
+  it('refuse une fiche sans description', () => {
+    expect(() => parseSheet('{"subtitle":"x","description":""}')).toThrow();
+  });
+});
