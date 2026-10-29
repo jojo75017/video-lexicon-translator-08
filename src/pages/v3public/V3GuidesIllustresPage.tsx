@@ -11,7 +11,7 @@ import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
   guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, stripCadratins, type StockPhoto, type GuideBook, type GuideChapter,
-  boxKind,
+  boxKind, photoQuery,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
@@ -109,9 +109,9 @@ export default function V3GuidesIllustresPage() {
     const usedIds = new Set<string>();
     for (let i = 0; i < g.chapters.length; i++) {
       const c = g.chapters[i]; if (c.imageUrl) continue;
-      let photos = await searchStockPhotos(`${guide.title} ${c.title}`.slice(0, 90));
-      if (!photos.length) photos = await searchStockPhotos(c.title);
-      if (!photos.length) photos = await searchStockPhotos(guide.title);
+      let photos = await searchStockPhotos(photoQuery(c.title));
+      if (!photos.length) photos = await searchStockPhotos(photoQuery(c.title, photoQuery(guide.title).split(' ').slice(0, 2).join(' ')));
+      if (!photos.length) photos = await searchStockPhotos(photoQuery(guide.title));
       const fresh = photos.filter((x) => !usedIds.has(x.id));
       const p = fresh.find((x) => x.width >= x.height) ?? fresh[0]; if (!p) continue; usedIds.add(p.id);
       trackStockPhoto(p); g.chapters[i] = await savePhotoToChapter(g.id, i, c, p); added++;

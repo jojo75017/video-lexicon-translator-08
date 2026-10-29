@@ -486,7 +486,7 @@ Réponds UNIQUEMENT avec du JSON valide, sans markdown, sans commentaires.`;
       const callBody = isAdmin && projectOr
         ? { ...body, provider: 'openrouter', userApiKey: (typeof body.userApiKey === 'string' && body.userApiKey.startsWith('sk-or-')) ? body.userApiKey : projectOr }
         : body;
-      const response = await comicTextProvider(callBody, sys, 12000);
+      const response = await comicTextProvider(callBody, sys, 16000);
       const headers = new Headers(response.headers);
       Object.entries(corsHeaders).forEach(([name, value]) => headers.set(name, value));
       return new Response(response.body, { status: response.status, headers });

@@ -66,3 +66,13 @@ describe('chapitres longs avec encarts', () => {
     expect(_boxKind('Texte normal')).toBeNull();
   });
 });
+
+import { parseChapter as pc2, photoQuery as pq2 } from './illustratedGuide';
+describe('robustesse chapitre et mots-clés photo', () => {
+  it('récupère le texte d’une réponse JSON coupée', () => {
+    expect(pc2('```json\n{"text":"## Intro\\n\\nLa plante pousse vite').text).toContain('La plante pousse vite');
+  });
+  it('retire « Chapitre N : » des mots-clés photo', () => {
+    expect(pq2('Chapitre 3: La Limnobium')).toBe('Limnobium');
+  });
+});
