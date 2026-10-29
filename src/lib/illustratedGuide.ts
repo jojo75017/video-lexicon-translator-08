@@ -50,10 +50,32 @@ export function parseOutline(raw: string): GuideChapter[] {
 }
 
 export function parseChapter(raw: string): { text: string; caption: string } {
-  const o = extractJson(raw);
-  const text = stripCadratins(String(o.text ?? ''));
+  let o: Record<string, unknown> = {};
+  try { o = extractJson(raw); } catch { /* JSON abîmé ou coupé : récupération ci-dessous */ }
+  let text = String(o.text ?? '');
+  let caption = String(o.caption ?? '');
+  if (!text) {
+    // Réponse longue coupée ou mal échappée : on récupère quand même le texte du chapitre.
+    const m = raw.match(/"text"\s*:\s*"([\s\S]*?)(?:"\s*,\s*"caption"\s*:\s*"([\s\S]*?)"\s*}|$)/);
+    if (m) {
+      text = m[1].replace(/\\n/g, '\n').replace(/\\"/g, '"').replace(/\\\\/g, '\\').replace(/"\s*}?\s*`*\s*$/, '');
+      caption = m[2] ?? caption;
+    } else {
+      const plain = raw.replace(/^```(?:json)?\s*/i, '').replace(/```\s*$/, '').trim();
+      if (plain.split(/\s+/).length > 300 && !plain.startsWith('{')) text = plain;
+    }
+  }
+  text = stripCadratins(text);
   if (!text) throw new Error('chapitre vide');
-  return { text, caption: stripCadratins(String(o.caption ?? '')) };
+  return { text, caption: stripCadratins(caption) };
+}
+
+/** Mots-clés photo courts : le titre du chapitre sans « Chapitre N : ». */
+export function photoQuery(chapterTitle: string, guideSubject = ''): string {
+  const t = chapterTitle.replace(/^\s*chapitre\s*\d+\s*[:.\-]?\s*/i, '').replace(/[«»"'()]/g, ' ').replace(/\s+/g, ' ').trim();
+  const words = t.split(' ').filter((w) => w.length > 2 && !/^(les|des|une|pour|avec|dans|sur|son|ses|aux|du|de|la|le)$/i.test(w));
+  const base = words.slice(0, 4).join(' ');
+  return (base + (guideSubject ? ' ' + guideSubject : '')).trim().slice(0, 80);
 }
 
 const LANG = 'LANGUE : français courant uniquement, orthographe impeccable. Interdit : latin, pseudo-langues, mots inventés, anglicismes décoratifs. GUIDE PRATIQUE : aucun personnage, aucune intrigue, aucune fiction. PONCTUATION : jamais de tiret cadratin (—) ni de demi-cadratin (–) ; remplace-les par une virgule, un point ou des deux-points.';
