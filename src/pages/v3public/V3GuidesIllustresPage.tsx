@@ -11,7 +11,7 @@ import { VC_FORMATS } from '@/lib/vcBooksExport';
 import {
   GUIDE_CHAPTERS_MAX, GUIDE_CHAPTERS_MIN, GUIDE_IMAGE_STYLES, buildGuideDocx, buildGuidePdf, generateChapterImage,
   guideFileName, writeChapter, writeOutline, writeSheet, generateGuideCover, buildBookMockup, searchStockPhotos, trackStockPhoto, photoCredit, composePhotoCover, stripCadratins, type StockPhoto, type GuideBook, type GuideChapter,
-  boxKind, photoQuery,
+  boxKind, photoQuery, storeGuideImage,
 } from '@/lib/illustratedGuide';
 
 type Row = GuideBook & { id: string; updated_at?: string };
@@ -35,7 +35,8 @@ export default function V3GuidesIllustresPage() {
   const stop = useRef({ stopped: false });
 
   async function loadList() {
-    const { data } = await supabase.from('illustrated_guides').select('id, title, subtitle, author_name, subject, audience, image_style, format, chapter_count, chapters, cover_url, updated_at').order('updated_at', { ascending: false });
+    const { data, error: e } = await supabase.from('illustrated_guides').select('id, title, chapter_count, chapters, updated_at').order('updated_at', { ascending: false });
+    if (e) toast.error('Impossible de charger vos guides. Rechargez la page.');
     setList((data ?? []) as unknown as Row[]);
   }
   useEffect(() => { void loadList(); }, []);
@@ -121,7 +122,7 @@ export default function V3GuidesIllustresPage() {
   });
 
   const makeCover = () => run('cover', async () => {
-    if (!guide) return; const url = await generateGuideCover(guide);
+    if (!guide) return; const url = await storeGuideImage(await generateGuideCover(guide), guide.id, 'cover');
     const { error: e } = await supabase.from('illustrated_guides').update({ cover_url: url }).eq('id', guide.id);
     if (e) throw new Error('Couverture créée mais non enregistrée.');
     setGuide({ ...guide, cover_url: url }); toast.success('Couverture créée.');
@@ -164,7 +165,8 @@ export default function V3GuidesIllustresPage() {
 
   const illustrate = (i: number) => run(`img-${i}`, async () => {
     if (!guide) return; const c = guide.chapters[i];
-    const url = await generateChapterImage(guide.title, guide.image_style, c.imagePrompt || c.title);
+    const raw = await generateChapterImage(guide.title, guide.image_style, c.imagePrompt || c.title);
+    const url = await storeGuideImage(raw, guide.id, `ch${i + 1}`);
     const chapters = [...guide.chapters]; chapters[i] = { ...c, imageUrl: url };
     await persist({ ...guide, chapters }); toast.success('Illustration ajoutée.');
   });
