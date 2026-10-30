@@ -48,3 +48,4 @@
 - The "/" root route sends visitors to the internal /commander tunnel, never to the dead external Landaa 47 EUR funnel; only authenticated users are routed to their space.
 - Illustrated adult guides live at /v3/guides-illustres in the user-scoped `illustrated_guides` table, writing via the `illustrated-guide` generate-content branch (BYOK) and images via the included generate-ai-cover engine, so no paid credits or other studios change.
 - Illustrated guides write with OpenRouter for admins and with each subscriber's chosen provider (Gemini default) otherwise; chapter and cover photos come from Unsplash/Pixabay via the stock-photos function (project keys, credited captions, Unsplash download tracking), with AI images kept as an option.
+- Illustrated guide images (AI or stock) are uploaded to the ebook-images bucket via storeGuideImage and only their URL is saved, because inline data URLs bloated rows to 40+ MB and made guides time out on load and save.

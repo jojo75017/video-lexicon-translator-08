@@ -199,6 +199,21 @@ export async function generateGuideCover(b: { title: string; subtitle: string; a
   return data.imageUrl;
 }
 
+/**
+ * Les images IA arrivent en data URL (plusieurs Mo) : on les range dans le stockage et on ne garde que le lien,
+ * sinon la fiche du guide devient trop lourde et ne se charge ni ne s'enregistre plus.
+ */
+export async function storeGuideImage(src: string, guideId: string, name: string): Promise<string> {
+  if (!src.startsWith('data:')) return src;
+  const { data: u } = await supabase.auth.getUser(); if (!u.user) throw new Error('Connectez-vous.');
+  const blob = await (await fetch(src)).blob();
+  const ext = blob.type.includes('png') ? 'png' : 'jpg';
+  const path = `${u.user.id}/guides/${guideId}-${name}-${Date.now()}.${ext}`;
+  const { error } = await supabase.storage.from('ebook-images').upload(path, blob, { contentType: blob.type || 'image/png', upsert: true });
+  if (error) throw new Error('Enregistrement de l’image impossible.');
+  return supabase.storage.from('ebook-images').getPublicUrl(path).data.publicUrl;
+}
+
 /** Mockup 3D (livre broché en perspective + ombre) dessiné à partir de la vraie couverture, PNG transparent pour les tunnels de vente. */
 export async function buildBookMockup(coverUrl: string): Promise<Blob> {
   const blob = await (await fetch(coverUrl)).blob();
