@@ -184,21 +184,45 @@ export function buildGuideCoverPrompt(b: { title: string; subtitle: string; auth
 Typographie française parfaitement lisible. Reproduire uniquement ces textes à l’identique : titre « ${b.title} » en haut, grand ; ${b.subtitle ? `sous-titre « ${b.subtitle} » sous le titre ; ` : ''}${b.author_name ? `auteur « ${b.author_name} » en bas. ` : ''}Aucun autre mot, aucun faux texte, sans prix, sans logo, sans filigrane, sans livre en perspective.`;
 }
 
-/** Images Google Imagen avec la clé Gemini personnelle (crédit Google de l'utilisateur). Null si aucune clé Google. */
+/** Choisit un modèle d'image réellement disponible pour la clé Google (liste officielle des modèles). */
+let googleImageModel: Promise<{ name: string; method: 'predict' | 'generateContent' } | null> | null = null;
+async function pickGoogleImageModel(key: string) {
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', { headers: { 'x-goog-api-key': key } });
+  const d = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(`Google : ${d?.error?.message || `erreur ${res.status}`}`);
+  const models: { name: string; supportedGenerationMethods?: string[] }[] = d?.models ?? [];
+  const imagen = models.filter((m) => /imagen/i.test(m.name) && m.supportedGenerationMethods?.includes('predict'))
+    .sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true }));
+  const pref = imagen.find((m) => !/fast|ultra/i.test(m.name)) || imagen[0];
+  if (pref) return { name: pref.name, method: 'predict' as const };
+  const gem = models.filter((m) => /gemini.*image/i.test(m.name) && m.supportedGenerationMethods?.includes('generateContent'))
+    .sort((a, b) => b.name.localeCompare(a.name, undefined, { numeric: true }))[0];
+  return gem ? { name: gem.name, method: 'generateContent' as const } : null;
+}
+
+/** Images Google (Imagen, sinon Gemini Image) avec la clé Google personnelle. Null si aucune clé Google. */
 export async function generateImagenImage(prompt: string, aspectRatio: '3:4' | '4:3' | '1:1' = '3:4'): Promise<string | null> {
   const { getProviderKey } = await import('@/services/aiWritingService');
   const key = getProviderKey('gemini');
   if (!key) return null;
-  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-    body: JSON.stringify({ instances: [{ prompt }], parameters: { sampleCount: 1, aspectRatio } }),
-  });
+  googleImageModel ??= pickGoogleImageModel(key).catch((e) => { googleImageModel = null; throw e; });
+  const model = await googleImageModel;
+  if (!model) throw new Error('Aucun modèle d’image Google n’est disponible avec votre clé.');
+  const url = `https://generativelanguage.googleapis.com/v1beta/${model.name}:${model.method}`;
+  const body = model.method === 'predict'
+    ? { instances: [{ prompt }], parameters: { sampleCount: 1, aspectRatio } }
+    : { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio } } };
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
   const d = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(`Google Imagen : ${d?.error?.message || `erreur ${res.status}`}`);
-  const p = d?.predictions?.[0];
-  if (!p?.bytesBase64Encoded) throw new Error('Google Imagen n’a renvoyé aucune image (contenu refusé ?).');
-  return `data:${p.mimeType || 'image/png'};base64,${p.bytesBase64Encoded}`;
+  if (!res.ok) throw new Error(`Google Images : ${d?.error?.message || `erreur ${res.status}`}`);
+  if (model.method === 'predict') {
+    const p = d?.predictions?.[0];
+    if (p?.bytesBase64Encoded) return `data:${p.mimeType || 'image/png'};base64,${p.bytesBase64Encoded}`;
+  } else {
+    const part = d?.candidates?.[0]?.content?.parts?.find((x: { inlineData?: { data?: string } }) => x.inlineData?.data);
+    if (part) return `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
+  }
+  throw new Error('Google n’a renvoyé aucune image (demande refusée par Google).');
 }
 
 export async function generateGuideCover(b: { title: string; subtitle: string; author_name: string; subject: string; image_style: string }): Promise<string> {

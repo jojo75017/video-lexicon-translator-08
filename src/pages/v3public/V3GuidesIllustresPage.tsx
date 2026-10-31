@@ -63,7 +63,7 @@ export default function V3GuidesIllustresPage() {
   async function fillWithAI() {
     setError(''); setFilling(true);
     try { const sh = await writeSheet(form.title); setForm((f) => ({ ...f, ...sh })); toast.success('Fiche remplie par l’IA — vous pouvez tout modifier.'); }
-    catch (e) { setError((e as Error).message); } finally { setFilling(false); }
+    catch (e) { setError((e as Error).message); toast.error((e as Error).message); } finally { setFilling(false); }
   }
 
   // Sélecteur de photos Unsplash / Pixabay : target = index du chapitre ou 'cover'.
