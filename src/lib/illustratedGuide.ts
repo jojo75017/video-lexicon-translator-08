@@ -184,8 +184,27 @@ export function buildGuideCoverPrompt(b: { title: string; subtitle: string; auth
 Typographie française parfaitement lisible. Reproduire uniquement ces textes à l’identique : titre « ${b.title} » en haut, grand ; ${b.subtitle ? `sous-titre « ${b.subtitle} » sous le titre ; ` : ''}${b.author_name ? `auteur « ${b.author_name} » en bas. ` : ''}Aucun autre mot, aucun faux texte, sans prix, sans logo, sans filigrane, sans livre en perspective.`;
 }
 
+/** Images Google Imagen avec la clé Gemini personnelle (crédit Google de l'utilisateur). Null si aucune clé Google. */
+export async function generateImagenImage(prompt: string, aspectRatio: '3:4' | '4:3' | '1:1' = '3:4'): Promise<string | null> {
+  const { getProviderKey } = await import('@/services/aiWritingService');
+  const key = getProviderKey('gemini');
+  if (!key) return null;
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/imagen-4.0-generate-001:predict', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+    body: JSON.stringify({ instances: [{ prompt }], parameters: { sampleCount: 1, aspectRatio } }),
+  });
+  const d = await res.json().catch(() => null);
+  if (!res.ok) throw new Error(`Google Imagen : ${d?.error?.message || `erreur ${res.status}`}`);
+  const p = d?.predictions?.[0];
+  if (!p?.bytesBase64Encoded) throw new Error('Google Imagen n’a renvoyé aucune image (contenu refusé ?).');
+  return `data:${p.mimeType || 'image/png'};base64,${p.bytesBase64Encoded}`;
+}
+
 export async function generateGuideCover(b: { title: string; subtitle: string; author_name: string; subject: string; image_style: string }): Promise<string> {
   const prompt = buildGuideCoverPrompt(b);
+  const imagen = await generateImagenImage(prompt, '3:4');
+  if (imagen) return imagen;
   const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
     body: { title: b.title, subtitle: b.subtitle, author: b.author_name, format: 'kindle', userPrompt: prompt, customPrompt: prompt, genre: 'Guide pratique illustré' },
   });
@@ -263,6 +282,8 @@ export function buildGuideImagePrompt(style: string, scene: string): string {
 
 export async function generateChapterImage(title: string, style: string, scene: string): Promise<string> {
   const prompt = buildGuideImagePrompt(style, scene);
+  const imagen = await generateImagenImage(prompt, '4:3');
+  if (imagen) return imagen;
   const { data, error } = await supabase.functions.invoke('generate-ai-cover', {
     body: { title: title || 'Guide illustré', format: 'kindle', userPrompt: prompt, customPrompt: prompt, genre: 'Guide pratique illustré' },
   });
