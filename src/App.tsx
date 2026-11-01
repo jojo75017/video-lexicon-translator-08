@@ -155,6 +155,7 @@ const V3ToolsIndexPage = lazy(() => import('./pages/v3public/V3ToolsIndexPage'))
  * Une seule liste : aucun ancien lien (email, blog, favori) ne tombe en 404.
  */
 const V3_LEGACY_ALIASES: Array<[string, string]> = [
+  ['audiobook', '/v3/outils/audiobook'],
   ['offres', '/v3/forfaits'],
   ['offres/merci', '/v3/forfaits'],
   ['tarifs', '/v3/forfaits'],

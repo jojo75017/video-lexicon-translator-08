@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { supabase } from '@/integrations/supabase/client';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { BookOpen, Loader2, RefreshCw } from 'lucide-react';
+import { listAudioBooks, loadAudioBook, type AudioBookContent, type AudioBookOption } from '@/lib/audiobook/bookImport';
+import { useSearchParams } from 'react-router-dom';
 
-type Book = { id: string; title: string; updated_at: string };
+type Book = AudioBookOption;
 
 type Props = {
-  onLoaded: (book: { title: string; manuscript: string }) => void;
+  onLoaded: (book: AudioBookContent) => void;
 };
 
 /**
@@ -15,6 +15,7 @@ type Props = {
  * Lecture seule : aucune écriture en base, aucun crédit.
  */
 export default function AudiobookBookPicker({ onLoaded }: Props) {
+  const [params] = useSearchParams();
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
   const [importing, setImporting] = useState<string | null>(null);
@@ -23,14 +24,15 @@ export default function AudiobookBookPicker({ onLoaded }: Props) {
   const load = async () => {
     setLoading(true);
     setError(null);
-    const { data, error: err } = await supabase
-      .from('cs_projects')
-      .select('id, title, updated_at')
-      .order('updated_at', { ascending: false })
-      .limit(30);
-    if (err) setError("Impossible de lire vos livres pour le moment.");
-    setBooks((data as Book[]) || []);
-    setLoading(false);
+    try {
+      const data = await listAudioBooks();
+      setBooks(data);
+      const id = params.get('livre') || params.get('book');
+      const selected = data.find(b => b.id === id);
+      if (selected) onLoaded(await loadAudioBook(selected));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Impossible de lire vos livres.');
+    } finally { setLoading(false); }
   };
 
   useEffect(() => { load(); }, []);
@@ -38,68 +40,51 @@ export default function AudiobookBookPicker({ onLoaded }: Props) {
   const importBook = async (book: Book) => {
     setImporting(book.id);
     setError(null);
-    const { data, error: err } = await supabase
-      .from('cs_chapters')
-      .select('chapter_number, title, content_markdown')
-      .eq('project_id', book.id)
-      .order('chapter_number', { ascending: true });
-    setImporting(null);
-    if (err) { setError("Ce livre n'a pas pu être chargé."); return; }
-    const rows = (data as { chapter_number: number; title: string; content_markdown: string | null }[]) || [];
-    const written = rows.filter((c) => (c.content_markdown || '').trim().length > 0);
-    if (written.length === 0) {
-      setError(`« ${book.title} » n'a encore aucun chapitre rédigé : écrivez-le d'abord.`);
-      return;
-    }
-    const manuscript = written
-      .map((c) => `## ${c.title || `Chapitre ${c.chapter_number}`}\n\n${(c.content_markdown || '').trim()}`)
-      .join('\n\n');
-    onLoaded({ title: book.title, manuscript });
+    try { onLoaded(await loadAudioBook(book)); }
+    catch (e) { setError(e instanceof Error ? e.message : 'Ce livre ne peut pas être chargé.'); }
+    finally { setImporting(null); }
   };
 
   return (
-    <Card className="p-5 mb-6">
+    <section className="py-5 mb-6 border-b">
       <div className="flex items-center justify-between gap-3 mb-1">
         <div className="flex items-center gap-2">
-          <BookOpen className="h-5 w-5 text-amber-600" />
-          <h2 className="font-semibold text-[#232F3E]">Reprendre un de mes livres</h2>
+          <BookOpen className="h-5 w-5 text-primary" />
+          <h2 className="font-semibold text-foreground">Reprendre un de mes livres</h2>
         </div>
         <Button variant="ghost" size="sm" onClick={load} disabled={loading}>
           <RefreshCw className="h-4 w-4 mr-1" /> Actualiser
         </Button>
       </div>
-      <p className="text-xs text-slate-500 mb-3">
-        Le livre audio ne coûte rien de plus : choisissez un livre déjà écrit, son texte se place
-        automatiquement ci-dessous. Vous pouvez aussi coller un texte à la main.
-      </p>
 
       {loading ? (
-        <div className="flex items-center gap-2 text-sm text-slate-500">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Chargement de vos livres…
         </div>
       ) : books.length === 0 ? (
-        <p className="text-sm text-slate-500">
+        <p className="text-sm text-muted-foreground">
           Aucun livre enregistré pour l'instant. Collez simplement votre texte plus bas.
         </p>
       ) : (
         <div className="grid gap-2 sm:grid-cols-2">
           {books.map((b) => (
-            <button
-              key={b.id}
+            <Button
+              key={`${b.source}-${b.id}`}
+              variant="outline"
               onClick={() => importBook(b)}
               disabled={importing === b.id}
-              className="text-left border rounded-lg px-3 py-2 hover:border-amber-400 hover:bg-amber-50/60 transition disabled:opacity-60"
+              className="h-auto min-w-0 flex-col items-start text-left px-3 py-2"
             >
-              <div className="font-medium text-sm text-[#232F3E] truncate">{b.title || 'Sans titre'}</div>
-              <div className="text-xs text-slate-500">
+              <div className="font-medium text-sm text-foreground w-full truncate">{b.title || 'Sans titre'}</div>
+              <div className="text-xs text-muted-foreground">
                 {importing === b.id ? 'Chargement…' : 'Utiliser ce livre'}
               </div>
-            </button>
+            </Button>
           ))}
         </div>
       )}
 
-      {error && <p className="text-sm text-red-600 mt-3">{error}</p>}
-    </Card>
+      {error && <p role="alert" className="text-sm text-destructive mt-3">{error}</p>}
+    </section>
   );
 }
