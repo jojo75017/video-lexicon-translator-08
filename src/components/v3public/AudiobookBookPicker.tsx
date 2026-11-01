@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { BookOpen, Loader2, RefreshCw } from 'lucide-react';
 import { listAudioBooks, loadAudioBook, type AudioBookContent, type AudioBookOption } from '@/lib/audiobook/bookImport';
 import { useSearchParams } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 type Book = AudioBookOption;
 
@@ -66,21 +67,17 @@ export default function AudiobookBookPicker({ onLoaded }: Props) {
           Aucun livre enregistré pour l'instant. Collez simplement votre texte plus bas.
         </p>
       ) : (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {books.map((b) => (
-            <Button
-              key={`${b.source}-${b.id}`}
-              variant="outline"
-              onClick={() => importBook(b)}
-              disabled={importing === b.id}
-              className="h-auto min-w-0 flex-col items-start text-left px-3 py-2"
-            >
-              <div className="font-medium text-sm text-foreground w-full truncate">{b.title || 'Sans titre'}</div>
-              <div className="text-xs text-muted-foreground">
-                {importing === b.id ? 'Chargement…' : 'Utiliser ce livre'}
-              </div>
-            </Button>
-          ))}
+        <div>
+          <Select disabled={!!importing} onValueChange={value => {
+            const b = books.find(b => `${b.source}:${b.id}` === value);
+            if (b) void importBook(b);
+          }}>
+            <SelectTrigger aria-label="Choisir un livre de ma bibliothèque"><SelectValue placeholder="Choisir un livre de ma bibliothèque" /></SelectTrigger>
+            <SelectContent>
+              {books.map(b => <SelectItem key={`${b.source}:${b.id}`} value={`${b.source}:${b.id}`}>{b.title || 'Sans titre'}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          {importing && <p className="mt-2 text-sm text-muted-foreground">Chargement du livre…</p>}
         </div>
       )}
 

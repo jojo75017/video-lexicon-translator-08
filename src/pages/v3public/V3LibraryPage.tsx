@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { BookOpen, Sparkles, Settings, Headphones, AlertCircle, RefreshCw, ImageIcon, Loader2, Trash2, Filter, Images } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
 import {
@@ -37,7 +36,6 @@ export default function V3LibraryPage() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
-  const [audioModal, setAudioModal] = useState<{ id: string; title: string } | null>(null);
   const [dedup, setDedup] = useState<boolean>(() => localStorage.getItem('v3_lib_dedup') !== '0');
   const [rawRows, setRawRows] = useState<Row[]>([]);
   const [loadError, setLoadError] = useState(false);
@@ -229,10 +227,9 @@ export default function V3LibraryPage() {
             <div className="mt-10">
               <div className="flex items-baseline justify-between mb-4">
                 <h2 className="text-lg font-bold">Terminés <span className="text-sm font-normal text-[var(--v3-muted)]">· {done.length}</span></h2>
-                <span className="text-xs text-[var(--v3-muted)]">Chaque livre peut être converti en audio (option 9,99 €)</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => nav(`/v3/outils/audiobook?livre=${r.id}`)} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -240,7 +237,7 @@ export default function V3LibraryPage() {
             <div className="mt-12">
               <h2 className="text-lg font-bold mb-4">En cours <span className="text-sm font-normal text-[var(--v3-muted)]">· {started.length}</span></h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {started.map((r) => <BookCard key={r.id} r={r} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => setAudioModal({ id: r.id, title: r.title })} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {started.map((r) => <BookCard key={r.id} r={r} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => nav(`/v3/outils/audiobook?livre=${r.id}`)} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -289,16 +286,6 @@ export default function V3LibraryPage() {
         </div>
       )}
 
-      {audioModal && (
-        <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4" onClick={() => setAudioModal(null)}>
-          <div className="max-w-lg w-full" onClick={(e) => e.stopPropagation()}>
-            <AudiobookOfferCard bookId={audioModal.id} bookTitle={audioModal.title} />
-            <div className="text-center mt-3">
-              <button onClick={() => setAudioModal(null)} className="text-white/80 text-sm underline">Fermer</button>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
@@ -420,13 +407,13 @@ function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio,
           {genLoading ? 'Génération…' : 'Générer la couverture'}
         </button>
       )}
-      <button
+      <Button
         onClick={onAudio}
-        className="mt-2 inline-flex items-center justify-center gap-1.5 rounded-full border border-[color:var(--v3-orange)]/40 bg-[#FFF6E8] hover:bg-[#FFE9C7] text-[11px] font-bold text-[var(--v3-orange-600)] py-1.5 px-2 transition"
-        title="Convertir ce livre en audiobook (option payante)"
+        className="mt-2 w-full gap-1.5 text-xs"
+        title="Ouvrir ce livre dans le Studio Audio"
       >
-        <Headphones className="w-3.5 h-3.5" /> Audio · 9,99 €
-      </button>
+        <Headphones className="w-3.5 h-3.5" /> Studio Audio
+      </Button>
       <button
         onClick={onDelete}
         className="mt-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-red-200 bg-white hover:bg-red-50 text-[11px] font-semibold text-red-600 py-1.5 px-2 transition"

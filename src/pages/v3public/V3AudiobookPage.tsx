@@ -93,14 +93,14 @@ export default function V3AudiobookPage() {
         <AudiobookBookPicker onLoaded={applyBook} />
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="flex h-auto flex-wrap justify-start mb-6">
-            <TabsTrigger value="studio">Livre audio</TabsTrigger>
-            <TabsTrigger value="express">Audio Express</TabsTrigger>
-            <TabsTrigger value="library">Mes livres audio</TabsTrigger>
-            <TabsTrigger value="formation">Formation audio</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" value="studio">Livre audio</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" value="express">Audio Express</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" value="library">Mes livres audio</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" value="formation">Formation audio</TabsTrigger>
           </TabsList>
           <TabsContent value="library"><AudiobookLibrary /></TabsContent>
           <TabsContent value="formation"><EbookFormationAudio /></TabsContent>
-          <TabsContent value="express"><AudioExpressWorkflow ebookTitle={title} authorName={author} chapters={chapters} preface={preface} conclusion={conclusion} onNavigateToAudio={() => setTab('studio')} /></TabsContent>
+          <TabsContent value="express"><AudioExpressWorkflow key={`${title}:${manuscript.length}`} ebookTitle={title} authorName={author} chapters={chapters} preface={preface} conclusion={conclusion} onNavigateToAudio={() => setTab('studio')} /></TabsContent>
           <TabsContent value="studio" forceMount className="data-[state=inactive]:hidden">
 
         <AudiobookCoverPicker
