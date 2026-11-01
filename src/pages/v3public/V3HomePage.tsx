@@ -1,13 +1,15 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
 import V3VCBooksBanner from '@/components/v3public/V3VCBooksBanner';
 import {
-  ArrowRight,
+  ArrowRight, AudioLines,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
 } from 'lucide-react';
 import { trackCaptureEvent } from '@/lib/captureTracking';
+import { Button } from '@/components/ui/button';
 
 import V3CapabilitiesPanel from '@/components/v3public/V3CapabilitiesPanel';
 import V3ReserveCtaBand from '@/components/v3public/V3ReserveCtaBand';
@@ -82,6 +84,15 @@ export default function V3HomePage() {
 
   return (
     <div className="v3-home pb-4">
+      {user && (
+        <div className="v3-shell flex justify-end py-4">
+          <Button asChild size="lg" className="v3-btn v3-btn-action-orange min-h-12 w-full justify-center text-base sm:w-auto">
+            <Link to="/v3/outils/audiobook">
+              <AudioLines aria-hidden="true" /> Studio Audio <ArrowRight aria-hidden="true" />
+            </Link>
+          </Button>
+        </div>
+      )}
       {/* VC Books — encart placé tout en haut, juste sous la barre des robots. */}
       <V3VCBooksBanner />
 

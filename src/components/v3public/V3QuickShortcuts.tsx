@@ -9,7 +9,7 @@ const SHORTCUTS = [
   { label: 'Publier', to: '/audit-pilot', color: '#0891B2', agent: 'timothee', name: 'Timothée', role: 'Audit avant publication' },
   { label: 'Vendre', to: '/kdp-keywords', color: '#CA8A04', agent: 'solene', name: 'Solène', role: 'Mots-clés Amazon' },
   { label: 'Livres spéciaux', to: '/v3/create/illustre', color: '#9333EA', agent: 'prune', name: 'Prune', role: 'Albums et illustrés' },
-  { label: 'Version audio', to: '/v3/version-audio', color: '#D97706', agent: 'aurele', name: 'Aurèle', role: 'Votre livre en audio' },
+  { label: 'Studio Audio', to: '/v3/outils/audiobook', color: '#D97706', agent: 'aurele', name: 'Aurèle', role: 'Votre livre en audio' },
 ];
 
 export default function V3QuickShortcuts() {
