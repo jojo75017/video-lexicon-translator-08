@@ -93,10 +93,10 @@ export default function V3AudiobookPage() {
         <AudiobookBookPicker onLoaded={applyBook} />
         <Tabs value={tab} onValueChange={setTab}>
           <TabsList className="flex h-auto flex-wrap justify-start mb-6">
-            <TabsTrigger className="v3-chip-toggle" value="studio">Livre audio</TabsTrigger>
-            <TabsTrigger className="v3-chip-toggle" value="express">Audio Express</TabsTrigger>
-            <TabsTrigger className="v3-chip-toggle" value="library">Mes livres audio</TabsTrigger>
-            <TabsTrigger className="v3-chip-toggle" value="formation">Formation audio</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" aria-pressed={tab === 'studio'} value="studio">Livre audio</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" aria-pressed={tab === 'express'} value="express">Audio Express</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" aria-pressed={tab === 'library'} value="library">Mes livres audio</TabsTrigger>
+            <TabsTrigger className="v3-chip-toggle" aria-pressed={tab === 'formation'} value="formation">Formation audio</TabsTrigger>
           </TabsList>
           <TabsContent value="library"><AudiobookLibrary /></TabsContent>
           <TabsContent value="formation"><EbookFormationAudio /></TabsContent>
