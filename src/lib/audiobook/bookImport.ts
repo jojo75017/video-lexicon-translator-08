@@ -61,21 +61,26 @@ export async function loadAudioBook(book: AudioBookOption): Promise<AudioBookCon
   if (book.source === 'book') {
     const [chapters, versions] = await Promise.all([
       supabase.from('book_chapters').select('id,title,position').eq('project_id', book.id).eq('user_id', uid).order('position'),
-      supabase.from('book_chapter_versions').select('chapter_id,content,version').eq('project_id', book.id).eq('user_id', uid).order('version', { ascending: false }),
+      supabase.from('book_chapter_versions').select('chapter_id,content,created_at').eq('project_id', book.id).eq('user_id', uid).order('created_at', { ascending: false }),
     ]);
     if (chapters.error || versions.error) throw new Error('Ce livre ne peut pas être chargé.');
     row = { title: book.title, chapters: (chapters.data ?? []).map(c => ({ ...c, content: versions.data?.find(v => v.chapter_id === c.id)?.content })) };
   } else if (book.source === 'cs') {
-    const { data, error } = await supabase.from('cs_chapters').select('chapter_number,title,content_markdown').eq('project_id', book.id).eq('user_id', uid).order('chapter_number');
+    const { data: project, error: projectError } = await supabase.from('cs_projects').select('id').eq('id', book.id).eq('user_id', uid).single();
+    if (projectError || !project) throw new Error('Ce livre ne peut pas être chargé.');
+    const { data, error } = await supabase.from('cs_chapters').select('chapter_number,title,content_markdown').eq('project_id', project.id).order('chapter_number');
     if (error) throw new Error('Ce livre ne peut pas être chargé.');
     row = { title: book.title, chapters: data };
+  } else if (book.source === 'ebook') {
+    const { data, error } = await supabase.from('ebook_projects').select('title,author_name,preface,conclusion,chapters,draft_state').eq('id', book.id).eq('user_id', uid).single();
+    if (error) throw new Error('Ce livre ne peut pas être chargé.');
+    row = data;
+  } else if (book.source === 'guide') {
+    const { data, error } = await supabase.from('illustrated_guides').select('title,author_name,chapters').eq('id', book.id).eq('user_id', uid).single();
+    if (error) throw new Error('Ce livre ne peut pas être chargé.');
+    row = data;
   } else {
-    const query = book.source === 'ebook'
-      ? supabase.from('ebook_projects').select('title,author_name,preface,conclusion,chapters,draft_state')
-      : book.source === 'guide'
-        ? supabase.from('illustrated_guides').select('title,author_name,chapters')
-        : supabase.from('vc_books').select('title,author_name,pauses');
-    const { data, error } = await query.eq('id', book.id).eq('user_id', uid).single();
+    const { data, error } = await supabase.from('vc_books').select('title,author_name,pauses').eq('id', book.id).eq('user_id', uid).single();
     if (error) throw new Error('Ce livre ne peut pas être chargé.');
     row = data;
   }
