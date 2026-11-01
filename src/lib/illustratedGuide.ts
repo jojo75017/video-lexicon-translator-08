@@ -214,7 +214,16 @@ export async function generateImagenImage(prompt: string, aspectRatio: '3:4' | '
     : { contents: [{ parts: [{ text: prompt }] }], generationConfig: { responseModalities: ['IMAGE'], imageConfig: { aspectRatio } } };
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key }, body: JSON.stringify(body) });
   const d = await res.json().catch(() => null);
-  if (!res.ok) throw new Error(`Google Images : ${d?.error?.message || `erreur ${res.status}`}`);
+  if (!res.ok) {
+    const msg: string = d?.error?.message || '';
+    if (res.status === 429 && /free_tier|limit: 0/i.test(msg)) {
+      // Clé en offre gratuite Google : aucune image autorisée. On repasse sur le moteur inclus.
+      const { toast } = await import('sonner');
+      toast.warning('Votre clé Google est en offre gratuite : les images Google sont bloquées. Image créée avec le moteur inclus. Reliez la facturation (vos 300 $) à votre clé dans Google AI Studio.', { duration: 12000 });
+      return null;
+    }
+    throw new Error(`Google Images : ${msg || `erreur ${res.status}`}`);
+  }
   if (model.method === 'predict') {
     const p = d?.predictions?.[0];
     if (p?.bytesBase64Encoded) return `data:${p.mimeType || 'image/png'};base64,${p.bytesBase64Encoded}`;
