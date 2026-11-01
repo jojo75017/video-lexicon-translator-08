@@ -1,5 +1,5 @@
 # Accueil bloqué
-- [ ] Mettre le bouton « Studio Audio » en évidence en haut de l’accueil V3 et dans les raccourcis, sans changer les droits ni les prix.
+- [x] Mettre le bouton « Studio Audio » en évidence en haut de l’accueil V3 et dans les raccourcis, sans changer les droits ni les prix : bouton visible dans le premier écran, ouverture du studio vérifiée avec le compte connecté, compilation OK ; rien publié.
 - [x] Déverrouiller la V3 dans le code (`V3_LAUNCH_UNLOCKED = true`) : l'interrupteur en base reste la source, mais une base en pause ne fait plus retomber le site en « Mode contemplation ».
 - [x] Corriger la racine « / » : les visiteurs étaient renvoyés vers l'ancien tunnel externe Landaa (offre 47 €, mort → page 404) ; ils arrivent désormais sur le tunnel interne /commander. Vérifié au navigateur, build OK. Rien publié.
 
