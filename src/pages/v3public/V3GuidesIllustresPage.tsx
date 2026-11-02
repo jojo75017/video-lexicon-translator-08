@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Search, Sparkles, Copy, ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen, Upload } from 'lucide-react';
+import { Search, Sparkles, Copy, ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen, Upload, Save } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
