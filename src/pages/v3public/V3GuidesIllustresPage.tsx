@@ -171,7 +171,7 @@ export default function V3GuidesIllustresPage() {
     await persist({ ...guide, chapters }); toast.success('Illustration ajoutée.');
   });
 
-  // Import d'une image personnelle (JPG/PNG/WebP, 15 Mo max) : rangée dans le stockage, seul le lien est gardé.
+  // Import d'une image personnelle (JPG/PNG, 15 Mo max) : rangée dans le stockage, seul le lien est gardé.
   const fileInput = useRef<HTMLInputElement>(null);
   const uploadTarget = useRef<number | 'cover'>('cover');
   const pickFile = (target: number | 'cover') => { uploadTarget.current = target; fileInput.current?.click(); };
@@ -180,10 +180,10 @@ export default function V3GuidesIllustresPage() {
     if (!file || !guide) return;
     const target = uploadTarget.current;
     void run(`up-${target}`, async () => {
-      if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('Format accepté : JPG, PNG ou WebP.');
+      if (!/^image\/(jpeg|png)$/.test(file.type)) throw new Error('Format accepté : JPG ou PNG.');
       if (file.size > 15 * 1024 * 1024) throw new Error('Image trop lourde (15 Mo maximum).');
       const { data: u } = await supabase.auth.getUser(); if (!u.user) throw new Error('Connectez-vous.');
-      const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+      const ext = file.type === 'image/png' ? 'png' : 'jpg';
       const name = target === 'cover' ? 'cover' : `ch${target + 1}`;
       const path = `${u.user.id}/guides/${guide.id}-${name}-upload-${Date.now()}.${ext}`;
       const { error: ue } = await supabase.storage.from('ebook-images').upload(path, file, { contentType: file.type, upsert: true });
@@ -233,7 +233,7 @@ export default function V3GuidesIllustresPage() {
           <Button size="sm" className="w-full" onClick={makeCover} disabled={!!busy}>{busy === 'cover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{guide.cover_url ? 'Refaire avec l’IA' : 'Couverture IA'}</Button>
           <Button size="sm" variant="secondary" className="w-full" onClick={() => openPicker('cover')} disabled={!!busy}><Search className="mr-2 h-4 w-4" />Couverture avec une photo</Button>
           <Button size="sm" variant="outline" className="w-full" onClick={() => pickFile('cover')} disabled={!!busy}>{busy === 'up-cover' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}Couverture de mon ordinateur</Button>
-          <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={onFile} />
+          <input ref={fileInput} type="file" accept="image/jpeg,image/png" className="hidden" onChange={onFile} />
           {guide.cover_url && <>
             <Button size="sm" variant="outline" className="w-full" onClick={downloadCover} disabled={!!busy}><FileDown className="mr-2 h-4 w-4" />Télécharger la couverture</Button>
             <Button size="sm" variant="outline" className="w-full" onClick={makeMockup} disabled={!!busy}>{busy === 'mockup' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookOpen className="mr-2 h-4 w-4" />}Mockup 3D pour tunnel de vente</Button>
