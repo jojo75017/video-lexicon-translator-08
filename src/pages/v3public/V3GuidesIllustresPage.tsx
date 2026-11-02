@@ -205,6 +205,22 @@ export default function V3GuidesIllustresPage() {
     if (!guide) return; const chapters = [...guide.chapters]; chapters[i] = { ...chapters[i], ...patch }; setGuide({ ...guide, chapters });
   }
 
+  const [savedAt, setSavedAt] = useState<string>('');
+  const guideRef = useRef(guide); guideRef.current = guide;
+  const saveNow = async () => {
+    const g = guideRef.current; if (!g) return;
+    setBusy('save');
+    const { error: e } = await supabase.from('illustrated_guides').update({ chapters: g.chapters as unknown as never, cover_url: g.cover_url ?? null }).eq('id', g.id);
+    setBusy('');
+    if (e) { toast.error('Enregistrement impossible. Réessayez.'); return; }
+    const t = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    setSavedAt(t); toast.success(`Guide enregistré à ${t}.`);
+  };
+  useEffect(() => {
+    const onKey = (ev: KeyboardEvent) => { if ((ev.ctrlKey || ev.metaKey) && ev.key.toLowerCase() === 's') { ev.preventDefault(); void saveNow(); } };
+    window.addEventListener('keydown', onKey); return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   async function remove(gid: string) {
     if (!confirm('Supprimer ce guide ?')) return;
     await supabase.from('illustrated_guides').delete().eq('id', gid); void loadList();
@@ -246,7 +262,9 @@ export default function V3GuidesIllustresPage() {
         </div>
       </section>
       {error && <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">{error}</p>}
-      <div className="mb-6 flex flex-wrap gap-2">
+      <div className="mb-6 flex flex-wrap items-center gap-2">
+        <Button variant="default" onClick={() => void saveNow()} disabled={!!busy}>{busy === 'save' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}Sauvegarder le projet</Button>
+        {savedAt && <span className="text-xs text-muted-foreground">Enregistré à {savedAt} · Ctrl+S</span>}
         <Button onClick={outline} disabled={!!busy}>{busy === 'outline' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <BookOpen className="mr-2 h-4 w-4" />}{guide.chapters.length ? 'Refaire le sommaire' : '1. Créer le sommaire'}</Button>
         {guide.chapters.length > 0 && (busy === 'write'
           ? <Button variant="outline" onClick={() => { stop.current.stopped = true; }}><Square className="mr-2 h-4 w-4" />Arrêter après ce chapitre</Button>
