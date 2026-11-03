@@ -57,4 +57,4 @@
 - [x] Publier la nouvelle mise en page des livres VC Books (rubriques de 10 pauses, question et réponse, « Comment profiter de ces N pauses ») et le bouton « Enregistrer et rédiger avec le robot » : publication programmée vers ebookstudio.fr, contrôle de sécurité frais sans alerte critique (8 relevés, 4 avertissements, 4 informations), pages 200 et nouveau format retrouvé dans les fichiers publiés. Rédaction réelle et exports non relancés en ligne : aucun livre n'a de pauses en base et la rédaction utilise la clé IA du client.
 
 # Maquette noire du 5 novembre
-- [ ] Compléter le PDF noir : encart Écriture Express novices au centre au-dessus des 4 encarts, modules sous les encarts, tarifs mensuels 19/29/59 € avec quotas, FAQ et pied de page.
+- [x] Compléter le PDF noir : encart Écriture Express novices au centre au-dessus des 4 encarts, modules sous les encarts, tarifs mensuels 19/29/59 € avec quotas, FAQ et pied de page.
