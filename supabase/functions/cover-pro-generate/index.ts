@@ -9,7 +9,6 @@
 // Un crédit inclus n'est définitivement consommé que si l'image est générée,
 // enregistrée dans le bucket privé `covers` et rattachée au projet.
 
-import { decode, Image } from "https://deno.land/x/imagescript@1.2.15/mod.ts";
 import {
   authenticate,
   corsHeaders,
@@ -252,15 +251,13 @@ Deno.serve(async (req) => {
     if (!b64) throw new Error("Aucune image renvoyée par le fournisseur.");
     const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
 
-    // Dimensions réellement obtenues + miniature (aucun agrandissement artificiel).
-    const decoded = await decode(bytes);
-    const width = decoded.width;
-    const height = decoded.height;
-    let thumbBytes: Uint8Array | null = null;
-    if (decoded instanceof Image) {
-      const thumb = decoded.clone().resize(400, Image.RESIZE_AUTO);
-      thumbBytes = await thumb.encodeJPEG(82);
-    }
+    // Dimensions lues dans l'en-tête PNG (sans décodage lourd, évite le dépassement CPU).
+    // La miniature est produite par l'éditeur dans le navigateur.
+    const isPng = bytes.length > 24 && bytes[0] === 0x89 && bytes[1] === 0x50;
+    const dv = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    const width = isPng ? dv.getUint32(16) : 0;
+    const height = isPng ? dv.getUint32(20) : 0;
+    const thumbBytes: Uint8Array | null = null;
 
     // --- Enregistrement privé : covers/<user_id>/<project_id>/ ------------
     const stamp = Date.now();
