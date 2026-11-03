@@ -55,3 +55,6 @@
 - [x] Rendre visibles les catégories choisies dans la fiche VC Books : la règle « tous les boutons en bleu » de `v3-public.css` masquait l’état sélectionné ; nouvelles puces `.v3-chip-toggle` (blanc au repos, couleur du thème quand choisies), vérifié à l’écran (3 puces orange, 7 blanches).
 - [x] VC Books : robot d'écriture des pauses + exports Word et PDF
 - [x] Publier la nouvelle mise en page des livres VC Books (rubriques de 10 pauses, question et réponse, « Comment profiter de ces N pauses ») et le bouton « Enregistrer et rédiger avec le robot » : publication programmée vers ebookstudio.fr, contrôle de sécurité frais sans alerte critique (8 relevés, 4 avertissements, 4 informations), pages 200 et nouveau format retrouvé dans les fichiers publiés. Rédaction réelle et exports non relancés en ligne : aucun livre n'a de pauses en base et la rédaction utilise la clé IA du client.
+
+# Maquette noire du 5 novembre
+- [ ] Compléter le PDF noir : encart Écriture Express novices au centre au-dessus des 4 encarts, modules sous les encarts, tarifs mensuels 19/29/59 € avec quotas, FAQ et pied de page.
