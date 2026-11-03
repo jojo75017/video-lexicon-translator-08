@@ -259,7 +259,7 @@ function buildFallbackOutline(title: string, category: string, count: number, bo
     return {
       id: makeId(),
       numero: index + 1,
-      titre: cycle === 0 ? prefix : `${prefix} — ${variant}`,
+      titre: cycle === 0 ? prefix : `${prefix}, ${variant}`,
       objectif,
     };
   });
@@ -1763,9 +1763,11 @@ ${outlineRulesFor(bookType)}`;
     const safeTitle = (finalTitle.trim() || title.trim() || cleanText(aiTopic).slice(0, 70) || 'Mon livre');
     const safeAuthor = authorName.trim() || 'Auteur Ebookstudio';
     const baseOutline = outlineOverride && outlineOverride.length >= 3 ? outlineOverride : normalizedOutline;
+    const fallbackFull = buildFallbackOutline(safeTitle, effectiveCategory, chapters, bookType);
     const safeOutline = baseOutline.length >= 3
-      ? baseOutline
-      : buildFallbackOutline(safeTitle, effectiveCategory, chapters, bookType);
+      // Toujours un titre pour chaque chapitre demandé (sinon ch. 13+ sans titre).
+      ? [...baseOutline, ...fallbackFull.slice(baseOutline.length)].map((c, i) => ({ ...c, numero: i + 1 }))
+      : fallbackFull;
     if (finalTitle.trim() !== safeTitle) setFinalTitle(safeTitle);
     if (authorName.trim() !== safeAuthor) setAuthorName(safeAuthor);
     if (baseOutline.length < 3) {
