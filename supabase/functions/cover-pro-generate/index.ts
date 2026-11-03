@@ -9,6 +9,7 @@
 // Un crédit inclus n'est définitivement consommé que si l'image est générée,
 // enregistrée dans le bucket privé `covers` et rattachée au projet.
 
+import { Buffer } from "node:buffer";
 import {
   authenticate,
   corsHeaders,
@@ -249,7 +250,8 @@ Deno.serve(async (req) => {
     const payload = await res.json();
     const b64 = payload?.data?.[0]?.b64_json;
     if (!b64) throw new Error("Aucune image renvoyée par le fournisseur.");
-    const bytes = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+    // Décodage natif (évite la boucle JS qui dépassait le temps CPU autorisé).
+    const bytes = new Uint8Array(Buffer.from(b64, "base64"));
 
     // Dimensions lues dans l'en-tête PNG (sans décodage lourd, évite le dépassement CPU).
     // La miniature est produite par l'éditeur dans le navigateur.
