@@ -286,7 +286,7 @@ Deno.serve(async (req) => {
     const { error: updErr } = await service.from("cover_projects").update({
       ...compositionPatch,
       illustration_path: imagePath,
-      thumbnail_path: thumbBytes ? thumbPath : null,
+      ...(thumbBytes ? { thumbnail_path: thumbPath } : {}),
       ai_generated: true,
       illustration_provider: "openai",
       illustration_model: MODEL,
