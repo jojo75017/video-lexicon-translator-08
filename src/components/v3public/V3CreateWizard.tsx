@@ -1439,8 +1439,17 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
     }
 
     setOutlineLoading(true);
+    // Génération par lots de 10 chapitres : un seul appel pour 40 chapitres
+    // dépassait la longueur de réponse de l'IA et tout repartait au plan de secours.
+    const BATCH_SIZE = 10;
+    const collected: OutlineChapter[] = [];
+    const seenTitles = new Set<string>();
     try {
-      const prompt = `Tu es directeur éditorial KDP. Crée une table des matières professionnelle en français.
+      for (let start = 0; start < chapters; start += BATCH_SIZE) {
+        const end = Math.min(chapters, start + BATCH_SIZE);
+        const batchCount = end - start;
+        const previous = collected.map((c) => `${c.numero}. ${c.titre}`).join('\n');
+        const prompt = `Tu es directeur éditorial KDP. Crée une partie de la table des matières professionnelle en français.
 Titre : ${finalTitle || title}
 Sous-titre : ${subtitle || 'Non défini'}
 Type de livre : ${bookTypeLabel(bookType)}
@@ -1448,56 +1457,80 @@ Catégorie : ${effectiveCategory}
 Ton : ${tone}
 Persona lecteur : ${avatarConsigne || cibleProfil || 'non précisé'}
 Synopsis : ${description}
-Nombre exact de chapitres : ${chapters}
-Mots par chapitre : ${wordsPerChapter}
+Nombre total de chapitres du livre : ${chapters}
+Chapitres à produire maintenant : du chapitre ${start + 1} au chapitre ${end} (soit ${batchCount} chapitres)
+${previous ? `Chapitres déjà écrits (ne pas les répéter, poursuivre la progression logique) :\n${previous}\n` : ''}Mots par chapitre : ${wordsPerChapter}
 Points clés attendus par chapitre : ${outlinePoints}
 Ton du sommaire : ${outlineTone}
 Mots-clés à placer naturellement : ${outlineKeywords.trim() || 'aucun imposé'}
 Idée de départ de l'auteur : ${aiTopic || 'non précisée'}
 
 Réponds STRICTEMENT en JSON valide, sans markdown, avec ce schéma :
-{"chapters":[{"numero":1,"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]}
+{"chapters":[{"numero":${start + 1},"titre":"Titre spécifique non générique","objectif":"Objectif éditorial clair en une phrase","points":["${outlinePoints} points clés"],"motCle":"mot-clé KDP"}]}
 
 Règles :
-- exactement ${chapters} chapitres ;
+- exactement ${batchCount} chapitres, numérotés de ${start + 1} à ${end} ;
+- ${end === chapters ? 'ce lot contient la fin du livre : terminer la progression avec une vraie conclusion' : 'ne pas conclure le livre dans ce lot, la suite viendra après'} ;
 - exactement ${outlinePoints} points clés par chapitre ;
 - jamais de titre générique comme "Chapitre 1" ;
 - jamais le même titre répété ;
+- chaque titre et objectif doit parler précisément du sujet du livre ;
 - interdiction de répéter "L'aboutissement" ou une formule de conclusion sur plusieurs chapitres ;
 - 100 % en français courant, aucun mot latin ni étranger ;
 - aucun bloc markdown, aucune balise json ;
 - titres courts, vendeurs, cohérents avec le synopsis.
 ${outlineRulesFor(bookType)}`;
-      const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(12000, 1800 + chapters * 180) });
-      let parsed: any = null;
-      try { parsed = JSON.parse(raw); } catch {
-        const match = raw.match(/\{[\s\S]*\}/);
-        if (match) parsed = JSON.parse(match[0]);
+
+        let batch: OutlineChapter[] = [];
+        for (let attempt = 0; attempt < 2 && batch.length === 0; attempt += 1) {
+          try {
+            const raw = await callAIWriting(prompt, { jsonMode: true, temperature: 0.55, maxTokens: Math.min(8000, 1500 + batchCount * 320) });
+            let parsed: any = null;
+            try { parsed = JSON.parse(raw); } catch {
+              const match = raw.match(/\{[\s\S]*\}/);
+              if (match) parsed = JSON.parse(match[0]);
+            }
+            const aiChapters = Array.isArray(parsed?.chapters) ? parsed.chapters : [];
+            batch = aiChapters.map((item: any) => ({
+              id: makeId(),
+              numero: 0,
+              titre: cleanText(item.titre || item.title),
+              objectif: cleanText(item.objectif || item.goal || item.description),
+            })).filter((item: OutlineChapter) => {
+              const key = cleanText(item.titre).toLowerCase();
+              if (isGenericTitle(item.titre) || seenTitles.has(key)) return false;
+              return true;
+            }).slice(0, batchCount);
+            if (!isFictionType(bookType) && looksLikeFictionOutline(batch.map((c) => c.titre))) batch = [];
+          } catch (batchError) {
+            console.warn(`Outline batch ${start + 1}-${end} failed:`, batchError);
+            batch = [];
+          }
+        }
+        if (batch.length === 0) break;
+        batch.forEach((item) => {
+          seenTitles.add(cleanText(item.titre).toLowerCase());
+          collected.push({ ...item, numero: collected.length + 1 });
+        });
+        setOutline([...collected]);
       }
-      const aiChapters = Array.isArray(parsed?.chapters) ? parsed.chapters : [];
-      const seenTitles = new Set<string>();
-      const nextOutline = aiChapters.map((item: any, index: number) => ({
-        id: makeId(),
-        numero: index + 1,
-        titre: cleanText(item.titre || item.title),
-        objectif: cleanText(item.objectif || item.goal || item.description),
-      })).filter((item: OutlineChapter) => {
-        const key = cleanText(item.titre).toLowerCase();
-        if (isGenericTitle(item.titre) || seenTitles.has(key)) return false;
-        seenTitles.add(key);
-        return true;
-      }).slice(0, chapters);
-      if (nextOutline.length !== chapters) throw new Error('Sommaire incomplet');
-      if (!isFictionType(bookType) && looksLikeFictionOutline(nextOutline.map((c: OutlineChapter) => c.titre))) throw new Error('Sommaire romanesque refusé pour un livre non-fiction');
-      setOutline(nextOutline);
-      toast.success('Sommaire généré — relis puis valide avant de lancer.');
-    } catch (error) {
-      console.error('Outline generation failed:', error);
-      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType));
-      toast.warning('Sommaire robuste préparé — tu peux le modifier avant génération.');
     } finally {
       setOutlineLoading(false);
     }
+
+    if (collected.length === 0) {
+      setOutline(buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType));
+      toast.warning('L’IA n’a pas répondu : sommaire provisoire préparé, clique sur « Régénérer » ou modifie chaque chapitre.');
+      return;
+    }
+    if (collected.length < chapters) {
+      const filler = buildFallbackOutline(finalTitle || title, effectiveCategory, chapters, bookType).slice(collected.length);
+      setOutline([...collected, ...filler].map((c, i) => ({ ...c, numero: i + 1 })));
+      toast.warning(`${collected.length} chapitres générés par l’IA sur ${chapters} : les suivants sont provisoires, clique sur « Régénérer » pour les compléter.`);
+      return;
+    }
+    setOutline(collected);
+    toast.success(`Sommaire de ${chapters} chapitres généré — relis puis valide avant de lancer.`);
   };
 
   const goNext = () => {
