@@ -155,20 +155,8 @@ function cleanText(value: unknown) {
     .trim();
 }
 
-function isGenericTitle(value: unknown) {
-  const normalized = cleanText(value).toLowerCase();
-  return !normalized
-    || /^(chapitre|chapter|ch\.?)\s*\d+$/.test(normalized)
-    || /^l[’']aboutissement\b/i.test(normalized);
-}
-
-function buildFallbackOutline(title: string, category: string, count: number, bookType: BookTypeId = 'roman'): OutlineChapter[] {
-  const subject = cleanText(title) || cleanText(category) || 'le projet';
-  void subject;
-
-  const isFiction = isFictionType(bookType) && /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
-  const fictionTemplates = [
-    ['L’appel de Montferrand', 'Ouvrir le récit par une image forte, un lieu, une attente et une tension immédiate.'],
+const FICTION_TEMPLATES: [string, string][] = [
+    ['Le premier appel', 'Ouvrir le récit par une image forte, un lieu, une attente et une tension immédiate.'],
     ['La première fissure', 'Faire apparaître le premier signe que l’équilibre du héros est menacé.'],
     ['La promesse brisée', 'Installer une perte, un mensonge ou un engagement impossible à ignorer.'],
     ['Le témoin silencieux', 'Introduire un indice humain ou matériel qui change la perception du lecteur.'],
@@ -199,7 +187,7 @@ function buildFallbackOutline(title: string, category: string, count: number, bo
     ['Ce qui demeure', 'Montrer les conséquences humaines de la révélation.'],
     ['La lumière après l’ombre', 'Fermer l’arc principal avec émotion, résolution et ouverture maîtrisée.'],
   ];
-  const practicalTemplates = [
+const PRACTICAL_TEMPLATES: [string, string][] = [
     ['Le point de départ', 'Clarifier la situation actuelle, le besoin du lecteur et la promesse du livre.'],
     ['Le vrai problème', 'Identifier l’obstacle central que le lecteur n’arrive pas encore à résoudre.'],
     ['Les erreurs fréquentes', 'Montrer ce qui bloque les résultats et comment éviter ces pièges.'],
@@ -231,7 +219,35 @@ function buildFallbackOutline(title: string, category: string, count: number, bo
     ['Le nouvel élan', 'Préparer la suite avec confiance et clarté.'],
     ['La conclusion active', 'Terminer par une synthèse forte et un appel à appliquer immédiatement.'],
   ];
-  const templates = isFiction ? fictionTemplates : practicalTemplates;
+
+/** Titres du plan de secours (y compris l'ancien « L'appel de Montferrand ») :
+ * ils ne comptent jamais comme un sommaire écrit par l'auteur. */
+const TEMPLATE_TITLES = new Set(
+  [...FICTION_TEMPLATES, ...PRACTICAL_TEMPLATES]
+    .map(([t]) => t)
+    .concat(['L’appel de Montferrand'])
+    .map((t) => t.toLowerCase().replace(/'/g, '’')),
+);
+
+function isTemplateTitle(value: unknown) {
+  const base = cleanText(value).toLowerCase().replace(/'/g, '’').split(' — ')[0].trim();
+  return TEMPLATE_TITLES.has(base);
+}
+
+function isGenericTitle(value: unknown) {
+  const normalized = cleanText(value).toLowerCase();
+  return !normalized
+    || isTemplateTitle(normalized)
+    || /^(chapitre|chapter|ch\.?)\s*\d+$/.test(normalized)
+    || /^l[’']aboutissement\b/i.test(normalized);
+}
+
+function buildFallbackOutline(title: string, category: string, count: number, bookType: BookTypeId = 'roman'): OutlineChapter[] {
+  const subject = cleanText(title) || cleanText(category) || 'le projet';
+  void subject;
+
+  const isFiction = isFictionType(bookType) && /roman|thriller|policier|romance|fantasy|fantastique|science|fiction|jeunesse|enfants/i.test(category);
+  const templates = isFiction ? FICTION_TEMPLATES : PRACTICAL_TEMPLATES;
 
   return Array.from({ length: count }, (_, index) => {
     const [prefix, objectif] = templates[index % templates.length];
@@ -1491,6 +1507,7 @@ ${outlineRulesFor(bookType)}`;
               if (match) parsed = JSON.parse(match[0]);
             }
             const aiChapters = Array.isArray(parsed?.chapters) ? parsed.chapters : [];
+            const batchSeen = new Set<string>();
             batch = aiChapters.map((item: any) => ({
               id: makeId(),
               numero: 0,
@@ -1498,7 +1515,8 @@ ${outlineRulesFor(bookType)}`;
               objectif: cleanText(item.objectif || item.goal || item.description),
             })).filter((item: OutlineChapter) => {
               const key = cleanText(item.titre).toLowerCase();
-              if (isGenericTitle(item.titre) || seenTitles.has(key)) return false;
+              if (isGenericTitle(item.titre) || seenTitles.has(key) || batchSeen.has(key)) return false;
+              batchSeen.add(key);
               return true;
             }).slice(0, batchCount);
             if (!isFictionType(bookType) && looksLikeFictionOutline(batch.map((c) => c.titre))) batch = [];
