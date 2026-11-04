@@ -297,7 +297,7 @@ export default function V3MainTabs() {
           onMouseLeave={scheduleClose}
         >
           <div
-            className="rounded-2xl bg-white overflow-hidden"
+            className="v3-mega-panel rounded-2xl bg-white overflow-hidden"
             style={{
               minWidth: openPanelWidth,
               boxShadow: 'var(--v3-shadow-menu)',
