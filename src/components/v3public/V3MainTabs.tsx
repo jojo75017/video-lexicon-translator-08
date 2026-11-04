@@ -14,14 +14,14 @@ import { V2V3ModeButton } from '@/components/admin/V2V3FloatingSwitch';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
 const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
-  creer: { color: '#0F766E', agent: 'camille', name: 'Camille', role: 'Lance votre livre et son sommaire' },
-  ecrire: { color: '#1D4ED8', agent: 'victor', name: 'Victor', role: 'Rédige chapitre par chapitre' },
-  habiller: { color: '#EC4899', agent: 'iris', name: 'Iris', role: 'Signe vos couvertures' },
-  kdp: { color: '#4D7C5B', agent: 'gaspard', name: 'Gaspard', role: 'Repère les niches Amazon' },
+  creer: { color: '#EA580C', agent: 'camille', name: 'Camille', role: 'Lance votre livre et son sommaire' },
+  ecrire: { color: '#2563EB', agent: 'victor', name: 'Victor', role: 'Rédige chapitre par chapitre' },
+  habiller: { color: '#7C3AED', agent: 'iris', name: 'Iris', role: 'Signe vos couvertures' },
+  kdp: { color: '#059669', agent: 'gaspard', name: 'Gaspard', role: 'Repère les niches Amazon' },
   publier: { color: '#0891B2', agent: 'timothee', name: 'Timothée', role: 'Traduit et prépare la voix' },
-  vendre: { color: '#CA8A04', agent: 'solene', name: 'Solène', role: 'Optimise votre fiche KDP' },
-  livres: { color: '#9333EA', agent: 'prune', name: 'Prune', role: 'Crée les livres spéciaux' },
-  plans: { color: '#D97706', agent: 'aurele', name: 'Aurèle', role: 'Vous guide vers la bonne formule' },
+  vendre: { color: '#D97706', agent: 'solene', name: 'Solène', role: 'Optimise votre fiche KDP' },
+  livres: { color: '#DC2626', agent: 'prune', name: 'Prune', role: 'Crée les livres spéciaux' },
+  plans: { color: '#DB2777', agent: 'aurele', name: 'Aurèle', role: 'Vous guide vers la bonne formule' },
 };
 
 /**
