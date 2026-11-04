@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, Feather, Palette, AudioLines, Rocket, GraduationCap, Sparkles } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Plus, Minus } from 'lucide-react';
+import AgentPortrait from './AgentPortrait';
+import useIsAdmin from '@/hooks/useIsAdmin';
+import { setSpaceChoice } from '@/lib/v3OpenState';
+import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
+import photoRevise from '@/assets/template-memoir.jpg';
+import photoCreate from '@/assets/template-fiction.jpg';
+import photoVisual from '@/assets/bd-studio-hero.jpg';
+import photoAudio from '@/assets/v3-kdp-auto-formatting.jpg';
 import { supabase } from '@/integrations/supabase/client';
 
 /**
@@ -20,12 +28,151 @@ const EXAMPLES = [
   { label: 'Livre jeunesse', title: 'Léon le petit phare', subject: 'Un petit phare qui apprend à briller malgré sa peur du noir', genre: 'Enfants / Jeunesse', chapters: 8 },
 ];
 
-const STARTS = [
-  { title: 'Écrire mon livre', desc: 'Roman, guide ou récit, chapitre par chapitre.', icon: Feather, color: '#EA580C', to: '/v3/create', tuto: '/v3/tutoriels-v3' },
-  { title: 'Studio Couvertures', desc: 'Couverture Kindle et brochée prête pour KDP.', icon: Palette, color: '#7C3AED', to: '/v3/studio-v4', tuto: '/v3/tutoriels-v3' },
-  { title: 'Audio & KDP', desc: 'Livre audio MP3 et fiche Amazon complète.', icon: AudioLines, color: '#059669', to: '/v3/outils/audiobook', tuto: '/v3/tutoriels-v3' },
-  { title: 'Vendre & Lancer', desc: 'Plan de lancement et publicités Amazon.', icon: Rocket, color: '#D97706', to: '/v3/kdp-pilot', tuto: '/v3/tutoriels-v3' },
+type Situation = {
+  tag: string; title: string; sub: string; color: string; agent: string; agentName: string;
+  photo: string; to: string; steps: string[]; links: { label: string; to: string }[];
+};
+
+const SITUATIONS: Situation[] = [
+  {
+    tag: 'J’ai déjà un texte', title: 'Réviser mon livre', sub: 'Importer · corriger · relire', color: '#2563EB',
+    agent: 'victor', agentName: 'Victor', photo: photoRevise, to: '/v3/corriger',
+    steps: [
+      'Ouvrez « Corriger mon livre » et importez votre manuscrit (Word ou texte).',
+      'L’IA corrige chaque chapitre : orthographe, style et cohérence.',
+      'Relisez chapitre par chapitre et acceptez les corrections.',
+      'Passez le texte dans HumanizeAI si vous voulez un style plus naturel.',
+      'Exportez en Word ou PDF au format KDP.',
+    ],
+    links: [
+      { label: 'Corriger mon livre', to: '/v3/corriger' },
+      { label: 'BookPerfect AI', to: '/bookperfect' },
+      { label: 'HumanizeAI', to: '/v3/outils/humanizer' },
+      { label: 'Livres corrigés', to: '/v3/livres-corriges' },
+      { label: 'Traduction 10 langues', to: '/v3/outils/traduction' },
+    ],
+  },
+  {
+    tag: 'Je pars de zéro', title: 'Créer mon livre & sommaire', sub: 'Idée · sommaire · rédaction', color: '#EA580C',
+    agent: 'camille', agentName: 'Camille', photo: photoCreate, to: '/v3/lancer',
+    steps: [
+      'Ouvrez « Écrire un livre » et donnez un titre et un sujet.',
+      'Choisissez le genre et le nombre de chapitres (5 à 40).',
+      'Validez ou modifiez le sommaire proposé par l’IA.',
+      'Lancez la rédaction : les chapitres s’écrivent un par un.',
+      'Retrouvez votre livre dans « Mes livres » pour l’exporter.',
+    ],
+    links: [
+      { label: 'Écrire un livre', to: '/v3/lancer' },
+      { label: 'Ebookstudio-Génie', to: '/v3/create' },
+      { label: 'Sommaire IA — dialogue', to: '/v3/create?sommaire=ia' },
+      { label: 'Sommaire Ultime', to: '/v3/outils/sommaire-ultime' },
+      { label: 'Studio Pro (Gemini + ChatGPT)', to: '/v3/studio' },
+    ],
+  },
+  {
+    tag: 'Je veux un livre visuel', title: 'Livres illustrés, BD & VC Books', sub: 'Format · images · export', color: '#7C3AED',
+    agent: 'iris', agentName: 'Iris', photo: photoVisual, to: '/v3/create/illustre',
+    steps: [
+      'Choisissez votre format : album, BD, VC Books ou guide illustré.',
+      'Remplissez la fiche du livre (titre, thème, public).',
+      'Générez les images, ou importez les vôtres depuis l’ordinateur.',
+      'Vérifiez chaque page puis créez la couverture.',
+      'Exportez en PDF au format KDP.',
+    ],
+    links: [
+      { label: 'Illustrations intérieures', to: '/v3/create/illustre' },
+      { label: 'BD Studio', to: '/bd-studio' },
+      { label: 'VC Books — créer un livre', to: '/v3/vc-books/creer' },
+      { label: 'Guides illustrés de A à Z', to: '/v3/guides-illustres' },
+      { label: 'Studio de couverture', to: '/v3/studio-v4' },
+    ],
+  },
+  {
+    tag: 'Je prépare audio & Amazon', title: 'Studio Audio & publication KDP', sub: 'Manuscrit · voix · fiche KDP', color: '#059669',
+    agent: 'gaspard', agentName: 'Gaspard', photo: photoAudio, to: '/v3/audiobook',
+    steps: [
+      'Ouvrez le Studio Audio et importez un livre de « Mes livres ».',
+      'Choisissez la voix et générez le fichier MP3.',
+      'Dans l’Espace KDP, trouvez vos mots-clés et catégories.',
+      'Faites rédiger la description et la fiche Amazon.',
+      'Passez l’audit KDP Pilot avant de publier.',
+    ],
+    links: [
+      { label: 'Studio Audio', to: '/v3/audiobook' },
+      { label: 'Espace KDP', to: '/v3/kdp' },
+      { label: 'Mots-clés Amazon', to: '/kdp-keywords' },
+      { label: 'Studio Recherche KDP', to: '/v3/recherche' },
+      { label: 'KDP Pilot — Audit', to: '/audit-pilot' },
+    ],
+  },
 ];
+
+const QUICK_TILES = [
+  { label: 'Mes livres', to: '/v3/mes-livres', color: '#2563EB' },
+  { label: 'Tutoriels A à Z', to: '/v3/tutoriels-v3', color: '#0891B2' },
+  { label: 'Tous les outils V3', to: '/v3/outils', color: '#7C3AED' },
+];
+
+const ADMIN_LINKS = [
+  { label: 'Dashboard admin', to: '/admin' },
+  { label: 'Pilotage du lancement', to: '/admin/lancement' },
+  { label: 'Base emails & envois', to: '/gestion-prospects' },
+  { label: 'Aperçu des emails', to: '/apercu-emails' },
+  { label: 'Partenaires', to: '/admin/partenaires' },
+];
+
+function SituationCard({ s }: { s: Situation }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="overflow-hidden rounded-2xl" style={{ border: `2px solid ${s.color}`, background: '#14110F' }}>
+      <div className="relative p-4" style={{ minHeight: 190 }}>
+        <img src={s.photo} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.35 }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(20,17,15,.92), rgba(20,17,15,.45))' }} />
+        <div className="relative flex items-start justify-between gap-3">
+          <span className="rounded-md px-3 py-1 text-xs font-bold" style={{ background: s.color, color: '#fff' }}>{s.tag}</span>
+          <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-lg" style={{ background: s.color, border: '2px solid #fff' }}>
+            <AgentPortrait id={s.agent} name={s.agentName} />
+          </span>
+        </div>
+        <h3 className="relative mt-2 text-2xl font-bold" style={{ color: '#fff' }}>{s.title}</h3>
+        <p className="relative mt-6 text-sm" style={{ color: '#E7E0DA' }}>{s.sub}</p>
+        <div className="relative mt-2 grid grid-cols-2 gap-2">
+          <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
+            className="v3-chip-toggle inline-flex items-center justify-between rounded-md px-3 py-1.5 text-sm font-bold"
+            style={{ background: s.color, color: '#fff' }}>
+            <span style={{ color: '#fff' }}>Tutoriel</span>
+            {open ? <Minus className="h-4 w-4" style={{ color: '#fff' }} /> : <Plus className="h-4 w-4" style={{ color: '#fff' }} />}
+          </button>
+          <Link to={s.to} className="inline-flex items-center justify-between rounded-md px-3 py-1.5 text-sm font-bold" style={{ background: '#3F3A37', color: '#fff' }}>
+            <span style={{ color: '#fff' }}>Ouvrir l’atelier</span> <ArrowRight className="h-4 w-4" style={{ color: '#fff' }} />
+          </Link>
+        </div>
+      </div>
+      {open && (
+        <div className="space-y-3 p-4" style={{ background: `${s.color}1f`, borderTop: `1px solid ${s.color}` }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#fff' }}>Comment faire</p>
+          <ol className="space-y-1.5">
+            {s.steps.map((st, i) => (
+              <li key={st} className="flex gap-2 rounded-md p-2 text-sm" style={{ background: '#1E1A18', color: '#EDE7E2' }}>
+                <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-xs font-bold" style={{ background: s.color, color: '#fff' }}>{i + 1}</span>
+                <span>{st}</span>
+              </li>
+            ))}
+          </ol>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#fff' }}>Onglets de cet atelier</p>
+          <div className="flex flex-wrap gap-2">
+            {s.links.map((l) => (
+              <Link key={l.to} to={l.to} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: '#1E1A18', border: `1px solid ${s.color}`, color: '#fff' }}>
+                <span style={{ color: '#fff' }}>{l.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 type Book = { id: string; title: string | null; updated_at: string };
 
@@ -40,6 +187,8 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
   const [subject, setSubject] = useState('');
   const [genre, setGenre] = useState('Roman');
   const [chapters, setChapters] = useState(12);
+  const [adminOpen, setAdminOpen] = useState(false);
+  const { isAdmin } = useIsAdmin();
 
   useEffect(() => {
     let cancelled = false;
@@ -65,7 +214,37 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="space-y-6" style={{ background: '#080B11', borderRadius: 32, padding: '1.25rem' }}>
+    <div className="space-y-6" style={{ background: '#2A2624', borderRadius: 32, padding: '1.25rem' }}>
+      {/* 0. Accès directs */}
+      <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        {QUICK_TILES.map((t) => (
+          <Link key={t.to} to={t.to} className="rounded-md px-3 py-2 text-sm font-bold" style={{ background: t.color, color: '#fff' }}>
+            <span style={{ color: '#fff' }}>{t.label}</span>
+          </Link>
+        ))}
+        {isAdmin && (
+          <div className="relative">
+            <button type="button" onClick={() => setAdminOpen((v) => !v)} aria-expanded={adminOpen}
+              className="v3-chip-toggle flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-bold" style={{ background: '#B91C1C', color: '#fff' }}>
+              <span style={{ color: '#fff' }}>Administration</span>
+              {adminOpen ? <Minus className="h-4 w-4" style={{ color: '#fff' }} /> : <Plus className="h-4 w-4" style={{ color: '#fff' }} />}
+            </button>
+            {adminOpen && (
+              <div className="absolute left-0 right-0 z-20 mt-1 space-y-1 rounded-md p-2" style={{ background: '#1E1A18', border: '1px solid #B91C1C' }}>
+                {ADMIN_LINKS.map((l) => (
+                  <Link key={l.to} to={l.to} className="block rounded px-2 py-1.5 text-sm" style={{ background: '#2A2624', color: '#fff' }}>
+                    <span style={{ color: '#fff' }}>{l.label}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        <a href={SUBSCRIBER_HOME_PATH} onClick={() => setSpaceChoice('v2')} className="rounded-md px-3 py-2 text-sm font-bold" style={{ background: '#EA580C', color: '#fff' }}>
+          <span style={{ color: '#fff' }}>Revenir à la V2</span>
+        </a>
+      </div>
+
       {/* 1. Reprise du livre */}
       <div className={`${panel} flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between`} style={panelStyle}>
         <div className="flex items-center gap-3 min-w-0">
@@ -128,25 +307,10 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
         </div>
       </form>
 
-      {/* 3. Les 4 grands départs */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {STARTS.map(({ title: t, desc, icon: Icon, color, to, tuto }) => (
-          <div key={t} className="flex flex-col rounded-3xl p-5" style={{ background: `${color}22`, border: `2px solid ${color}` }}>
-            <span className="grid h-11 w-11 place-items-center rounded-2xl" style={{ background: color }}>
-              <Icon className="h-5 w-5" style={{ color: '#fff' }} />
-            </span>
-            <h3 className="mt-3 text-lg font-bold" style={{ color: '#F8FAFC' }}>{t}</h3>
-            <p className="mt-1 flex-1 text-sm" style={{ color: '#CBD5E1' }}>{desc}</p>
-            <div className="mt-4 flex flex-col gap-2">
-              <Link to={to} className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold" style={{ background: color, color: '#fff' }}>
-                <span style={{ color: '#fff' }}>Y aller</span> <ArrowRight className="h-4 w-4" style={{ color: '#fff' }} />
-              </Link>
-              <Link to={tuto} className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold" style={{ background: '#101622', border: `1px solid ${color}`, color: '#F1F5F9' }}>
-                <GraduationCap className="h-4 w-4" /> <span>Tutoriel</span>
-              </Link>
-            </div>
-          </div>
-        ))}
+      {/* 3. Dans quelle situation vous retrouvez-vous ? */}
+      <h2 className="text-2xl font-bold" style={{ color: '#F8FAFC' }}>Dans quelle situation vous retrouvez-vous ?</h2>
+      <div className="grid gap-4 md:grid-cols-2">
+        {SITUATIONS.map((s) => <SituationCard key={s.title} s={s} />)}
       </div>
     </div>
   );
