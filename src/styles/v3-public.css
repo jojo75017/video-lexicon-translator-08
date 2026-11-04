@@ -760,6 +760,23 @@
 }
 
 /* Refonte du 5 novembre — barre d'onglets sur fond noir, 8 couleurs vives bien distinctes */
+.v3pub .v3-welcome-header {
+  --welcome-background: #080b11;
+  --welcome-text: #f1f5f9;
+  --welcome-accent: #f6bd2a;
+  --welcome-border: #243248;
+  background: var(--welcome-background);
+  color: var(--welcome-text);
+  border-bottom: 1px solid var(--welcome-border);
+}
+.v3pub .v3-welcome-title { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; line-height: 1.1; letter-spacing: 0; }
+.v3pub .v3-welcome-title strong { font-weight: 700; }
+.v3pub .v3-welcome-premium { color: var(--welcome-accent); }
+.v3pub .v3-welcome-version { font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600; }
+@media (max-width: 640px) {
+  .v3pub .v3-welcome-title { font-size: 23px; }
+  .v3pub .v3-welcome-intro { display: block; font-size: 16px; margin-bottom: 3px; }
+}
 .v3pub .v3-professional-tabs {
   --nav-search-background: #172132;
   --nav-search-foreground: #f1f5f9;
