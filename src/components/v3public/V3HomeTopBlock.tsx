@@ -268,8 +268,8 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
 
       {/* 2. Écriture Express */}
       <form onSubmit={start} className={`${panel} relative mx-auto max-w-3xl overflow-hidden`} style={{ ...panelStyle, border: '2px solid #EA580C' }}>
-        <img src={photoCreate} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.5 }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(16,22,34,.72), rgba(16,22,34,.55))' }} />
+        <img src={photoCreate} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.85 }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(16,22,34,.38), rgba(16,22,34,.18))' }} />
         <div className="relative">
         <div className="text-center">
           <p className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest" style={{ background: '#2A1608', color: '#FB923C' }}>
