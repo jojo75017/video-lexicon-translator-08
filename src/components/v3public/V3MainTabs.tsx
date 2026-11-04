@@ -14,7 +14,7 @@ import { V2V3ModeButton } from '@/components/admin/V2V3FloatingSwitch';
 import V3ToolSearch from './V3ToolSearch';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
-const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
+export const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
   creer: { color: '#EA580C', agent: 'camille', name: 'Camille', role: 'Lance votre livre et son sommaire' },
   ecrire: { color: '#2563EB', agent: 'victor', name: 'Victor', role: 'Rédige chapitre par chapitre' },
   habiller: { color: '#7C3AED', agent: 'iris', name: 'Iris', role: 'Signe vos couvertures' },
