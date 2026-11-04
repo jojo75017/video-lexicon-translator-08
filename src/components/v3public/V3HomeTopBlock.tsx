@@ -156,7 +156,7 @@ function SituationCard({ s }: { s: Situation }) {
             {s.steps.map((st, i) => (
               <li key={st} className="flex gap-2 rounded-md p-2 text-sm" style={{ background: '#1E1A18', color: '#EDE7E2' }}>
                 <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full text-xs font-bold" style={{ background: s.color, color: '#fff' }}>{i + 1}</span>
-                <span>{st}</span>
+                <span className="v3-sit-step">{st}</span>
               </li>
             ))}
           </ol>
@@ -309,7 +309,7 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
 
       {/* 3. Dans quelle situation vous retrouvez-vous ? */}
       <h2 className="text-2xl font-bold" style={{ color: '#F8FAFC' }}>Dans quelle situation vous retrouvez-vous ?</h2>
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid items-start gap-4 md:grid-cols-2">
         {SITUATIONS.map((s) => <SituationCard key={s.title} s={s} />)}
       </div>
     </div>
