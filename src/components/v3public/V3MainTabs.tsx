@@ -166,9 +166,9 @@ export default function V3MainTabs() {
                 `v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform ${isActive ? 'ring-2 ring-offset-1' : ''}`
               }
               style={{
-                background: '#ffffff',
-                color: '#1e3a8a',
-                border: '1px solid #94a3b8',
+                background: '#172132',
+                color: '#ffffff',
+                border: '1px solid #DB2777',
                 fontWeight: 600,
                 padding: '8px 14px',
                 gap: 6,
@@ -177,7 +177,7 @@ export default function V3MainTabs() {
               <span aria-hidden>✨</span>
               <span>Nos offres · dès 27 € à vie</span>
             </NavLink>
-            <Button asChild variant="outline" className="h-9 shrink-0 text-xs"><Link to="/starter">Starter · 27 € à vie <ArrowRight className="h-3.5 w-3.5" /></Link></Button>
+            <Button asChild variant="outline" className="h-9 shrink-0 text-xs" style={{ background: '#172132', color: '#e2e8f0', border: '1px solid #243248', fontWeight: 600 }}><Link to="/starter">Starter · 27 € à vie <ArrowRight className="h-3.5 w-3.5" /></Link></Button>
             <NavLink
               to={pathname === '/v3' ? '/v3#v3-upsells' : '/v3/upsells'}
               onClick={
@@ -407,16 +407,16 @@ export default function V3MainTabs() {
               onClick={() => setMobileOpen(false)}
               className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
               style={{
-                background: '#ffffff',
-                color: '#1e3a8a',
-                border: '1px solid #94a3b8',
+                background: '#172132',
+                color: '#ffffff',
+                border: '1px solid #DB2777',
                 fontWeight: 700,
                 textShadow: 'none',
               }}
             >
               ✨ Nos offres · dès 27 € à vie
             </NavLink>
-            <Button asChild variant="outline" className="w-full"><Link to="/starter" onClick={() => setMobileOpen(false)}>EbookStudio Starter · 27 € à vie <ArrowRight className="h-4 w-4" /></Link></Button>
+            <Button asChild variant="outline" className="w-full" style={{ background: '#172132', color: '#e2e8f0', border: '1px solid #243248', fontWeight: 700, textShadow: 'none' }}><Link to="/starter" onClick={() => setMobileOpen(false)}>EbookStudio Starter · 27 € à vie <ArrowRight className="h-4 w-4" /></Link></Button>
             <NavLink
               to="/v3/upsells"
               onClick={() => setMobileOpen(false)}
