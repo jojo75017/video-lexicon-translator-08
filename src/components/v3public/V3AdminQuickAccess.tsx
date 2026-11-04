@@ -53,7 +53,7 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
     <aside
       data-contemplation-allow="true"
       data-v3-nav=""
-      className="v3-professional-admin sticky top-[7.5rem] z-20 border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
+      className="v3-professional-admin relative z-20 border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
       aria-label="Accès rapides administrateur"
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 overflow-x-auto">
