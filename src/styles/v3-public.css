@@ -813,3 +813,9 @@
 .v3pub .v3-professional-admin .v3-admin-actions button:first-child { background: #2563eb; color: #ffffff; }
 .v3pub .v3-professional-admin .v3-admin-actions button:last-child { color: #f6bd2a; }
 .v3pub .v3-professional-admin .v3-admin-actions button:not(:disabled):hover { background: #1c2740; color: #f6bd2a; }
+
+/* Barre latérale sombre : textes clairs lisibles sur fond anthracite. */
+.v3pub .v3-sidebar-dark nav a { color: #CBD5E1 !important; }
+.v3pub .v3-sidebar-dark nav a[aria-current="page"] { color: #ffffff !important; }
+.v3pub .v3-sidebar-dark nav button,
+.v3pub .v3-sidebar-dark nav button * { color: #ffffff !important; }

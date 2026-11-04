@@ -234,7 +234,7 @@ export default function V3Sidebar() {
 
   return (
     <aside
-      className={`hidden shrink-0 transition-all duration-200 md:block ${collapsed ? 'w-14' : 'w-60'}`}
+      className={`v3-sidebar-dark hidden shrink-0 transition-all duration-200 md:block ${collapsed ? 'w-14' : 'w-60'}`}
       style={{
         background: '#0B0F17',
         borderRight: '1px solid #1E293B',
