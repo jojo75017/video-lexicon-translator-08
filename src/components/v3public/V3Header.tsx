@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Search, LogIn, User, Mail, GraduationCap, Menu, X, HelpCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { LogIn, User, Mail, GraduationCap, Menu, X, HelpCircle } from 'lucide-react';
 import BlogExternalLink from './BlogExternalLink';
 import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
 
@@ -11,14 +11,6 @@ import { ADMIN_HOME_PATH } from '@/config/adminRoutes';
  */
 export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuthed?: boolean; isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
-  const [q, setQ] = useState('');
-  const nav = useNavigate();
-
-  const submitSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const term = q.trim();
-    nav(`/v3/outils${term ? `?q=${encodeURIComponent(term)}` : ''}`);
-  };
 
   return (
     <header
@@ -50,21 +42,6 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
             </div>
           </div>
         </Link>
-
-        {/* Search — desktop */}
-        <form onSubmit={submitSearch} className="hidden xl:flex flex-1 max-w-md relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
-          <input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Rechercher un outil, un guide, un livre…"
-            className="w-full pl-10 pr-4 py-2 rounded-full text-[13px] text-white placeholder:text-white/50 focus:outline-none transition-colors"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(201, 168, 76, 0.25)',
-            }}
-          />
-        </form>
 
         {/* Actions droite (≥ lg) */}
         <nav className="hidden xl:flex items-center gap-1 ml-auto">
@@ -137,16 +114,6 @@ export default function V3Header({ isAuthed = false, isAdmin = false }: { isAuth
       {open && (
         <div className="xl:hidden v3-mobile-panel">
           <div className="px-5 py-4 space-y-2">
-            <form onSubmit={submitSearch} className="relative">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--v3-gold)' }} />
-              <input
-                value={q}
-                onChange={(e) => setQ(e.target.value)}
-                placeholder="Rechercher…"
-                className="w-full pl-10 pr-4 py-2 rounded-full text-[13px] text-white placeholder:text-white/50 focus:outline-none"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(201,168,76,0.25)' }}
-              />
-            </form>
             <Link to="/v3/lancer" onClick={() => setOpen(false)} className="v3-btn v3-btn-gold w-full justify-center">
               Écrire un livre
             </Link>

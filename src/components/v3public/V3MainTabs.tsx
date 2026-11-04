@@ -11,6 +11,7 @@ import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 import { Button } from '@/components/ui/button';
 import AgentPortrait from '@/components/v3public/AgentPortrait';
 import { V2V3ModeButton } from '@/components/admin/V2V3FloatingSwitch';
+import V3ToolSearch from './V3ToolSearch';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
 const ROBOT_THEME: Record<string, { color: string; agent: string; name: string; role: string }> = {
@@ -140,6 +141,7 @@ export default function V3MainTabs() {
               </div>
             );
           })}
+          <V3ToolSearch />
           </div>
 
           {/* Accès rapides — bleu / blanc / rouge, centrés au milieu de la barre */}
@@ -269,6 +271,7 @@ export default function V3MainTabs() {
 
         {/* Mobile & tablette (< xl) — menu « Catégories » */}
         <div className="xl:hidden flex items-center gap-2 flex-1">
+          <V3ToolSearch />
           <button
             onClick={() => setMobileOpen((o) => !o)}
             className="flex h-9 items-center gap-2 rounded-full px-3 py-2 font-sans text-[13px] font-semibold"

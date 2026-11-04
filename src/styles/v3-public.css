@@ -761,11 +761,16 @@
 
 /* Refonte du 5 novembre — barre d'onglets sur fond noir, 8 couleurs vives bien distinctes */
 .v3pub .v3-professional-tabs {
+  --nav-search-background: #172132;
+  --nav-search-foreground: #f1f5f9;
+  --nav-search-border: #243248;
   --nav-create: #EA580C; --nav-write: #2563EB; --nav-cover: #7C3AED; --nav-kdp: #059669;
   --nav-publish: #0891B2; --nav-sell: #D97706; --nav-special: #DC2626; --nav-plans: #DB2777;
   background: #080B11 !important; border-color: #243248 !important;
 }
 .v3pub .v3-professional-tabs .v3-category-group { background: #101622; border-color: #243248; }
+.v3pub .v3-professional-tabs button.v3-tool-search { background: var(--nav-search-background); color: var(--nav-search-foreground); border-color: var(--nav-search-border); }
+.v3pub .v3-professional-tabs button.v3-tool-search:hover { border-color: var(--nav-sell); }
 .v3pub .v3-robot-tab[data-category="plans"] { --robot: var(--nav-plans); }
 .v3pub .v3-mega-panel { background: #101622 !important; border-color: #243248 !important; }
 .v3pub .v3-mega-panel a, .v3pub .v3-mega-panel button, .v3pub .v3-mega-panel .v3-serif { color: #F1F5F9 !important; }
