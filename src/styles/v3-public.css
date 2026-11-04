@@ -819,3 +819,4 @@
 .v3pub .v3-sidebar-dark nav a[aria-current="page"] { color: #ffffff !important; }
 .v3pub .v3-sidebar-dark nav button,
 .v3pub .v3-sidebar-dark nav button * { color: #ffffff !important; }
+.v3pub .v3-sidebar-dark nav a span:not([class*="rounded"]) { color: inherit !important; }
