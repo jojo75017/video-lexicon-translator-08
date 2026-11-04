@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film,
+  Rocket, Crown, Search, Plus, Minus, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -14,7 +14,8 @@ import { isTrialLockedPath } from '@/lib/trialLockedPaths';
 import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
 import { setSpaceChoice } from '@/lib/v3OpenState';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
-import vcRobot from '@/assets/plans/vc-books-robot.png';
+import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
+import { ROBOT_THEME } from './V3MainTabs';
 
 /**
  * Sidebar V3 — espace personnel, organisée en sections repliables.
@@ -172,6 +173,17 @@ const NAV: NavSection[] = [
   },
 ];
 
+type SidebarGroup = { key: string; label: string; color: string; items: NavItem[] };
+
+/** Accès directs en tête de barre, comme sur la maquette du 5 novembre. */
+const DIRECT_LINKS = [
+  { to: '/v3', label: 'Accueil V3', icon: Home, color: '#3F3A37' },
+  { to: '/v3/commence-ici', label: 'Commence ici', icon: Rocket, color: '#EA580C' },
+  { to: '/v3/mes-livres', label: 'Bibliothèque / Mes livres', icon: LibraryBig, color: '#2563EB' },
+  { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
+  { to: '/v3/outils', label: 'Tous les outils V3', icon: ListTree, color: '#7C3AED' },
+];
+
 /** Couleur « robot » par section, en harmonie avec les onglets du menu principal. */
 const SECTION_COLORS: Record<string, string> = {
   'Admin — Lancement': '#DC2626',
@@ -201,19 +213,31 @@ export default function V3Sidebar() {
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
-  const sections = useMemo(() => (isAdmin ? [ADMIN_SECTION, ...NAV] : NAV), [isAdmin]);
-
-  /** Section contenant la page courante (ouverte par défaut). */
-  const activeSection = useMemo(() => {
-    const match = sections.find((g) =>
-      g.items.some((it) => {
-        if (it.external) return false;
-        const [itPath] = it.to.split('?');
-        return pathname === itPath || (itPath.length > 1 && pathname.startsWith(itPath + '/'));
+  const groups = useMemo<SidebarGroup[]>(() => {
+    const seen = new Set<string>(DIRECT_LINKS.map((l) => l.to));
+    const header: SidebarGroup[] = V3_HEADER_MENU.map((c) => ({
+      key: c.key,
+      label: c.label,
+      color: ROBOT_THEME[c.key]?.color ?? '#64748B',
+      items: c.links.map((l) => {
+        seen.add(l.to);
+        return { to: l.to, label: l.label, icon: LayoutGrid, badge: l.badge };
       }),
-    );
-    return match?.section ?? sections[0].section;
-  }, [pathname, sections]);
+    }));
+    const others = NAV.flatMap((g) => g.items).filter((it) => {
+      if (seen.has(it.to)) return false;
+      seen.add(it.to);
+      return true;
+    });
+    const out = [...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
+    if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: ADMIN_SECTION.items });
+    return out;
+  }, [isAdmin]);
+
+  const activeSection = useMemo(() => {
+    const match = groups.find((g) => g.items.some((it) => !it.external && pathname === it.to.split('?')[0]));
+    return match?.key ?? '';
+  }, [pathname, groups]);
 
   const [open, setOpen] = useState<Record<string, boolean>>({ [activeSection]: true });
 
@@ -236,7 +260,7 @@ export default function V3Sidebar() {
     <aside
       className={`v3-sidebar-dark hidden shrink-0 transition-all duration-200 md:block ${collapsed ? 'w-14' : 'w-60'}`}
       style={{
-        background: '#0B0F17',
+        background: '#2A2624',
         borderRight: '1px solid #1E293B',
         position: 'sticky',
         top: 0,
