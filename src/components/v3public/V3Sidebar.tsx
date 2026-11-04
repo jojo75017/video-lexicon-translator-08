@@ -175,14 +175,15 @@ const NAV: NavSection[] = [
 /** Couleur « robot » par section, en harmonie avec les onglets du menu principal. */
 const SECTION_COLORS: Record<string, string> = {
   'Admin — Lancement': '#DC2626',
-  Lancement: '#FF9E2D',
-  Démarrer: '#0F766E',
-  'Créer un livre': '#1D4ED8',
-  'Recherche KDP': '#4D7C5B',
-  'Habiller & exporter': '#EC4899',
-  'Mes livres': '#9333EA',
-  Vendre: '#CA8A04',
-  Apprendre: '#0891B2',
+  Lancement: '#EA580C',
+  Démarrer: '#EA580C',
+  'Créer un livre': '#EA580C',
+  'Recherche KDP': '#2563EB',
+  'Livres spéciaux': '#7C3AED',
+  'Mes livres': '#7C3AED',
+  'Habiller & exporter': '#059669',
+  Vendre: '#D97706',
+  Apprendre: '#2563EB',
   'Mon compte': '#D97706',
   Support: '#64748B',
 };
@@ -235,8 +236,8 @@ export default function V3Sidebar() {
     <aside
       className={`hidden shrink-0 transition-all duration-200 md:block ${collapsed ? 'w-14' : 'w-60'}`}
       style={{
-        background: 'var(--v3-surface)',
-        borderRight: '1px solid var(--v3-line)',
+        background: '#0B0F17',
+        borderRight: '1px solid #1E293B',
         position: 'sticky',
         top: 0,
         alignSelf: 'flex-start',
@@ -246,20 +247,20 @@ export default function V3Sidebar() {
     >
       <div
         className="flex items-center justify-between px-3 py-3"
-        style={{ borderBottom: '1px solid var(--v3-line)' }}
+        style={{ borderBottom: '1px solid #1E293B' }}
       >
         {!collapsed && (
           <span
             className="text-[10px] font-bold uppercase tracking-[0.22em]"
-            style={{ color: 'var(--v3-gold-600)' }}
+            style={{ color: '#F6BD2A' }}
           >
             Espace auteur
           </span>
         )}
         <button
           onClick={() => setCollapsed((v) => !v)}
-          className="ml-auto rounded p-1 hover:bg-black/5"
-          style={{ color: 'var(--v3-muted)' }}
+          className="ml-auto rounded p-1 hover:bg-white/10"
+          style={{ color: '#CBD5E1' }}
           aria-label={collapsed ? 'Déplier' : 'Replier'}
         >
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -267,7 +268,7 @@ export default function V3Sidebar() {
       </div>
 
       {/* Accès prioritaire : reste visible au-dessus des longues rubriques. */}
-      <div className="sticky top-[49px] z-10 bg-background px-2 py-2">
+      <div className="sticky top-[49px] z-10 px-2 py-2" style={{ background: '#0B0F17' }}>
         <NavLink
           to="/v3/studio-v4"
           title="Créer ma couverture — Studio de couverture"
@@ -290,7 +291,8 @@ export default function V3Sidebar() {
           to="/v3/vc-books/images"
           title="VC Books — studio de couverture"
           aria-label="VC Books — studio de couverture"
-          className="mt-2 flex min-h-12 items-center gap-2 rounded-md border border-border bg-accent px-2.5 py-2 text-sm font-semibold text-accent-foreground transition-colors hover:bg-muted"
+          className="mt-2 flex min-h-12 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-semibold transition-colors hover:brightness-125"
+          style={{ background: '#1C1430', border: '1px solid #7C3AED', color: '#EDE9FE' }}
         >
           <img src={vcRobot} alt="" className="h-9 w-9 shrink-0 object-contain" />
           {!collapsed && <span className="min-w-0"><span className="block">VC Books</span><span className="block text-xs font-normal">Studio de couverture</span></span>}
@@ -332,22 +334,22 @@ export default function V3Sidebar() {
                   type="button"
                   onClick={() => setOpen((prev) => ({ ...prev, [group.section]: !prev[group.section] }))}
                   aria-expanded={isOpen}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-[0.22em] hover:bg-black/[0.04]"
-                  style={{ color: secColor }}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-[0.22em] hover:brightness-110"
+                  style={{ background: secColor, color: '#ffffff', boxShadow: `0 2px 8px ${secColor}55` }}
                 >
                   <span
                     className="inline-block w-2 h-2 rounded-full shrink-0"
-                    style={{ background: secColor, boxShadow: `0 0 6px ${secColor}` }}
+                    style={{ background: '#ffffff' }}
                   />
                   <span className="flex-1 text-left">{group.section}</span>
                   <ChevronDown
                     className={`w-3.5 h-3.5 transition-transform ${isOpen ? '' : '-rotate-90'}`}
-                    style={{ color: 'var(--v3-muted)' }}
+                    style={{ color: '#ffffff' }}
                   />
                 </button>
               )}
               {isOpen && (
-                <ul className="space-y-0.5 mt-0.5">
+                <ul className="space-y-0.5 mt-1 rounded-md p-1" style={{ background: `${secColor}14`, borderLeft: `2px solid ${secColor}` }}>
                   {group.items.map((it) => {
                     const [itPath, itQuery] = it.to.split('?');
                     const itTab = itQuery ? new URLSearchParams(itQuery).get('tab') : null;
@@ -370,7 +372,7 @@ export default function V3Sidebar() {
                             rel="noopener noreferrer"
                             title={trialLocked ? `${it.label} — réservé aux abonnés` : it.label}
                             className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
-                            style={{ color: 'var(--v3-emerald)', fontWeight: 600, background: 'rgba(201,168,76,0.10)' }}
+                            style={{ color: '#FDE68A', fontWeight: 600, background: 'rgba(217,119,6,0.15)' }}
                           >
                             <span
                               aria-hidden
@@ -401,14 +403,14 @@ export default function V3Sidebar() {
                             style={
                               active
                                 ? {
-                                    background: 'var(--v3-gold-soft)',
-                                    color: 'var(--v3-emerald)',
+                                    background: `${secColor}33`,
+                                    color: '#ffffff',
                                     fontWeight: 600,
                                   }
-                                : { color: 'var(--v3-ink)' }
+                                : { color: '#CBD5E1' }
                             }
                             onMouseOver={(e) => {
-                              if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(6,78,59,0.04)';
+                              if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
                             }}
                             onMouseOut={(e) => {
                               if (!active) (e.currentTarget as HTMLElement).style.background = '';
@@ -455,7 +457,7 @@ export default function V3Sidebar() {
           href={SUBSCRIBER_HOME_PATH}
           onClick={() => setSpaceChoice('v2')}
           className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold"
-          style={{ border: '1px solid var(--v3-line)', color: 'var(--v3-ink)' }}
+          style={{ border: '1px solid #EA580C', background: 'rgba(234,88,12,0.15)', color: '#FED7AA' }}
           title="Revenir à mon espace habituel"
         >
           <ChevronLeft className="w-4 h-4 shrink-0" />
