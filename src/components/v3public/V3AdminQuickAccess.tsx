@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Eye, EyeOff, Mail, Palette, Shield, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, Crown, Handshake, Eye, EyeOff, Mail, Palette, Shield, ShieldCheck, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ const ACCESS_LINKS = [
   { label: 'Emails', path: '/apercu-emails', icon: Mail },
   { label: 'Tester BD', path: '/admin/tester-bd', icon: Palette },
   { label: 'Admin', path: ADMIN_HOME_PATH, icon: Shield },
+  { label: 'Lancement V3', path: '/admin/lancement', icon: Crown },
+  { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake },
 ];
 
 /**
@@ -51,7 +53,7 @@ export default function V3AdminQuickAccess({ isAdmin, isAdminChecking }: V3Admin
     <aside
       data-contemplation-allow="true"
       data-v3-nav=""
-      className="v3-professional-admin sticky top-[7.5rem] z-20 border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
+      className="v3-professional-admin relative z-20 border-b border-border bg-card/95 px-3 py-2 shadow-sm backdrop-blur"
       aria-label="Accès rapides administrateur"
     >
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-2 overflow-x-auto">
