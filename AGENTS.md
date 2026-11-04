@@ -1,4 +1,5 @@
 # Architecture
+- V3 navigation search lives beside the offer category and reuses the tools index query parameter, avoiding a duplicate search in the brand header.
 - V3 audio reuses the V2 generator, Audio Express, audio library and training; bookImport reads ownership-filtered metadata then only the selected manuscript, preserving chapter boundaries and existing payment gates.
 - KDP launch plans reuse listMyBooks for saved manuscript metadata and the ASIN library for published books; only the title is required, so missing categories never block preparation or carry another book's metadata.
 - Amazon Ads plans reuse the existing KDP advertising route and BYOK writing service, enforce three Sponsored Products campaign types and user-supplied competitor ASINs, and calculate optional simulations from explicit assumptions only, so preparation never starts spend or fabricates performance.
