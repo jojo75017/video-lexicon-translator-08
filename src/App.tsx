@@ -482,7 +482,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-background">
-          {keepAdminNavigationVisible && !isAdminAuthRoute && <AdminQuickNav />}
+          {keepAdminNavigationVisible && !isAdminAuthRoute && !(pathname === '/v3' || pathname.startsWith('/v3/')) && <AdminQuickNav />}
           <V3LaunchGlobalBanner />
           <Suspense fallback={<PageLoader />}>
           <Routes>

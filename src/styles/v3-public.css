@@ -804,3 +804,12 @@
 .v3pub .v3-mega-panel a span, .v3pub .v3-mega-panel button span { color: inherit; }
 .v3pub .v3-mega-panel a:hover, .v3pub .v3-mega-panel button:hover { background: #172132 !important; }
 .v3pub .v3-mega-panel [class*="text-[11.5px]"] { color: #94A3B8 !important; }
+
+/* Barre admin V3 : même habillage sombre que la barre d'accès rapide. */
+.v3pub .v3-professional-admin { background: #080b11; border-color: #243248; }
+.v3pub .v3-professional-admin .v3-admin-status { background: #f08a24; color: #0b0f17; }
+.v3pub .v3-professional-admin .v3-admin-actions { background: linear-gradient(180deg, #131b2c, #0e1420); border: 1px solid #2a3a55; border-top-color: rgba(240, 138, 36, 0.45); border-radius: 14px; }
+.v3pub .v3-professional-admin .v3-admin-actions button { color: #dbe4f3; }
+.v3pub .v3-professional-admin .v3-admin-actions button:first-child { background: #2563eb; color: #ffffff; }
+.v3pub .v3-professional-admin .v3-admin-actions button:last-child { color: #f6bd2a; }
+.v3pub .v3-professional-admin .v3-admin-actions button:not(:disabled):hover { background: #1c2740; color: #f6bd2a; }

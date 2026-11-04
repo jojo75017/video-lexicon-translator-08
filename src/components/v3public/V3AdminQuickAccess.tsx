@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BookOpen, Eye, EyeOff, Mail, Palette, Shield, ShieldCheck, Users } from 'lucide-react';
+import { BookOpen, Crown, Handshake, Eye, EyeOff, Mail, Palette, Shield, ShieldCheck, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,8 @@ const ACCESS_LINKS = [
   { label: 'Emails', path: '/apercu-emails', icon: Mail },
   { label: 'Tester BD', path: '/admin/tester-bd', icon: Palette },
   { label: 'Admin', path: ADMIN_HOME_PATH, icon: Shield },
+  { label: 'Lancement V3', path: '/admin/lancement', icon: Crown },
+  { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake },
 ];
 
 /**
