@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Rocket, Crown, Search, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film,
+  Rocket, Crown, Search, Plus, Minus, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -14,7 +14,8 @@ import { isTrialLockedPath } from '@/lib/trialLockedPaths';
 import { countUnseenNouveautes, isRouteNouveau } from '@/data/v3Nouveautes';
 import { setSpaceChoice } from '@/lib/v3OpenState';
 import { SUBSCRIBER_HOME_PATH } from '@/lib/authDestination';
-import vcRobot from '@/assets/plans/vc-books-robot.png';
+import { V3_HEADER_MENU } from '@/data/v3HeaderMenu';
+import { ROBOT_THEME } from './V3MainTabs';
 
 /**
  * Sidebar V3 — espace personnel, organisée en sections repliables.
@@ -172,6 +173,17 @@ const NAV: NavSection[] = [
   },
 ];
 
+type SidebarGroup = { key: string; label: string; color: string; items: NavItem[] };
+
+/** Accès directs en tête de barre, comme sur la maquette du 5 novembre. */
+const DIRECT_LINKS = [
+  { to: '/v3', label: 'Accueil V3', icon: Home, color: '#3F3A37' },
+  { to: '/v3/commence-ici', label: 'Commence ici', icon: Rocket, color: '#EA580C' },
+  { to: '/v3/mes-livres', label: 'Bibliothèque / Mes livres', icon: LibraryBig, color: '#2563EB' },
+  { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
+  { to: '/v3/outils', label: 'Tous les outils V3', icon: ListTree, color: '#7C3AED' },
+];
+
 /** Couleur « robot » par section, en harmonie avec les onglets du menu principal. */
 const SECTION_COLORS: Record<string, string> = {
   'Admin — Lancement': '#DC2626',
@@ -201,19 +213,31 @@ export default function V3Sidebar() {
   const { pathname, search } = useLocation();
   const currentTab = new URLSearchParams(search).get('tab');
 
-  const sections = useMemo(() => (isAdmin ? [ADMIN_SECTION, ...NAV] : NAV), [isAdmin]);
-
-  /** Section contenant la page courante (ouverte par défaut). */
-  const activeSection = useMemo(() => {
-    const match = sections.find((g) =>
-      g.items.some((it) => {
-        if (it.external) return false;
-        const [itPath] = it.to.split('?');
-        return pathname === itPath || (itPath.length > 1 && pathname.startsWith(itPath + '/'));
+  const groups = useMemo<SidebarGroup[]>(() => {
+    const seen = new Set<string>(DIRECT_LINKS.map((l) => l.to));
+    const header: SidebarGroup[] = V3_HEADER_MENU.map((c) => ({
+      key: c.key,
+      label: c.label,
+      color: ROBOT_THEME[c.key]?.color ?? '#64748B',
+      items: c.links.map((l) => {
+        seen.add(l.to);
+        return { to: l.to, label: l.label, icon: LayoutGrid, badge: l.badge };
       }),
-    );
-    return match?.section ?? sections[0].section;
-  }, [pathname, sections]);
+    }));
+    const others = NAV.flatMap((g) => g.items).filter((it) => {
+      if (seen.has(it.to)) return false;
+      seen.add(it.to);
+      return true;
+    });
+    const out = [...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
+    if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: ADMIN_SECTION.items });
+    return out;
+  }, [isAdmin]);
+
+  const activeSection = useMemo(() => {
+    const match = groups.find((g) => g.items.some((it) => !it.external && pathname === it.to.split('?')[0]));
+    return match?.key ?? '';
+  }, [pathname, groups]);
 
   const [open, setOpen] = useState<Record<string, boolean>>({ [activeSection]: true });
 
@@ -236,7 +260,7 @@ export default function V3Sidebar() {
     <aside
       className={`v3-sidebar-dark hidden shrink-0 transition-all duration-200 md:block ${collapsed ? 'w-14' : 'w-60'}`}
       style={{
-        background: '#0B0F17',
+        background: '#2A2624',
         borderRight: '1px solid #1E293B',
         position: 'sticky',
         top: 0,
@@ -267,38 +291,6 @@ export default function V3Sidebar() {
         </button>
       </div>
 
-      {/* Accès prioritaire : reste visible au-dessus des longues rubriques. */}
-      <div className="sticky top-[49px] z-10 px-2 py-2" style={{ background: '#0B0F17' }}>
-        <NavLink
-          to="/v3/studio-v4"
-          title="Créer ma couverture — Studio de couverture"
-          aria-label="Créer ma couverture — Studio de couverture"
-          style={{ background: '#EC4899', color: '#ffffff' }}
-          className="relative flex min-h-12 items-center gap-2.5 rounded-md px-2.5 py-2 text-sm font-bold text-white shadow-sm transition-colors hover:brightness-110"
-        >
-          <ImageIcon className="h-5 w-5 shrink-0" />
-          {!collapsed && (
-            <>
-              <span className="min-w-0 flex-1">
-                <span className="block truncate">Créer ma couverture</span>
-                 <span className="block truncate text-[10px] font-medium opacity-90">Studio de couverture</span>
-              </span>
-              <span className="rounded bg-primary-foreground/20 px-1.5 py-0.5 text-[9px] font-bold uppercase">V4</span>
-            </>
-          )}
-        </NavLink>
-        <NavLink
-          to="/v3/vc-books/images"
-          title="VC Books — studio de couverture"
-          aria-label="VC Books — studio de couverture"
-          className="mt-2 flex min-h-12 items-center gap-2 rounded-md px-2.5 py-2 text-sm font-semibold transition-colors hover:brightness-125"
-          style={{ background: '#1C1430', border: '1px solid #7C3AED', color: '#EDE9FE' }}
-        >
-          <img src={vcRobot} alt="" className="h-9 w-9 shrink-0 object-contain" />
-          {!collapsed && <span className="min-w-0"><span className="block">VC Books</span><span className="block text-xs font-normal">Studio de couverture</span></span>}
-        </NavLink>
-      </div>
-
       {hasV2 && (
         <div className="px-2 pt-2">
           <NavLink
@@ -323,122 +315,72 @@ export default function V3Sidebar() {
         </div>
       )}
 
-      <nav className="p-2 space-y-2" data-v3-nav>
-        {sections.map((group) => {
-          const isOpen = collapsed || !!open[group.section];
-          const secColor = SECTION_COLORS[group.section] ?? 'var(--v3-gold)';
-          return (
-            <div key={group.section}>
-              {!collapsed && (
-                <button
-                  type="button"
-                  onClick={() => setOpen((prev) => ({ ...prev, [group.section]: !prev[group.section] }))}
-                  aria-expanded={isOpen}
-                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-[0.22em] hover:brightness-110"
-                  style={{ background: secColor, color: '#ffffff', boxShadow: `0 2px 8px ${secColor}55` }}
-                >
-                  <span
-                    className="inline-block w-2 h-2 rounded-full shrink-0"
-                    style={{ background: '#ffffff' }}
-                  />
-                  <span className="flex-1 text-left">{group.section}</span>
-                  <ChevronDown
-                    className={`w-3.5 h-3.5 transition-transform ${isOpen ? '' : '-rotate-90'}`}
-                    style={{ color: '#ffffff' }}
-                  />
-                </button>
-              )}
-              {isOpen && (
-                <ul className="space-y-0.5 mt-1 rounded-md p-1" style={{ background: `${secColor}14`, borderLeft: `2px solid ${secColor}` }}>
-                  {group.items.map((it) => {
-                    const [itPath, itQuery] = it.to.split('?');
-                    const itTab = itQuery ? new URLSearchParams(itQuery).get('tab') : null;
-                    const active = it.external
-                      ? false
-                      : it.end
-                        ? pathname === itPath
-                        : itTab
-                          ? pathname === itPath && currentTab === itTab
-                          : pathname === itPath || (itPath.length > 1 && pathname.startsWith(itPath + '/'));
-                    const Icon = it.icon;
-                    const trialLocked = trialRestricted && !it.external && isTrialLockedPath(it.to);
+      <nav className="space-y-1.5 p-2" data-v3-nav>
+        {DIRECT_LINKS.map((l) => (
+          <NavLink
+            key={l.to}
+            to={l.to}
+            end
+            title={l.label}
+            className="v3-sb-tile"
+            style={{ background: l.color }}
+          >
+            <l.icon className="h-4 w-4 shrink-0" />
+            {!collapsed && <span className="truncate">{l.label}</span>}
+          </NavLink>
+        ))}
 
+        {!collapsed && <p className="v3-sb-heading">Mes ateliers</p>}
+        {groups.map((g) => {
+          const isOpen = !!open[g.key];
+          return (
+            <div key={g.key}>
+              <button
+                type="button"
+                onClick={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
+                aria-expanded={isOpen}
+                title={g.label}
+                className="v3-sb-tile w-full"
+                style={{ background: g.color }}
+              >
+                <LayoutGrid className="h-4 w-4 shrink-0" />
+                {!collapsed && (
+                  <>
+                    <span className="flex-1 truncate text-left">{g.label}</span>
+                    {isOpen ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                  </>
+                )}
+              </button>
+              {isOpen && !collapsed && (
+                <ul className="v3-sb-list" style={{ borderLeftColor: g.color, background: `${g.color}1f` }}>
+                  {g.items.map((it) => {
+                    const [itPath] = it.to.split('?');
+                    const active = !it.external && pathname === itPath;
+                    const locked = trialRestricted && !it.external && isTrialLockedPath(it.to);
+                    const rawBadge = badgeFor(it);
+                    const badge = rawBadge && rawBadge.length > 10 ? 'Nouveau' : rawBadge;
+                    const inner = (
+                      <>
+                        <span className="flex-1 truncate">{it.label}</span>
+                        {locked ? (
+                          <Lock className="h-3.5 w-3.5 shrink-0" />
+                        ) : badge ? (
+                          <span className="v3-sb-badge" style={{ background: g.color }}>{badge}</span>
+                        ) : null}
+                      </>
+                    );
                     return (
-                      <li key={it.to}>
+                      <li key={g.key + it.to + it.label}>
                         {it.external ? (
-                          <a
-                            href={it.to}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            title={trialLocked ? `${it.label} — réservé aux abonnés` : it.label}
-                            className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
-                            style={{ color: '#FDE68A', fontWeight: 600, background: 'rgba(217,119,6,0.15)' }}
-                          >
-                            <span
-                              aria-hidden
-                              className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r"
-                              style={{ background: 'var(--v3-gold)' }}
-                            />
-                            <Icon className="w-4 h-4 shrink-0" />
-                            {!collapsed && (
-                              <>
-                                <span className="truncate flex-1">{it.label}</span>
-                                {badgeFor(it) && (
-                                  <span
-                                    className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
-                                    style={{ background: '#C97A14', color: '#fff' }}
-                                  >
-                                    {badgeFor(it)}
-                                  </span>
-                                )}
-                              </>
-                            )}
-                          </a>
+                          <a href={it.to} target="_blank" rel="noopener noreferrer" className="v3-sb-link" title={it.label}>{inner}</a>
                         ) : (
                           <NavLink
                             to={it.to}
-                            end={it.end}
-                            title={trialLocked ? `${it.label} — réservé aux abonnés` : it.label}
-                            className="relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] transition-colors"
-                            style={
-                              active
-                                ? {
-                                    background: `${secColor}33`,
-                                    color: '#ffffff',
-                                    fontWeight: 600,
-                                  }
-                                : { color: '#CBD5E1' }
-                            }
-                            onMouseOver={(e) => {
-                              if (!active) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.06)';
-                            }}
-                            onMouseOut={(e) => {
-                              if (!active) (e.currentTarget as HTMLElement).style.background = '';
-                            }}
+                            className="v3-sb-link"
+                            title={it.label}
+                            style={active ? { background: `${g.color}55`, color: '#ffffff', fontWeight: 700 } : undefined}
                           >
-                            {active && (
-                              <span
-                                aria-hidden
-                                className="absolute left-0 top-1.5 bottom-1.5 w-[3px] rounded-r"
-                                style={{ background: secColor }}
-                              />
-                            )}
-                            <Icon className="w-4 h-4 shrink-0" />
-                            {!collapsed && (
-                              <>
-                                <span className="truncate flex-1">{it.label}</span>
-                                {trialLocked ? (
-                                  <Lock className="w-3.5 h-3.5 shrink-0" style={{ color: 'var(--v3-muted)' }} />
-                                ) : badgeFor(it) ? (
-                                  <span
-                                    className="text-[9px] font-bold uppercase tracking-[0.15em] px-1.5 py-0.5 rounded"
-                                    style={{ background: '#C97A14', color: '#fff' }}
-                                  >
-                                    {badgeFor(it)}
-                                  </span>
-                                ) : null}
-                              </>
-                            )}
+                            {inner}
                           </NavLink>
                         )}
                       </li>
@@ -452,16 +394,16 @@ export default function V3Sidebar() {
       </nav>
 
       {/* Retour vers l'espace habituel : le choix reste réversible à tout moment. */}
-      <div className="px-2 pt-2">
+      <div className="px-2 pb-3">
         <a
           href={SUBSCRIBER_HOME_PATH}
           onClick={() => setSpaceChoice('v2')}
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold"
-          style={{ border: '1px solid #EA580C', background: 'rgba(234,88,12,0.15)', color: '#FED7AA' }}
+          className="v3-sb-tile"
+          style={{ background: '#EA580C' }}
           title="Revenir à mon espace habituel"
         >
           <ChevronLeft className="w-4 h-4 shrink-0" />
-          {!collapsed && <span className="truncate">Mon espace habituel</span>}
+          {!collapsed && <span className="truncate">Revenir à la V2</span>}
         </a>
       </div>
     </aside>

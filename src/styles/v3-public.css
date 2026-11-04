@@ -821,3 +821,15 @@
 .v3pub .v3-sidebar-dark nav button * { color: #ffffff !important; }
 .v3pub .v3-sidebar-dark nav a span:not([class*="rounded"]) { color: inherit !important; }
 .v3pub .v3-sidebar-dark > div > a, .v3pub .v3-sidebar-dark > div > a span { color: #FED7AA !important; }
+
+/* Barre latérale maquette 5 novembre : tuiles pleines colorées. */
+.v3pub .v3-sidebar-dark .v3-sb-tile { display:flex; align-items:center; gap:8px; border-radius:8px; padding:8px 10px; font-size:13px; font-weight:700; color:#fff !important; box-shadow:0 1px 3px rgba(0,0,0,.35); transition:filter .15s; }
+.v3pub .v3-sidebar-dark .v3-sb-tile * { color:#fff !important; }
+.v3pub .v3-sidebar-dark .v3-sb-tile:hover { filter:brightness(1.12); }
+.v3pub .v3-sidebar-dark .v3-sb-tile[aria-current="page"] { box-shadow:0 0 0 2px #fff inset; }
+.v3pub .v3-sidebar-dark .v3-sb-heading { padding:10px 4px 2px; font-size:10px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:#D6CFC9; }
+.v3pub .v3-sidebar-dark .v3-sb-list { margin:4px 0 6px 6px; padding:4px; border-left:3px solid; border-radius:0 8px 8px 0; }
+.v3pub .v3-sidebar-dark .v3-sb-link { display:flex; align-items:center; gap:6px; border-radius:6px; padding:6px 8px; font-size:12.5px; color:#EDE7E2 !important; }
+.v3pub .v3-sidebar-dark .v3-sb-link span { color:inherit !important; }
+.v3pub .v3-sidebar-dark .v3-sb-link:hover { background:rgba(255,255,255,.08); }
+.v3pub .v3-sidebar-dark .v3-sb-badge { font-size:9px; font-weight:800; text-transform:uppercase; padding:1px 5px; border-radius:4px; color:#fff !important; }
