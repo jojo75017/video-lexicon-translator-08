@@ -357,7 +357,8 @@ export default function V3Sidebar() {
                     const [itPath] = it.to.split('?');
                     const active = !it.external && pathname === itPath;
                     const locked = trialRestricted && !it.external && isTrialLockedPath(it.to);
-                    const badge = badgeFor(it);
+                    const rawBadge = badgeFor(it);
+                    const badge = rawBadge && rawBadge.length > 10 ? 'Nouveau' : rawBadge;
                     const inner = (
                       <>
                         <span className="flex-1 truncate">{it.label}</span>
