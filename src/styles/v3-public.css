@@ -769,6 +769,7 @@
   color: var(--welcome-text);
   border-bottom: 1px solid var(--welcome-border);
 }
+.v3pub .v3-welcome-header .v3-welcome-title, .v3pub .v3-welcome-header .v3-welcome-title strong, .v3pub .v3-welcome-header .v3-welcome-intro, .v3pub .v3-welcome-header .v3-welcome-version { color: var(--welcome-text); }
 .v3pub .v3-welcome-title { margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 28px; line-height: 1.1; letter-spacing: 0; }
 .v3pub .v3-welcome-title strong { font-weight: 700; }
 .v3pub .v3-welcome-premium { color: var(--welcome-accent); }
