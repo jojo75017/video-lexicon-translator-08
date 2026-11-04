@@ -308,6 +308,7 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
             <span style={{ color: '#fff' }}>Écrire mon livre</span> <ArrowRight className="h-5 w-5" style={{ color: '#fff' }} />
           </button>
         </div>
+        </div>
       </form>
 
       {/* 3. Dans quelle situation vous retrouvez-vous ? */}
