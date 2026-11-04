@@ -25,7 +25,7 @@ describe('V3Header + V3MainTabs', () => {
 
   it('affiche la marque, la ligne 2 et les CTA principaux', () => {
     renderHeader(false);
-    expect(screen.getByRole('link', { name: /^EEbookstudioV3 · Premium$/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /^E Ebookstudio V3 · Premium$/i })).toBeInTheDocument();
     // Le CTA d'inscription : « Commencer gratuitement » (desktop ou CTA rapide mobile).
     expect(screen.getAllByRole('link', { name: /Commencer gratuitement/i }).length).toBeGreaterThan(0);
 
