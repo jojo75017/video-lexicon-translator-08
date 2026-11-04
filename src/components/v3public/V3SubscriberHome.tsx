@@ -8,6 +8,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useV3Entitlement } from '@/hooks/useV3Entitlement';
 import { V3_AGENTS } from '@/data/v3Agents';
 import AgentPortrait from './AgentPortrait';
+import V3HomeTopBlock from './V3HomeTopBlock';
 
 const STEPS = [
   { n: 1, title: 'Idée et niche', icon: Lightbulb, to: '/v3/kdp/radar-niches' },
@@ -77,6 +78,8 @@ export default function V3SubscriberHome({ user }: { user: any }) {
             Bienvenue dans votre maison d'édition IA{prenom ? `, ${prenom}` : ''}
           </h1>
         </div>
+
+        <V3HomeTopBlock userId={user.id} />
 
         {/* b) Deux boutons + robots */}
         <div id="nouveau-livre" className="flex flex-col items-stretch justify-center gap-3 sm:flex-row scroll-mt-28">
