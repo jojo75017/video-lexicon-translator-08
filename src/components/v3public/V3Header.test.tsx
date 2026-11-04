@@ -1,8 +1,13 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, within, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import V3Header from './V3Header';
 import V3MainTabs from './V3MainTabs';
+
+vi.mock('@/hooks/useIsAdmin', () => ({ default: () => ({ isAdmin: false, checking: false }) }));
+vi.mock('@/hooks/useV3Open', () => ({ default: () => ({ open: true }) }));
+vi.mock('@/hooks/usePlanTier', () => ({ default: () => ({ tier: 'edition' }) }));
+vi.mock('@/components/admin/V2V3FloatingSwitch', () => ({ V2V3ModeButton: () => null }));
 
 const renderHeader = (authed = false) =>
   render(
