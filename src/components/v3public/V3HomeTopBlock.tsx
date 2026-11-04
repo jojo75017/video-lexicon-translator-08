@@ -127,16 +127,16 @@ function SituationCard({ s }: { s: Situation }) {
   return (
     <div className="overflow-hidden rounded-2xl" style={{ border: `2px solid ${s.color}`, background: '#14110F' }}>
       <div className="relative p-4" style={{ minHeight: 190 }}>
-        <img src={s.photo} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.35 }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(20,17,15,.92), rgba(20,17,15,.45))' }} />
+        <img src={s.photo} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.78 }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(20,17,15,.55), rgba(20,17,15,.22))' }} />
         <div className="relative flex items-start justify-between gap-3">
           <span className="rounded-md px-3 py-1 text-xs font-bold" style={{ background: s.color, color: '#fff' }}>{s.tag}</span>
           <span className="block h-14 w-14 shrink-0 overflow-hidden rounded-lg" style={{ background: s.color, border: '2px solid #fff' }}>
             <AgentPortrait id={s.agent} name={s.agentName} />
           </span>
         </div>
-        <h3 className="relative mt-2 text-2xl font-bold" style={{ color: '#fff' }}>{s.title}</h3>
-        <p className="relative mt-6 text-sm" style={{ color: '#E7E0DA' }}>{s.sub}</p>
+        <h3 className="relative mt-2 text-2xl font-bold" style={{ color: '#fff', textShadow: '0 2px 10px rgba(0,0,0,.85)' }}>{s.title}</h3>
+        <p className="relative mt-6 text-sm" style={{ color: '#F0EAE4', textShadow: '0 1px 6px rgba(0,0,0,.85)' }}>{s.sub}</p>
         <div className="relative mt-2 grid grid-cols-2 gap-2">
           <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
             className="v3-chip-toggle inline-flex items-center justify-between rounded-md px-3 py-1.5 text-sm font-bold"
@@ -214,7 +214,7 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="space-y-6" style={{ background: '#2A2624', borderRadius: 32, padding: '1.25rem' }}>
+    <div className="space-y-6" style={{ background: '#332E2B', borderRadius: 32, padding: '1.25rem' }}>
       {/* 0. Accès directs */}
       <div className="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {QUICK_TILES.map((t) => (

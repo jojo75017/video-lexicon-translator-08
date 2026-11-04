@@ -64,7 +64,7 @@ export default function V3SubscriberHome({ user }: { user: any }) {
   }, [user.id]);
 
   return (
-    <section style={{ background: 'var(--v3-joy-cream)', borderBottom: '1px solid var(--v3-joy-orange-soft)' }}>
+    <section style={{ background: '#2A2624', borderBottom: '1px solid rgba(246,189,42,0.18)' }}>
       <div className="v3-shell space-y-8 py-8 md:py-12">
         {/* a) Bienvenue */}
         <div className="text-center">
@@ -74,7 +74,7 @@ export default function V3SubscriberHome({ user }: { user: any }) {
           >
             Niveau {niveau}
           </span>
-          <h1 className="v3-serif mt-3 text-2xl font-semibold md:text-4xl" style={{ color: 'var(--v3-joy-ink)' }}>
+          <h1 className="v3-serif mt-3 text-2xl font-semibold md:text-4xl" style={{ color: '#F3EDE6' }}>
             Bienvenue dans votre maison d'édition IA{prenom ? `, ${prenom}` : ''}
           </h1>
         </div>
@@ -107,8 +107,8 @@ export default function V3SubscriberHome({ user }: { user: any }) {
                   <div className="aspect-square overflow-hidden rounded-2xl bg-white transition-transform group-hover:-translate-y-1" style={cardStyle}>
                     <AgentPortrait id={a.id} name={a.name} />
                   </div>
-                  <p className="mt-1.5 truncate text-xs font-bold" style={{ color: 'var(--v3-joy-ink)' }}>{a.name}</p>
-                  <p className="truncate text-[11px]" style={{ color: 'var(--v3-joy-muted)' }}>{a.role}</p>
+                  <p className="mt-1.5 truncate text-xs font-bold" style={{ color: '#F3EDE6' }}>{a.name}</p>
+                  <p className="truncate text-[11px]" style={{ color: '#B9AFA6' }}>{a.role}</p>
                 </Link>
               </li>
             ))}
