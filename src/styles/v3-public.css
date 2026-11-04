@@ -553,7 +553,8 @@
 .v3pub .v3-launch-sage { background:#eef6f0 !important; border-bottom:1px solid #f2c9a5 !important; }
 .v3pub .v3-launch-sage h2, .v3pub .v3-launch-sage h2 *, .v3pub .v3-launch-sage a, .v3pub .v3-launch-sage span { color:#3f6b52 !important; }
 .v3pub .v3-launch-sage strong { color:#c97a45 !important; }
-.v3pub .v3-header-sage .v3-mobile-panel { background:#e4f0e8 !important; }
+.v3pub .v3-header-sage .v3-mobile-panel { background:#101622 !important; border-color:#243248 !important; }
+.v3pub .v3-header-sage .v3-mobile-panel a, .v3pub .v3-header-sage .v3-mobile-panel button, .v3pub .v3-header-sage .v3-mobile-panel span { color:#F1F5F9 !important; }
 
 /* Onglets du menu principal : couleur « voyant robot » par catégorie */
 .v3pub button.v3-robot-tab:not(:disabled) {
