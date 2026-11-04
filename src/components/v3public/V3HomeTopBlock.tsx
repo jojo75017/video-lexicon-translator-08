@@ -267,7 +267,10 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
       </div>
 
       {/* 2. Écriture Express */}
-      <form onSubmit={start} className={`${panel} mx-auto max-w-3xl`} style={{ ...panelStyle, border: '2px solid #EA580C' }}>
+      <form onSubmit={start} className={`${panel} relative mx-auto max-w-3xl overflow-hidden`} style={{ ...panelStyle, border: '2px solid #EA580C' }}>
+        <img src={photoCreate} alt="" className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.5 }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(16,22,34,.72), rgba(16,22,34,.55))' }} />
+        <div className="relative">
         <div className="text-center">
           <p className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest" style={{ background: '#2A1608', color: '#FB923C' }}>
             <Sparkles className="h-3.5 w-3.5" /> Écriture Express
@@ -304,6 +307,7 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
           <button type="submit" className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-base font-semibold" style={{ background: '#EA580C', color: '#fff' }}>
             <span style={{ color: '#fff' }}>Écrire mon livre</span> <ArrowRight className="h-5 w-5" style={{ color: '#fff' }} />
           </button>
+        </div>
         </div>
       </form>
 
