@@ -546,9 +546,10 @@
 }
 
 /* Palette vert sauge & orange : bandeaux clairs */
-.v3pub .v3-header-sage { background: linear-gradient(180deg,#e4f0e8 0%,#d6e8dc 100%) !important; border-bottom:2px solid #f2c9a5 !important; }
-.v3pub .v3-header-sage .text-white { color:#2f5a42 !important; }
-.v3pub .v3-header-sage input { background:#fff !important; color:#2f4a3a !important; }
+.v3pub .v3-header-sage { background: linear-gradient(180deg,#080B11 0%,#0B1019 100%) !important; border-bottom:1px solid rgba(201,168,76,0.35) !important; }
+.v3pub .v3-header-sage .text-white { color:#F1F5F9 !important; }
+.v3pub .v3-header-sage input { background:#101622 !important; color:#F1F5F9 !important; border-color:#243248 !important; }
+.v3pub .v3-header-sage input::placeholder { color:#64748B !important; }
 .v3pub .v3-launch-sage { background:#eef6f0 !important; border-bottom:1px solid #f2c9a5 !important; }
 .v3pub .v3-launch-sage h2, .v3pub .v3-launch-sage h2 *, .v3pub .v3-launch-sage a, .v3pub .v3-launch-sage span { color:#3f6b52 !important; }
 .v3pub .v3-launch-sage strong { color:#c97a45 !important; }
