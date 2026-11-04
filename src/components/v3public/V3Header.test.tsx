@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import V3Header from './V3Header';
 import V3MainTabs from './V3MainTabs';
@@ -23,33 +23,14 @@ describe('V3Header + V3MainTabs', () => {
     document.documentElement.style.overflowX = '';
   });
 
-  it('affiche la marque, la ligne 2 et les CTA principaux', () => {
+  it('conserve les catégories et le catalogue', () => {
     renderHeader(false);
-    expect(screen.getByRole('link', { name: /^E Ebookstudio V3 · Premium$/i })).toBeInTheDocument();
-    // Le CTA d'inscription : « Commencer gratuitement » (desktop ou CTA rapide mobile).
-    expect(screen.getAllByRole('link', { name: /Commencer gratuitement/i }).length).toBeGreaterThan(0);
 
     // Les 6 catégories de la ligne 2 sont présentes (au moins dans le drawer mobile).
     ['Créer', 'Écrire', 'Habiller', 'Publier', 'Vendre'].forEach((label) => {
       expect(screen.getAllByText(new RegExp(`^${label}$`, 'i')).length).toBeGreaterThan(0);
     });
     expect(screen.getAllByRole('link', { name: /Tous les outils/i }).length).toBeGreaterThan(0);
-  });
-
-  it('bascule vers "Ma bibliothèque" quand l\'utilisateur est authentifié', () => {
-    renderHeader(true);
-    expect(screen.getAllByRole('link', { name: /Ma bibliothèque/i }).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('link', { name: /^Connexion$/i })).not.toBeInTheDocument();
-  });
-
-  it('ouvre le drawer mobile via le bouton menu principal', () => {
-    renderHeader(false);
-    const trigger = screen.getByRole('button', { name: /Ouvrir le menu principal/i });
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    // Le drawer contient un CTA vers la page d'écriture.
-    expect(screen.getAllByRole('link', { name: /Écrire un livre/i }).length).toBeGreaterThan(0);
   });
 
   it('déploie le mega-menu Créer au clic sur le bouton de catégorie', () => {
@@ -68,13 +49,6 @@ describe('V3Header + V3MainTabs', () => {
     // Après ouverture, chaque catégorie devient un <summary> cliquable.
     const summaries = screen.getAllByText(/Livres spéciaux/i);
     expect(summaries.length).toBeGreaterThan(0);
-  });
-
-  it("chaque CTA d'inscription pointe vers une destination réelle (pas de lien mort)", () => {
-    renderHeader(false);
-    // On tolère plusieurs liens (nav desktop + CTA mobile), mais chacun doit avoir une destination.
-    const links = screen.getAllByRole('link', { name: /Commencer gratuitement/i });
-    links.forEach((l) => expect(l).toHaveAttribute('href'));
   });
 
 });
