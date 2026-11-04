@@ -678,10 +678,10 @@
 .v3pub .v3-admin-actions button:last-child { color: var(--nav-blue-hover); }
 .v3pub .v3-admin-actions button:not(:disabled):hover { background: var(--nav-surface); color: var(--nav-blue-hover); }
 .v3pub .v3-admin-actions button * { color: inherit; }
-.v3pub .v3-header-sage nav .v3-btn { background: transparent !important; color: var(--nav-ink) !important; border: 1px solid transparent !important; border-radius: 8px; padding: 8px 10px; box-shadow: none; }
+.v3pub .v3-header-sage nav .v3-btn { background: transparent !important; color: #E2E8F0 !important; border: 1px solid transparent !important; border-radius: 8px; padding: 8px 10px; box-shadow: none; }
 .v3pub .v3-header-sage nav .v3-btn * { color: inherit !important; }
-.v3pub .v3-header-sage nav .v3-btn:hover { background: var(--nav-surface) !important; }
-.v3pub .v3-header-sage nav .v3-btn-gold { background: var(--nav-blue) !important; color: var(--nav-surface) !important; }
+.v3pub .v3-header-sage nav .v3-btn:hover { background: #172132 !important; color: #ffffff !important; }
+.v3pub .v3-header-sage nav .v3-btn-gold { background: var(--v3-gold) !important; color: #1a1408 !important; }
 
 /* Bandeau « Nos partenaires » (accueil public) */
 .v3-partners{--p-bg:#0b1324;--p-card:#111c33;--p-line:#1f2d4a;--p-ink:#f1f5f9;--p-accent:#f97316;--p-muted:#64748b;background:var(--p-bg);color:var(--p-ink);font-size:14px;line-height:1.4;padding:22px 16px;border-top:1px solid var(--p-line);border-bottom:1px solid var(--p-line)}
