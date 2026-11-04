@@ -787,6 +787,15 @@
   background: #080B11 !important; border-color: #243248 !important;
 }
 .v3pub .v3-professional-tabs .v3-category-group { background: #101622; border-color: #243248; }
+.v3pub .v3-professional-tabs .v3-quickbar-group {
+  background: linear-gradient(180deg, #131b2c, #0e1420);
+  border: 1px solid #2a3a55;
+  border-top-color: rgba(240, 138, 36, 0.45);
+  border-radius: 16px;
+  padding: 9px 12px 7px;
+  margin-top: 9px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 6px 18px rgba(0, 0, 0, 0.35);
+}
 .v3pub .v3-professional-tabs button.v3-tool-search { background: var(--nav-search-background); color: var(--nav-search-foreground); border-color: var(--nav-search-border); }
 .v3pub .v3-professional-tabs button.v3-tool-search:hover { border-color: var(--nav-sell); }
 .v3pub .v3-robot-tab[data-category="plans"] { --robot: var(--nav-plans); }
