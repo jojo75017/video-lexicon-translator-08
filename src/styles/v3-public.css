@@ -548,6 +548,7 @@
 /* Palette vert sauge & orange : bandeaux clairs */
 .v3pub .v3-header-sage { background: linear-gradient(180deg,#080B11 0%,#0B1019 100%) !important; border-bottom:1px solid rgba(201,168,76,0.35) !important; }
 .v3pub .v3-header-sage .text-white { color:#F1F5F9 !important; }
+.v3pub .v3-header-sage .text-white span, .v3pub .v3-header-sage .text-white svg { color:#F1F5F9 !important; }
 .v3pub .v3-header-sage input { background:#101622 !important; color:#F1F5F9 !important; border-color:#243248 !important; }
 .v3pub .v3-header-sage input::placeholder { color:#64748B !important; }
 .v3pub .v3-launch-sage { background:#eef6f0 !important; border-bottom:1px solid #f2c9a5 !important; }
