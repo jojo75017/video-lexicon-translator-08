@@ -145,8 +145,8 @@ const AmbiancesPage: React.FC = () => {
 
         {/* Note rassurante */}
         <div className="rounded-xl bg-white border p-5 text-sm text-[#6B7280] leading-relaxed">
-          <strong className="text-[#232F3E]">À noter :</strong> l'ambiance change uniquement l'apparence
-          de votre éditeur pendant l'écriture. Vos exports PDF et EPUB restent 100 % conformes aux
+          <strong className="text-[#232F3E]">À noter :</strong> l'ambiance change le fond, les couleurs et la
+          police de votre espace d'écriture (« Ma maison d'édition »), exactement comme dans l'aperçu. Vos exports PDF et EPUB restent 100 % conformes aux
           standards Amazon KDP (typographie professionnelle, marges, pagination).
         </div>
       </div>

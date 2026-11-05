@@ -385,12 +385,13 @@
 
 /* En sombre, le choix d'une ambiance conserve sa typographie et son accent,
    mais ne doit pas réintroduire des surfaces claires illisibles. */
-.dark .v3pub .v3-ambiance {
-  --amb-bg: var(--v3-paper) !important;
-  --amb-surface: var(--v3-surface) !important;
-  --amb-surface-alt: var(--v3-cream) !important;
-  --amb-text: var(--v3-ink) !important;
-  --amb-muted: var(--v3-muted) !important;
+/* Chaque ambiance fournit une palette complète (fond + texte contrastés) :
+   on la laisse s'appliquer dans l'éditeur, même en thème sombre. */
+.dark .v3pub .v3-ambiance input,
+.dark .v3pub .v3-ambiance textarea,
+.dark .v3pub .v3-ambiance select {
+  background: var(--amb-surface) !important;
+  color: var(--amb-text) !important;
 }
 
 /* ============ Ambiances d'écriture (variables --amb-* posées par applyAmbiance) ============ */
