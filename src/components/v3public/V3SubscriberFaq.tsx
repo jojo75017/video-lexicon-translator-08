@@ -38,7 +38,7 @@ export default function V3SubscriberFaq() {
                 type="button"
                 onClick={() => setOpen(isOpen ? null : q.id)}
                 aria-expanded={isOpen}
-                className="flex w-full items-center gap-3 px-4 py-3.5 text-left"
+                className="v3-flat-btn flex w-full items-center gap-3 px-4 py-3.5 text-left"
               >
                 <span
                   className="grid h-7 w-7 shrink-0 place-items-center rounded-full"

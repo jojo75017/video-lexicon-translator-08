@@ -44,7 +44,7 @@ export default function V3SubscriberWorkshops() {
                 type="button"
                 onClick={() => setOpen((prev) => ({ ...prev, [cat.key]: !prev[cat.key] }))}
                 aria-expanded={isOpen}
-                className="flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:brightness-110"
+                className="v3-flat-btn flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:brightness-110"
                 style={{ background: `linear-gradient(90deg, ${color}26, transparent 60%)` }}
               >
                 {theme && (
