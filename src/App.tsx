@@ -225,6 +225,7 @@ const V3AmsKeywordsPage = lazy(() => import('./pages/v3public/V3AmsKeywordsPage'
 const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyPage'));
 const V3OutilsOffertsPage = lazy(() => import('./pages/v3public/V3OutilsOffertsPage'));
 const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
+const FormulesPubliquesPage = lazy(() => import("./pages/FormulesPubliquesPage"));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 const V3PlansPage = lazy(() => import('./pages/v3public/V3PlansPage'));
 const V3UpsellsPage = lazy(() => import('./pages/v3/V3UpsellsPage'));
@@ -602,6 +603,7 @@ const App = () => {
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-offre" element={<NouvelleOffrePaiementPage />} />
             <Route path="/paiement-mensuel" element={<AbonnementMensuelPaiementPage />} />
+            <Route path="/formules" element={<FormulesPubliquesPage />} />
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
@@ -950,5 +952,5 @@ export default App;
 
 function CommanderRedirect() {
   const { search } = useLocation();
-  return <Navigate to={`/v3/forfaits${search}`} replace />;
+  return <Navigate to={`/formules${search}`} replace />;
 }
