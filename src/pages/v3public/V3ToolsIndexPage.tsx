@@ -60,13 +60,13 @@ export default function V3ToolsIndexPage() {
 
 
   return (
-    <div style={{ background: 'var(--v3-paper)' }} className="min-h-screen">
+    <div className="v3-dark-page min-h-screen">
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       {/* Hero */}
       <section
         className="relative overflow-hidden"
         style={{
-          background: 'linear-gradient(180deg, #ecf5f1 0%, var(--v3-paper) 100%)',
+          background: 'linear-gradient(180deg, #111827 0%, #0B0F17 100%)',
           borderBottom: '1px solid var(--v3-line)',
         }}
       >
@@ -92,7 +92,7 @@ export default function V3ToolsIndexPage() {
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
                 placeholder="Rechercher un outil…"
-                className="w-full pl-11 pr-4 py-3 rounded-full bg-white text-[14px] focus:outline-none focus:ring-2 transition"
+                className="w-full pl-11 pr-4 py-3 rounded-full text-[14px] focus:outline-none focus:ring-2 transition"
                 style={{
                   border: '1px solid var(--v3-line)',
                   boxShadow: '0 2px 8px -4px rgba(6,78,59,0.08)',
@@ -106,7 +106,7 @@ export default function V3ToolsIndexPage() {
                 style={
                   activeCat === null
                     ? { background: 'var(--v3-emerald)', color: '#fff' }
-                    : { background: '#fff', color: 'var(--v3-ink)', border: '1px solid var(--v3-line)' }
+                    : { background: '#1F2937', color: '#F9FAFB', border: '1px solid var(--v3-line)' }
                 }
               >
                 Tous
@@ -119,7 +119,7 @@ export default function V3ToolsIndexPage() {
                   style={
                     activeCat === cat.id
                       ? { background: 'var(--v3-emerald)', color: '#fff' }
-                      : { background: '#fff', color: 'var(--v3-ink)', border: '1px solid var(--v3-line)' }
+                      : { background: '#1F2937', color: '#F9FAFB', border: '1px solid var(--v3-line)' }
                   }
                 >
                   <span className="mr-1">{cat.emoji}</span>
@@ -139,7 +139,7 @@ export default function V3ToolsIndexPage() {
               className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
               style={activePlan === null
                 ? { background: 'var(--v3-emerald)', color: '#fff' }
-                : { background: '#fff', color: 'var(--v3-ink)', border: '1px solid var(--v3-line)' }}
+                : { background: '#1F2937', color: '#F9FAFB', border: '1px solid var(--v3-line)' }}
             >
               Tous
             </button>
@@ -166,7 +166,7 @@ export default function V3ToolsIndexPage() {
               className="px-3 py-1.5 rounded-full text-[12px] font-semibold transition"
               style={activePlan === 'all'
                 ? { background: 'var(--v3-gold-600)', color: '#fff' }
-                : { background: '#fff', color: 'var(--v3-gold-600)', border: '1px solid var(--v3-line)' }}
+                : { background: '#1F2937', color: '#F6BD2A', border: '1px solid var(--v3-line)' }}
             >
               Comparer les 3
             </button>
@@ -254,7 +254,7 @@ export default function V3ToolsIndexPage() {
                     <h2 className="v3-serif text-[22px] font-semibold flex items-center gap-2" style={{ color: meta.color }}>
                       {p === 'plume' && '🖊️'}
                       {p === 'edition' && '👑'}
-                      Forfait {meta.short}
+                      {meta.label}
                     </h2>
                     <span className="text-[12px]" style={{ color: 'var(--v3-muted)' }}>
                       {tools.length} outil{tools.length > 1 ? 's' : ''} exclusifs à ce palier
