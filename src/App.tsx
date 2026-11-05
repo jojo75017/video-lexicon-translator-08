@@ -638,8 +638,8 @@ const App = () => {
             <Route path="/audiobook-merci/:slug" element={<Navigate to="/formation-audio" replace />} />
             <Route path="/hub-v3" element={<Navigate to="/v3/hub" replace />} />
             <Route path="/demo" element={<DemoGeniePage />} />
-            <Route path="/v3/import" element={<Navigate to="/v3/create?import=1" replace />} />
-            <Route path="/v3/traduire" element={<Navigate to="/v3/outils/traduction" replace />} />
+            <Route path="/v3/import" element={<div className="v3pub v3-dark-page"><Navigate to="/v3/create?import=1" replace /></div>} />
+            <Route path="/v3/traduire" element={<div className="v3pub v3-dark-page"><Navigate to="/v3/outils/traduction" replace /></div>} />
             <Route path="/dashboard-essais" element={<Navigate to="/admin" replace />} />
             <Route path="/emails-onboarding" element={<Navigate to="/admin" replace />} />
             <Route path="/guide-automatisation-brevo" element={<Navigate to="/admin" replace />} />
@@ -724,12 +724,12 @@ const App = () => {
             <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
             <Route path="/bookperfect" element={<PlanGuard><BookPerfectGate><BookPerfectPage /></BookPerfectGate></PlanGuard>} />
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
-            <Route path="/v3/cover-studio-pro" element={<Navigate to="/v3/mes-couvertures" replace />} />
-            <Route path="/v3/cover-studio-pro/edit" element={<Navigate to="/v3/mes-couvertures" replace />} />
-            <Route path="/v3/couverture-express" element={gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)} />
-            <Route path="/v3/studio-v4" element={gated(<PlanGuard><TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate></PlanGuard>)} />
-            <Route path="/v3/mes-couvertures" element={gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)} />
-            <Route path="/v3/mes-couvertures/:id" element={gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)} />
+            <Route path="/v3/cover-studio-pro" element={<div className="v3pub v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
+            <Route path="/v3/cover-studio-pro/edit" element={<div className="v3pub v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
+            <Route path="/v3/couverture-express" element={<div className="v3pub v3-dark-page">gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)</div>} />
+            <Route path="/v3/studio-v4" element={<div className="v3pub v3-dark-page">gated(<PlanGuard><TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate></PlanGuard>)</div>} />
+            <Route path="/v3/mes-couvertures" element={<div className="v3pub v3-dark-page">gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)</div>} />
+            <Route path="/v3/mes-couvertures/:id" element={<div className="v3pub v3-dark-page">gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)</div>} />
             {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}
             <Route path="/v3/cover-pro" element={gated(<PlanGuard><TrialGate label="Cover Studio KDP Pro"><CoverProPage /></TrialGate></PlanGuard>)} />
             <Route path="/v3/paiements" element={gated(<TrialGate label="Mes paiements"><PaiementsCouverturesPage /></TrialGate>)} />
