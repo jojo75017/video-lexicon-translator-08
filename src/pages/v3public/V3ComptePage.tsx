@@ -4,6 +4,7 @@ import { BookOpen, Crown, Key, CreditCard, Gauge, ArrowRight, ExternalLink } fro
 import { supabase } from "@/integrations/supabase/client";
 import { V3_PLANS } from "@/data/v3Pricing";
 import { BackButton } from "@/components/v3/BackButton";
+import { V3MonthlySubscriptionCard } from "@/components/v3public/V3MonthlySubscriptionCard";
 
 type ProjectRow = {
   id: string;
@@ -81,6 +82,8 @@ export default function V3ComptePage() {
             {email ?? "Non connecté"}
           </p>
         </header>
+
+        <V3MonthlySubscriptionCard />
 
         {/* Cards row */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
