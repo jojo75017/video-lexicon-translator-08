@@ -18,6 +18,7 @@ export default function V3TranslatorPage() {
   const fileInput = useRef<HTMLInputElement>(null);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState('');
+  const [coverLang, setCoverLang] = useState('Anglais');
   const applyBook = (b: AudioBookContent) => {
     const sections = parseManuscript(b.manuscript, 'Chapitre 1');
     setBook({ title: b.title, preface: b.preface, conclusion: b.conclusion, chapters: sections.map((sec) => ({ title: sec.title, content: sec.blocks.map((x) => x.text).join('\n\n') })) });
@@ -96,6 +97,20 @@ export default function V3TranslatorPage() {
               <div className="text-[13px] mt-1" style={{ color: '#9CA3AF' }}>{x.d}</div>
             </Link>
           ))}
+        </div>
+        <h3 className="text-lg font-bold mt-6 mb-2" style={{ color: '#F9FAFB' }}>🎨 Couvertures par langue</h3>
+        <div className="flex flex-wrap gap-2 mb-3" role="tablist">
+          {[['🇬🇧','Anglais'],['🇩🇪','Allemand'],['🇪🇸','Espagnol'],['🇮🇹','Italien'],['🇧🇷','Portugais'],['🇳🇱','Néerlandais'],['🇵🇱','Polonais'],['🇯🇵','Japonais'],['🇨🇳','Chinois'],['🇸🇦','Arabe']].map(([f, l]) => (
+            <button key={l} type="button" role="tab" aria-selected={coverLang === l} onClick={() => setCoverLang(l)} className="v3-chip-toggle px-3 py-1.5 rounded-full text-[13px] font-semibold"
+              style={{ background: coverLang === l ? '#7C3AED' : '#1F2937', color: '#F9FAFB', border: '1px solid #7C3AED' }}>{f} {l}</button>
+          ))}
+        </div>
+        <div className="rounded-xl p-4 mb-2" style={{ background: '#1F2937', borderLeft: '4px solid #7C3AED' }}>
+          <p className="text-[14px] mb-3" style={{ color: '#D1D5DB' }}>Couverture en <strong style={{ color: '#F9FAFB' }}>{coverLang}</strong> : l'outil s'ouvre avec votre titre, remplacez-le par le titre traduit en {coverLang.toLowerCase()} affiché plus haut.</p>
+          <div className="flex flex-wrap gap-2">
+            <Link to={`/v3/couverture-express?title=${encodeURIComponent(book?.title || '')}`} className="px-4 py-2 rounded-lg font-bold text-sm" style={{ background: '#7C3AED', color: '#fff' }}>📱 Couverture Kindle en {coverLang.toLowerCase()}</Link>
+            <Link to="/v3/studio-v4" className="px-4 py-2 rounded-lg font-bold text-sm" style={{ background: '#374151', color: '#F9FAFB' }}>🎨 Couverture brochée en {coverLang.toLowerCase()}</Link>
+          </div>
         </div>
         <h3 className="text-lg font-bold mt-6 mb-2" style={{ color: '#F9FAFB' }}>🌍 Amazon KDP dans votre langue</h3>
         <p className="text-[13px] mb-3" style={{ color: '#9CA3AF' }}>Ouvrez KDP pour publier, et la boutique Amazon du pays pour vérifier votre livre en ligne.</p>
