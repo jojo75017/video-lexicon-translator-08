@@ -1,3 +1,4 @@
+import voyageHero from '@/assets/livre-voyage-hero.jpg';
 import cuisineHero from '@/assets/livre-cuisine-hero.jpg';
 import romanHero from '@/assets/livre-roman-hero.jpg';
 import { useParams, Navigate } from 'react-router-dom';
@@ -46,6 +47,12 @@ const MAP: Record<string, { title: string; Comp: React.FC }> = {
   univers: { title: 'Univers multi-volumes', Comp: SpecialUniverseVolumes },
 };
 
+const HEROES: Record<string, { src: string; alt: string }> = {
+  roman: { src: romanHero, alt: "Roman ouvert sur un bureau à la lueur d'une lampe" },
+  cuisine: { src: cuisineHero, alt: 'Livre de cuisine ouvert entouré de produits frais' },
+  voyage: { src: voyageHero, alt: 'Guide de voyage ouvert avec carte, boussole et passeport' },
+};
+
 export default function V3SpecialBookPage() {
   const { type = '' } = useParams();
   const entry = MAP[type];
@@ -56,8 +63,8 @@ export default function V3SpecialBookPage() {
   return (
     <div className="v3-special-readable container mx-auto px-4 py-6 max-w-7xl">
       <V3AgentReturnBar />
-      {(type === 'roman' || type === 'cuisine') && (
-        <img src={type === 'cuisine' ? cuisineHero : romanHero} alt={type === 'cuisine' ? 'Livre de cuisine ouvert entouré de produits frais' : "Roman ouvert sur un bureau à la lueur d'une lampe"} width={1600} height={560} className="mt-4 w-full rounded-2xl object-cover" />
+      {HEROES[type] && (
+        <img src={HEROES[type].src} alt={HEROES[type].alt} width={1600} height={560} className="mt-4 w-full rounded-2xl object-cover" />
       )}
       <h1 className="text-3xl font-bold mb-6 mt-4">{title}</h1>
       <Comp />
