@@ -111,6 +111,7 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
+const AbonnementMensuelPaiementPage = lazy(() => import('./pages/AbonnementMensuelPaiementPage'));
 import PageHeroImage from './components/v3public/PageHeroImage';
 import parrainageHero from './assets/parrainage-hero.jpg';
 import communauteHero from './assets/communaute-hero.jpg';
@@ -600,6 +601,7 @@ const App = () => {
             <Route path="/assistance" element={<div className="v3-dark-page">{<FaqAssistancePage />}</div>} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-offre" element={<NouvelleOffrePaiementPage />} />
+            <Route path="/paiement-mensuel" element={<AbonnementMensuelPaiementPage />} />
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
