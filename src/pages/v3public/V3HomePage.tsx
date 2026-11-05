@@ -4,6 +4,8 @@ import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
 import V3CoversGallery from '@/components/v3public/V3CoversGallery';
+import V3SubscriberWorkshops from '@/components/v3public/V3SubscriberWorkshops';
+import V3SubscriberFaq from '@/components/v3public/V3SubscriberFaq';
 import {
   ArrowRight, AudioLines,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
