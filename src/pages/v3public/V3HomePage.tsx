@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
+import V3CoversGallery from '@/components/v3public/V3CoversGallery';
 import {
   ArrowRight, AudioLines,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
@@ -141,8 +142,10 @@ export default function V3HomePage() {
       {/* Le parcours public conserve ses offres aux emplacements historiques. */}
       {!user && <V3MicroSeriesSurpriseBanner />}
 
+      {user && <V3CoversGallery />}
+
       {/* PREUVE AUTEUR — livres publiés + nom d'auteur, avant les offres */}
-      <section className="v3-shell py-8">
+      {!user && (<section className="v3-shell py-8">
         <div
           className="rounded-3xl bg-white p-6 md:p-10"
           style={{ border: '1px solid var(--v3-joy-orange-soft)', boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)' }}
@@ -200,7 +203,7 @@ export default function V3HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </section>)}
 
       {!user && <V3PricingOverview />}
 
