@@ -13,6 +13,7 @@ import {
 import { useAmbiance } from '@/hooks/useAmbiance';
 import { AmbianceCard } from '@/components/ambiance/AmbianceCard';
 import { AmbiancePreview } from '@/components/ambiance/AmbiancePreview';
+import ambiancesHero from '@/assets/ambiances-hero.jpg';
 
 const CATEGORIES: { id: AmbianceCategory | 'toutes'; label: string }[] = [
   { id: 'toutes', label: 'Toutes' },
@@ -59,7 +60,7 @@ const AmbiancesPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#232F3E]">
       {/* En-tête */}
-      <div className="bg-gradient-to-br from-[#0f1419] via-[#1a2530] to-[#0f1419] text-white">
+      <div className="text-white" style={{ backgroundImage: `linear-gradient(90deg, rgba(15,20,25,0.92) 0%, rgba(15,20,25,0.6) 60%, rgba(15,20,25,0.3) 100%), url(${ambiancesHero})`, backgroundSize: "cover", backgroundPosition: "center" }}>
         <div className="max-w-[1600px] mx-auto px-6 lg:px-10 py-8">
           <Button
             variant="ghost"
