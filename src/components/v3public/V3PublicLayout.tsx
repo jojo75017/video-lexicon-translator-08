@@ -88,7 +88,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
     <V3ContemplationMode>
       <div
         className="v3pub min-h-screen flex flex-col"
-        style={isHome && isAuthed ? { background: '#2A2624' } : undefined}
+        style={(isHome && isAuthed) || location.pathname === '/v3/revision-editoriale' ? { background: '#2A2624' } : undefined}
       >
         <V3Header isAuthed={isAuthed} isAdmin={isAdmin} />
         <V3TrialBanner />
@@ -121,11 +121,11 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
             <V3UpsellReturnBar />
             {/* Retour à l'accueil : présent sur toutes les pages internes V3. */}
             {!isHome && (
-              <div className="border-b px-3 py-2" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+              <div className="border-b px-3 py-2" style={{ borderColor: 'rgba(246,189,42,0.25)', background: '#080B11' }}>
                 <Link
                   to="/v3"
                   className="inline-flex items-center gap-2 rounded-md px-2 py-1 text-xs font-semibold transition-colors hover:opacity-80"
-                  style={{ color: 'var(--v3-ink)' }}
+                  style={{ color: '#F6BD2A' }}
                 >
                   <Home className="h-4 w-4" /> Retour à l'accueil V3
                 </Link>

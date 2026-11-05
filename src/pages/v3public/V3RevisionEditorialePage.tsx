@@ -48,7 +48,7 @@ export default function V3RevisionEditorialePage() {
               {STEPS.slice(0, 4).map((s) => (
                 <div key={s.n} className="flex items-center gap-3 rounded-md border px-4 py-3" style={{ background: '#111827', borderColor: '#1F2937' }}>
                   <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border text-sm font-bold" style={{ borderColor: '#3B82F6', color: '#3B82F6' }}>{s.n}</span>
-                  <span className="font-semibold">{s.title}</span>
+                  <span className="font-semibold" style={{ color: "#F9FAFB" }}>{s.title}</span>
                 </div>
               ))}
             </div>
@@ -61,7 +61,7 @@ export default function V3RevisionEditorialePage() {
             <div key={s.n} className="flex flex-col rounded-xl border p-5" style={{ background: '#111827', borderColor: s.color }}>
               <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-lg" style={{ background: s.color, color: '#fff' }}><s.icon className="h-5 w-5" /></span>
-                <h3 className="font-bold">{s.n}. {s.title}</h3>
+                <h3 className="font-bold" style={{ color: "#F9FAFB" }}>{s.n}. {s.title}</h3>
               </div>
               <p className="mt-3 flex-1 text-sm" style={{ color: '#9CA3AF' }}>{s.text}</p>
               <Link to={s.to} className="v3-flat-btn mt-4 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-bold" style={{ background: s.color, color: '#fff' }}>
@@ -75,7 +75,7 @@ export default function V3RevisionEditorialePage() {
         <div className="space-y-2">
           {TUTO.map((t) => (
             <details key={t.q} className="group rounded-lg border px-5 py-4" style={{ background: '#111827', borderColor: '#1F2937' }}>
-              <summary className="flex cursor-pointer list-none items-center justify-between font-semibold">
+              <summary className="flex cursor-pointer list-none items-center justify-between font-semibold" style={{ color: "#F9FAFB" }}>
                 {t.q} <ChevronDown className="h-4 w-4 transition group-open:rotate-180" />
               </summary>
               <p className="mt-3 text-sm leading-relaxed" style={{ color: '#D1D5DB' }}>{t.a}</p>
