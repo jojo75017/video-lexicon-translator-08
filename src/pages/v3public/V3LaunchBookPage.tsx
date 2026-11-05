@@ -8,6 +8,7 @@ import V3GenieOutlinePanel from '@/components/v3public/V3GenieOutlinePanel';
 import V3KeyHint from '@/components/v3public/V3KeyHint';
 import V3PipelinePanel from '@/components/v3public/V3PipelinePanel';
 import V3ResetBookButton from '@/components/v3public/V3ResetBookButton';
+import ecrireHero from '@/assets/ecrire-livre-hero.jpg';
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
 
@@ -29,6 +30,7 @@ export default function V3LaunchBookPage() {
           <V3QuickActionsBar />
         </div>
 
+        <img src={ecrireHero} alt="Écrire un livre" width={1600} height={560} className="mt-6 w-full h-48 md:h-64 object-cover rounded-2xl" />
         <div className="mt-6 text-center">
           <span className="v3-chip v3-chip-gold">
             <Rocket className="w-3.5 h-3.5" /> Lancer mon livre
