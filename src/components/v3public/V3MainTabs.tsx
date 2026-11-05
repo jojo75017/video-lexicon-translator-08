@@ -29,7 +29,7 @@ export const ROBOT_THEME: Record<string, { color: string; agent: string; name: s
  * Ligne 2 du header — mega-menu premium.
  * Fond papier, filet or, typo sérif pour les catégories, panels 3 colonnes.
  */
-export default function V3MainTabs() {
+export default function V3MainTabs({ hideCategories = false }: { hideCategories?: boolean } = {}) {
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [anchorLeft, setAnchorLeft] = useState(0);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -86,7 +86,7 @@ export default function V3MainTabs() {
 
   return (
     <div data-v3-nav=""
-      className="v3-professional-tabs sticky top-16 z-30 relative overflow-x-clip"
+      className={`v3-professional-tabs sticky ${hideCategories ? 'top-0' : 'top-16'} z-30 relative overflow-x-clip`}
       style={{
         background: 'var(--v3-paper)',
         borderBottom: '1px solid var(--v3-line)',
@@ -104,7 +104,7 @@ export default function V3MainTabs() {
       <div className={`max-w-[1600px] mx-auto pl-4 md:pl-6 pr-2 md:pr-3 py-3 flex items-center gap-2 ${tabsLocked ? 'pointer-events-none select-none opacity-70' : ''}`}>
         {/* Desktop (≥ xl) — rangée scrollable : aucun onglet n'est coupé */}
         <nav className="hidden xl:flex flex-wrap items-center gap-2 flex-1 min-w-0 font-sans">
-          <div className="v3-category-group">
+          {!hideCategories && <div className="v3-category-group">
           {V3_HEADER_MENU.map((cat) => {
             const active = openKey === cat.key || isCatActive(cat);
 
@@ -142,7 +142,7 @@ export default function V3MainTabs() {
             );
           })}
           <V3ToolSearch />
-          </div>
+          </div>}
 
           {/* Accès rapides — bleu / blanc / rouge, centrés au milieu de la barre */}
           <div className="v3-quickbar-group flex w-full flex-wrap items-center justify-center gap-2">

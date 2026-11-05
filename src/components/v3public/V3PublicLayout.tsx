@@ -92,7 +92,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
       >
         <V3Header isAuthed={isAuthed} isAdmin={isAdmin} />
         <V3TrialBanner />
-        <V3MainTabs />
+        <V3MainTabs hideCategories={isAuthed} />
         <V3AdminQuickAccess isAdmin={isAdmin} isAdminChecking={isAdminChecking} />
 
         {/* Interrupteur du menu latéral : toujours visible en haut de page. */}

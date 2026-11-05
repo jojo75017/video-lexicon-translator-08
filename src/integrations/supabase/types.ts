@@ -881,6 +881,27 @@ export type Database = {
         }
         Relationships: []
       }
+      cover_generation_log: {
+        Row: {
+          created_at: string
+          id: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       cover_pro_api_keys: {
         Row: {
           created_at: string

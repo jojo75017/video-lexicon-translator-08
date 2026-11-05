@@ -125,6 +125,16 @@ serve(async (req) => {
     if (!user) {
       return new Response(JSON.stringify({ error: 'Non authentifié' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
+    // Plafond mensuel des formules 19/29/59 € (admins et clients à vie : aucun plafond)
+    const svc = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+    const { data: quotaRows } = await svc.rpc('monthly_quota_status', { _user_id: user.id });
+    const quota = Array.isArray(quotaRows) ? quotaRows[0] : null;
+    if (quota?.plan && quota.covers_used >= quota.covers_limit) {
+      return new Response(JSON.stringify({
+        error: `Vous avez utilisé vos ${quota.covers_limit} couvertures et images de ce mois. Elles reviennent le 1er du mois prochain, ou passez à la formule supérieure.`,
+        code: 'MONTHLY_COVER_QUOTA',
+      }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     const body = await req.json();
 
     const {
@@ -292,6 +302,9 @@ Render variation #${variationSeed}. The output MUST be a finished, print-ready, 
     const textResponse = data.choices?.[0]?.message?.content || "";
 
     if (!imageUrl) throw new Error("Aucune image générée");
+    if (quota?.plan) {
+      await svc.from('cover_generation_log').insert({ user_id: user.id, source: 'generate-ai-cover' });
+    }
 
     return new Response(JSON.stringify({
       imageUrl,
