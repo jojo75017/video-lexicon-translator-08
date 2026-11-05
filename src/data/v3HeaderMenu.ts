@@ -151,7 +151,6 @@ export const V3_HEADER_MENU: MenuCategory[] = [
       { label: 'Compléments & options', to: '/v3/upsells', desc: 'Des studios et services à ajouter uniquement si vous en avez besoin' },
       { label: 'Ancien client V2', to: '/v3/migration', badge: 'Droits conservés', desc: 'Vos achats et avantages acquis restent inchangés' },
       { label: 'Calendrier des ouvertures', to: '/v3/calendrier', badge: 'Dates exactes', desc: 'Ce qui est déjà libre et la date d’ouverture de chaque module' },
-      { label: 'Prestation KDP clé en main', to: '/prestation-kdp', badge: 'À partir de 149 €', desc: 'Vous voulez que tout soit fait pour vous : correction, mise en page, couverture et accompagnement KDP' },
     ],
   },
 
