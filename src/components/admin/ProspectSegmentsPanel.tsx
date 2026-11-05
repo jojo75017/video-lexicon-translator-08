@@ -35,10 +35,10 @@ export default function ProspectSegmentsPanel() {
             </Button>
           ))}
         </div>
-        <div className="max-h-72 overflow-y-auto rounded-md border text-sm">
+        <div className="max-h-72 overflow-y-auto rounded-md border border-border bg-card text-sm text-foreground">
           {rows.map((r) => (
-            <div key={r.email} className="flex justify-between border-b px-3 py-1.5 last:border-0">
-              <span>{r.email}</span><span className="text-muted-foreground">{r.first_name || ''} {r.status === 'bounced' ? '· rejetée' : ''}</span>
+            <div key={r.email} className="flex justify-between border-b border-border bg-card px-3 py-1.5 last:border-0">
+              <span className="text-foreground">{r.email}</span><span className="text-muted-foreground">{r.first_name || ''} {r.status === 'bounced' ? '· rejetée' : ''}</span>
             </div>
           ))}
           {rows.length === 200 && <p className="px-3 py-1.5 text-xs text-muted-foreground">200 premières adresses affichées.</p>}
