@@ -1,3 +1,5 @@
+import heroImg from '@/assets/ebook-illustre-hero.jpg';
+import pagesImg from '@/assets/ebook-illustre-pages.jpg';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Baby, BookImage, GraduationCap, Layers, Image, Smile } from 'lucide-react';
 
@@ -28,12 +30,14 @@ export default function V3EbookIllustrePage() {
   return (
     <div style={{ background: '#0B0F17', color: '#E5E7EB', minHeight: '100vh' }} className="px-6 py-10">
       <div className="mx-auto max-w-6xl">
+        <img src={heroImg} alt="Livre illustré ouvert, un enfant et un renard dans la forêt" width={1600} height={640} className="mb-6 w-full rounded-2xl object-cover" style={{ maxHeight: 340, border: '1px solid #1F2937' }} />
         <span className="inline-block rounded-full px-4 py-1 text-xs font-bold tracking-widest" style={{ background: '#EA580C', color: '#fff' }}>INCLUS DANS VOTRE ESPACE</span>
         <div className="mt-4 grid gap-8 lg:grid-cols-2">
           <div>
             <h1 className="text-4xl font-black tracking-wide md:text-5xl" style={{ color: '#14B8A6' }}>CRÉATION D'EBOOK ILLUSTRÉ</h1>
             <p className="mt-2 text-2xl font-extrabold uppercase md:text-3xl" style={{ color: '#F9FAFB' }}>Votre histoire, scène après scène</p>
             <p className="mt-4 text-[15px]" style={{ color: '#D1D5DB' }}>Enfants, adultes, guide, BD ou humour : choisissez votre studio, racontez votre idée, et chaque page reçoit son texte et son illustration.</p>
+            <img src={pagesImg} alt="Exemples de pages illustrées : dragon, baleine, forêt, ville" width={1024} height={768} loading="lazy" className="mt-5 w-full rounded-xl object-cover" style={{ maxHeight: 280, border: '1px solid #1F2937' }} />
           </div>
           <div>
             <h2 className="text-sm font-black tracking-widest" style={{ color: '#F9FAFB' }}>COMMENT ÇA MARCHE</h2>
