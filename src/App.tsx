@@ -710,7 +710,7 @@ const App = () => {
             <Route
               path="/ebook-planner"
               element={
-                gated(
+                <div className="v3-dark-page">{gated(
                   <EbookPlannerPage
                     subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData}
@@ -718,7 +718,7 @@ const App = () => {
                     isAdmin={isAdmin}
                     onLogout={handleLogout}
                   />
-                )
+                )}</div>
               }
             />
             <Route path="/kdp-keywords" element={<div className="v3-dark-page">{gated(<KdpKeywordResearchPage />)}</div>} />
