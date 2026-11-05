@@ -2,12 +2,11 @@ import { ArrowRight, ListOrdered, Rocket, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import V3AgentsStartGrid from '@/components/v3public/V3AgentsStartGrid';
 import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
-import V3WelcomeVideo from '@/components/v3public/V3WelcomeVideo';
 
 /** Page « Commence ici » — point d'entrée unique vers tous les agents V3. */
 export default function V3StartHerePage() {
   return (
-    <div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
+    <div className="v3-dark-page"><div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
       <header className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Commence ici
@@ -75,7 +74,26 @@ export default function V3StartHerePage() {
         <V3StartIdeaCTA variant="discreet" />
       </section>
 
-      <V3WelcomeVideo />
+      <section className="rounded-2xl border p-5 md:p-7" style={{ background: '#111827', borderColor: 'rgba(246,189,42,0.3)' }}>
+        <h2 className="text-xl font-bold" style={{ color: '#F6BD2A' }}>Tutoriel : bien démarrer en 5 étapes</h2>
+        <ol className="mt-4 grid gap-3 md:grid-cols-5">
+          {[
+            ['1. Choisissez votre départ', "Écrire tout de suite, ou commencer par le sommaire IA pour garder la main."],
+            ['2. Remplissez la fiche', "Titre, sujet et public : quelques lignes suffisent, l'IA s'occupe du reste."],
+            ['3. Laissez écrire', "Les chapitres s'écrivent un par un ; vous pouvez relire et corriger à tout moment."],
+            ['4. Habillez le livre', "Créez la couverture et la quatrième dans le studio couverture."],
+            ['5. Exportez et publiez', "Récupérez votre livre en Word ou PDF, prêt pour Amazon KDP."],
+          ].map(([t, d]) => (
+            <li key={t} className="rounded-xl border p-4" style={{ background: '#0F172A', borderColor: '#1F2937' }}>
+              <span className="block text-sm font-bold" style={{ color: '#F9FAFB' }}>{t}</span>
+              <span className="mt-1 block text-[13px]" style={{ color: '#D1D5DB' }}>{d}</span>
+            </li>
+          ))}
+        </ol>
+        <Link to="/v3/tutoriels-v3" className="v3-flat-btn mt-5 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold" style={{ background: '#EA580C', color: '#fff' }}>
+          Voir tous les tutoriels <ArrowRight className="h-4 w-4" />
+        </Link>
+      </section>
 
 
       <Link
@@ -100,6 +118,7 @@ export default function V3StartHerePage() {
       </Link>
 
       <V3AgentsStartGrid />
+    </div>
     </div>
   );
 }

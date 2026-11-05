@@ -38,16 +38,16 @@ export default function V3AgentsStartGrid() {
         })}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
         {agents.map((agent) => (
           <Link
             key={agent.id}
             to={agent.route}
             className="group relative flex flex-col overflow-hidden rounded-2xl border border-black/5 bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
-            <div className="relative aspect-square overflow-hidden bg-muted">
+            <div className="relative mx-auto mt-4 h-24 w-24 overflow-hidden rounded-full bg-muted ring-2" style={{ boxShadow: `0 0 0 2px ${agent.accent}` }}>
               <span
-                className="absolute right-3 top-2 z-10 text-3xl font-black leading-none opacity-25"
+                className="absolute right-1 top-0 z-10 text-lg font-black leading-none opacity-25"
                 style={{ color: agent.accent }}
               >
                 {agent.num}

@@ -88,7 +88,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
     <V3ContemplationMode>
       <div
         className="v3pub min-h-screen flex flex-col"
-        style={(isHome && isAuthed) || ['/v3/revision-editoriale','/v3/corriger'].includes(location.pathname) ? { background: '#2A2624' } : undefined}
+        style={(isHome && isAuthed) || ['/v3/revision-editoriale','/v3/corriger','/v3/commence-ici'].includes(location.pathname) ? { background: '#2A2624' } : undefined}
       >
         <V3Header isAuthed={isAuthed} isAdmin={isAdmin} />
         <V3TrialBanner />
