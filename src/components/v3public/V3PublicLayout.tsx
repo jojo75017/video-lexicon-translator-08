@@ -86,7 +86,10 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
 
   return (
     <V3ContemplationMode>
-      <div className="v3pub min-h-screen flex flex-col">
+      <div
+        className="v3pub min-h-screen flex flex-col"
+        style={isHome && isAuthed ? { background: '#2A2624' } : undefined}
+      >
         <V3Header isAuthed={isAuthed} isAdmin={isAdmin} />
         <V3TrialBanner />
         <V3MainTabs />
