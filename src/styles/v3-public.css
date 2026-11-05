@@ -876,3 +876,6 @@
 }
 .v3-dark-page [class*="from-"][class*="-50"], .v3-dark-page [class*="from-white"] { background-image: linear-gradient(135deg, #111827, #1F2937) !important; }
 .v3-dark-page [class*="from-"][class*="-50"] :is(p,span,h3,div) { color: inherit; }
+.v3-dark-page .bg-\[\#FAFAFA\], .v3-dark-page .bg-\[\#fafafa\] { background-color: #0B0F17 !important; }
+.v3-dark-page :is(.text-\[\#232F3E\],.text-\[\#232f3e\],.text-\[\#0F1111\]) { color: #F9FAFB !important; }
+.v3-dark-page button:not([class*="text-"]):not([style*="color"]) { color: #F9FAFB; }
