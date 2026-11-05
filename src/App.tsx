@@ -114,6 +114,7 @@ const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 import PageHeroImage from './components/v3public/PageHeroImage';
 import parrainageHero from './assets/parrainage-hero.jpg';
 import communauteHero from './assets/communaute-hero.jpg';
+import seriesAudioHero from './assets/series-audio-hero.jpg';
 const PausedPage = ({ src, title, text }: { src: string; title: string; text: string }) => (
   <div className="min-h-screen" style={{ background: '#0b1120', color: '#f5f5f5' }}>
     <PageHeroImage src={src} alt={title} />
@@ -682,7 +683,7 @@ const App = () => {
             <Route path="/formation" element={<div className="v3-dark-page">{<FormationPage />}</div>} />
             <Route path="/formation-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-series" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationSeriesPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
-            <Route path="/formation-series-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationSeriesAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
+            <Route path="/formation-series-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <><PageHeroImage src={seriesAudioHero} alt="Formation séries audio" /><FormationSeriesAudioPage /></> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-videos" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationVideosPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
 
