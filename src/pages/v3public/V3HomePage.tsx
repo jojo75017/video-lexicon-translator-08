@@ -90,6 +90,8 @@ export default function V3HomePage() {
       <div className="v3-home pb-4" style={{ background: '#2A2624' }}>
         <V3SubscriberHome user={user} />
         <V3CoversGallery />
+        <V3SubscriberWorkshops />
+        <V3SubscriberFaq />
       </div>
     );
   }
