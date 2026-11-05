@@ -131,8 +131,10 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     let leadId = existing?.id as string | undefined;
+    const isNew = !leadId;
+    // Un prospect existant n'est jamais modifié ni relancé depuis ce formulaire public.
     if (leadId) {
-      await supabase.from("funnel_leads").update(payload).eq("id", leadId);
+      return json(200, { ok: true, emailed: false });
     } else {
       const { data: inserted, error: insErr } = await supabase
         .from("funnel_leads")
