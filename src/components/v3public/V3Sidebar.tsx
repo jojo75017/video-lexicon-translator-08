@@ -446,8 +446,11 @@ export default function V3Sidebar() {
           </NavLink>
         ))}
 
+        {/* Abonnement & aide juste sous « Tous les outils V3 », facile à trouver pour les abonnés. */}
+        {groups.filter((g) => g.key === 'compte').map((g) => renderGroup(g))}
+
         {!collapsed && <p className="v3-sb-heading">Mes ateliers</p>}
-        {groups.map((g) => renderGroup(g))}
+        {groups.filter((g) => g.key !== 'compte').map((g) => renderGroup(g))}
       </nav>
 
       {/* Retour vers l'espace habituel : le choix reste réversible à tout moment. */}
