@@ -1,3 +1,4 @@
+import heroImg from '@/assets/livres-audio-hero.jpg';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Headphones, Mic, GraduationCap, ListMusic, MessageSquare } from 'lucide-react';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
@@ -22,6 +23,7 @@ const AUDIO_ADDONS = V3_ADDON_LIST.filter((a) => a.key === 'audio_premium' || a.
 export default function V3LivresAudioPage() {
   return (
     <div className="max-w-6xl mx-auto px-5 md:px-8 py-10 space-y-12 text-[#f5f5f5]">
+      <img src={heroImg} alt="Livre ouvert avec casque audio et micro" width={1600} height={640} className="w-full rounded-2xl object-cover" />
       <header>
         <p className="text-[12px] font-bold uppercase tracking-[0.24em]" style={{ color: '#F97316' }}>Livres audio</p>
         <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-2" style={{ color: '#F97316' }}>Création de livres audio</h1>
