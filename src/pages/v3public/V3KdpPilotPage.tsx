@@ -55,15 +55,15 @@ export default function V3KdpPilotPage() {
       <header className="space-y-2">
         <span
           className="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em]"
-          style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.12)', color: '#8a6d1f' }}
+          style={{ borderColor: 'rgba(201,168,76,0.45)', background: 'rgba(201,168,76,0.12)', color: '#e8c96a' }}
         >
           <BarChart3 className="h-3.5 w-3.5" />
           Outil partenaire — pour aller plus loin
         </span>
-        <h1 className="v3-serif text-[26px] md:text-[32px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+        <h1 className="v3-serif text-[26px] md:text-[32px] font-semibold" style={{ color: '#f5f5f5' }}>
           KDP Pilot — suivez vos ventes réelles sur Amazon
         </h1>
-        <p className="text-[15px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+        <p className="text-[15px] leading-relaxed" style={{ color: '#c4cad6' }}>
           EbookStudio vous aide à écrire et à publier. KDP Pilot vous aide à comprendre ce qui se passe
           <strong> après</strong> la publication : classement, ventes estimées, concurrence de votre niche.
           En tant qu’abonné EbookStudio, vous bénéficiez d’une réduction négociée.
@@ -75,10 +75,10 @@ export default function V3KdpPilotPage() {
         className="rounded-[20px] border p-5 md:p-6"
         style={{ borderColor: 'rgba(13,122,95,0.28)', background: 'linear-gradient(120deg, rgba(13,122,95,0.06), rgba(201,168,76,0.12))' }}
       >
-        <h2 className="v3-serif text-[19px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+        <h2 className="v3-serif text-[19px] font-semibold" style={{ color: '#f5f5f5' }}>
           Votre code abonné EbookStudio
         </h2>
-        <p className="mt-1 text-[13.5px]" style={{ color: 'var(--v3-muted)' }}>
+        <p className="mt-1 text-[13.5px]" style={{ color: '#c4cad6' }}>
           15 % de réduction sur le premier mois ou la première année. À saisir dans le champ
           « code promo » de KDP Pilot, au moment du paiement.
         </p>
@@ -86,7 +86,7 @@ export default function V3KdpPilotPage() {
         <div className="mt-4 flex flex-wrap items-center gap-3">
           <span
             className="rounded-xl border px-5 py-3 text-[20px] font-bold tracking-[0.16em]"
-            style={{ borderColor: 'rgba(201,168,76,0.55)', background: '#fff', color: 'var(--v3-ink)' }}
+            style={{ borderColor: 'rgba(201,168,76,0.55)', background: '#141c2b', color: '#f5f5f5' }}
           >
             {KDP_PILOT_PROMO_CODE}
           </span>
@@ -116,7 +116,7 @@ export default function V3KdpPilotPage() {
 
       {/* À quoi ça sert */}
       <section className="space-y-3">
-        <h2 className="v3-serif text-[21px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+        <h2 className="v3-serif text-[21px] font-semibold" style={{ color: '#f5f5f5' }}>
           À quoi ça sert, concrètement
         </h2>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -124,15 +124,15 @@ export default function V3KdpPilotPage() {
             <div
               key={title}
               className="rounded-[18px] border p-4"
-              style={{ borderColor: 'rgba(13,122,95,0.18)', background: '#fffdf8' }}
+              style={{ borderColor: 'rgba(13,122,95,0.18)', background: '#151d2c' }}
             >
               <div className="flex items-center gap-2">
-                <Icon className="h-4 w-4" style={{ color: '#0d7a5f' }} />
-                <h3 className="text-[14.5px] font-bold" style={{ color: 'var(--v3-ink)' }}>
+                <Icon className="h-4 w-4" style={{ color: '#2fd0a8' }} />
+                <h3 className="text-[14.5px] font-bold" style={{ color: '#f5f5f5' }}>
                   {title}
                 </h3>
               </div>
-              <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: '#c4cad6' }}>
                 {text}
               </p>
             </div>
@@ -143,11 +143,11 @@ export default function V3KdpPilotPage() {
       {/* Transparence */}
       <section
         className="rounded-[18px] border p-4 md:p-5"
-        style={{ borderColor: 'rgba(0,0,0,0.10)', background: 'rgba(0,0,0,0.03)' }}
+        style={{ borderColor: 'rgba(0,0,0,0.10)', background: '#151d2c' }}
       >
         <div className="flex items-start gap-3">
-          <Info className="mt-0.5 h-4 w-4 shrink-0" style={{ color: 'var(--v3-muted)' }} />
-          <p className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+          <Info className="mt-0.5 h-4 w-4 shrink-0" style={{ color: '#c4cad6' }} />
+          <p className="text-[13px] leading-relaxed" style={{ color: '#c4cad6' }}>
             En toute transparence : KDP Pilot est un service <strong>indépendant et payant</strong>, qui n’est
             pas inclus dans votre abonnement EbookStudio. Nous avons négocié une réduction pour nos abonnés et
             notre lien est un lien partenaire. Vous pouvez très bien publier sans cet outil : il s’adresse à
