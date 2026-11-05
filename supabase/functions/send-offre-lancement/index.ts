@@ -6,6 +6,7 @@
  * - Arrêt total si pause, si 0 place restante ou après le 15/10/2026 23:59 Paris.
  * - Journal offre_lancement_sends (email, email_id) : jamais deux fois la même étape.
  */
+import { unsubToken } from "../_shared/unsubToken.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThrottle.ts";
 import { FROM_CAMPAIGN, REPLY_TO } from "../_shared/emailIdentity.ts";

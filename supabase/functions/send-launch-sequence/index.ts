@@ -1,3 +1,4 @@
+import { unsubUrl } from "../_shared/unsubToken.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { sendResendEmailThrottled, isQuotaExhausted } from "../_shared/resendThrottle.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";

@@ -204,7 +204,7 @@ serve(async (req) => {
 
 
     return new Response(
-      JSON.stringify({ ok: true, email, alreadyActive, access_code: alreadyActive ? null : accessCode, trial_ends_at: trialEndsAt, bonus_pdf_url: BONUS_PDF_URL }),
+      JSON.stringify({ ok: true, email, alreadyActive, trial_ends_at: trialEndsAt, bonus_pdf_url: BONUS_PDF_URL }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
