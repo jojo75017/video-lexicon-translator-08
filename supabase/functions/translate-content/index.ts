@@ -40,6 +40,11 @@ serve(async (req) => {
       zh: "Chinese",
       ko: "Korean",
       fr: "French",
+      vi: "Vietnamese",
+      th: "Thai",
+      tr: "Turkish",
+      "de-CH": "Swiss Standard German (Switzerland conventions: use ss instead of ß, Swiss vocabulary)",
+      auto: "the original language of the text (detect it)",
     };
 
     const targetLangName = languageNames[targetLanguage] || targetLanguage;

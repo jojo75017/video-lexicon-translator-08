@@ -100,7 +100,7 @@ export default function V3TranslatorPage() {
         </div>
         <h3 className="text-lg font-bold mt-6 mb-2" style={{ color: '#F9FAFB' }}>🎨 Couvertures par langue</h3>
         <div className="flex flex-wrap gap-2 mb-3" role="tablist">
-          {[['🇫🇷','Français'],['🇬🇧','Anglais'],['🇩🇪','Allemand'],['🇪🇸','Espagnol'],['🇮🇹','Italien'],['🇧🇷','Portugais'],['🇳🇱','Néerlandais'],['🇵🇱','Polonais'],['🇯🇵','Japonais'],['🇨🇳','Chinois'],['🇸🇦','Arabe']].map(([f, l]) => (
+          {[['🇫🇷','Français'],['🇬🇧','Anglais'],['🇩🇪','Allemand'],['🇪🇸','Espagnol'],['🇮🇹','Italien'],['🇧🇷','Portugais'],['🇳🇱','Néerlandais'],['🇵🇱','Polonais'],['🇯🇵','Japonais'],['🇨🇳','Chinois'],['🇰🇷','Coréen'],['🇨🇭','Suisse'],['🇹🇷','Turc'],['🇻🇳','Vietnamien'],['🇹🇭','Thaïlandais']].map(([f, l]) => (
             <button key={l} type="button" role="tab" aria-selected={coverLang === l} onClick={() => setCoverLang(l)} className="v3-chip-toggle px-3 py-1.5 rounded-full text-[13px] font-semibold"
               style={{ background: coverLang === l ? '#7C3AED' : '#1F2937', color: '#F9FAFB', border: '1px solid #7C3AED' }}>{f} {l}</button>
           ))}

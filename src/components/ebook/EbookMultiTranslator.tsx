@@ -50,6 +50,7 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
   const [globalProgress, setGlobalProgress] = useState(0);
 
   const availableLanguages = [
+    { code: 'fr', name: 'Français', flag: 'FR', market: '🇫🇷🇧🇪🇨🇦 Livre importé dans une autre langue' },
     { code: 'en', name: 'Anglais', flag: 'GB', market: '🇺🇸🇬🇧 Marché #1 mondial' },
     { code: 'es', name: 'Espagnol', flag: 'ES', market: '🇪🇸🇲🇽 500M+ locuteurs' },
     { code: 'de', name: 'Allemand', flag: 'DE', market: '🇩🇪🇦🇹 Marché premium' },
@@ -60,6 +61,10 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
     { code: 'ja', name: 'Japonais', flag: 'JP', market: '🇯🇵 Marché manga/ebooks' },
     { code: 'zh', name: 'Chinois', flag: 'CN', market: '🇨🇳 1.4B+ potentiel' },
     { code: 'ko', name: 'Coréen', flag: 'KR', market: '🇰🇷 Webtoons populaires' },
+    { code: 'de-CH', name: 'Suisse (allemand)', flag: 'CH', market: '🇨🇭 Marché suisse alémanique' },
+    { code: 'tr', name: 'Turc', flag: 'TR', market: '🇹🇷 85M+ locuteurs' },
+    { code: 'vi', name: 'Vietnamien', flag: 'VN', market: '🇻🇳 100M+ locuteurs' },
+    { code: 'th', name: 'Thaïlandais', flag: 'TH', market: '🇹🇭 70M+ locuteurs' },
   ];
 
   const toggleLanguage = (code: string) => {
@@ -89,7 +94,7 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
         body: JSON.stringify({
           text,
           targetLanguage: targetLang,
-          sourceLanguage: 'fr'
+          sourceLanguage: targetLang === 'fr' ? 'auto' : 'fr'
         }),
       });
 
