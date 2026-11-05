@@ -849,3 +849,33 @@
 .v3-dark-page li, .v3-dark-page p { color: #D1D5DB !important; }
 .v3pub .v3-dark-page :is(h1,h2,h3,h4) { color: #F9FAFB; }
 .v3pub .v3-dark-page .v3-card { background: #111827 !important; color: #F9FAFB; border-color: rgba(246,189,42,0.25); }
+/* Fond noir généralisé des sous-pages abonnés : neutralise les fonds clairs courants. */
+.v3pub .v3-dark-page :is(.bg-white,.bg-gray-50,.bg-gray-100,.bg-slate-50,.bg-slate-100,.bg-neutral-50,.bg-stone-50,.bg-amber-50,.bg-emerald-50,.bg-orange-50,.bg-blue-50,.bg-background,.bg-card,.bg-muted,.bg-secondary) { background-color: #111827 !important; }
+.v3pub .v3-dark-page :is(.text-gray-900,.text-gray-800,.text-gray-700,.text-slate-900,.text-slate-800,.text-slate-700,.text-foreground,.text-black,.text-card-foreground) { color: #F9FAFB !important; }
+.v3pub .v3-dark-page :is(.text-gray-600,.text-gray-500,.text-slate-600,.text-slate-500,.text-muted-foreground) { color: #9CA3AF !important; }
+.v3pub .v3-dark-page :is(.border,.border-gray-200,.border-slate-200,.border-border) { border-color: rgba(246,189,42,0.18); }
+.v3pub .v3-dark-page :is(input,textarea,select) { background-color: #0F172A !important; color: #F9FAFB !important; border-color: #334155; }
+.v3pub .v3-dark-page :is(input,textarea)::placeholder { color: #6B7280; }
+.v3pub .v3-dark-page [style*="background: rgb(255, 255, 255)"], .v3pub .v3-dark-page [style*="background-color: rgb(255, 255, 255)"], .v3pub .v3-dark-page [style*="background: var(--v3-paper)"] { background: #111827 !important; }
+
+/* (hors layout) Fond noir généralisé des sous-pages abonnés : neutralise les fonds clairs courants. */
+.v3-dark-page :is(.bg-white,.bg-gray-50,.bg-gray-100,.bg-slate-50,.bg-slate-100,.bg-neutral-50,.bg-stone-50,.bg-amber-50,.bg-emerald-50,.bg-orange-50,.bg-blue-50,.bg-background,.bg-card,.bg-muted,.bg-secondary) { background-color: #111827 !important; }
+.v3-dark-page :is(.text-gray-900,.text-gray-800,.text-gray-700,.text-slate-900,.text-slate-800,.text-slate-700,.text-foreground,.text-black,.text-card-foreground) { color: #F9FAFB !important; }
+.v3-dark-page :is(.text-gray-600,.text-gray-500,.text-slate-600,.text-slate-500,.text-muted-foreground) { color: #9CA3AF !important; }
+.v3-dark-page :is(.border,.border-gray-200,.border-slate-200,.border-border) { border-color: rgba(246,189,42,0.18); }
+.v3-dark-page :is(input,textarea,select) { background-color: #0F172A !important; color: #F9FAFB !important; border-color: #334155; }
+.v3-dark-page :is(input,textarea)::placeholder { color: #6B7280; }
+.v3-dark-page [style*="background: rgb(255, 255, 255)"], .v3-dark-page [style*="background-color: rgb(255, 255, 255)"], .v3-dark-page [style*="background: var(--v3-paper)"] { background: #111827 !important; }
+
+.v3-dark-page :is(h1,h2,h3,h4) { color: #F9FAFB; }
+.v3-dark-page .v3-card { background: #111827 !important; color: #F9FAFB; }
+.v3-dark-page .v3-theme-scope, .v3-dark-page [class*="v3-theme"] {
+  --background: 222 47% 7%; --foreground: 210 20% 98%; --card: 221 39% 11%; --card-foreground: 210 20% 98%;
+  --muted: 217 33% 17%; --muted-foreground: 218 11% 65%; --border: 217 33% 24%; --input: 217 33% 24%;
+  --popover: 221 39% 11%; --popover-foreground: 210 20% 98%; color: #F9FAFB;
+}
+.v3-dark-page [class*="from-"][class*="-50"], .v3-dark-page [class*="from-white"] { background-image: linear-gradient(135deg, #111827, #1F2937) !important; }
+.v3-dark-page [class*="from-"][class*="-50"] :is(p,span,h3,div) { color: inherit; }
+.v3-dark-page .bg-\[\#FAFAFA\], .v3-dark-page .bg-\[\#fafafa\] { background-color: #0B0F17 !important; }
+.v3-dark-page :is(.text-\[\#232F3E\],.text-\[\#232f3e\],.text-\[\#0F1111\]) { color: #F9FAFB !important; }
+.v3-dark-page button:not([class*="text-"]):not([style*="color"]) { color: #F9FAFB; }
