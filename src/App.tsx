@@ -569,8 +569,8 @@ const App = () => {
             <Route path="/59" element={<Navigate to="/commander" replace />} />
 
             <Route path="/demo-classique" element={<DemoPage />} />
-            <Route path="/faq" element={<FaqAssistancePage />} />
-            <Route path="/assistance" element={<FaqAssistancePage />} />
+            <Route path="/faq" element={<div className="v3-dark-page">{<FaqAssistancePage />}</div>} />
+            <Route path="/assistance" element={<div className="v3-dark-page">{<FaqAssistancePage />}</div>} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-offre" element={<NouvelleOffrePaiementPage />} />
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
@@ -600,7 +600,7 @@ const App = () => {
             <Route path="/valeur-offre" element={<Navigate to="/commander" replace />} />
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/mon-parrainage" replace />} />
-            <Route path="/mon-parrainage" element={<ReferralKitPage />} />
+            <Route path="/mon-parrainage" element={<div className="v3-dark-page">{<ReferralKitPage />}</div>} />
             <Route path="/partenaires" element={<PartenairesPage />} />
             <Route path="/outils-partenaires" element={<PartnerToolsPage />} />
             <Route path="/prestation-kdp" element={<PrestationKdpPage />} />
@@ -618,7 +618,7 @@ const App = () => {
             <Route path="/guide-ebook" element={<Navigate to="/formation" replace />} />
             <Route path="/kdp-ads-guide" element={<Navigate to="/formation" replace />} />
             <Route path="/checklist-tournage" element={<Navigate to="/formation" replace />} />
-            <Route path="/communaute" element={<V3CommunautePage />} />
+            <Route path="/communaute" element={<div className="v3-dark-page">{<V3CommunautePage />}</div>} />
             <Route path="/communaute/post/:id" element={<V3CommunautePostPage />} />
             <Route path="/ai-chat" element={<Navigate to="/ebookbot" replace />} />
             <Route path="/business-center" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
@@ -654,10 +654,10 @@ const App = () => {
             <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
             <Route path="/guide-kdp-enfants" element={<SeoGuideKdpEnfantsPage />} />
             <Route path="/creer-ebook-kdp-etranger" element={<SeoFrancophonesEtrangerPage />} />
-            <Route path="/formation" element={<FormationPage />} />
-            <Route path="/formation-audio" element={isAdmin || isAuthenticated ? <FormationAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation" element={<div className="v3-dark-page">{<FormationPage />}</div>} />
+            <Route path="/formation-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-series" element={isAdmin || isAuthenticated ? <FormationSeriesPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
-            <Route path="/formation-series-audio" element={isAdmin || isAuthenticated ? <FormationSeriesAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-series-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationSeriesAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-videos" element={isAdmin || isAuthenticated ? <FormationVideosPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
 
@@ -690,23 +690,23 @@ const App = () => {
 
 
             {/* V2 tools */}
-            <Route path="/ebook-ideas" element={<EbookIdeasPage />} />
-            <Route path="/ambiances" element={<AmbiancesPage />} />
-            <Route path="/ebookbot" element={<EbookbotPage />} />
+            <Route path="/ebook-ideas" element={<div className="v3-dark-page">{<EbookIdeasPage />}</div>} />
+            <Route path="/ambiances" element={<div className="v3-dark-page">{<AmbiancesPage />}</div>} />
+            <Route path="/ebookbot" element={<div className="v3-dark-page">{<EbookbotPage />}</div>} />
             <Route path="/assistant" element={<AssistantPublicPage />} />
             <Route path="/masterclass" element={<MasterclassPage />} />
-            <Route path="/niches" element={<NichesPage />} />
-            <Route path="/niches-600" element={<Niches600Page />} />
+            <Route path="/niches" element={<div className="v3-dark-page">{<NichesPage />}</div>} />
+            <Route path="/niches-600" element={<div className="v3-dark-page">{<Niches600Page />}</div>} />
             <Route path="/10-niches-offertes" element={<Niches10OffertesPage />} />
-            <Route path="/quiz" element={<QuizPage />} />
-            <Route path="/signature" element={<SignaturePage />} />
-            <Route path="/bd-studio" element={<PlanGuard><BDStudioPage /></PlanGuard>} />
+            <Route path="/quiz" element={<div className="v3-dark-page">{<QuizPage />}</div>} />
+            <Route path="/signature" element={<div className="v3-dark-page">{<SignaturePage />}</div>} />
+            <Route path="/bd-studio" element={<div className="v3-dark-page">{<PlanGuard><BDStudioPage /></PlanGuard>}</div>} />
             {/* Tunnel Studio BD & Jeunesse : vente 17 € → upsell Pro 47 € → studio */}
             <Route path="/bd-offre" element={<BDOffrePage />} />
             <Route path="/bd-upsell" element={<BDUpsellPage />} />
             <Route path="/bd-merci" element={<BDMerciPage />} />
             <Route path="/comic-agent" element={<ComicAgentPage />} />
-            <Route path="/word-count" element={<WordCountPage />} />
+            <Route path="/word-count" element={<div className="v3-dark-page">{<WordCountPage />}</div>} />
             <Route
               path="/ebook-planner"
               element={
@@ -721,9 +721,9 @@ const App = () => {
                 )
               }
             />
-            <Route path="/kdp-keywords" element={gated(<KdpKeywordResearchPage />)} />
-            <Route path="/audit-pilot" element={gated(<AuditPilotPage />)} />
-            <Route path="/bookperfect" element={<PlanGuard><BookPerfectGate><BookPerfectPage /></BookPerfectGate></PlanGuard>} />
+            <Route path="/kdp-keywords" element={<div className="v3-dark-page">{gated(<KdpKeywordResearchPage />)}</div>} />
+            <Route path="/audit-pilot" element={<div className="v3-dark-page">{gated(<AuditPilotPage />)}</div>} />
+            <Route path="/bookperfect" element={<div className="v3-dark-page">{<PlanGuard><BookPerfectGate><BookPerfectPage /></BookPerfectGate></PlanGuard>}</div>} />
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/cover-studio-pro/edit" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
@@ -736,8 +736,8 @@ const App = () => {
             <Route path="/v3/paiements" element={gated(<TrialGate label="Mes paiements"><PaiementsCouverturesPage /></TrialGate>)} />
             <Route path="/admin/cover-pro" element={<AdminGate><AdminCoverProPage /></AdminGate>} />
 
-            <Route path="/series-tomes" element={gated(<SeriesTomesPage />)} />
-            <Route path="/fiches-pratiques" element={gated(<PracticalSheetsGeneratorPage />)} />
+            <Route path="/series-tomes" element={<div className="v3-dark-page">{gated(<SeriesTomesPage />)}</div>} />
+            <Route path="/fiches-pratiques" element={<div className="v3-dark-page">{gated(<PracticalSheetsGeneratorPage />)}</div>} />
 
             {/* Admin */}
             <Route path={ADMIN_HOME_PATH} element={<AdminGate><AdminPage /></AdminGate>} />
