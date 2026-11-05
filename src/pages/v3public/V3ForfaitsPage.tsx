@@ -21,7 +21,7 @@ export default function V3ForfaitsPage() {
         <p className="my-3 text-muted-foreground">Version audio d’un livre : 9,99 €. Précommande Micro-Séries V4 : 67 €. Aucun de ces compléments n’est ajouté automatiquement.</p>
         <Button asChild variant="outline"><Link to="/v3/upsells">Voir toutes les options</Link></Button>
       </section>
-      <p className="mt-6 text-sm text-muted-foreground">Les abonnements historiques se consultent dans <Link to="/v3/compte" className="underline">Mon compte</Link> ; aucune formule mensuelle ou annuelle n’est proposée aux nouveaux clients sur cette page.</p>
+      <p className="mt-6 text-sm text-muted-foreground">Les abonnements historiques se consultent dans <Link to="/v3/compte" className="underline">Mon compte</Link> ; ils restent inchangés.</p>
     </div>
   </main>;
 }
