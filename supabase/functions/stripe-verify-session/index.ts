@@ -210,7 +210,8 @@ serve(async (req) => {
       });
 
       return new Response(
-        JSON.stringify({ ok: true, email, accessCode, trialEndsAt, subscriber: { ...existingSubscriber, plan_type: planType, status: subscriberStatus, trial_ends_at: trialEndsAt } }),
+        // Compte existant : le code n'est jamais renvoyé ici, seulement par email au titulaire.
+        JSON.stringify({ ok: true, email, trialEndsAt, codeSentByEmail: true }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

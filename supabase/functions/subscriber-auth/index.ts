@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { clientIp, isLockedOut, recordFailure } from '../_shared/codeAttempts.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -51,8 +52,16 @@ serve(async (req) => {
       );
     }
 
+    const ip = clientIp(req);
+    if (await isLockedOut(adminClient, normalizedEmail, ip)) {
+      return new Response(
+        JSON.stringify({ error: 'Trop de tentatives. Réessayez dans 15 minutes.' }),
+        { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     const storedCode = subscriber.access_code?.trim().toUpperCase();
     if (storedCode !== normalizedCode) {
+      await recordFailure(adminClient, normalizedEmail, ip);
       return new Response(
         JSON.stringify({ error: 'Code incorrect' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
