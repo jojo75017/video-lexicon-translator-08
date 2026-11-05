@@ -242,10 +242,10 @@ export default function V3BookManagerPage() {
             return (
 
             <div key={b.id} className="v3-card flex flex-wrap items-center gap-4">
-              <div className="w-14 h-20 rounded bg-[var(--v3-ink)] shrink-0" />
+              <div className="w-14 h-20 rounded bg-[#1F2937] shrink-0" />
               <div className="flex-1 min-w-[260px]">
                 <div className="font-semibold flex items-center gap-2 text-base">
-                  <span className="line-clamp-2">{b.title || 'Livre sans titre'}</span>
+                  <span className="line-clamp-2" style={{ color: "#F9FAFB" }}>{b.title || 'Livre sans titre'}</span>
                   {duplicateIds.has(b.id) && (
                     <span className="shrink-0 rounded-full bg-[var(--v3-orange)]/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[var(--v3-orange)]">Doublon</span>
                   )}
