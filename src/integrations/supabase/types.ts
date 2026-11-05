@@ -3470,6 +3470,16 @@ export type Database = {
           status: string
         }[]
       }
+      get_my_monthly_quota: {
+        Args: never
+        Returns: {
+          books_limit: number
+          books_used: number
+          covers_limit: number
+          covers_used: number
+          plan: string
+        }[]
+      }
       get_my_v3_installment_orders: {
         Args: never
         Returns: {
@@ -3509,6 +3519,16 @@ export type Database = {
           project_type: string
           title: string
           updated_at: string
+        }[]
+      }
+      monthly_quota_status: {
+        Args: { _user_id: string }
+        Returns: {
+          books_limit: number
+          books_used: number
+          covers_limit: number
+          covers_used: number
+          plan: string
         }[]
       }
       vip_days_remaining: { Args: never; Returns: number }
