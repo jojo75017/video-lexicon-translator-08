@@ -81,7 +81,8 @@ Deno.serve(async (req) => {
 
     // Le service role peut réparer n'importe quel projet ; un abonné, uniquement les siens.
     let ownerCheck: string | null = null;
-    if (token && token !== serviceKey) {
+    if (!token || token === Deno.env.get("SUPABASE_ANON_KEY")) return json(401, { error: "Non authentifié" });
+    if (token !== serviceKey) {
       const { data: userData } = await admin.auth.getUser(token);
       if (!userData?.user) return json(401, { error: "Non authentifié" });
       ownerCheck = userData.user.id;

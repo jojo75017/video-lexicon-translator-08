@@ -1,3 +1,4 @@
+const __esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 // EbookStudio Scanner — Analyse Amazon Kindle (données fiables via backend PA-API)
 (function () {
   const STORAGE_KEY = "ebkstudio_history";
@@ -374,7 +375,7 @@
     return `
       ${headHtml()}
       <div class="ebk-book-info">
-        <div class="ebk-book-title">${title || "Analyse en cours…"}</div>
+        <div class="ebk-book-title">${__esc(title || "Analyse en cours…")}</div>
       </div>
       <div class="ebk-loading">
         <div class="ebk-spinner"></div>
@@ -407,7 +408,7 @@
         <div class="ebk-book-row">
           ${metrics.cover ? `<img class="ebk-cover" src="${metrics.cover}" alt="" />` : ""}
           <div class="ebk-book-text">
-            <div class="ebk-book-title" title="${titleSafe}">${metrics.title || "(titre introuvable)"}</div>
+            <div class="ebk-book-title" title="${titleSafe}">${__esc(metrics.title || "(titre introuvable)")}</div>
             <div class="ebk-book-author">${metrics.author ? "par " + metrics.author : ""}</div>
           </div>
         </div>

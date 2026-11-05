@@ -121,8 +121,8 @@ const AdminBetaCodesPage: React.FC = () => {
       let attempts = 0;
       while (newCodes.length < qty && attempts < 500) {
         attempts++;
-        const num = Math.floor(1000 + Math.random() * 9000); // 4 digits
-        const code = `BETA-EBOOK-${num}`;
+        const rnd = Array.from(crypto.getRandomValues(new Uint32Array(8)), (n) => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[n % 32]).join('');
+        const code = `BETA-${rnd}`;
         if (!existing.has(code) && !newCodes.includes(code)) {
           newCodes.push(code);
         }
