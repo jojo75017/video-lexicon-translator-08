@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
-import V3VCBooksBanner from '@/components/v3public/V3VCBooksBanner';
 import {
   ArrowRight, AudioLines,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
@@ -82,6 +81,15 @@ export default function V3HomePage() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Abonné : vrai tableau de bord, sans blocs de vente empilés (refonte du 5 novembre).
+  if (user) {
+    return (
+      <div className="v3-home pb-4" style={{ background: '#2A2624' }}>
+        <V3SubscriberHome user={user} />
+      </div>
+    );
+  }
+
   return (
     <div className="v3-home pb-4">
       {user && (
@@ -94,7 +102,6 @@ export default function V3HomePage() {
         </div>
       )}
       {/* VC Books — encart placé tout en haut, juste sous la barre des robots. */}
-      <V3VCBooksBanner />
 
       {/* 1. LANCEMENT — bande fine */}
       {user ? (

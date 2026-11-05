@@ -6,8 +6,8 @@ import reference from '@/assets/vc-books/style-reference.png.asset.json';
 
 export default function V3VCBooksBanner() {
   return (
-    <section id="vc-books" aria-labelledby="vc-books-home-title" className="scroll-mt-40 border-y border-border bg-background">
-      <div className="v3-shell grid items-center gap-6 py-8 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_160px] md:gap-10">
+    <section id="vc-books" aria-labelledby="vc-books-home-title" className="v3-vcbooks-dark scroll-mt-40 rounded-3xl" style={{ background: 'linear-gradient(135deg,#0B0F17,#1A1614)', border: '1px solid rgba(246,189,42,0.35)' }}>
+      <div className="grid items-center gap-6 p-6 md:p-8 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_160px] md:gap-10">
         <img
           src={vcRobot}
           alt="La mascotte robot VC Books, installée aux petits coins avec son livre"
@@ -20,13 +20,13 @@ export default function V3VCBooksBanner() {
           <p className="flex items-center gap-2 text-xs font-semibold text-primary">
             <BookOpen className="h-4 w-4" aria-hidden="true" /> Atelier d’images · Auteur et Édition
           </p>
-          <h2 id="vc-books-home-title" className="v3-serif mt-2 text-2xl font-semibold text-foreground md:text-3xl">
+          <h2 id="vc-books-home-title" className="v3-serif mt-2 text-2xl font-semibold md:text-3xl" style={{ color: "#F3EDE6" }}>
             VC Books — la lecture aux petits coins
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed" style={{ color: "#D6CCC2" }}>
             Anecdotes, quiz, histoires courtes et jeux : des livres humoristiques à savourer une petite pause à la fois.
           </p>
-          <p className="mt-2 text-sm text-muted-foreground">Robot d’écriture et exports Word / PDF inclus.</p>
+          <p className="mt-2 text-sm" style={{ color: "#D6CCC2" }}>Robot d’écriture et exports Word / PDF inclus.</p>
           <div className="mt-4 flex flex-wrap gap-3">
             <Button asChild>
               <Link to="/v3/vc-books/creer">Créer mon livre VC Books <ArrowRight aria-hidden="true" /></Link>
