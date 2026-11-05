@@ -588,7 +588,7 @@ export default function V3CorrecteurPage() {
 
 
   return (
-    <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
+    <div className="v3-dark-page"><div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
       <BackButton to="/v3/commence-ici" label="Retour aux agents" />
 
       <input ref={fileRef} type="file" accept=".docx,.md,.txt,.rtf" className="hidden"

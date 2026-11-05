@@ -834,3 +834,15 @@
 .v3pub .v3-sidebar-dark .v3-sb-link:hover { background:rgba(255,255,255,.08); }
 .v3pub .v3-sidebar-dark .v3-sb-badge { font-size:9px; font-weight:800; text-transform:uppercase; padding:1px 5px; border-radius:4px; color:#fff !important; }
 .v3pub .v3-sit-step { color:#EDE7E2 !important; }
+
+/* Pages intérieures V3 en noir (révision éditoriale, correction). */
+.v3-dark-page {
+  --v3-ink: #F9FAFB; --v3-muted: #9CA3AF; --v3-line: rgba(246,189,42,0.22);
+  --v3-paper: #111827; --v3-cream: #111827; --v3-ivory: #111827; --v3-emerald: #3B82F6;
+  --background: 222 47% 7%; --foreground: 210 20% 98%; --card: 221 39% 11%; --card-foreground: 210 20% 98%;
+  --muted: 217 33% 17%; --muted-foreground: 218 11% 65%; --border: 217 33% 20%; --input: 217 33% 20%;
+  --popover: 221 39% 11%; --popover-foreground: 210 20% 98%;
+  background: #0B0F17; color: #F9FAFB; min-height: 100vh;
+}
+.v3-dark-page .bg-white { background: #111827 !important; }
+.v3-dark-page textarea, .v3-dark-page input, .v3-dark-page select { background: #0F172A; color: #F9FAFB; }
