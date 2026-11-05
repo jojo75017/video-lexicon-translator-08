@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ExternalLink } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
+import profilHero from '@/assets/profil-auteur-hero.jpg';
 
 const STATS = [
   { label: 'Livres publiés', value: '91' },
@@ -21,8 +22,12 @@ const coverUrl = (asin: string) => `https://images-na.ssl-images-amazon.com/imag
 
 export default function V3GuestAuthorPage() {
   return (
-    <>
+    <div className="v3-plans-dark min-h-screen" style={{ background: '#0b1120' }}>
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
+      <div className="max-w-6xl mx-auto px-4 pt-4">
+        <img src={profilHero} alt="Bureau d'écrivain avec fauteuil en cuir, bibliothèque et machine à écrire" width={1600} height={560}
+          className="h-56 w-full rounded-2xl object-cover md:h-72" />
+      </div>
       <section className="v3-section-dark">
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 flex items-center gap-8 flex-wrap">
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--v3-orange)] to-orange-700 grid place-items-center text-3xl font-bold">
@@ -72,6 +77,6 @@ export default function V3GuestAuthorPage() {
       <div className="text-center pb-10">
         <Link to="/v3/create" className="v3-btn v3-btn-primary">Écrire mon propre livre</Link>
       </div>
-    </>
+    </div>
   );
 }
