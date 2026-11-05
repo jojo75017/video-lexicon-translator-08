@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import revisionHero from '@/assets/revision-hero.jpg';
 import { ArrowRight, BookOpen, FileSearch, Feather, Wand2, Image, Globe2, ChevronDown } from 'lucide-react';
 
 const STEPS = [
@@ -23,6 +24,8 @@ export default function V3RevisionEditorialePage() {
   return (
     <div style={{ background: '#0B0F17', color: '#E5E7EB', minHeight: '100vh' }} className="px-6 py-10">
       <div className="mx-auto max-w-6xl">
+        <img src={revisionHero} alt="Manuscrit annoté de corrections, stylo plume et lunettes" width={1600} height={560}
+          className="mb-8 h-56 w-full rounded-2xl object-cover md:h-72" />
         <span className="inline-block rounded-full px-4 py-1 text-xs font-bold tracking-widest" style={{ background: '#EA580C', color: '#fff' }}>
           INCLUS DANS VOTRE ESPACE
         </span>
