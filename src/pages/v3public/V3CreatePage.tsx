@@ -25,6 +25,7 @@ import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 import { BOOK_BRIEF_EVENT, clearBookBrief, parseTocText, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
 import { writeLocalThread } from '@/lib/v3/genieThread';
+import geniusHero from '@/assets/genius-hero.jpg';
 
 
 const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard'));
@@ -458,6 +459,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
         {/* Ma maison d'édition : on explique avant de faire */}
         {!openedBook && (
         <div className="mt-6">
+          <img src={geniusHero} alt="EbookStudio Genius" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
           <div className="text-center">
             <span className="v3-chip v3-chip-orange">
               <Sparkles className="w-3.5 h-3.5" /> {biography ? 'Biographie — Le récit de votre vie' : 'Ma maison d’édition'}
