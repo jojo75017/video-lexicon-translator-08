@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ExternalLink, BookOpen } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
 
 const STATS = [
@@ -9,11 +9,15 @@ const STATS = [
   { label: 'Lecteurs', value: '10k+' },
 ];
 
-const CATALOG = Array.from({ length: 24 }, (_, i) => ({
-  id: `axel-${i + 1}`,
-  title: `AXEL — Tome ${i + 1}`,
-  genre: i % 3 === 0 ? 'Thriller' : i % 3 === 1 ? 'Aventure' : 'Espionnage',
-}));
+const CATALOG = [
+  { asin: 'B0GXB3V5DJ', title: "L'Ancien Locataire", genre: 'Thriller psychologique' },
+  { asin: 'B0GG7QCFTZ', title: "Axel Kiev — L'Origine du Code", genre: 'Espionnage' },
+  { asin: 'B0GY5K8GCS', title: 'Signal Zéro — Intégrale', genre: 'Thriller' },
+  { asin: 'B0GX2SVHY4', title: 'Le Loup en Vacances', genre: 'Jeunesse' },
+  { asin: 'B0GQQB7V1F', title: "Dans l'Ombre de la Villa", genre: 'Polar' },
+  { asin: 'B0GN34WYMK', title: 'La Bible du Voyage', genre: 'Voyage' },
+];
+const coverUrl = (asin: string) => `https://images-na.ssl-images-amazon.com/images/P/${asin}.01.LZZZZZZZ.jpg`;
 
 export default function V3GuestAuthorPage() {
   return (
@@ -52,23 +56,15 @@ export default function V3GuestAuthorPage() {
       <section className="max-w-6xl mx-auto px-5 md:px-8 py-14">
         <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
           <h2 className="v3-serif text-3xl font-bold">Le catalogue</h2>
-          <div className="flex gap-2">
-            {['Tous', 'Thriller', 'Aventure', 'Espionnage'].map((g) => (
-              <button key={g} className="v3-chip">{g}</button>
-            ))}
-          </div>
+
         </div>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           {CATALOG.map((b) => (
-            <div key={b.id}>
-              <div className="aspect-[3/4] rounded-lg bg-gradient-to-br from-orange-600 to-orange-900 grid place-items-end p-3 text-white">
-                <BookOpen className="w-4 h-4 text-white/40 self-start" />
-                <div className="text-[11px] font-bold uppercase tracking-wider leading-tight">
-                  {b.title}
-                </div>
-              </div>
-              <div className="mt-2 text-[11px] text-[var(--v3-muted)]">{b.genre}</div>
-            </div>
+            <a key={b.asin} href={`https://www.amazon.fr/dp/${b.asin}/`} target="_blank" rel="noopener noreferrer" className="block">
+              <img src={coverUrl(b.asin)} alt={b.title} loading="lazy" className="aspect-[2/3] w-full rounded-lg object-cover bg-white/5" onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://m.media-amazon.com/images/P/${b.asin}.jpg`; }} />
+              <div className="mt-2 text-[12px] font-semibold leading-tight">{b.title}</div>
+              <div className="text-[11px] text-[var(--v3-muted)]">{b.genre}</div>
+            </a>
           ))}
         </div>
       </section>
