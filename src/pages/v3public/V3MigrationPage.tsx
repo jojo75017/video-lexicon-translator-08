@@ -12,7 +12,7 @@ export default function V3MigrationPage() {
   const { loading, hasV2 } = useV3Entitlement();
   if (loading) {
     return (
-      <div className="py-16 grid place-items-center" style={{ background: "#FAFAFA" }}>
+      <div className="py-16 grid place-items-center" style={{ background: "#0b1120" }}>
         <p className="text-sm text-slate-500">Vérification de votre accès V2…</p>
       </div>
     );
@@ -20,8 +20,8 @@ export default function V3MigrationPage() {
 
   if (!hasV2) {
     return (
-      <div className="py-10 md:py-16 grid place-items-center px-4" style={{ background: "#FAFAFA" }}>
-        <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #e5e7eb" }}>
+      <div className="v3-plans-dark py-10 md:py-16 grid place-items-center px-4" style={{ background: "#0b1120" }}>
+        <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #2a3448" }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Tarif fidélité -20 % à vie
           </p>
@@ -48,7 +48,7 @@ export default function V3MigrationPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4" style={{ background: "#FAFAFA" }}>
+    <div className="v3-plans-dark min-h-screen py-12 px-4" style={{ background: "#0b1120" }}>
       <div className="max-w-5xl mx-auto">
         <BackButton className="mb-4" />
 
@@ -68,10 +68,10 @@ export default function V3MigrationPage() {
         {/* 5 modules offerts */}
         <section
           className="rounded-2xl bg-white p-8 mb-10"
-          style={{ border: "1px solid #e5e7eb", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}
+          style={{ border: "1px solid #2a3448", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg grid place-items-center" style={{ background: "#e8f7ef", color: "#0b6e4c" }}>
+            <div className="w-10 h-10 rounded-lg grid place-items-center" style={{ background: "#12302a", color: "#0b6e4c" }}>
               <Gift size={20} />
             </div>
             <div>
@@ -90,7 +90,7 @@ export default function V3MigrationPage() {
                 key={m.key}
                 to={m.to}
                 className="rounded-xl p-5 transition hover:opacity-90"
-                style={{ border: "1px solid #e5e7eb", background: "#fcfcfc" }}
+                style={{ border: "1px solid #2a3448", background: "#1c2638" }}
               >
                 <div className="flex items-start gap-2 mb-2">
                   <Check size={16} className="shrink-0 mt-1" style={{ color: "#0b6e4c" }} />
@@ -102,7 +102,7 @@ export default function V3MigrationPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-4 mt-6">
-            <div className="rounded-xl p-4" style={{ background: "#f6fbf8", border: "1px solid #0f8a5f33" }}>
+            <div className="rounded-xl p-4" style={{ background: "#12302a", border: "1px solid #0f8a5f33" }}>
               <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "#0b6e4c" }}>
                 Ce qui est inclus
               </p>
@@ -115,7 +115,7 @@ export default function V3MigrationPage() {
                 </li>
               </ul>
             </div>
-            <div className="rounded-xl p-4" style={{ background: "#fdfbf6", border: "1px solid #e5e7eb" }}>
+            <div className="rounded-xl p-4" style={{ background: "#1c2638", border: "1px solid #2a3448" }}>
               <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "#9a6b0a" }}>
                 Compléments professionnels
               </p>
