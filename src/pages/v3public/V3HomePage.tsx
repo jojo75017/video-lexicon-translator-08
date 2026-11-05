@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
@@ -103,6 +103,11 @@ export default function V3HomePage() {
   // Session en cours de vérification : on n'affiche pas l'ancienne page de vente.
   if (user === undefined) {
     return <div className="v3-home" style={{ background: '#2A2624', minHeight: '100vh' }} />;
+  }
+
+  // Ancienne page de vente mise à l'écart : les visiteurs non connectés vont à la connexion.
+  if (user === null) {
+    return <Navigate to="/connexion-abonne" replace />;
   }
 
   return (
