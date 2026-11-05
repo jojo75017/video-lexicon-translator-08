@@ -903,3 +903,12 @@
 .v3-dark-page .bg-\[\#fafbfc\], .v3-dark-page .bg-\[\#FAFAFA\]\/95 { background-color: #0F172A !important; }
 .v3-dark-page .border-\[\#e8ecf1\] { border-color: #1F2937 !important; }
 .v3-dark-page header :is(a,button,span):not([class*="text-white"]):not([class*="bg-"]) { color: #E5E7EB; }
+
+/* Catégories KDP : champs lisibles sur fond sombre */
+.kdp-field, .v3-dark-page .kdp-field {
+  background-color: hsl(222 30% 14%) !important;
+  color: hsl(0 0% 96%) !important;
+  border-color: hsl(186 60% 40%) !important;
+  -webkit-text-fill-color: hsl(0 0% 96%) !important;
+}
+.kdp-field::placeholder { color: hsl(215 20% 70%) !important; -webkit-text-fill-color: hsl(215 20% 70%) !important; opacity: 1; }
