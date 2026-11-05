@@ -1,5 +1,6 @@
 import { ArrowRight, ListOrdered, Rocket, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import tutoVideo from '@/assets/videos/commence-ici-tutoriel-5-etapes.mp4.asset.json';
 import V3AgentsStartGrid from '@/components/v3public/V3AgentsStartGrid';
 import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 
@@ -76,6 +77,7 @@ export default function V3StartHerePage() {
 
       <section className="rounded-2xl border p-5 md:p-7" style={{ background: '#111827', borderColor: 'rgba(246,189,42,0.3)' }}>
         <h2 className="text-xl font-bold" style={{ color: '#F6BD2A' }}>Tutoriel : bien démarrer en 5 étapes</h2>
+        <video src={tutoVideo.url} controls playsInline preload="metadata" className="mt-4 w-full max-w-3xl rounded-xl border" style={{ borderColor: '#1F2937', background: '#000' }} />
         <ol className="mt-4 grid gap-3 md:grid-cols-5">
           {[
             ['1. Choisissez votre départ', "Écrire tout de suite, ou commencer par le sommaire IA pour garder la main."],
