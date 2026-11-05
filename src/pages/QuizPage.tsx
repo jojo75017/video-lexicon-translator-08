@@ -14,6 +14,7 @@ import {
   type ProfileKey,
 } from "@/data/authorQuiz";
 import { BookOpen, ArrowRight, CheckCircle2, Sparkles, Loader2 } from "lucide-react";
+import quizHero from "@/assets/quiz-hero.jpg";
 
 type Step = "intro" | "questions" | "capture" | "result";
 
@@ -110,6 +111,7 @@ const QuizPage = () => {
           EbookStudio
         </Link>
 
+        <img src={quizHero} alt="Quiz auteur" width={1600} height={560} className="w-full h-40 md:h-52 object-cover rounded-2xl mb-8" />
         {step !== "intro" && step !== "result" && (
           <Progress value={progress} className="mb-8 h-2" />
         )}
