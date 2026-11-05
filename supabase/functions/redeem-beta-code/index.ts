@@ -20,7 +20,7 @@ function generateAccessCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let code = 'EBK-';
   for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+    code += chars.charAt(crypto.getRandomValues(new Uint32Array(1))[0] % chars.length);
   }
   return code;
 }

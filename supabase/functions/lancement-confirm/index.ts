@@ -129,8 +129,7 @@ Deno.serve(async (req) => {
 
     const paid =
       session?.payment_status === "paid" ||
-      session?.payment_status === "no_payment_required" ||
-      session?.status === "complete";
+      session?.payment_status === "no_payment_required" ;
 
     const email = String(
       session?.customer_details?.email || session?.customer_email || session?.metadata?.email || "",
