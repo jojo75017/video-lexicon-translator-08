@@ -3,7 +3,7 @@ import { ExternalLink } from 'lucide-react';
 import { BackButton } from '@/components/v3/BackButton';
 
 const STATS = [
-  { label: 'Livres publiés', value: '71' },
+  { label: 'Livres publiés', value: '91' },
   { label: 'Genres explorés', value: '6' },
   { label: 'Années d\'écriture', value: '12' },
   { label: 'Lecteurs', value: '10k+' },
@@ -34,7 +34,7 @@ export default function V3GuestAuthorPage() {
             </span>
             <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-3">Mr Georges Boubet</h1>
             <p className="mt-2 text-white/60 max-w-xl">
-              71 livres publiés. Thrillers, sagas d'espionnage, aventure — un catalogue passionnant à découvrir.
+              91 livres publiés. Thrillers, sagas d'espionnage, aventure — un catalogue passionnant à découvrir.
             </p>
           </div>
           <a href="https://www.amazon.fr/stores/author/B00J4G8QOE" target="_blank" rel="noopener noreferrer" className="v3-btn" style={{ background: '#fff', color: '#000' }}>

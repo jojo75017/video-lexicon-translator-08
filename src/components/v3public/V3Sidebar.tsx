@@ -424,6 +424,11 @@ export default function V3Sidebar() {
           {!collapsed && <span className="truncate">eBook illustré</span>}
         </NavLink>
 
+        <NavLink to="/v3/livres-audio" end title="Livres audio" className="v3-sb-tile" style={{ background: '#EA580C' }}>
+          <span className="shrink-0">🎧</span>
+          {!collapsed && <span className="truncate">Livres audio</span>}
+        </NavLink>
+
         {DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
           <NavLink
             key={l.to}

@@ -223,6 +223,7 @@ const V3StudioV4Page = lazy(() => import('./pages/v3public/V3StudioV4Page'));
 const PrestationKdpPage = lazy(() => import('./pages/PrestationKdpPage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
 const ReferralKitPage = lazy(() => import('./pages/ReferralKitPage'));
+const V3LivresAudioPage = lazy(() => import('./pages/v3public/V3LivresAudioPage'));
 const PartenairesPage = lazy(() => import('./pages/PartenairesPage'));
 const PartnerToolsPage = lazy(() => import('./pages/PartnerToolsPage'));
 const GoKdpPilotPage = lazy(() => import('./pages/GoKdpPilotPage'));
@@ -852,6 +853,7 @@ const App = () => {
               <Route path="outils/traduction" element={<V3PaidModuleRoute><V3TranslatorPage /></V3PaidModuleRoute>} />
               <Route path="revision-editoriale" element={<V3RevisionEditorialePage />} />
               <Route path="ebook-illustre" element={<V3EbookIllustrePage />} />
+              <Route path="livres-audio" element={<V3LivresAudioPage />} />
               <Route path="corriger" element={<PlanGuard><V3PaidModuleRoute><V3CorrecteurPage /></V3PaidModuleRoute></PlanGuard>} />
               <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
               <Route path="posts" element={<V3PaidModuleRoute><V3PostsPage /></V3PaidModuleRoute>} />
