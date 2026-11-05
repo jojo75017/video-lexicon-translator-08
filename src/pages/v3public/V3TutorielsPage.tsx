@@ -60,7 +60,7 @@ export default function V3TutorielsPage() {
   const start = (t: TutorielV3) => { setOpen(t); setI(0); };
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="v3-dark-page"><div className="mx-auto max-w-6xl px-4 py-8">
       <div className="mb-8">
         <Badge variant="secondary">Mis à jour oct. 2026</Badge>
         <h1 className="mt-2 text-3xl font-bold">Tutoriels V3</h1>
@@ -168,6 +168,6 @@ export default function V3TutorielsPage() {
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </div></div>
   );
 }
