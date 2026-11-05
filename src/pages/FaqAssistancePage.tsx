@@ -8,6 +8,7 @@ import { HelpCircle, Mail, MessageCircle, Clock, CheckCircle, AlertCircle, Book,
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import assistanceHero from '@/assets/assistance-hero.jpg';
 
 // SEO Meta + Schema.org FAQ pour la page
 const useFaqSeo = (faqItems: { question: string; answer: string }[]) => {
@@ -243,6 +244,7 @@ Vos ebooks vous appartiennent à 100%.`
       </div>
 
       <div className="container mx-auto px-4 py-12 max-w-4xl space-y-8">
+        <img src={assistanceHero} alt="Assistance EbookStudio" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl" />
         {/* Hero */}
         <div className="text-center space-y-4">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
