@@ -19,6 +19,7 @@ import StudioProBudgetPanel from '@/components/v3/studio/StudioProBudgetPanel';
 import EngineBadge from '@/components/v3/studio/EngineBadge';
 import V3TwoStepBadge from '@/components/v3public/V3TwoStepBadge';
 import { BibleContent, EMPTY_BIBLE, MasterSheetDraft, emptyMasterSheet } from '@/types/studioPro';
+import studioProHero from '@/assets/studio-pro-hero.jpg';
 
 
 /**
@@ -145,6 +146,7 @@ const V3StudioProPage: React.FC = () => {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-8">
+      <img src={studioProHero} alt="Studio Pro" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
       <header className="mb-6 space-y-3">
         <div className="flex flex-wrap items-center gap-2">
           <Badge>Studio Pro</Badge>
