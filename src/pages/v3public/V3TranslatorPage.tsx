@@ -97,6 +97,29 @@ export default function V3TranslatorPage() {
             </Link>
           ))}
         </div>
+        <h3 className="text-lg font-bold mt-6 mb-2" style={{ color: '#F9FAFB' }}>🌍 Amazon KDP dans votre langue</h3>
+        <p className="text-[13px] mb-3" style={{ color: '#9CA3AF' }}>Ouvrez KDP pour publier, et la boutique Amazon du pays pour vérifier votre livre en ligne.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2">
+          {[
+            { f: '🇫🇷', l: 'Français', kdp: 'fr_FR', shop: 'amazon.fr' },
+            { f: '🇺🇸', l: 'English (US)', kdp: 'en_US', shop: 'amazon.com' },
+            { f: '🇬🇧', l: 'English (UK)', kdp: 'en_US', shop: 'amazon.co.uk' },
+            { f: '🇩🇪', l: 'Deutsch', kdp: 'de_DE', shop: 'amazon.de' },
+            { f: '🇪🇸', l: 'Español', kdp: 'es_ES', shop: 'amazon.es' },
+            { f: '🇮🇹', l: 'Italiano', kdp: 'it_IT', shop: 'amazon.it' },
+            { f: '🇧🇷', l: 'Português', kdp: 'pt_BR', shop: 'amazon.com.br' },
+            { f: '🇳🇱', l: 'Nederlands', kdp: 'nl_NL', shop: 'amazon.nl' },
+            { f: '🇯🇵', l: '日本語', kdp: 'ja_JP', shop: 'amazon.co.jp' },
+          ].map((m) => (
+            <div key={m.shop} className="rounded-lg p-3" style={{ background: '#1F2937' }}>
+              <div className="font-semibold" style={{ color: '#F9FAFB' }}>{m.f} {m.l}</div>
+              <div className="flex gap-2 mt-2 text-[12px]">
+                <a href={`https://kdp.amazon.com/${m.kdp}`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 rounded" style={{ background: '#D97706', color: '#fff' }}>KDP</a>
+                <a href={`https://www.${m.shop}`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 rounded" style={{ background: '#374151', color: '#F9FAFB' }}>{m.shop}</a>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
