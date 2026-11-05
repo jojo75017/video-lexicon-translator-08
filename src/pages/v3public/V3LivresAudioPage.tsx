@@ -15,7 +15,6 @@ const STUDIOS = [
   { title: "Version audio d'un livre", text: 'Un livre converti en MP3, à écouter et télécharger tout de suite.', to: '/v3/version-audio', icon: Mic, color: '#2563EB' },
   { title: 'Formation audio', text: 'Apprenez à produire et publier vos livres audio pas à pas.', to: '/formation-audio', icon: GraduationCap, color: '#059669' },
   { title: 'Formation séries audio', text: 'Créez des séries audio en plusieurs épisodes à partir de vos histoires.', to: '/formation-series-audio', icon: ListMusic, color: '#7C3AED' },
-  { title: 'Message audio (MP3)', text: 'Un court message vocal en MP3 pour présenter votre livre.', to: '/message', icon: MessageSquare, color: '#0D9488' },
 ];
 
 const AUDIO_ADDONS = V3_ADDON_LIST.filter((a) => a.key === 'audio_premium' || a.key === 'audio_single');
