@@ -566,7 +566,7 @@ const App = () => {
             <Route path="/subscription" element={<Navigate to="/connexion-abonne" replace />} />
             {/* Tunnel de commande : toujours accessible (les CTA emails/bannières doivent
                 arriver sur le paiement, même pour un admin ou un abonné connecté). */}
-            <Route path="/commander" element={<V3CommanderPage />} />
+            <Route path="/commander" element={<CommanderRedirect />} />
             {/* Tunnel de lancement du 1er octobre : capture → offres → remerciement */}
             <Route path="/lancement" element={<LancementCapturePage />} />
             <Route path="/starter" element={<StarterPage />} />
@@ -947,3 +947,8 @@ const App = () => {
 };
 
 export default App;
+
+function CommanderRedirect() {
+  const { search } = useLocation();
+  return <Navigate to={`/lancement/offres${search}`} replace />;
+}
