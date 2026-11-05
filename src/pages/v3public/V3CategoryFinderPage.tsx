@@ -92,15 +92,15 @@ export default function V3CategoryFinderPage() {
         <CardHeader><CardTitle className="flex items-center gap-2"><FolderTree className="h-5 w-5" /> Renseigne ton livre</CardTitle></CardHeader>
         <CardContent className="space-y-3">
           <div className="grid md:grid-cols-2 gap-3">
-            <Input placeholder="Titre du livre *" value={form.title} onChange={e => set('title', e.target.value)} />
-            <Input placeholder="Sous-titre" value={form.subtitle} onChange={e => set('subtitle', e.target.value)} />
-            <Input placeholder="Genre (ex: thriller psychologique, dev perso...)" value={form.genre} onChange={e => set('genre', e.target.value)} />
-            <Input placeholder="Public cible (ex: femmes 30-50, entrepreneurs...)" value={form.audience} onChange={e => set('audience', e.target.value)} />
-            <Input placeholder="Marketplace" value={form.marketplace} onChange={e => set('marketplace', e.target.value)} />
-            <Input placeholder="Format (ebook / broché / both)" value={form.format} onChange={e => set('format', e.target.value)} />
+            <Input className="kdp-field" placeholder="Titre du livre *" value={form.title} onChange={e => set('title', e.target.value)} />
+            <Input className="kdp-field" placeholder="Sous-titre" value={form.subtitle} onChange={e => set('subtitle', e.target.value)} />
+            <Input className="kdp-field" placeholder="Genre (ex: thriller psychologique, dev perso...)" value={form.genre} onChange={e => set('genre', e.target.value)} />
+            <Input className="kdp-field" placeholder="Public cible (ex: femmes 30-50, entrepreneurs...)" value={form.audience} onChange={e => set('audience', e.target.value)} />
+            <Input className="kdp-field" placeholder="Marketplace" value={form.marketplace} onChange={e => set('marketplace', e.target.value)} />
+            <Input className="kdp-field" placeholder="Format (ebook / broché / both)" value={form.format} onChange={e => set('format', e.target.value)} />
           </div>
-          <Input placeholder="Mots-clés principaux (séparés par des virgules)" value={form.keywords} onChange={e => set('keywords', e.target.value)} />
-          <Textarea rows={5} placeholder="Synopsis / résumé du livre * (3-6 phrases)" value={form.synopsis} onChange={e => set('synopsis', e.target.value)} />
+          <Input className="kdp-field" placeholder="Mots-clés principaux (séparés par des virgules)" value={form.keywords} onChange={e => set('keywords', e.target.value)} />
+          <Textarea className="kdp-field" rows={5} placeholder="Synopsis / résumé du livre * (3-6 phrases)" value={form.synopsis} onChange={e => set('synopsis', e.target.value)} />
           <Button onClick={run} disabled={loading} size="lg" className="bg-emerald-800 hover:bg-emerald-900">
             {loading ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Analyse des 19 000+ catégories…</> : <><Sparkles className="mr-2 h-4 w-4" /> Analyser & optimiser</>}
           </Button>
