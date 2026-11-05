@@ -940,3 +940,8 @@
   background-color: #141c2b !important; color: #f5f5f5 !important; -webkit-text-fill-color: #f5f5f5 !important; border-color: rgba(47,208,168,0.45) !important;
 }
 .v3-special-readable input::placeholder, .v3-special-readable textarea::placeholder { color: #9aa3b2 !important; -webkit-text-fill-color: #9aa3b2 !important; }
+.v3-dark-page .v3-ambiance, .v3-special-readable .v3-ambiance {
+  background: #111827 !important; color: #f5f5f5 !important;
+  --v3-ink: #f5f5f5; --v3-muted: #c4cad6;
+}
+.v3-dark-page .v3-ambiance textarea, .v3-dark-page .v3-ambiance input { color: #f5f5f5 !important; -webkit-text-fill-color: #f5f5f5 !important; }
