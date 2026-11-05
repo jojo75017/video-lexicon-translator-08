@@ -406,14 +406,14 @@ const __esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;",
       ${headHtml()}
       <div class="ebk-book-info">
         <div class="ebk-book-row">
-          ${metrics.cover ? `<img class="ebk-cover" src="${metrics.cover}" alt="" />` : ""}
+          ${metrics.cover ? `<img class="ebk-cover" src="${__esc(metrics.cover)}" alt="" />` : ""}
           <div class="ebk-book-text">
             <div class="ebk-book-title" title="${titleSafe}">${__esc(metrics.title || "(titre introuvable)")}</div>
-            <div class="ebk-book-author">${metrics.author ? "par " + metrics.author : ""}</div>
+            <div class="ebk-book-author">${metrics.author ? "par " + __esc(metrics.author) : ""}</div>
           </div>
         </div>
         <div class="ebk-book-meta">
-          <span class="ebk-asin" title="Cliquer pour copier">ASIN <b>${metrics.asin || "—"}</b></span>
+          <span class="ebk-asin" title="Cliquer pour copier">ASIN <b>${__esc(metrics.asin || "—")}</b></span>
           <span class="ebk-mp">🌍 .${mp.toLowerCase()}</span>
           ${metrics.pages ? `<span>📖 ${metrics.pages} p.</span>` : ""}
           ${metrics.rating ? `<span class="ebk-stars">${stars} ${metrics.rating.toFixed(1)}</span>` : ""}
