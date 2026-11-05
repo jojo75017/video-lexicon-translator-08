@@ -1,5 +1,6 @@
 // Agent illustrateur — génère une illustration cohérente pour un chapitre
 // de livre illustré maternelle et l'upload dans le bucket `ebook-images`.
+import { checkImageQuota, logImage, quotaMessage, userIdFromAuth } from '../_shared/monthlyImageQuota.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 import { z } from 'npm:zod@3.23.8';
@@ -30,6 +31,8 @@ Deno.serve(async (req) => {
     const { data: userData } = await authed.auth.getUser();
     if (!userData?.user) return json({ error: 'Non authentifié' }, 401);
     const userId = userData.user.id;
+    const imgQuota = await checkImageQuota(userId);
+    if (imgQuota.exceeded) return json({ error: quotaMessage(imgQuota.limit), code: 'MONTHLY_COVER_QUOTA' }, 403);
 
     const parsed = BodySchema.safeParse(await req.json());
     if (!parsed.success) return json({ error: 'Paramètres d’illustration invalides.', fields: parsed.error.flatten().fieldErrors }, 400);
@@ -90,6 +93,7 @@ Deno.serve(async (req) => {
     if (upErr) return json({ error: `Upload: ${upErr.message}` }, 500);
 
     const { data: pub } = admin.storage.from('ebook-images').getPublicUrl(path);
+    await logImage(imgQuota, 'album-illustrated-image');
     return json({ url: pub.publicUrl, path, model });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);

@@ -1,5 +1,6 @@
 // Agent illustrateur — génère une illustration cohérente pour un chapitre
 // de livre illustré maternelle et l'upload dans le bucket `ebook-images`.
+import { checkImageQuota, logImage, quotaMessage, userIdFromAuth } from '../_shared/monthlyImageQuota.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -34,6 +35,8 @@ Deno.serve(async (req) => {
     const { data: userData } = await authed.auth.getUser();
     if (!userData?.user) return json({ error: 'Non authentifié' }, 401);
     const userId = userData.user.id;
+    const imgQuota = await checkImageQuota(userId);
+    if (imgQuota.exceeded) return json({ error: quotaMessage(imgQuota.limit), code: 'MONTHLY_COVER_QUOTA' }, 403);
 
     const body = (await req.json()) as Body;
     if (!body.characterBible || !body.scene) return json({ error: 'characterBible et scene requis' }, 400);
@@ -79,6 +82,7 @@ Deno.serve(async (req) => {
     if (upErr) return json({ error: `Upload: ${upErr.message}` }, 500);
 
     const { data: pub } = admin.storage.from('ebook-images').getPublicUrl(path);
+    await logImage(imgQuota, 'agent-illustrator');
     return json({ url: pub.publicUrl, path, model });
   } catch (e) {
     return json({ error: (e as Error).message }, 500);
