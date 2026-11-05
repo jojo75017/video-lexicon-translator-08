@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, Sparkles, Plus, Minus } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Plus, Minus, RotateCcw } from 'lucide-react';
 import AgentPortrait from './AgentPortrait';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { setSpaceChoice } from '@/lib/v3OpenState';
@@ -261,11 +261,16 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
             {book && <p className="text-xs" style={{ color: '#94A3B8' }}>Modifié le {new Date(book.updated_at).toLocaleDateString('fr-FR')}</p>}
           </div>
         </div>
-        {book && (
-          <Link to={`/v3/book/${book.id}`} className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold" style={{ background: '#EA580C', color: '#fff' }}>
-            <span style={{ color: '#fff' }}>Continuer mon livre</span> <ArrowRight className="h-4 w-4" style={{ color: '#fff' }} />
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <Link to="/v3/lancer" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold" style={{ background: 'rgba(234,88,12,.14)', border: '1px solid rgba(234,88,12,.55)', color: '#FDBA74' }}>
+            <span style={{ color: '#FDBA74' }}>Je repars de zéro</span> <RotateCcw className="h-4 w-4" style={{ color: '#FDBA74' }} />
           </Link>
-        )}
+          {book && (
+            <Link to={`/v3/book/${book.id}`} className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold" style={{ background: '#EA580C', color: '#fff' }}>
+              <span style={{ color: '#fff' }}>Continuer mon livre</span> <ArrowRight className="h-4 w-4" style={{ color: '#fff' }} />
+            </Link>
+          )}
+        </div>
       </div>
 
       {/* 2. Écriture Express */}
