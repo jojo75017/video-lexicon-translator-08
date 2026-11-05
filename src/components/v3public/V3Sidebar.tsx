@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  Home, Sparkles, BookOpen, BookPlus, LibraryBig, Settings,
+  FilePen, Home, Sparkles, BookOpen, BookPlus, LibraryBig, Settings,
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
@@ -409,7 +409,10 @@ export default function V3Sidebar() {
           </NavLink>
         ))}
 
-        {renderGroup(REVISION_GROUP)}
+        <NavLink to="/v3/revision-editoriale" end title="Révision éditoriale" className="v3-sb-tile" style={{ background: '#1D4ED8' }}>
+          <FilePen className="h-4 w-4 shrink-0" />
+          {!collapsed && <span className="truncate">📝 Révision éditoriale</span>}
+        </NavLink>
 
         {DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
           <NavLink
