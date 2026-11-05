@@ -58,23 +58,25 @@ export default function V3GuestAuthorPage() {
         </div>
       </section>
 
-      <section className="max-w-6xl mx-auto px-5 md:px-8 py-14">
+      <section style={{ background: '#0b1120', color: '#f5f5f5' }}>
+      <div className="max-w-6xl mx-auto px-5 md:px-8 py-14">
         <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
-          <h2 className="v3-serif text-3xl font-bold">Le catalogue</h2>
+          <h2 className="v3-serif text-3xl font-bold" style={{ color: '#fff' }}>Le catalogue</h2>
 
         </div>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
           {CATALOG.map((b) => (
             <a key={b.asin} href={`https://www.amazon.fr/dp/${b.asin}/`} target="_blank" rel="noopener noreferrer" className="block">
               <img src={coverUrl(b.asin)} alt={b.title} loading="lazy" className="aspect-[2/3] w-full rounded-lg object-cover bg-white/5" onError={(e) => { (e.currentTarget as HTMLImageElement).src = `https://m.media-amazon.com/images/P/${b.asin}.jpg`; }} />
-              <div className="mt-2 text-[12px] font-semibold leading-tight">{b.title}</div>
-              <div className="text-[11px] text-[var(--v3-muted)]">{b.genre}</div>
+              <div className="mt-2 text-[12px] font-semibold leading-tight" style={{ color: '#fff' }}>{b.title}</div>
+              <div className="text-[11px]" style={{ color: '#c4cad6' }}>{b.genre}</div>
             </a>
           ))}
         </div>
+      </div>
       </section>
 
-      <div className="text-center pb-10">
+      <div className="text-center pb-10" style={{ background: '#0b1120' }}>
         <Link to="/v3/create" className="v3-btn v3-btn-primary">Écrire mon propre livre</Link>
       </div>
     </div>
