@@ -229,7 +229,20 @@ export default function V3Sidebar() {
       seen.add(it.to);
       return true;
     });
-    const out = [...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
+    const revision: SidebarGroup = {
+      key: 'revision-editoriale',
+      label: '📝 Révision éditoriale',
+      color: '#2563EB',
+      items: [
+        { to: '/v3/mes-livres', label: '1. Choisir ou importer mon livre', icon: LayoutGrid },
+        { to: '/v3/corriger', label: '2. Corriger mon livre', icon: LayoutGrid, badge: 'Rapport' },
+        { to: '/bookperfect', label: '3. Polir le style (BookPerfect)', icon: LayoutGrid },
+        { to: '/v3/outils/humanizer', label: '4. Humaniser & audit (HumanizeAI)', icon: LayoutGrid },
+        { to: '/v3/studio-v4', label: '5. Couverture & 4e de couverture', icon: LayoutGrid },
+        { to: '/v3/outils/traduction', label: '6. Traduire mon livre', icon: LayoutGrid },
+      ],
+    };
+    const out = [revision, ...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
     if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: ADMIN_SECTION.items });
     return out;
   }, [isAdmin]);
@@ -239,7 +252,7 @@ export default function V3Sidebar() {
     return match?.key ?? '';
   }, [pathname, groups]);
 
-  const [open, setOpen] = useState<Record<string, boolean>>({ [activeSection]: true });
+  const [open, setOpen] = useState<Record<string, boolean>>({ 'revision-editoriale': true, [activeSection]: true });
 
   // Nouveautés non vues : recalculé à chaque navigation (la page /v3/nouveautes remet à 0).
   const unseenNouveautes = useMemo(() => countUnseenNouveautes(), [pathname]);

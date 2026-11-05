@@ -59,3 +59,8 @@
 
 # Maquette noire du 5 novembre
 - [x] Compléter le PDF noir : encart Écriture Express novices au centre au-dessus des 4 encarts, modules sous les encarts, tarifs mensuels 19/29/59 € avec quotas, FAQ et pied de page.
+
+# Refonte 5 novembre (suite)
+- [x] Onglet « Révision éditoriale » dans la barre latérale (étapes 1 à 6 vers les outils existants).
+- [ ] Publier l’accueil V3 : en pause à la demande de Georges, à relancer sur son accord.
+- [ ] Remettre les encarts retirés de l’accueil sur leurs pages dédiées.
