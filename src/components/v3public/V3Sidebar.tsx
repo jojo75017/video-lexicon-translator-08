@@ -414,6 +414,11 @@ export default function V3Sidebar() {
           {!collapsed && <span className="truncate">📝 Révision éditoriale</span>}
         </NavLink>
 
+        <NavLink to="/v3/outils/traduction" end title="Traducteur d'Ebooks" className="v3-sb-tile" style={{ background: '#059669' }}>
+          <span className="shrink-0">🌍</span>
+          {!collapsed && <span className="truncate">Traducteur d'Ebooks</span>}
+        </NavLink>
+
         {DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
           <NavLink
             key={l.to}
