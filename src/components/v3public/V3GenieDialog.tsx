@@ -312,7 +312,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
 
       {/* Fil de conversation : tout ce que vous avez dit et ce que le Génie a corrigé */}
       {messages.length > 0 && (
-        <div className="mt-5 rounded-3xl border bg-white/85 p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+        <div className="mt-5 rounded-3xl border bg-[#151d2c] p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
               <MessageSquare className="h-3.5 w-3.5" /> Notre conversation ({messages.length} messages)
@@ -366,7 +366,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
                   className="rounded-2xl border p-2.5 text-xs leading-relaxed"
                   style={{
                     borderColor: m.role === 'assistant' ? 'rgba(201,168,76,0.55)' : 'rgba(0,0,0,0.10)',
-                    background: m.role === 'assistant' ? 'rgba(201,168,76,0.08)' : '#ffffff',
+                    background: m.role === 'assistant' ? 'rgba(201,168,76,0.08)' : '#1b2436',
                     color: 'var(--v3-ink)',
                   }}
                 >
@@ -393,7 +393,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
 
       {/* Boîte de saisie unique */}
 
-      <div className="mt-5 rounded-3xl border bg-white/90 p-3 shadow-sm" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
+      <div className="mt-5 rounded-3xl border bg-[#151d2c] p-3 shadow-sm" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
         <textarea
           ref={inputRef}
           value={input}
@@ -425,7 +425,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       {progressContent}
 
       {(brief.factMemory || []).length > 0 && (
-        <details className="mt-4 rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
+        <details className="mt-4 rounded-2xl border bg-[#151d2c] p-3" style={{ borderColor: 'rgba(15,107,74,0.35)' }}>
           <summary className="cursor-pointer text-[11px] font-bold uppercase tracking-wider" style={{ color: '#0f6b4a' }}>
             Ce que le Génie retient de vous ({(brief.factMemory || []).length} informations)
           </summary>
@@ -468,7 +468,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
         <div className="mt-3 flex flex-wrap gap-2">
           {(mode === 'biography' ? BIOGRAPHY_EXAMPLES : BOOK_EXAMPLES).map((ex) => (
             <button key={ex} type="button" onClick={() => setInput(ex)}
-              className="rounded-full border bg-white/80 px-3 py-1.5 text-[11px] transition hover:opacity-80"
+              className="rounded-full border bg-[#151d2c] px-3 py-1.5 text-[11px] transition hover:opacity-80"
               style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-muted)' }}>
               {ex.length > 62 ? `${ex.slice(0, 62)}…` : ex}
             </button>
@@ -477,7 +477,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       )}
 
       {/* La fiche du livre et les autres voies : repliées, elles servent à l'étape 2. */}
-      <details className="mt-4 rounded-2xl border bg-white/92 p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+      <details className="mt-4 rounded-2xl border bg-[#151d2c] p-3" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
         <summary className="cursor-pointer text-[12px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
           La fiche de mon livre et les autres façons de commencer
         </summary>
@@ -494,7 +494,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
 
       {/* Fiche déduite par le Génie */}
       {ready && (
-        <div ref={resultRef} className="mt-5 rounded-2xl border bg-white/92 p-4" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
+        <div ref={resultRef} className="mt-5 rounded-2xl border bg-[#151d2c] p-4" style={{ borderColor: 'rgba(0,0,0,0.10)' }}>
           <p className="text-sm" style={{ color: 'var(--v3-ink)' }}>
             🧞 Voilà ce que j’ai compris : <strong>{brief.title}</strong>
             {brief.subtitle ? ` — ${brief.subtitle}` : ''}
@@ -558,11 +558,11 @@ function RefineRow({ question, disabled, onRemember, onSend, onSkip }: {
 }) {
   const [value, setValue] = useState('');
   return (
-    <div className="rounded-2xl border bg-white p-3" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
+    <div className="rounded-2xl border bg-[#151d2c] p-3" style={{ borderColor: 'rgba(201,168,76,0.55)' }}>
       <p className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-ink)' }}>🧞 {question}</p>
       <textarea value={value} onChange={(e) => setValue(e.target.value)} rows={3}
         placeholder="Votre réponse — un prénom, une date, une précision. Elle n’entre pas dans votre livre."
-        className="mt-2 w-full resize-none rounded-xl border bg-white px-2.5 py-2 text-[13px] outline-none"
+        className="mt-2 w-full resize-none rounded-xl border bg-[#151d2c] px-2.5 py-2 text-[13px] outline-none"
         style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <button type="button" disabled={disabled || value.trim().length < 2} onClick={() => onRemember(value)}
@@ -582,7 +582,7 @@ function Field({ label, value, onChange, type = 'text' }: { label: string; value
     <label className="block text-xs" style={{ color: 'var(--v3-muted)' }}>
       {label}
       <input type={type} value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-xl border bg-white px-2.5 py-2 text-sm outline-none"
+        className="mt-1 w-full rounded-xl border bg-[#151d2c] px-2.5 py-2 text-sm outline-none"
         style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }} />
     </label>
   );
@@ -593,7 +593,7 @@ function Select({ label, value, options, onChange }: { label: string; value: str
     <label className="block text-xs" style={{ color: 'var(--v3-muted)' }}>
       {label}
       <select value={value} onChange={(e) => onChange(e.target.value)}
-        className="mt-1 w-full rounded-xl border bg-white px-2.5 py-2 text-sm outline-none"
+        className="mt-1 w-full rounded-xl border bg-[#151d2c] px-2.5 py-2 text-sm outline-none"
         style={{ borderColor: 'rgba(0,0,0,0.12)', color: 'var(--v3-ink)' }}>
         <option value="">—</option>
         {options.map((o) => <option key={o} value={o}>{o}</option>)}
