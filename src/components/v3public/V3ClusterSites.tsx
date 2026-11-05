@@ -16,9 +16,9 @@ const SITES = [
     url: 'https://blogcluster.com',
     icon: PenLine,
     color: '#2563EB',
-    tag: 'Le blog',
-    title: 'Des articles pour attirer des lecteurs',
-    text: "Un blog d'articles utiles qui renvoient vers mes livres. Chaque article est écrit avec l'outil, puis relu : c'est la preuve qu'un auteur seul peut faire vivre ses livres.",
+    tag: 'Les histoires audio',
+    title: 'Mes livres audio, réalisés avec cet outil',
+    text: "Sur BlogCluster, ce sont mes histoires audio qui prennent la parole : écoutez un extrait, entrez dans l'univers, puis explorez les histoires complètes. Tout a été écrit et voicé avec EbookStudio — vous aussi, vous pouvez le faire vous-même.",
   },
 ];
 
