@@ -1,5 +1,7 @@
 import { ArrowRight, Check, Crown, Feather, Rocket, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 import { V2_ACCESS_NOTE, V3_MONTHLY_OFFERS } from '@/data/v3Pricing';
 import { Button } from '@/components/ui/button';
 import { V3StarterKdpPilotBanner } from '@/components/v3public/V3StarterKdpPilotBanner';
@@ -17,7 +19,14 @@ const BADGES: Record<string, string> = {
   vip: 'Studio pro',
 };
 
+const MONTHLY_PRICE_IDS = {
+  debutant: 'v3m_debutant_monthly',
+  auteur: 'v3m_auteur_monthly',
+  vip: 'v3m_vip_monthly',
+} as const;
+
 export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
+  const [checkout, setCheckout] = useState<{ priceId: string; name: string } | null>(null);
   return (
     <section className="v3-shell py-7" aria-labelledby="v3-offers-title">
       <header className="mb-7">
@@ -45,7 +54,10 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
                   <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>
                 ))}
               </ul>
-              <Button asChild><Link to="/v3/plans">Voir tout ce qui est inclus <ArrowRight /></Link></Button>
+              <Button onClick={() => setCheckout({ priceId: MONTHLY_PRICE_IDS[p.id], name: `${p.name} — ${p.price} €/mois` })}>
+                S'abonner — {p.price} €/mois <ArrowRight />
+              </Button>
+              <Button asChild variant="ghost" className="mt-2"><Link to="/v3/plans">Voir tout ce qui est inclus</Link></Button>
             </article>
           );
         })}
@@ -54,6 +66,9 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
         Sans engagement : vous pouvez arrêter à tout moment, l'accès reste ouvert jusqu'à la fin du mois payé.
         En cas d'impayé, l'accès est simplement mis en pause — vous le retrouvez dès le règlement.
       </p>
+      {checkout && (
+        <V3SubscribeCheckout priceId={checkout.priceId} planName={checkout.name} onClose={() => setCheckout(null)} />
+      )}
       <V3StarterKdpPilotBanner />
       <section className="mt-6 border-y py-5 text-foreground">
         <Gift className="h-6 w-6 text-primary" />
