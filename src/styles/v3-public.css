@@ -847,3 +847,5 @@
 .v3-dark-page .bg-white { background: #111827 !important; }
 .v3-dark-page textarea, .v3-dark-page input, .v3-dark-page select { background: #0F172A; color: #F9FAFB; }
 .v3-dark-page li, .v3-dark-page p { color: #D1D5DB !important; }
+.v3pub .v3-dark-page :is(h1,h2,h3,h4) { color: #F9FAFB; }
+.v3pub .v3-dark-page .v3-card { background: #111827 !important; color: #F9FAFB; border-color: rgba(246,189,42,0.25); }
