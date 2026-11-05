@@ -7,9 +7,9 @@ const SITES = [
     url: 'https://ebookcluster.com',
     icon: BookOpen,
     color: '#EA580C',
-    tag: 'Le site des livres',
-    title: 'Une vitrine pour tous mes livres',
-    text: "Toutes mes publications réunies au même endroit : couvertures, résumés et liens d'achat. Les livres, les couvertures et les textes ont été préparés avec EbookStudio.",
+    tag: 'Les livres numériques',
+    title: 'Mes ebooks, réalisés avec cet outil',
+    text: "Tous mes livres numériques réunis au même endroit : couvertures, résumés et liens d'achat. Les ebooks, les couvertures et les textes ont été préparés avec EbookStudio — vous aussi, vous pouvez le faire vous-même.",
   },
   {
     name: 'blogcluster.com',
