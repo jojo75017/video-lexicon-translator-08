@@ -31,7 +31,6 @@ const ADMIN_SECTION: NavSection = {
     { to: '/admin/lancement', label: 'Pilotage du lancement', icon: Rocket, end: true, badge: 'Admin' },
     { to: '/gestion-prospects', label: 'Base emails & envois', icon: Mail, end: true, badge: 'Admin' },
     { to: '/apercu-emails', label: 'Aperçu des emails', icon: FileText, end: true, badge: 'Admin' },
-    { to: '/message', label: 'Message audio (MP3)', icon: Video, end: true },
   ],
 };
 
