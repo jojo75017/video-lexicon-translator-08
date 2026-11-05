@@ -125,9 +125,15 @@ export default function V3TranslatorPage() {
             { f: '🇧🇷', l: 'Português', kdp: 'pt_BR', shop: 'amazon.com.br' },
             { f: '🇳🇱', l: 'Nederlands', kdp: 'nl_NL', shop: 'amazon.nl' },
             { f: '🇯🇵', l: '日本語', kdp: 'ja_JP', shop: 'amazon.co.jp' },
-          ].map((m) => (
-            <div key={m.shop} className="rounded-lg p-3" style={{ background: '#1F2937' }}>
+            { f: '🇨🇭', l: 'Suisse (Schweiz)', kdp: 'de_DE', shop: 'amazon.de', note: 'Les Suisses achètent sur amazon.de' },
+            { f: '🇹🇷', l: 'Türkçe', kdp: 'en_US', shop: 'amazon.com.tr', note: 'KDP en anglais' },
+            { f: '🇵🇱', l: 'Polski', kdp: 'en_US', shop: 'amazon.pl', note: 'KDP en anglais' },
+            { f: '🇻🇳', l: 'Tiếng Việt', kdp: 'en_US', shop: 'amazon.com', note: 'Pas de boutique Amazon au Vietnam : vente via amazon.com' },
+            { f: '🇹🇭', l: 'ภาษาไทย', kdp: 'en_US', shop: 'amazon.com', note: 'Pas de boutique Amazon en Thaïlande : vente via amazon.com' },
+          ].map((m: { f: string; l: string; kdp: string; shop: string; note?: string }) => (
+            <div key={m.l} className="rounded-lg p-3" style={{ background: '#1F2937' }}>
               <div className="font-semibold" style={{ color: '#F9FAFB' }}>{m.f} {m.l}</div>
+              {m.note && <div className="text-[11px] mt-1" style={{ color: '#9CA3AF' }}>{m.note}</div>}
               <div className="flex gap-2 mt-2 text-[12px]">
                 <a href={`https://kdp.amazon.com/${m.kdp}`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 rounded" style={{ background: '#D97706', color: '#fff' }}>KDP</a>
                 <a href={`https://www.${m.shop}`} target="_blank" rel="noopener noreferrer" className="px-2 py-1 rounded" style={{ background: '#374151', color: '#F9FAFB' }}>{m.shop}</a>
