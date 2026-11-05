@@ -1,3 +1,8 @@
+import documentaireHero from '@/assets/livre-documentaire-hero.jpg';
+import atlasHero from '@/assets/livre-atlas-hero.jpg';
+import encyclopedieHero from '@/assets/livre-encyclopedie-hero.jpg';
+import agendaHero from '@/assets/livre-agenda-hero.jpg';
+import scolaireHero from '@/assets/livre-scolaire-hero.jpg';
 import bdHero from '@/assets/livre-bd-hero.jpg';
 import coloriageHero from '@/assets/livre-coloriage-hero.jpg';
 import voyageHero from '@/assets/livre-voyage-hero.jpg';
@@ -52,6 +57,11 @@ const MAP: Record<string, { title: string; Comp: React.FC }> = {
 const HEROES: Record<string, { src: string; alt: string }> = {
   roman: { src: romanHero, alt: "Roman ouvert sur un bureau à la lueur d'une lampe" },
   cuisine: { src: cuisineHero, alt: 'Livre de cuisine ouvert entouré de produits frais' },
+  documentaire: { src: documentaireHero, alt: 'Livre documentaire ouvert avec photos de nature' },
+  atlas: { src: atlasHero, alt: 'Atlas ouvert avec cartes du monde et globe' },
+  encyclopedie: { src: encyclopedieHero, alt: 'Collection d’encyclopédies reliées' },
+  agenda: { src: agendaHero, alt: 'Agenda ouvert avec stylo et café' },
+  scolaire: { src: scolaireHero, alt: 'Manuel scolaire ouvert avec cahier et crayons' },
   voyage: { src: voyageHero, alt: 'Guide de voyage ouvert avec carte, boussole et passeport' },
   bd: { src: bdHero, alt: 'Bande dessinée et manga ouverts sur un bureau de dessinateur' },
   coloriage: { src: coloriageHero, alt: 'Livre de coloriage ouvert avec crayons de couleur' },
