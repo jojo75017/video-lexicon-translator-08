@@ -899,3 +899,7 @@
 }
 .v3-dark-page .bg-gradient-hero { background-image: linear-gradient(135deg, #111827, #1F2937) !important; }
 .v3-dark-page :is(header, nav).bg-background, .v3-dark-page [class*="bg-background/"], .v3-dark-page [class*="bg-white/"], .v3-dark-page [class*="bg-card/"] { background-color: #0B0F17 !important; }
+.v3-dark-page header[style*="250, 250, 250"], .v3-dark-page header[style*="250,250,250"] { background-color: rgba(11,15,23,0.95) !important; border-color: #1F2937 !important; }
+.v3-dark-page .bg-\[\#fafbfc\], .v3-dark-page .bg-\[\#FAFAFA\]\/95 { background-color: #0F172A !important; }
+.v3-dark-page .border-\[\#e8ecf1\] { border-color: #1F2937 !important; }
+.v3-dark-page header :is(a,button,span):not([class*="text-white"]):not([class*="bg-"]) { color: #E5E7EB; }
