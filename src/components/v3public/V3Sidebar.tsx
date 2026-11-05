@@ -345,11 +345,11 @@ export default function V3Sidebar() {
           </NavLink>
         ))}
 
-        {!collapsed && <p className="v3-sb-heading">Mes ateliers</p>}
-        {groups.map((g) => {
+        {[REVISION_GROUP, ...groups].map((g, i) => {
           const isOpen = !!open[g.key];
           return (
             <div key={g.key}>
+              {i === 1 && !collapsed && <p className="v3-sb-heading">Mes ateliers</p>}
               <button
                 type="button"
                 onClick={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
