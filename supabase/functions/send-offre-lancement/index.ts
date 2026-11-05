@@ -128,14 +128,14 @@ const STEPS: Step[] = [
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]!));
 
-function buildHtml(step: Step, email: string, ctx: Ctx, baseUrl: string): string {
+function buildHtml(step: Step, email: string, ctx: Ctx, baseUrl: string, unsubKey = ""): string {
   const e = encodeURIComponent(email);
   const fn = `${baseUrl}/functions/v1`;
   const s = 46 + step.n; // 47 = email 1 (inchangé), 48..53 = emails 2..7
   const click = `${fn}/track-email-click?e=${e}&s=${s}&t=${step.emailId}&u=${encodeURIComponent(CTA_URL)}`;
   const pdfClick = `${fn}/track-email-click?e=${e}&s=${s}&t=offre-lancement-v3-pdf&u=${encodeURIComponent(V3_PREVIEW_PDF_URL)}`;
   const pixel = `${fn}/track-email-open?e=${e}&s=${s}&t=${step.emailId}`;
-  const unsub = `${fn}/unsubscribe?email=${e}`;
+  const unsub = `${fn}/unsubscribe?email=${e}&k=${unsubKey}`;
   const hello = ctx.prenom ? `Bonjour ${esc(ctx.prenom)},` : "Bonjour,";
   const p = (t: string) => `<p style="margin:0 0 16px;line-height:1.65">${t}</p>`;
   return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
@@ -298,7 +298,7 @@ Deno.serve(async (req) => {
       const res = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN, to: person.email, reply_to: REPLY_TO,
         subject: target.subject(ctx),
-        html: buildHtml(target, person.email, ctx, baseUrl),
+        html: buildHtml(target, person.email, ctx, baseUrl, await unsubToken(person.email)),
       });
       if (res.ok) sentCount++; else failedCount++;
       await db.from("offre_lancement_sends").upsert({

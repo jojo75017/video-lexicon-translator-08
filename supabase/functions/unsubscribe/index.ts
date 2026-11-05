@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { verifyUnsubToken } from "../_shared/unsubToken.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,6 +25,13 @@ serve(async (req) => {
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return new Response(html("Erreur", "<h1>Lien invalide</h1><p>Cet email est invalide.</p>"), {
       status: 400,
+      headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
+    });
+  }
+
+  if (!(await verifyUnsubToken(email, (url.searchParams.get("k") || "").trim()))) {
+    return new Response(html("Lien expiré", "<h1>Lien de désinscription expiré</h1><p>Pour ne plus recevoir nos emails, répondez simplement « STOP » à l'email reçu ou écrivez à contact@ebookstudio.fr.</p>"), {
+      status: 403,
       headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
     });
   }

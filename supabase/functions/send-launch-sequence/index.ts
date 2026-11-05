@@ -428,7 +428,7 @@ Deno.serve(async (req) => {
       const encEmail = encodeURIComponent(r.email);
       const ctaUrl = `${SITE_ORIGIN}/r/${email.shortKey}?e=${encEmail}&t=${encodeURIComponent(email.template)}`;
       const pixelUrl = `${baseUrl}/functions/v1/track-email-open?s=${email.step}&t=${encodeURIComponent(email.template)}&e=${encEmail}`;
-      const unsubscribeUrl = `${baseUrl}/functions/v1/unsubscribe?email=${encEmail}`;
+      const unsubscribeUrl = await unsubUrl(`${baseUrl}/functions/v1`, r.email);
 
       const res = await sendResendEmailThrottled({
         from: FROM_CAMPAIGN,
