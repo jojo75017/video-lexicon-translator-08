@@ -247,8 +247,11 @@ export default function V3Sidebar() {
       return true;
     });
     // « Compte, aide & autres » est réservé à l'administration : les abonnés ne le voient plus.
-    const out = [...header];
-    if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: [...ADMIN_SECTION.items, ...others] });
+    // Les abonnés voient seulement leur abonnement, leur compte et l'aide.
+    const accountItems = NAV.filter((g) => g.section === 'Mon compte' || g.section === 'Support').flatMap((g) => g.items);
+    const accountPaths = new Set(accountItems.map((it) => it.to));
+    const out = [...header, { key: 'compte', label: 'Mon abonnement & aide', color: '#475569', items: accountItems }];
+    if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: [...ADMIN_SECTION.items, ...others.filter((it) => !accountPaths.has(it.to))] });
     return out;
   }, [isAdmin]);
 
