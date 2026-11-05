@@ -26,8 +26,8 @@ export function planForTool(tool: Pick<V2Tool, 'id'>): V3Plan {
 }
 
 export const PLAN_META: Record<V3Plan, { label: string; short: string; color: string; bg: string; border: string; order: number }> = {
-  plume:   { label: 'Inclus dès Plume',   short: 'Plume',   color: '#0b6e4c', bg: '#e8f7ef', border: '#0f8a5f55', order: 0 },
-  edition: { label: 'Forfait Édition',    short: 'Édition', color: '#5B21B6', bg: '#f2ecfd', border: '#5B21B655', order: 1 },
+  plume:   { label: 'Inclus dès Débutant (19 €/mois)', short: 'Débutant · 19 €',   color: '#0b6e4c', bg: '#e8f7ef', border: '#0f8a5f55', order: 0 },
+  edition: { label: 'Dès Auteur (29 €/mois) et Édition VIP (59 €/mois)', short: 'Auteur 29 € · Édition VIP 59 €', color: '#5B21B6', bg: '#f2ecfd', border: '#5B21B655', order: 1 },
 };
 
 export function isUnlockedForPlan(toolPlan: V3Plan, userPlan: V3Plan): boolean {
