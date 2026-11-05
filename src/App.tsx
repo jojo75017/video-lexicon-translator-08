@@ -325,6 +325,10 @@ const PageLoader = () => (
 );
 const queryClient = new QueryClient();
 
+/** Pages de vente, de paiement et légales : elles gardent leur habillage clair. */
+const LIGHT_PUBLIC_PREFIXES = ['/commander', '/commande', '/oto', '/essai', '/lancement', '/starter', '/promo', '/paiement', '/upsell-paiement', '/confirmation-paiement', '/merci', '/carte-cadeau', '/cadeau', '/influenceurs', '/partenaires', '/prestation-kdp', '/connexion', '/auth', '/eula', '/licence', '/politique-confidentialite', '/mentions', '/cgv', '/trust', '/securite', '/confiance', '/bd-offre', '/bd-upsell', '/bd-merci', '/vente', '/offre', '/r/'];
+const isLightPublicRoute = (p: string) => p === '/' || LIGHT_PUBLIC_PREFIXES.some((x) => p === x || p.startsWith(x.endsWith('/') ? x : x + '/') || p.startsWith(x + '-'));
+
 const App = () => {
   useBrandTitle();
   const { pathname } = useLocation();
@@ -483,7 +487,7 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="min-h-screen bg-background">
+        <div className={`min-h-screen bg-background${isLightPublicRoute(pathname) ? '' : ' v3-dark-page'}`}>
           {keepAdminNavigationVisible && !isAdminAuthRoute && !(pathname === '/v3' || pathname.startsWith('/v3/')) && <AdminQuickNav />}
           <V3LaunchGlobalBanner />
           <Suspense fallback={<PageLoader />}>
