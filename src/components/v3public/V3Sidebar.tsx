@@ -175,6 +175,21 @@ const NAV: NavSection[] = [
 
 type SidebarGroup = { key: string; label: string; color: string; items: NavItem[] };
 
+/** Parcours de révision, placé sous « Bibliothèque / Mes livres », hors des ateliers. */
+const REVISION_GROUP: SidebarGroup = {
+  key: 'revision-editoriale',
+  label: '📝 Révision éditoriale',
+  color: '#2563EB',
+  items: [
+    { to: '/v3/mes-livres', label: '1. Choisir ou importer mon livre', icon: LayoutGrid },
+    { to: '/v3/corriger', label: '2. Corriger mon livre', icon: LayoutGrid, badge: 'Rapport' },
+    { to: '/bookperfect', label: '3. Polir le style (BookPerfect)', icon: LayoutGrid },
+    { to: '/v3/outils/humanizer', label: '4. Humaniser (HumanizeAI)', icon: LayoutGrid },
+    { to: '/v3/studio-v4', label: '5. Couverture et 4e', icon: LayoutGrid },
+    { to: '/v3/outils/traduction', label: '6. Traduire mon livre', icon: LayoutGrid },
+  ],
+};
+
 /** Accès directs en tête de barre, comme sur la maquette du 5 novembre. */
 const DIRECT_LINKS = [
   { to: '/v3', label: 'Accueil V3', icon: Home, color: '#3F3A37' },
@@ -183,6 +198,9 @@ const DIRECT_LINKS = [
   { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
   { to: '/v3/outils', label: 'Tous les outils V3', icon: ListTree, color: '#7C3AED' },
 ];
+
+/** Position de « Bibliothèque / Mes livres » : la révision s'insère juste en dessous. */
+const BIB_INDEX = Math.max(0, DIRECT_LINKS.findIndex((l) => l.to === '/v3/mes-livres'));
 
 /** Couleur « robot » par section, en harmonie avec les onglets du menu principal. */
 const SECTION_COLORS: Record<string, string> = {
@@ -229,26 +247,13 @@ export default function V3Sidebar() {
       seen.add(it.to);
       return true;
     });
-    const revision: SidebarGroup = {
-      key: 'revision-editoriale',
-      label: '📝 Révision éditoriale',
-      color: '#2563EB',
-      items: [
-        { to: '/v3/mes-livres', label: '1. Choisir ou importer mon livre', icon: LayoutGrid },
-        { to: '/v3/corriger', label: '2. Corriger mon livre', icon: LayoutGrid, badge: 'Rapport' },
-        { to: '/bookperfect', label: '3. Polir le style (BookPerfect)', icon: LayoutGrid },
-        { to: '/v3/outils/humanizer', label: '4. Humaniser (HumanizeAI)', icon: LayoutGrid },
-        { to: '/v3/studio-v4', label: '5. Couverture et 4e', icon: LayoutGrid },
-        { to: '/v3/outils/traduction', label: '6. Traduire mon livre', icon: LayoutGrid },
-      ],
-    };
-    const out = [revision, ...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
+    const out = [...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
     if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: ADMIN_SECTION.items });
     return out;
   }, [isAdmin]);
 
   const activeSection = useMemo(() => {
-    const match = groups.find((g) => g.items.some((it) => !it.external && pathname === it.to.split('?')[0]));
+    const match = [REVISION_GROUP, ...groups].find((g) => g.items.some((it) => !it.external && pathname === it.to.split('?')[0]));
     return match?.key ?? '';
   }, [pathname, groups]);
 
@@ -268,6 +273,67 @@ export default function V3Sidebar() {
     setOpen((prev) => (prev[activeSection] ? prev : { ...prev, [activeSection]: true }));
   }, [activeSection]);
 
+
+  /** Rendu d'un groupe repliable de la barre latérale. */
+  const renderGroup = (g: SidebarGroup) => {
+          const isOpen = !!open[g.key];
+          return (
+            <div key={g.key}>
+              <button
+                type="button"
+                onClick={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
+                aria-expanded={isOpen}
+                title={g.label}
+                className="v3-sb-tile w-full"
+                style={{ background: g.color }}
+              >
+                <LayoutGrid className="h-4 w-4 shrink-0" />
+                {!collapsed && (
+                  <>
+                    <span className="flex-1 truncate text-left">{g.label}</span>
+                    {isOpen ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
+                  </>
+                )}
+              </button>
+              {isOpen && !collapsed && (
+                <ul className="v3-sb-list" style={{ borderLeftColor: g.color, background: `${g.color}1f` }}>
+                  {g.items.map((it) => {
+                    const [itPath] = it.to.split('?');
+                    const active = !it.external && pathname === itPath;
+                    const locked = trialRestricted && !it.external && isTrialLockedPath(it.to);
+                    const rawBadge = badgeFor(it);
+                    const badge = rawBadge && rawBadge.length > 10 ? 'Nouveau' : rawBadge;
+                    const inner = (
+                      <>
+                        <span className="flex-1 truncate">{it.label}</span>
+                        {locked ? (
+                          <Lock className="h-3.5 w-3.5 shrink-0" />
+                        ) : badge ? (
+                          <span className="v3-sb-badge" style={{ background: g.color }}>{badge}</span>
+                        ) : null}
+                      </>
+                    );
+                    return (
+                      <li key={g.key + it.to + it.label}>
+                        {it.external ? (
+                          <a href={it.to} target="_blank" rel="noopener noreferrer" className="v3-sb-link" title={it.label}>{inner}</a>
+                        ) : (
+                          <NavLink
+                            to={it.to}
+                            className="v3-sb-link"
+                            title={it.label}
+                            style={active ? { background: `${g.color}55`, color: '#ffffff', fontWeight: 700 } : undefined}
+                          >
+                            {inner}
+                          </NavLink>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          );  };
 
   return (
     <aside
@@ -329,7 +395,23 @@ export default function V3Sidebar() {
       )}
 
       <nav className="space-y-1.5 p-2" data-v3-nav>
-        {DIRECT_LINKS.map((l) => (
+        {DIRECT_LINKS.slice(0, BIB_INDEX + 1).map((l) => (
+          <NavLink
+            key={l.to}
+            to={l.to}
+            end
+            title={l.label}
+            className="v3-sb-tile"
+            style={{ background: l.color }}
+          >
+            <l.icon className="h-4 w-4 shrink-0" />
+            {!collapsed && <span className="truncate">{l.label}</span>}
+          </NavLink>
+        ))}
+
+        {renderGroup(REVISION_GROUP)}
+
+        {DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
           <NavLink
             key={l.to}
             to={l.to}
@@ -344,66 +426,7 @@ export default function V3Sidebar() {
         ))}
 
         {!collapsed && <p className="v3-sb-heading">Mes ateliers</p>}
-        {groups.map((g) => {
-          const isOpen = !!open[g.key];
-          return (
-            <div key={g.key}>
-              <button
-                type="button"
-                onClick={() => setOpen((prev) => ({ ...prev, [g.key]: !prev[g.key] }))}
-                aria-expanded={isOpen}
-                title={g.label}
-                className="v3-sb-tile w-full"
-                style={{ background: g.color }}
-              >
-                <LayoutGrid className="h-4 w-4 shrink-0" />
-                {!collapsed && (
-                  <>
-                    <span className="flex-1 truncate text-left">{g.label}</span>
-                    {isOpen ? <Minus className="h-3.5 w-3.5" /> : <Plus className="h-3.5 w-3.5" />}
-                  </>
-                )}
-              </button>
-              {isOpen && !collapsed && (
-                <ul className="v3-sb-list" style={{ borderLeftColor: g.color, background: `${g.color}1f` }}>
-                  {g.items.map((it) => {
-                    const [itPath] = it.to.split('?');
-                    const active = !it.external && pathname === itPath;
-                    const locked = trialRestricted && !it.external && isTrialLockedPath(it.to);
-                    const rawBadge = badgeFor(it);
-                    const badge = rawBadge && rawBadge.length > 10 ? 'Nouveau' : rawBadge;
-                    const inner = (
-                      <>
-                        <span className="flex-1 truncate">{it.label}</span>
-                        {locked ? (
-                          <Lock className="h-3.5 w-3.5 shrink-0" />
-                        ) : badge ? (
-                          <span className="v3-sb-badge" style={{ background: g.color }}>{badge}</span>
-                        ) : null}
-                      </>
-                    );
-                    return (
-                      <li key={g.key + it.to + it.label}>
-                        {it.external ? (
-                          <a href={it.to} target="_blank" rel="noopener noreferrer" className="v3-sb-link" title={it.label}>{inner}</a>
-                        ) : (
-                          <NavLink
-                            to={it.to}
-                            className="v3-sb-link"
-                            title={it.label}
-                            style={active ? { background: `${g.color}55`, color: '#ffffff', fontWeight: 700 } : undefined}
-                          >
-                            {inner}
-                          </NavLink>
-                        )}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          );
-        })}
+        {groups.map((g) => renderGroup(g))}
       </nav>
 
       {/* Retour vers l'espace habituel : le choix reste réversible à tout moment. */}
