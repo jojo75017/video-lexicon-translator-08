@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import tutorielsHero from '@/assets/tutoriels-hero.jpg';
 import { Link } from 'react-router-dom';
 import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, FileText, PlayCircle, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -61,6 +62,8 @@ export default function V3TutorielsPage() {
 
   return (
     <div className="v3-dark-page"><div className="mx-auto max-w-6xl px-4 py-8">
+      <img src={tutorielsHero} alt="Ordinateur affichant un tutoriel vidéo, carnet de notes et casque" width={1600} height={560}
+        className="mb-8 h-56 w-full rounded-2xl object-cover md:h-72" />
       <div className="mb-8">
         <Badge variant="secondary">Mis à jour oct. 2026</Badge>
         <h1 className="mt-2 text-3xl font-bold">Tutoriels V3</h1>
