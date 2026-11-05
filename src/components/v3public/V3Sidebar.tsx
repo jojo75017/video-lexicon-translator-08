@@ -1,6 +1,6 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import {
-  Home, Sparkles, BookOpen, BookPlus, LibraryBig, Settings,
+  FilePen, Home, Sparkles, BookOpen, BookPlus, LibraryBig, Settings,
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
