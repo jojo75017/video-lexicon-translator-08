@@ -35,7 +35,8 @@ Deno.serve(async (req) => {
     const returnUrl = String(body.returnUrl || "").trim();
 
     // Validate optional bonuses payload
-    const rawBonuses = Array.isArray(body.bonuses) ? body.bonuses : [];
+    // Montants des bonus jamais acceptés depuis le navigateur (tunnel /promo/commande redirigé).
+    const rawBonuses: unknown[] = [];
     const bonuses = rawBonuses
       .map((b: any) => ({
         key: String(b?.key || "").slice(0, 64),
