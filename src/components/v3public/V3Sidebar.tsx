@@ -135,7 +135,7 @@ const NAV: NavSection[] = [
       { to: '/v3/acquisition', label: '🚀 Plan 14 jours — trouver des lecteurs', icon: Megaphone },
       { to: '/v3/posts', label: '📣 Posts — 30 jours prêts', icon: Megaphone },
       { to: '/v3/avis', label: '⭐ Obtenir des avis clients', icon: Star, badge: 'Marche à suivre' },
-      { to: '/mon-parrainage', label: '🤝 Parrainage — 30 % de commission', icon: Gem },
+      { to: '/mon-parrainage', label: '🤝 Parrainage', icon: Gem, badge: 'Bientôt' },
       { to: '/v3/script-heygen', label: 'Script vidéo HeyGen', icon: Video },
       { to: '/v3/pourquoi', label: 'Pourquoi EbookStudio', icon: Award },
       { to: '/v3/realite-kdp', label: 'Combien gagnent les auteurs KDP', icon: BookOpen },
@@ -147,7 +147,7 @@ const NAV: NavSection[] = [
       { to: 'https://ebookstudio.blog/#accueil', label: 'Blog EbookStudio', icon: FileText, external: true, badge: 'Nouveau' },
       { to: '/formation', label: 'Formation vidéo', icon: GraduationCap },
       { to: '/masterclass', label: 'Masterclass', icon: Video },
-      { to: '/communaute', label: 'Communauté (Q&R)', icon: Award, badge: '220+' },
+      { to: '/communaute', label: 'Communauté (Q&R)', icon: Award, badge: 'Bientôt' },
     ],
   },
   {
