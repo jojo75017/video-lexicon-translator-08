@@ -53,10 +53,10 @@ export const TUTORIELS_V3: TutorielV3[] = [
     'Collez votre clé Gemini (commence par AIza) ou OpenRouter (commence par sk-or-).',
     'Enregistrez : la génération utilise votre clé, sans surcoût.',
   ]),
-  t(4, 'Démarrer', 'Les offres à vie et les compléments', '/v3/forfaits', [
-    'EbookStudio : 47 € à vie en paiement unique. Pack Édition Pro : 97 € en option, avec Cover Studio Pro, KDP avancé, BD Studio et BookPerfect. Cover Studio Pro seul : 67 €. Les autres compléments restent à la carte ; les droits acquis des anciens clients sont conservés.',
-    'Cover Studio Pro seul (67 €) est inclus dans le Pack Édition Pro ; Studio Jeunesse (47 €) reste séparé.',
-    'Choisissez votre formule puis payez par carte.',
+  t(4, 'Démarrer', 'Les formules mensuelles et les compléments', '/v3/forfaits', [
+    'Trois formules mensuelles sans engagement : Débutant 19 €/mois (20 livres et 10 couvertures), Auteur 29 €/mois (50 livres et 30 couvertures), Édition VIP 59 €/mois (livres illimités et 50 couvertures).',
+    'La génération tourne sur votre propre clé IA (Gemini ou OpenRouter), sans surcoût.',
+    'Les compléments (Version audio 9,99 €, Micro-Séries, studios spéciaux) restent à la carte ; les droits acquis des anciens clients sont conservés.',
   ]),
   t(5, 'Les 5 étapes', 'Vue d’ensemble : les 5 étapes de A à Z', '/v3/create', [
     'Étape 1 : l’idée et la fiche du livre.',

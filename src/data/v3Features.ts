@@ -145,8 +145,8 @@ export const FEATURE_ROWS: FeatureRow[] = [
       },
       {
         id: 'forfaits',
-        title: 'Offres à vie',
-        subtitle: 'Accès 47 € à vie · Pack Édition Pro 97 € en option',
+        title: 'Formules mensuelles',
+        subtitle: 'Dès 19 €/mois · 20 livres & 10 couvertures inclus',
         icon: Crown,
         tint: 'rgba(201,168,76,0.18)',
         kind: 'link',

@@ -756,9 +756,9 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-forf-01',
     question: 'Quels sont les prix affichés aujourd’hui ?',
     answer:
-      'EbookStudio : 47 € à vie en paiement unique. Pack Édition Pro : 97 € en option, avec Cover Studio Pro, KDP avancé, BD Studio et BookPerfect. Cover Studio Pro seul : 67 €. Les autres compléments restent à la carte ; les droits acquis des anciens clients sont conservés.',
+      'Trois formules mensuelles sans engagement : Débutant 19 €/mois (20 livres et 10 couvertures), Auteur 29 €/mois (50 livres et 30 couvertures) et Édition VIP 59 €/mois (livres illimités et 50 couvertures, extensible avec votre propre clé IA). Les compléments restent à la carte ; les droits acquis des anciens clients sont conservés.',
     theme: 'Forfaits & paiement',
-    action: { label: 'Voir les offres à vie', route: '/v3/forfaits' },
+    action: { label: 'Voir les formules', route: '/v3/forfaits' },
   },
   {
     id: 'x-forf-02',
