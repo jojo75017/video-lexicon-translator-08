@@ -3,6 +3,7 @@ import { ArrowLeft, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tools/TocUltimateGenerator';
 import { sendTocToWorkflow } from '@/lib/v3/bookBrief';
+import sommaireHero from '@/assets/sommaire-hero.jpg';
 
 export default function V3TocUltimatePage() {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ export default function V3TocUltimatePage() {
           <Link to="/v3/create" className="text-sm font-semibold text-orange-600 hover:underline">Créer un livre →</Link>
         </div>
 
+        <img src={sommaireHero} alt="Sommaire ultime" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
         <header className="mb-8">
           <span className="inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-orange-700">
             <Sparkles className="h-3 w-3" /> Outil V3
