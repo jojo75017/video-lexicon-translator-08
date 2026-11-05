@@ -1,4 +1,4 @@
-import { ExternalLink, BookOpen, PenLine } from 'lucide-react';
+import { ExternalLink, BookOpen, Headphones } from 'lucide-react';
 
 /** Les deux sites de Georges réalisés avec EbookStudio, affichés sous la galerie des couvertures. */
 const SITES = [
@@ -14,11 +14,11 @@ const SITES = [
   {
     name: 'blogcluster.com',
     url: 'https://blogcluster.com',
-    icon: PenLine,
+    icon: Headphones,
     color: '#2563EB',
-    tag: 'Le blog',
-    title: 'Des articles pour attirer des lecteurs',
-    text: "Un blog d'articles utiles qui renvoient vers mes livres. Chaque article est écrit avec l'outil, puis relu : c'est la preuve qu'un auteur seul peut faire vivre ses livres.",
+    tag: 'Les histoires audio',
+    title: 'Mes livres audio, réalisés avec cet outil',
+    text: "Sur BlogCluster, ce sont mes histoires audio qui prennent la parole : écoutez un extrait, entrez dans l'univers, puis explorez les histoires complètes. Tout a été écrit et voicé avec EbookStudio — vous aussi, vous pouvez le faire vous-même.",
   },
 ];
 
@@ -36,8 +36,8 @@ export default function V3ClusterSites() {
           Mes deux sites, faits avec cet outil
         </h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#B9AFA6' }}>
-          Publier un livre, c'est bien. Le faire connaître, c'est mieux. Voici comment j'utilise moi-même
-          EbookStudio pour présenter mes livres et attirer des lecteurs, sans agence ni publicité coûteuse.
+          Publier un livre, c'est bien. Le faire vivre, c'est mieux. Voici comment j'utilise moi-même
+          EbookStudio pour présenter mes livres et donner à écouter mes histoires audio, sans agence ni publicité coûteuse.
         </p>
       </div>
 
