@@ -112,6 +112,8 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 import PageHeroImage from './components/v3public/PageHeroImage';
+import signatureHero from './assets/signature-hero.jpg';
+import studioCouvHero from './assets/studio-couverture-hero.jpg';
 import plannerHero from './assets/planner-hero.jpg';
 import corrigerHero from './assets/corriger-hero.jpg';
 import bookperfectHero from './assets/bookperfect-hero.jpg';
@@ -710,7 +712,7 @@ const App = () => {
             <Route path="/niches-600" element={<div className="v3-dark-page">{<Niches600Page />}</div>} />
             <Route path="/10-niches-offertes" element={<Niches10OffertesPage />} />
             <Route path="/quiz" element={<div className="v3-dark-page">{<QuizPage />}</div>} />
-            <Route path="/signature" element={<div className="v3-dark-page">{<SignaturePage />}</div>} />
+            <Route path="/signature" element={<div className="v3-dark-page">{<><PageHeroImage src={signatureHero} alt="Signature auteur" /><SignaturePage /></>}</div>} />
             <Route path="/bd-studio" element={<div className="v3-dark-page">{<PlanGuard><BDStudioPage /></PlanGuard>}</div>} />
             {/* Tunnel Studio BD & Jeunesse : vente 17 € → upsell Pro 47 € → studio */}
             <Route path="/bd-offre" element={<BDOffrePage />} />
@@ -739,7 +741,7 @@ const App = () => {
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/cover-studio-pro/edit" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/couverture-express" element={<div className="v3-dark-page">{gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)}</div>} />
-            <Route path="/v3/studio-v4" element={<div className="v3-dark-page">{gated(<PlanGuard><TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate></PlanGuard>)}</div>} />
+            <Route path="/v3/studio-v4" element={<div className="v3-dark-page">{gated(<PlanGuard><TrialGate label="Studio V4"><PageHeroImage src={studioCouvHero} alt="Studio de couverture" /><V3StudioV4Page /></TrialGate></PlanGuard>)}</div>} />
             <Route path="/v3/mes-couvertures" element={<div className="v3-dark-page">{gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)}</div>} />
             <Route path="/v3/mes-couvertures/:id" element={<div className="v3-dark-page">{gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)}</div>} />
             {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}
