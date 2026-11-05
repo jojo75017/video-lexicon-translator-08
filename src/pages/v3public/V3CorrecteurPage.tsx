@@ -588,7 +588,7 @@ export default function V3CorrecteurPage() {
 
 
   return (
-    <div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
+    <div className="v3-dark-page"><div className="max-w-6xl mx-auto px-5 md:px-8 py-8">
       <BackButton to="/v3/commence-ici" label="Retour aux agents" />
 
       <input ref={fileRef} type="file" accept=".docx,.md,.txt,.rtf" className="hidden"
@@ -610,7 +610,7 @@ export default function V3CorrecteurPage() {
       </header>
 
       {/* Mode d'emploi visible : 3 étapes, sans jargon. */}
-      <div className="mb-6 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: '#fbfaf7' }}>
+      <div className="mb-6 rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: '#111827' }}>
         <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--v3-emerald)' }}>
           <Sparkles className="h-4 w-4" /> Comment ça marche
         </div>
@@ -1118,6 +1118,7 @@ export default function V3CorrecteurPage() {
           </div>
         </section>
       )}
+    </div>
     </div>
   );
 }

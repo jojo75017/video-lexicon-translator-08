@@ -37,10 +37,10 @@ export default function V3RevisionEditorialePage() {
               Votre manuscrit mérite de devenir une véritable œuvre. EbookStudio l'analyse, le corrige et le prépare
               pour la publication, sans dénaturer votre voix.
             </p>
-            <Link to="/v3/corriger" className="v3-flat-btn mt-6 inline-flex items-center gap-2 rounded-lg px-6 py-4 font-bold tracking-wide"
+            <a href="#etapes" className="v3-flat-btn mt-6 inline-flex items-center gap-2 rounded-lg px-6 py-4 font-bold tracking-wide"
               style={{ background: '#3B82F6', color: '#fff' }}>
-              JE LANCE L'ANALYSE DE MON LIVRE <ArrowRight className="h-4 w-4" />
-            </Link>
+              JE COMMENCE LA RÉVISION DE MON LIVRE <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
           <div>
             <h2 className="mb-3 text-sm font-black tracking-[0.2em]" style={{ color: '#F6BD2A' }}>COMMENT ÇA MARCHE</h2>
@@ -55,7 +55,7 @@ export default function V3RevisionEditorialePage() {
           </div>
         </div>
 
-        <h2 className="mt-14 mb-4 text-2xl font-bold" style={{ color: '#F6BD2A' }}>Les 6 étapes pour mettre votre livre au propre</h2>
+        <h2 id="etapes" className="mt-14 mb-4 text-2xl font-bold" style={{ color: '#F6BD2A' }}>Les 6 étapes pour mettre votre livre au propre</h2>
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {STEPS.map((s) => (
             <div key={s.n} className="flex flex-col rounded-xl border p-5" style={{ background: '#111827', borderColor: s.color }}>
