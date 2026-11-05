@@ -25,7 +25,7 @@ export default function V3MigrationPage() {
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Tarif fidélité -20 % à vie
           </p>
-          <h1 className="text-2xl font-serif mb-3" style={{ color: "#232F3E" }}>
+          <h1 className="text-2xl font-serif mb-3" style={{ color: "#f5f5f5" }}>
             Connectez-vous pour voir votre tarif fidélité
           </h1>
           <p className="text-sm mb-6" style={{ color: "#4b5563" }}>
@@ -56,7 +56,7 @@ export default function V3MigrationPage() {
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Ancien client V2
           </p>
-          <h1 className="text-4xl md:text-5xl font-serif mb-4" style={{ color: "#232F3E" }}>
+          <h1 className="text-4xl md:text-5xl font-serif mb-4" style={{ color: "#f5f5f5" }}>
             Bienvenue dans la V3 — avec votre tarif fidélité
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
@@ -75,10 +75,10 @@ export default function V3MigrationPage() {
               <Gift size={20} />
             </div>
             <div>
-              <h2 className="text-2xl font-serif" style={{ color: "#232F3E" }}>
+              <h2 className="text-2xl font-serif" style={{ color: "#f5f5f5" }}>
                 Offerts : vos modules V3
               </h2>
-              <p className="text-sm" style={{ color: "#6b7280" }}>
+              <p className="text-sm" style={{ color: "#c4cad6" }}>
                 Déjà actives dans votre compte, sans rien payer.
               </p>
             </div>
@@ -94,9 +94,9 @@ export default function V3MigrationPage() {
               >
                 <div className="flex items-start gap-2 mb-2">
                   <Check size={16} className="shrink-0 mt-1" style={{ color: "#0b6e4c" }} />
-                  <h3 className="font-semibold text-sm" style={{ color: "#232F3E" }}>{m.title}</h3>
+                  <h3 className="font-semibold text-sm" style={{ color: "#f5f5f5" }}>{m.title}</h3>
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: "#6b7280" }}>{m.description}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "#c4cad6" }}>{m.description}</p>
               </Link>
             ))}
           </div>
@@ -106,7 +106,7 @@ export default function V3MigrationPage() {
               <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "#0b6e4c" }}>
                 Ce qui est inclus
               </p>
-              <ul className="text-sm space-y-1" style={{ color: "#374151" }}>
+              <ul className="text-sm space-y-1" style={{ color: "#e5e7eb" }}>
                 <li>{V2_LEGACY_QUOTAS.booksPerMonth} livres / mois via les nouveautés</li>
                 <li>{V2_LEGACY_QUOTAS.chaptersMax} chapitres max · {V2_LEGACY_QUOTAS.wordsPerChapter.toLocaleString("fr-FR")} mots / chapitre</li>
                 <li>Export PDF / DOCX / EPUB avec sommaire stylé</li>
@@ -119,7 +119,7 @@ export default function V3MigrationPage() {
               <p className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: "#9a6b0a" }}>
                 Compléments professionnels
               </p>
-              <ul className="text-sm space-y-1" style={{ color: "#6b7280" }}>
+              <ul className="text-sm space-y-1" style={{ color: "#c4cad6" }}>
                 {V2_LEGACY_EXCLUSIONS.map((x) => (
                   <li key={x} className="flex items-start gap-2">
                     <Lock size={13} className="shrink-0 mt-1" />
@@ -137,7 +137,7 @@ export default function V3MigrationPage() {
           <Link to="/v3/forfaits" className="underline">Voir les offres à vie et les options</Link>
         </section>
 
-        <p className="text-center text-sm mt-12" style={{ color: "#6b7280" }}>
+        <p className="text-center text-sm mt-12" style={{ color: "#c4cad6" }}>
           Une question sur votre accès V2 ?{" "}
           <Link to="/contact-support?sujet=migration-v2" className="underline" style={{ color: "#008296" }}>
             Écrivez-nous
