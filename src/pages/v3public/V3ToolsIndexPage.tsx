@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect, useMemo, useState } from 'react';
+import outilsHero from '@/assets/outils-hero.jpg';
 import { V2_TOOLS, V2_TOOL_CATEGORIES } from '@/data/v2ToolsRegistry';
 import { planForTool, PLAN_META, type V3Plan } from '@/data/v3ToolPlans';
 import { Search, ArrowRight, Lock, Check } from 'lucide-react';
@@ -62,6 +63,10 @@ export default function V3ToolsIndexPage() {
   return (
     <div className="v3-dark-page min-h-screen">
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
+      <div className="max-w-6xl mx-auto px-4 pt-4">
+        <img src={outilsHero} alt="Bureau d'auteur avec livres, ordinateur, micro, crayons et couvertures" width={1600} height={560}
+          className="h-56 w-full rounded-2xl object-cover md:h-72" />
+      </div>
       {/* Hero */}
       <section
         className="relative overflow-hidden"
