@@ -328,6 +328,20 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
         </div>
       </form>
 
+      {/* 2bis. Commence ici — pour qui ne sait pas par où débuter */}
+      <Link to="/v3/commence-ici" className="flex flex-wrap items-center justify-between gap-4 rounded-2xl p-5" style={{ background: 'linear-gradient(135deg,#3A1F10,#1E1A18)', border: '1px solid #EA580C' }}>
+        <div className="flex items-center gap-4">
+          <span className="flex h-12 w-12 items-center justify-center rounded-full text-2xl" style={{ background: '#EA580C' }}>🚀</span>
+          <div>
+            <p className="text-lg font-bold" style={{ color: '#F8FAFC' }}>Pas sûr de par où commencer ? Commence ici</p>
+            <p className="text-sm" style={{ color: '#D6CCC2' }}>Découvrez tous les robots spécialistes et ce que chacun fait pour vous, puis choisissez celui qui vous accompagne.</p>
+          </div>
+        </div>
+        <span className="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold" style={{ background: '#EA580C', color: '#fff' }}>
+          Voir tous les robots <ArrowRight className="h-4 w-4" />
+        </span>
+      </Link>
+
       {/* 3. Dans quelle situation vous retrouvez-vous ? */}
       <h2 className="text-2xl font-bold" style={{ color: '#F8FAFC' }}>Dans quelle situation vous retrouvez-vous ?</h2>
       <div className="grid items-start gap-4 md:grid-cols-2">
