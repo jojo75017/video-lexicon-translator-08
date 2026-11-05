@@ -71,7 +71,7 @@ export default function V3CategoryFinderPage() {
     <div className="container max-w-6xl py-8 space-y-6">
       <BackButton />
 
-      <div className="rounded-xl bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 text-white p-8">
+      <div className="kdp-hero rounded-xl bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 text-white p-8">
         <div className="flex items-center gap-3 mb-2">
           <FolderTree className="h-6 w-6" />
           <Badge className="bg-amber-400 text-slate-900">Nouveau · Gratuit tous les plans</Badge>
