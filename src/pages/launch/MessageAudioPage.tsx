@@ -44,6 +44,7 @@ export default function MessageAudioPage() {
   if (!url || !isAudio) {
     return (
       <div className="min-h-screen" style={{ background: 'var(--v3-cream, #FBF8F3)' }}>
+        <Link to="/v3" className="fixed left-4 top-4 z-50 rounded-xl bg-[#0F2E1F] px-4 py-2 text-sm font-semibold text-white shadow">← Retour à l'accueil</Link>
         <main className="mx-auto max-w-2xl px-5 py-20 text-center">
           <h1 className="v3-serif text-2xl font-bold text-[#2A2118]">Message non disponible</h1>
           <p className="mt-3 text-[#5B5245]">Le message audio n'est pas encore en ligne.</p>
@@ -57,6 +58,7 @@ export default function MessageAudioPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--v3-cream, #FBF8F3)' }}>
+        <Link to="/v3" className="fixed left-4 top-4 z-50 rounded-xl bg-[#0F2E1F] px-4 py-2 text-sm font-semibold text-white shadow">← Retour à l'accueil</Link>
       <header className="border-b border-black/5 bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-5 py-4">
           <span className="v3-serif text-lg font-bold text-[#2A2118]">EbookStudio</span>
