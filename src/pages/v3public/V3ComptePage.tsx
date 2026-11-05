@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import compteHero from "@/assets/compte-hero.jpg";
 import { BookOpen, Crown, Key, CreditCard, Gauge, ArrowRight, ExternalLink } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { V3_PLANS } from "@/data/v3Pricing";
@@ -68,17 +69,19 @@ export default function V3ComptePage() {
   const quota = currentPlan?.booksPerMonth;
 
   return (
-    <div className="min-h-screen py-10 px-4" style={{ background: "#FAFAFA" }}>
+    <div className="v3-plans-dark min-h-screen py-10 px-4" style={{ background: "#0b1120" }}>
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="max-w-5xl mx-auto">
+        <img src={compteHero} alt="Bureau élégant avec carte de membre, carnet en cuir, stylo plume et livres" width={1600} height={560}
+          className="mb-8 mt-4 h-56 w-full rounded-2xl object-cover md:h-72" />
         <header className="mb-8">
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2" style={{ color: "#b45309" }}>
             Mon compte V3
           </p>
-          <h1 className="text-3xl md:text-4xl font-serif" style={{ color: "#232F3E" }}>
+          <h1 className="text-3xl md:text-4xl font-serif" style={{ color: "#f5f5f5" }}>
             Bonjour {email?.split("@")[0] ?? "Auteur"} 👋
           </h1>
-          <p className="text-sm mt-2" style={{ color: "#6b7280" }}>
+          <p className="text-sm mt-2" style={{ color: "#c4cad6" }}>
             {email ?? "Non connecté"}
           </p>
         </header>
@@ -88,28 +91,28 @@ export default function V3ComptePage() {
         {/* Cards row */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           {/* Plan actif */}
-          <div className="rounded-2xl bg-white p-5 border" style={{ borderColor: "#e5e7eb" }}>
+          <div className="rounded-2xl bg-white p-5 border" style={{ borderColor: "#2a3448" }}>
             <div className="flex items-center gap-2 mb-3">
               <Crown size={18} style={{ color: "#b45309" }} />
-              <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "#6b7280" }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "#c4cad6" }}>
                 Forfait
               </h2>
             </div>
             {currentPlan ? (
               <>
-                <p className="text-2xl font-serif" style={{ color: "#232F3E" }}>
+                <p className="text-2xl font-serif" style={{ color: "#f5f5f5" }}>
                   {currentPlan.name}
                 </p>
-                <p className="text-xs mb-3" style={{ color: "#6b7280" }}>
+                <p className="text-xs mb-3" style={{ color: "#c4cad6" }}>
                   Vos conditions d’achat et droits acquis restent inchangés
                 </p>
               </>
             ) : (
               <>
-                <p className="text-2xl font-serif" style={{ color: "#232F3E" }}>
+                <p className="text-2xl font-serif" style={{ color: "#f5f5f5" }}>
                   Aucun
                 </p>
-                <p className="text-xs mb-3" style={{ color: "#6b7280" }}>
+                <p className="text-xs mb-3" style={{ color: "#c4cad6" }}>
                   Consultez vos achats et vos droits d’accès
                 </p>
               </>
@@ -124,33 +127,33 @@ export default function V3ComptePage() {
           </div>
 
           {/* Quota */}
-          <div className="rounded-2xl bg-white p-5 border" style={{ borderColor: "#e5e7eb" }}>
+          <div className="rounded-2xl bg-white p-5 border" style={{ borderColor: "#2a3448" }}>
             <div className="flex items-center gap-2 mb-3">
               <Gauge size={18} style={{ color: "#008296" }} />
-              <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "#6b7280" }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "#c4cad6" }}>
                 Quota mensuel
               </h2>
             </div>
-            <p className="text-2xl font-serif" style={{ color: "#232F3E" }}>
+            <p className="text-2xl font-serif" style={{ color: "#f5f5f5" }}>
               {quota === null ? "Illimité" : quota ? `${quota} livres` : "—"}
             </p>
-            <p className="text-xs mt-1" style={{ color: "#6b7280" }}>
+            <p className="text-xs mt-1" style={{ color: "#c4cad6" }}>
               Renouvelé chaque 1er du mois
             </p>
           </div>
 
           {/* Clés API */}
-          <div className="rounded-2xl bg-white p-5 border" style={{ borderColor: "#e5e7eb" }}>
+          <div className="rounded-2xl bg-white p-5 border" style={{ borderColor: "#2a3448" }}>
             <div className="flex items-center gap-2 mb-3">
               <Key size={18} style={{ color: "#7c3aed" }} />
-              <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "#6b7280" }}>
+              <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: "#c4cad6" }}>
                 Clés IA (BYOK)
               </h2>
             </div>
-            <p className="text-2xl font-serif" style={{ color: "#232F3E" }}>
+            <p className="text-2xl font-serif" style={{ color: "#f5f5f5" }}>
               {geminiKeys.length} clé{geminiKeys.length > 1 ? "s" : ""}
             </p>
-            <p className="text-xs mt-1 mb-2" style={{ color: "#6b7280" }}>
+            <p className="text-xs mt-1 mb-2" style={{ color: "#c4cad6" }}>
               {geminiKeys.length === 0 ? "Aucune clé Gemini configurée" : geminiKeys.join(", ")}
             </p>
             <button
@@ -167,11 +170,11 @@ export default function V3ComptePage() {
         </div>
 
         {/* Projets récents */}
-        <section className="rounded-2xl bg-white border p-6 mb-8" style={{ borderColor: "#e5e7eb" }}>
+        <section className="rounded-2xl bg-white border p-6 mb-8" style={{ borderColor: "#2a3448" }}>
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <BookOpen size={18} style={{ color: "#008296" }} />
-              <h2 className="text-lg font-serif" style={{ color: "#232F3E" }}>
+              <h2 className="text-lg font-serif" style={{ color: "#f5f5f5" }}>
                 Mes livres récents
               </h2>
             </div>
@@ -183,7 +186,7 @@ export default function V3ComptePage() {
             <p className="text-sm text-slate-500">Chargement…</p>
           ) : projects.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-sm mb-3" style={{ color: "#6b7280" }}>
+              <p className="text-sm mb-3" style={{ color: "#c4cad6" }}>
                 Aucun livre pour l'instant. Lancez votre premier projet !
               </p>
               <Link
@@ -199,7 +202,7 @@ export default function V3ComptePage() {
               {projects.map((p) => (
                 <li key={p.id} className="py-3 flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: "#232F3E" }}>
+                    <p className="text-sm font-semibold" style={{ color: "#f5f5f5" }}>
                       {p.title ?? "Sans titre"}
                     </p>
                     <p className="text-xs" style={{ color: "#9ca3af" }}>
@@ -221,21 +224,21 @@ export default function V3ComptePage() {
         </section>
 
         {/* Facturation */}
-        <section className="rounded-2xl bg-white border p-6" style={{ borderColor: "#e5e7eb" }}>
+        <section className="rounded-2xl bg-white border p-6" style={{ borderColor: "#2a3448" }}>
           <div className="flex items-center gap-2 mb-4">
-            <CreditCard size={18} style={{ color: "#232F3E" }} />
-            <h2 className="text-lg font-serif" style={{ color: "#232F3E" }}>
+            <CreditCard size={18} style={{ color: "#f5f5f5" }} />
+            <h2 className="text-lg font-serif" style={{ color: "#f5f5f5" }}>
               Facturation
             </h2>
           </div>
-          <p className="text-sm mb-4" style={{ color: "#6b7280" }}>
+          <p className="text-sm mb-4" style={{ color: "#c4cad6" }}>
             Gérez votre abonnement, votre moyen de paiement et téléchargez vos factures.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link
               to="/subscription"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white"
-              style={{ background: "#232F3E" }}
+              style={{ background: "#008296" }}
             >
               Mon abonnement <ExternalLink size={14} />
             </Link>
