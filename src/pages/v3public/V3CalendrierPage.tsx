@@ -70,7 +70,7 @@ export default function V3CalendrierPage() {
                     <span className="font-semibold leading-snug">{entry.title}</span>
                   </div>
                   <p className="text-sm text-[#4B5563] mt-1.5">{entry.note}</p>
-                  <p className="text-xs mt-2 font-semibold" style={{ color: '#064E3B' }}>
+                  <p className="text-xs mt-2 font-semibold" style={{ color: '#2fd0a8' }}>
                     {entry.status === 'complement' ? 'Ouvert dès l’achat' : date ? date : 'Déjà ouvert'}
                   </p>
                 </>
