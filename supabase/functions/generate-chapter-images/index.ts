@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkImageQuota, logImage, quotaMessage, userIdFromAuth } from '../_shared/monthlyImageQuota.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
@@ -598,6 +599,10 @@ serve(async (req) => {
       coloringBookAgeGroup = '3-6',
     } = await req.json();
     
+    const imgQuota = await checkImageQuota(await userIdFromAuth(req.headers.get('Authorization')));
+    if (imgQuota.exceeded) {
+      return new Response(JSON.stringify({ error: quotaMessage(imgQuota.limit), code: 'MONTHLY_COVER_QUOTA' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+    }
     if (!chapterTitle) {
       return new Response(
         JSON.stringify({ error: 'Titre du chapitre requis' }),
@@ -926,6 +931,7 @@ Instructions de génération:
       console.log('Placeholder image detected, skipping storage upload');
     }
 
+    if (!isPlaceholder) await logImage(imgQuota, 'generate-chapter-images');
     console.log(`Image generated successfully (provider=${usedProvider}, fallback=${providerFallback})`);
     return new Response(
       JSON.stringify({ 

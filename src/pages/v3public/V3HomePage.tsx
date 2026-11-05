@@ -6,6 +6,7 @@ import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
 import V3CoversGallery from '@/components/v3public/V3CoversGallery';
 import V3SubscriberWorkshops from '@/components/v3public/V3SubscriberWorkshops';
 import V3SubscriberFaq from '@/components/v3public/V3SubscriberFaq';
+import V3SubscriberEditorial from '@/components/v3public/V3SubscriberEditorial';
 import {
   ArrowRight, AudioLines,
   Wand2, Feather, Rocket, Palette, ListTree, PenLine,
@@ -91,6 +92,7 @@ export default function V3HomePage() {
         <V3SubscriberHome user={user} />
         <V3CoversGallery />
         <V3SubscriberWorkshops />
+        <V3SubscriberEditorial />
         <V3SubscriberFaq />
       </div>
     );
