@@ -28,7 +28,7 @@ export default function V3GuestAuthorPage() {
         <img src={profilHero} alt="Bureau d'écrivain avec fauteuil en cuir, bibliothèque et machine à écrire" width={1600} height={560}
           className="h-56 w-full rounded-2xl object-cover md:h-72" />
       </div>
-      <section className="v3-section-dark">
+      <section className="v3-section-dark" style={{ background: "#111827", color: "#f5f5f5" }}>
         <div className="max-w-6xl mx-auto px-5 md:px-8 py-16 flex items-center gap-8 flex-wrap">
           <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[var(--v3-orange)] to-orange-700 grid place-items-center text-3xl font-bold">
             GB
