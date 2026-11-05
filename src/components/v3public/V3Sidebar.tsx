@@ -175,6 +175,21 @@ const NAV: NavSection[] = [
 
 type SidebarGroup = { key: string; label: string; color: string; items: NavItem[] };
 
+/** Parcours de révision, placé sous « Bibliothèque / Mes livres », hors des ateliers. */
+const REVISION_GROUP: SidebarGroup = {
+  key: 'revision-editoriale',
+  label: '📝 Révision éditoriale',
+  color: '#2563EB',
+  items: [
+    { to: '/v3/mes-livres', label: '1. Choisir ou importer mon livre', icon: LayoutGrid },
+    { to: '/v3/corriger', label: '2. Corriger mon livre', icon: LayoutGrid, badge: 'Rapport' },
+    { to: '/bookperfect', label: '3. Polir le style (BookPerfect)', icon: LayoutGrid },
+    { to: '/v3/outils/humanizer', label: '4. Humaniser (HumanizeAI)', icon: LayoutGrid },
+    { to: '/v3/studio-v4', label: '5. Couverture et 4e', icon: LayoutGrid },
+    { to: '/v3/outils/traduction', label: '6. Traduire mon livre', icon: LayoutGrid },
+  ],
+};
+
 /** Accès directs en tête de barre, comme sur la maquette du 5 novembre. */
 const DIRECT_LINKS = [
   { to: '/v3', label: 'Accueil V3', icon: Home, color: '#3F3A37' },
