@@ -950,5 +950,5 @@ export default App;
 
 function CommanderRedirect() {
   const { search } = useLocation();
-  return <Navigate to={`/lancement/offres${search}`} replace />;
+  return <Navigate to={`/v3/forfaits${search}`} replace />;
 }
