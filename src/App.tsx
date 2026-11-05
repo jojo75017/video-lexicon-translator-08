@@ -726,10 +726,10 @@ const App = () => {
             <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/cover-studio-pro/edit" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
-            <Route path="/v3/couverture-express" element={<div className="v3-dark-page">gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)</div>} />
-            <Route path="/v3/studio-v4" element={<div className="v3-dark-page">gated(<PlanGuard><TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate></PlanGuard>)</div>} />
-            <Route path="/v3/mes-couvertures" element={<div className="v3-dark-page">gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)</div>} />
-            <Route path="/v3/mes-couvertures/:id" element={<div className="v3-dark-page">gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)</div>} />
+            <Route path="/v3/couverture-express" element={<div className="v3-dark-page">{gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)}</div>} />
+            <Route path="/v3/studio-v4" element={<div className="v3-dark-page">{gated(<PlanGuard><TrialGate label="Studio V4"><V3StudioV4Page /></TrialGate></PlanGuard>)}</div>} />
+            <Route path="/v3/mes-couvertures" element={<div className="v3-dark-page">{gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)}</div>} />
+            <Route path="/v3/mes-couvertures/:id" element={<div className="v3-dark-page">{gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)}</div>} />
             {/* Cover Studio KDP Pro — upsell indépendant 67 € (étape 3). */}
             <Route path="/v3/cover-pro" element={gated(<PlanGuard><TrialGate label="Cover Studio KDP Pro"><CoverProPage /></TrialGate></PlanGuard>)} />
             <Route path="/v3/paiements" element={gated(<TrialGate label="Mes paiements"><PaiementsCouverturesPage /></TrialGate>)} />
