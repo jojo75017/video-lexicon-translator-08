@@ -237,8 +237,8 @@ export default function V3Sidebar() {
         { to: '/v3/mes-livres', label: '1. Choisir ou importer mon livre', icon: LayoutGrid },
         { to: '/v3/corriger', label: '2. Corriger mon livre', icon: LayoutGrid, badge: 'Rapport' },
         { to: '/bookperfect', label: '3. Polir le style (BookPerfect)', icon: LayoutGrid },
-        { to: '/v3/outils/humanizer', label: '4. Humaniser & audit (HumanizeAI)', icon: LayoutGrid },
-        { to: '/v3/studio-v4', label: '5. Couverture & 4e de couverture', icon: LayoutGrid },
+        { to: '/v3/outils/humanizer', label: '4. Humaniser (HumanizeAI)', icon: LayoutGrid },
+        { to: '/v3/studio-v4', label: '5. Couverture et 4e', icon: LayoutGrid },
         { to: '/v3/outils/traduction', label: '6. Traduire mon livre', icon: LayoutGrid },
       ],
     };
