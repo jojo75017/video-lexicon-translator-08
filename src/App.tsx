@@ -553,7 +553,7 @@ const App = () => {
             {/* Essai gratuit 7 jours : inscription publique + envoi Systeme.io */}
             <Route path="/essai-gratuit-7-jours" element={<EssaiGratuit7JoursPage />} />
             <Route path="/v3/attente" element={v3Standalone(<V3WaitingRoomPage />)} />
-            <Route path="/message" element={<MessageAudioPage />} />
+            <Route path="/message" element={<div className="v3-dark-page">{<MessageAudioPage />}</div>} />
             {/* Fiches ponts du tunnel email : 1 email = 1 fiche = 1 bouton vers /commander */}
             <Route path="/fiche/histoire" element={<FicheHistoirePage />} />
             <Route path="/fiche/preuve" element={<FichePreuvePage />} />
@@ -651,14 +651,14 @@ const App = () => {
             <Route path="/blog/:slug" element={<BlogArticleTemplate />} />
             <Route path="/ecrire-livre-chatgpt" element={<SeoTutorialChatGptPage />} />
             <Route path="/creer-ebook-ia" element={<SeoCreerEbookIaPage />} />
-            <Route path="/generateur-ebook" element={<SeoGenerateurEbookPage />} />
+            <Route path="/generateur-ebook" element={<div className="v3-dark-page">{<SeoGenerateurEbookPage />}</div>} />
             <Route path="/guide-kdp-enfants" element={<SeoGuideKdpEnfantsPage />} />
             <Route path="/creer-ebook-kdp-etranger" element={<SeoFrancophonesEtrangerPage />} />
             <Route path="/formation" element={<div className="v3-dark-page">{<FormationPage />}</div>} />
             <Route path="/formation-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
-            <Route path="/formation-series" element={isAdmin || isAuthenticated ? <FormationSeriesPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-series" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationSeriesPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-series-audio" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationSeriesAudioPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
-            <Route path="/formation-videos" element={isAdmin || isAuthenticated ? <FormationVideosPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />} />
+            <Route path="/formation-videos" element={<div className="v3-dark-page">{isAdmin || isAuthenticated ? <FormationVideosPage /> : <SubscriptionAuth onAuthenticated={handleAuthenticated} />}</div>} />
             <Route path="/formation-embed" element={<FormationEmbedPage />} />
 
             {/* Légal / système */}
@@ -693,7 +693,7 @@ const App = () => {
             <Route path="/ebook-ideas" element={<div className="v3-dark-page">{<EbookIdeasPage />}</div>} />
             <Route path="/ambiances" element={<div className="v3-dark-page">{<AmbiancesPage />}</div>} />
             <Route path="/ebookbot" element={<div className="v3-dark-page">{<EbookbotPage />}</div>} />
-            <Route path="/assistant" element={<AssistantPublicPage />} />
+            <Route path="/assistant" element={<div className="v3-dark-page">{<AssistantPublicPage />}</div>} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<div className="v3-dark-page">{<NichesPage />}</div>} />
             <Route path="/niches-600" element={<div className="v3-dark-page">{<Niches600Page />}</div>} />
@@ -705,7 +705,7 @@ const App = () => {
             <Route path="/bd-offre" element={<BDOffrePage />} />
             <Route path="/bd-upsell" element={<BDUpsellPage />} />
             <Route path="/bd-merci" element={<BDMerciPage />} />
-            <Route path="/comic-agent" element={<ComicAgentPage />} />
+            <Route path="/comic-agent" element={<div className="v3-dark-page">{<ComicAgentPage />}</div>} />
             <Route path="/word-count" element={<div className="v3-dark-page">{<WordCountPage />}</div>} />
             <Route
               path="/ebook-planner"
@@ -724,7 +724,7 @@ const App = () => {
             <Route path="/kdp-keywords" element={<div className="v3-dark-page">{gated(<KdpKeywordResearchPage />)}</div>} />
             <Route path="/audit-pilot" element={<div className="v3-dark-page">{gated(<AuditPilotPage />)}</div>} />
             <Route path="/bookperfect" element={<div className="v3-dark-page">{<PlanGuard><BookPerfectGate><BookPerfectPage /></BookPerfectGate></PlanGuard>}</div>} />
-            <Route path="/couverture-kdp" element={gated(<CouvertureKdpPage />)} />
+            <Route path="/couverture-kdp" element={<div className="v3-dark-page">{gated(<CouvertureKdpPage />)}</div>} />
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/cover-studio-pro/edit" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/couverture-express" element={<div className="v3-dark-page">{gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)}</div>} />
