@@ -129,10 +129,9 @@ export default function StarterPage({ offerOnly = false }: { offerOnly?: boolean
           <h2 className="text-xl font-bold">Et ensuite ?</h2>
           <p className="mt-2 text-muted-foreground">Quand vous voudrez aller plus loin, vous pourrez débloquer en un clic :</p>
           <ul className="mt-3 space-y-2">
-            <li>📚 <strong>Cover Studio Pro (47 €)</strong> : la couverture brochée complète, dos et quatrième, pour Amazon KDP</li>
             <li>🚀 <strong>Plan Auteur (97 €/an)</strong> : les 15 spécialistes IA, toutes les couvertures et la suite complète</li>
           </ul>
-          <div className="mt-5 flex flex-wrap gap-3"><Button asChild variant="outline"><Link to={`/v3/cover-pro${location.search}`}>Découvrir Cover Studio Pro</Link></Button><Button asChild><Link to={paymentUrl("auteur97_1x")}>Passer au plan Auteur · 97 €/an</Link></Button></div>
+          <div className="mt-5 flex flex-wrap gap-3"><Button asChild><Link to={paymentUrl("auteur97_1x")}>Passer au plan Auteur · 97 €/an</Link></Button></div>
         </section>
 
         {inscrit ? <section className="mt-8">
