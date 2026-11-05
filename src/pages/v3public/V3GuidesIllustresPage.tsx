@@ -1,3 +1,4 @@
+import guidesHero from "@/assets/guides-illustres-hero.jpg";
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { Search, Sparkles, Copy, ArrowLeft, FileDown, FileText, ImageIcon, Loader2, PenLine, Plus, Square, Trash2, BookOpen, Upload, Save } from 'lucide-react';
@@ -321,6 +322,7 @@ export default function V3GuidesIllustresPage() {
 
   const set = (k: keyof typeof EMPTY) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setForm({ ...form, [k]: e.target.value });
   return <main className="v3-shell py-8">
+    <img src={guidesHero} alt="Guides illustrés" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
     <header className="mb-8 border-b border-border pb-6">
       <p className="text-sm font-semibold text-primary">Livres spéciaux · Auteur et Édition</p>
       <h1 className="v3-serif text-3xl text-foreground">Guides illustrés</h1>
