@@ -93,13 +93,13 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
         <V3AdminQuickAccess isAdmin={isAdmin} isAdminChecking={isAdminChecking} />
 
         {/* Interrupteur du menu latéral : toujours visible en haut de page. */}
-        <div className="hidden border-b px-3 py-2 md:block" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+        <div className="hidden border-b px-3 py-2 md:block" style={{ borderColor: 'rgba(246,189,42,.25)', background: '#080B11' }}>
           <button
             type="button"
             onClick={toggleSidebar}
             aria-expanded={showSidebar}
-            className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors"
-            style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-surface)', color: 'var(--v3-ink)' }}
+            className="v3-chip-toggle inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-semibold transition-colors"
+            style={{ borderColor: 'rgba(246,189,42,.45)', background: '#1A1D24', color: '#F3EDE6' }}
           >
             {showSidebar ? <PanelLeftClose className="h-4 w-4" /> : <PanelLeftOpen className="h-4 w-4" />}
             {showSidebar ? 'Masquer le menu' : 'Afficher le menu'}
