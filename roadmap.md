@@ -1,4 +1,6 @@
 # Roadmap
 
-- [ ] Sécurité : corriger les 55 failles graves du contrôle approfondi (outils payants, emails, admin, accès payants, données)
+- [x] Sécurité : 49 failles graves corrigées (outils payants, emails, admin, accès payants, données)
+- [ ] Sécurité restante : anciens codes abonnés à 6 caractères, essai gratuit par email, vérification paiement au retour, imports d'URL, lien de désinscription, 62 avertissements
+- [ ] Clé de signature Resend (RESEND_WEBHOOK_SECRET) à fournir par Georges pour réactiver le suivi des emails
 - [ ] Publier les liens mensuels /paiement-mensuel (attente accord de Georges)
