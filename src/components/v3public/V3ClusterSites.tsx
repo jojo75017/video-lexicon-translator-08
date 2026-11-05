@@ -1,4 +1,4 @@
-import { ExternalLink, BookOpen, PenLine } from 'lucide-react';
+import { ExternalLink, BookOpen, Headphones } from 'lucide-react';
 
 /** Les deux sites de Georges réalisés avec EbookStudio, affichés sous la galerie des couvertures. */
 const SITES = [
@@ -14,7 +14,7 @@ const SITES = [
   {
     name: 'blogcluster.com',
     url: 'https://blogcluster.com',
-    icon: PenLine,
+    icon: Headphones,
     color: '#2563EB',
     tag: 'Les histoires audio',
     title: 'Mes livres audio, réalisés avec cet outil',
