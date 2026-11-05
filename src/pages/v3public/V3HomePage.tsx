@@ -100,6 +100,11 @@ export default function V3HomePage() {
     );
   }
 
+  // Session en cours de vérification : on n'affiche pas l'ancienne page de vente.
+  if (user === undefined) {
+    return <div className="v3-home" style={{ background: '#2A2624', minHeight: '100vh' }} />;
+  }
+
   return (
     <div className="v3-home pb-4">
       {user && (
