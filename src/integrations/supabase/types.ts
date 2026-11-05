@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_code_attempts: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          ip: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          ip?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          ip?: string | null
+        }
+        Relationships: []
+      }
       admin_launches: {
         Row: {
           color: string | null
