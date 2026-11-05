@@ -168,7 +168,7 @@ export default function V3BookManagerPage() {
   };
 
   return (
-    <section className="max-w-5xl mx-auto px-5 md:px-8 py-14">
+    <div className="v3-dark-page"><section className="max-w-5xl mx-auto px-5 md:px-8 py-14">
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
@@ -351,6 +351,6 @@ export default function V3BookManagerPage() {
           </div>
         </div>
       )}
-    </section>
+    </section></div>
   );
 }
