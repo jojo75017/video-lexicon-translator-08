@@ -1,4 +1,5 @@
 import { requireUser } from "../_shared/authGuard.ts";
+import { safeFetch } from "../_shared/safeFetch.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -44,9 +45,8 @@ Deno.serve(async (req) => {
     if (!url || typeof url !== 'string' || !/^https?:\/\//i.test(url)) {
       return new Response(JSON.stringify({ error: 'URL invalide' }), { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
     }
-    const resp = await fetch(url, {
+    const resp = await safeFetch(url, {
       headers: { 'User-Agent': 'Mozilla/5.0 (compatible; EbookStudioBot/1.0)', Accept: 'text/html,application/xhtml+xml' },
-      redirect: 'follow',
     });
     if (!resp.ok) {
       return new Response(JSON.stringify({ error: `La page a répondu ${resp.status}` }), { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });

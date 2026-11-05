@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { clientIp, isLockedOut, recordFailure } from '../_shared/codeAttempts.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -66,8 +67,16 @@ serve(async (req) => {
 
     // Compare access codes (case-insensitive) — sauf si la session a déjà été vérifiée
     const storedCode = subscriber.access_code?.trim().toUpperCase();
+    const ip = clientIp(req);
+    if (!sessionVerified && await isLockedOut(supabase, normalizedEmail, ip)) {
+      return new Response(
+        JSON.stringify({ valid: false, message: 'Trop de tentatives. Réessayez dans 15 minutes.' }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     if (!sessionVerified && storedCode !== normalizedCode) {
       console.log('Code mismatch for', normalizedEmail);
+      await recordFailure(supabase, normalizedEmail, ip);
       return new Response(
         JSON.stringify({ valid: false, message: 'Code d\'accès incorrect' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }

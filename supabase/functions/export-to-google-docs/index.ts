@@ -1,3 +1,4 @@
+import { safeFetch } from "../_shared/safeFetch.ts";
 import { requireUser } from "../_shared/authGuard.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -238,7 +239,7 @@ async function uploadImageToDrive(imageUrl: string, accessToken: string): Promis
     console.log(`📥 Téléchargement de l'image: ${imageUrl.substring(0, 80)}...`);
     
     // Télécharger l'image
-    const imageResponse = await fetch(imageUrl);
+    const imageResponse = await safeFetch(imageUrl);
     if (!imageResponse.ok) {
       console.error(`❌ Impossible de télécharger l'image: ${imageResponse.status} ${imageResponse.statusText}`);
       return null;
