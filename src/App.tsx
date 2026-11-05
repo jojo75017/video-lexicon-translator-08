@@ -453,9 +453,9 @@ const App = () => {
     v3Open === null
       ? null
       : v3Open === true
-        ? (spaceChoice === 'v2' ? SUBSCRIBER_HOME_PATH : spaceChoice === 'v3' ? '/v3' : SUBSCRIBER_CHOICE_PATH)
+        ? (spaceChoice === 'v2' ? SUBSCRIBER_HOME_PATH : '/v3')
         : SUBSCRIBER_HOME_PATH;
-  const homePath = accessState === 'subscriber' ? subscriberDestination : basePath;
+  const homePath = accessState === 'subscriber' ? subscriberDestination : accessState === 'admin' ? '/v3' : basePath;
   const isAdminAuthRoute = pathname === ADMIN_LOGIN_PATH || pathname === '/admin-direct';
 
   if (isCheckingAuth) return <PageLoader />;
