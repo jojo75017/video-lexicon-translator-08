@@ -1,3 +1,4 @@
+import { requireAdminOrService } from "../_shared/authGuard.ts";
 import { Resend } from 'npm:resend@2.0.0';
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from '../_shared/emailSendingGuard.ts';
 
@@ -43,6 +44,8 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+  const __guard = await requireAdminOrService(req);
+  if (__guard instanceof Response) return __guard;
 
   try {
     if (!EMAIL_SENDING_ENABLED) {

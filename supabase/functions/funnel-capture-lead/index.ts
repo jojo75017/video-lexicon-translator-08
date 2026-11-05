@@ -237,24 +237,9 @@ serve(async (req) => {
       .maybeSingle();
 
     let leadId = existing?.id;
+    // Un prospect existant n'est jamais modifié depuis ce formulaire public.
     if (leadId) {
-      await supabase
-        .from("funnel_leads")
-        .update({
-          first_name: first_name || null,
-          ref_code: ref_code,
-          lead_magnet: magnetKey,
-          source: source || null,
-          // On conserve la variante A/B d'origine si elle existe déjà
-          ab_variant: existing?.ab_variant || ab_variant,
-          utm_source: body.utm_source || null,
-          utm_medium: body.utm_medium || null,
-          utm_campaign: body.utm_campaign || null,
-          landing_url: body.landing_url || null,
-          user_agent: req.headers.get("user-agent") || null,
-          ip,
-        })
-        .eq("id", leadId);
+      // rien à faire
     } else {
       const { data: inserted, error: insErr } = await supabase
         .from("funnel_leads")

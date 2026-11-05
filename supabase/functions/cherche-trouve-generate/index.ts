@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 // Générateur de concepts "Cherche & Trouve" (Seek-and-Find coloring books KDP).
 // Génère un lot de scènes structurées : titre, description, objets cachés,
 // et prompt image optimisé EN ANGLAIS (line art noir & blanc).
@@ -113,6 +114,8 @@ Seule exception : le champ "promptImage" qui DOIT être rédigé en anglais.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },

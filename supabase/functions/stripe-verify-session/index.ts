@@ -184,7 +184,7 @@ serve(async (req) => {
     }
 
     const accessCode =
-      existingSubscriber?.access_code || `EBK-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+      existingSubscriber?.access_code || `EBK-${crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`;
 
     if (existingSubscriber) {
       const { error: updateError } = await supabase

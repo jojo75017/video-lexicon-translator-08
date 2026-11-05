@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -36,6 +37,8 @@ function htmlToText(html: string): { title: string; content: string } {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
   try {
     const { url } = await req.json().catch(() => ({}));
     if (!url || typeof url !== 'string' || !/^https?:\/\//i.test(url)) {

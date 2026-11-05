@@ -87,7 +87,8 @@ Deno.serve(async (req) => {
           status: "converted",
           email,
         })
-        .eq("id", trialChapterId);
+        .eq("id", trialChapterId)
+        .is("converted_user_id", null);
     }
 
     return json({ entry: created });

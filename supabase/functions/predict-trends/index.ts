@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
@@ -8,7 +9,7 @@ const corsHeaders = {
 // Helper to call our own amazon-search function internally
 async function searchAmazon(keywords: string, marketplace = "fr") {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
-  const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY");
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !supabaseKey) return null;
 
   try {
@@ -78,6 +79,8 @@ serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
 
   try {
     const { category, timeframe } = await req.json();

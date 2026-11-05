@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
@@ -40,6 +41,8 @@ serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
 
   try {
     const { imageBase64, pose = 'ipad-straight', viewMode = '3d' } = await req.json();

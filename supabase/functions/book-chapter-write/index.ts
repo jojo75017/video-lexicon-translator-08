@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 // Studio Pro — Phase 2 : ChatGPT rédige UN chapitre à la fois.
 // Rôle ChatGPT = rédaction, narration, style (jamais l'architecture).
 // Contexte transmis : fiche maître + Bible + mémoire des chapitres précédents.
@@ -234,6 +235,8 @@ function cleanChapter(text: string): string {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
 
   try {

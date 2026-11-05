@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 /**
@@ -37,6 +38,8 @@ const schema = {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
   if (req.method !== 'POST') return jsonResponse({ error: 'Method not allowed' }, 405);
 
   try {

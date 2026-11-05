@@ -1,3 +1,4 @@
+const __esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const STORAGE_KEY = "ebkstudio_history";
 
 document.querySelectorAll(".tab").forEach(t => {
@@ -33,8 +34,8 @@ function loadHistory() {
       return;
     }
     container.innerHTML = list.map(item => `
-      <div class="hist-item" data-url="${item.url}">
-        <div class="hist-title">${item.title || "(sans titre)"}</div>
+      <div class="hist-item" data-url="${__esc(item.url)}">
+        <div class="hist-title">${__esc(item.title || "(sans titre)")}</div>
         <div class="hist-meta">
           <span class="hist-score ${scoreClass(item.score)}">${item.score}/100</span>
           <span>BSR ${item.bsr ? "#" + item.bsr.toLocaleString("fr-FR") : "—"}</span>
