@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import SeoHead from '@/components/funnel/SeoHead';
+import contactHero from '@/assets/contact-hero.jpg';
 
 interface Props {
   subscriberEmail: string;
@@ -69,6 +70,7 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
         noindex
       />
 
+      <img src={contactHero} alt="Bureau de contact" width={1600} height={560} className="w-full h-48 md:h-64 object-cover" />
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link

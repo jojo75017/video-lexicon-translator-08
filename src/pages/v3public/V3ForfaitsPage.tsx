@@ -3,11 +3,13 @@ import { BackButton } from '@/components/v3/BackButton';
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import { Button } from '@/components/ui/button';
 import { usePageMeta } from '@/hooks/usePageMeta';
+import offresHero from '@/assets/offres-hero.jpg';
 
 export default function V3ForfaitsPage() {
   usePageMeta({ title: 'Formules mensuelles EbookStudio — dès 19 €/mois', description: 'Plan Débutant 19 €/mois (20 livres, 10 couvertures), Plan Auteur 29 €/mois (50 livres, 30 couvertures) et Plan Édition VIP 59 €/mois (illimité, 50 couvertures). Les droits des clients actuels sont conservés.' });
   return <main className="min-h-screen bg-background px-4 py-10 text-foreground">
     <div className="mx-auto max-w-7xl"><BackButton className="mb-4" />
+      <img src={offresHero} alt="Les offres EbookStudio" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
       <h1 className="text-center text-4xl font-bold">Les offres EbookStudio</h1>
       <V3PricingOverview />
       <section aria-labelledby="kdp-publication-limits" className="border-y border-destructive/40 py-6 text-destructive [&_*]:!text-destructive">
