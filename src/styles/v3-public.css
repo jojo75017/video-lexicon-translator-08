@@ -945,3 +945,8 @@
   --v3-ink: #f5f5f5; --v3-muted: #c4cad6;
 }
 .v3-dark-page .v3-ambiance textarea, .v3-dark-page .v3-ambiance input { color: #f5f5f5 !important; -webkit-text-fill-color: #f5f5f5 !important; }
+
+/* Page /v3/plans : comparaison lisible sur fond sombre */
+.v3-plans-dark .bg-white { background: #151d2c !important; }
+.v3-plans-dark h1, .v3-plans-dark h2, .v3-plans-dark h3, .v3-plans-dark td, .v3-plans-dark .font-medium { color: #f5f5f5; }
+.v3-plans-dark .text-neutral-500, .v3-plans-dark .text-neutral-600, .v3-plans-dark .text-muted-foreground { color: #c4cad6 !important; }

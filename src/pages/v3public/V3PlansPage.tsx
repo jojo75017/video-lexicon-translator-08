@@ -100,7 +100,7 @@ const PLANS = [
 function Cell({ row, level }: { row: Row; level: Level }) {
   const ok = level >= row.min;
   return (
-    <td className="px-3 py-3 text-center align-middle" style={{ borderTop: '1px solid var(--v3-line, #e5e0d0)' }}>
+    <td className="px-3 py-3 text-center align-middle" style={{ borderTop: '1px solid #2a3448' }}>
       {ok
         ? <Check className="mx-auto h-5 w-5" style={{ color: '#0b6e4c' }} aria-label="Inclus" />
         : <Lock className="mx-auto h-4 w-4" style={{ color: '#b08968' }} aria-label="Réservé à une offre supérieure" />}
@@ -115,7 +115,7 @@ export default function V3PlansPage() {
   });
 
   return (
-    <main className="min-h-screen" style={{ background: '#FAFAFA', color: '#232F3E' }}>
+    <main className="v3-plans-dark min-h-screen" style={{ background: '#0b1120', color: '#f5f5f5' }}>
       {/* ── Bannière ── */}
       <header className="relative overflow-hidden">
         <img src={plansHero} alt="Un bureau d’auteur avec un livre en cours de création" width={1600} height={704}
@@ -138,7 +138,7 @@ export default function V3PlansPage() {
         <section aria-label="Les trois offres" className="grid gap-6 md:grid-cols-3">
           {PLANS.map(p => (
             <article key={p.name} className="relative flex flex-col rounded-2xl bg-white p-6 shadow-sm"
-              style={{ border: p.popular ? `2px solid ${p.color}` : '1px solid #e5e0d0' }}>
+              style={{ border: p.popular ? `2px solid ${p.color}` : '1px solid #2a3448' }}>
               {p.popular && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-xs font-bold text-white"
                   style={{ background: p.color }}>Le plus choisi</span>
@@ -163,7 +163,7 @@ export default function V3PlansPage() {
 
         {/* ── Encart VC Books ── */}
         <V3StarterKdpPilotBanner />
-        <section aria-label="VC Books" className="mt-12 overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #e5e0d0' }}>
+        <section aria-label="VC Books" className="mt-12 overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #2a3448' }}>
           <div className="grid items-center gap-6 p-6 sm:grid-cols-[auto_1fr] sm:p-8">
             <img src={vcRobot} alt="Le robot VC Books, assis en train de lire un livre" width={816} height={816}
               loading="lazy" className="mx-auto h-40 w-40 object-contain sm:h-48 sm:w-48" />
@@ -188,7 +188,7 @@ export default function V3PlansPage() {
             Chaque plan inclut tout ce qui est dans les plans précédents. Un cadenas 🔒 signifie que l’outil s’ouvre avec le plan supérieur.
           </p>
 
-          <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #e5e0d0' }}>
+          <div className="mt-8 overflow-x-auto rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #2a3448' }}>
             <table className="w-full min-w-[640px] border-collapse text-sm">
               <thead>
                 <tr style={{ background: '#232F3E' }}>
@@ -204,14 +204,14 @@ export default function V3PlansPage() {
               <tbody>
                 {FAMILIES.map(f => (
                   <Fragment key={f.title}>
-                    <tr style={{ background: 'var(--v3-cream, #f6f1e7)' }}>
+                    <tr style={{ background: '#1c2638' }}>
                       <td colSpan={4} className="px-4 py-2.5 text-xs font-bold uppercase tracking-wide" style={{ color: '#008296' }}>
                         {f.emoji} {f.title}
                       </td>
                     </tr>
                     {f.rows.map(r => (
                       <tr key={r.label}>
-                        <td className="px-4 py-3" style={{ borderTop: '1px solid var(--v3-line, #e5e0d0)' }}>
+                        <td className="px-4 py-3" style={{ borderTop: '1px solid #2a3448' }}>
                           <span className="font-medium">{r.label}</span>
                           {r.badge && <span className="ml-2 rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: '#FF9E2D' }}>{r.badge}</span>}
                           {r.detail && <span className="block text-xs text-neutral-500">{r.detail}</span>}
@@ -229,7 +229,7 @@ export default function V3PlansPage() {
         </section>
 
         {/* ── Image + réassurance ── */}
-        <section aria-label="Pourquoi EbookStudio" className="mt-12 overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #e5e0d0' }}>
+        <section aria-label="Pourquoi EbookStudio" className="mt-12 overflow-hidden rounded-2xl bg-white shadow-sm" style={{ border: '1px solid #2a3448' }}>
           <img src={plansFooter} alt="Une bibliothèque de livres publiés et un trophée" width={1600} height={608}
             loading="lazy" className="h-48 w-full object-cover sm:h-64" />
           <div className="grid gap-6 p-6 sm:grid-cols-3 sm:p-8">
