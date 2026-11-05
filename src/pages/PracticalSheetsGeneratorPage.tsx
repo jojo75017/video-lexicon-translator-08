@@ -8,6 +8,7 @@ import { ArrowLeft, FileText, Copy, CheckCircle, Download, Sparkles, Image as Im
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
+import fichesHero from '@/assets/fiches-pratiques-hero.jpg';
 
 interface PracticalSheet {
   id: number;
@@ -230,6 +231,7 @@ ${sheet.imagePrompt ? `\n🎨 PROMPT IMAGE :\n${sheet.imagePrompt}\n` : ''}
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
+      <img src={fichesHero} alt="Fiches pratiques" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
       <div className="flex items-center mb-8">
         <Button
           variant="ghost"
