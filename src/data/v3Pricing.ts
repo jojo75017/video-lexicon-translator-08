@@ -368,3 +368,71 @@ export const V3_NEW_OFFERS = {
     paidLinks: [{ label: "EbookStudio AI Team — 10 robots KDP 47€", href: "https://www.trafic-affiliation.com/captur_robotsamazonkdp" }],
   },
 } as const;
+
+/**
+ * Nouvelle formule mensuelle (validée par Georges le 1er novembre 2026) :
+ * Débutant 19 €/mois · Auteur 29 €/mois · Édition VIP 59 €/mois.
+ * Affichage public pour les nouveaux clients ; les formules à vie ci-dessus
+ * restent vendables et les droits des anciens clients sont sanctuarisés.
+ * Les caisses d'abonnement mensuel ne sont pas encore câblées : aucun
+ * identifiant de plan de paiement n'est défini ici pour l'instant.
+ */
+export interface V3MonthlyOffer {
+  id: "debutant" | "auteur" | "vip";
+  name: string;
+  price: number;
+  /** null = illimité (extensible via la clé IA de l'abonné). */
+  booksPerMonth: number | null;
+  coversPerMonth: number;
+  features: string[];
+}
+
+export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
+  {
+    id: "debutant",
+    name: "Plan Débutant",
+    price: 19,
+    booksPerMonth: 20,
+    coversPerMonth: 10,
+    features: [
+      "20 livres par mois · 10 couvertures par mois",
+      "Écriture guidée : écrire un livre, raconter un livre ou partir de son sommaire",
+      "Rédaction chapitre par chapitre avec les robots",
+      "Mise en page et exports PDF, Word (DOCX) et EPUB",
+      "Outils KDP de base : description, mots-clés, catégories",
+      "Votre propre clé IA (Gemini ou OpenRouter), sans surcoût",
+    ],
+  },
+  {
+    id: "auteur",
+    name: "Plan Auteur",
+    price: 29,
+    booksPerMonth: 50,
+    coversPerMonth: 30,
+    features: [
+      "Tout le plan Débutant",
+      "50 livres par mois · 30 couvertures par mois",
+      "Je raconte un livre, BD Studio et livres spéciaux",
+      "Correction éditoriale et HumanizeAI",
+      "KDP étranger (publication multi-pays)",
+      "Recherche de niches avancée",
+      "Rédaction en 10 langues",
+    ],
+  },
+  {
+    id: "vip",
+    name: "Plan Édition VIP",
+    price: 59,
+    booksPerMonth: null,
+    coversPerMonth: 50,
+    features: [
+      "Tout le plan Auteur",
+      "Livres illimités (extensible avec votre propre clé IA)",
+      "50 couvertures par mois (extensible avec votre propre clé API)",
+      "Studio Couverture Broché KDP : tranche, 4e de couverture, PDF 300 DPI",
+      "Studio Album illustré jeunesse",
+      "Audiolivres et voix off",
+      "Amazon Spy et outils d'éditeur",
+    ],
+  },
+];

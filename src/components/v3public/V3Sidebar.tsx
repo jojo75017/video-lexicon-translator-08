@@ -45,7 +45,7 @@ const NAV: NavSection[] = [
       { to: '/v3/upsells', label: 'UPSELLS — packs & compléments', icon: Sparkles, badge: '6 compléments' },
       { to: '/essai', label: '🎁 Essai gratuit — chapitre 1', icon: Rocket, end: true, badge: 'Gratuit' },
       { to: '/v3/attente', label: '👑 Salon des membres fondateurs', icon: Crown, end: true, badge: '1er mois' },
-      { to: '/lancement/offres#offres', label: '47 € à vie — jusqu’au 15 octobre', icon: Gem, end: true, badge: '15 octobre' },
+      { to: '/v3/forfaits', label: '👑 Formules dès 19 €/mois', icon: Gem, end: true, badge: 'Nouveau' },
     ],
   },
   {
@@ -155,8 +155,8 @@ const NAV: NavSection[] = [
     section: 'Mon compte',
     items: [
       { to: '/v3/compte', label: 'Mon compte & accès', icon: User },
-      { to: '/v3/forfaits', label: 'Offres à vie & options', icon: Gem },
-      { to: '/starter', label: 'EbookStudio Starter 27 €', icon: Rocket, badge: 'Nouveau' },
+      { to: '/v3/forfaits', label: 'Formules & options', icon: Gem },
+      { to: '/v3/plans', label: 'Comparer les 3 formules', icon: Rocket, badge: 'dès 19 €/mois' },
       
       { to: '/v3/auteur', label: 'Profil auteur', icon: User },
       { to: '/v3/parametres', label: 'Paramètres', icon: Settings },

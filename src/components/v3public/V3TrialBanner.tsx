@@ -14,9 +14,9 @@ const V3TrialBanner: React.FC = () => {
   if (isStarter) {
     return (
       <div className="w-full border-b border-border bg-card px-4 py-2 text-center text-sm text-foreground">
-        EbookStudio Starter · accès à vie · exports Word et PDF
-        <Link to="/paiement-offre?plan=auteur97_1x" className="ml-3 font-semibold text-primary underline">Passer au plan Auteur 97 €/an</Link>
-        <Link to="/v3/cover-pro" className="ml-3 text-primary underline">Cover Studio Pro 47 €</Link>
+        EbookStudio Starter · exports Word et PDF
+        <Link to="/v3/forfaits" className="ml-3 font-semibold text-primary underline">Voir les formules dès 19 €/mois</Link>
+        <Link to="/v3/cover-pro" className="ml-3 text-primary underline">Cover Studio Pro</Link>
       </div>
     );
   }
