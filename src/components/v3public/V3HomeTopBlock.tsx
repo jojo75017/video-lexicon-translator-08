@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, Sparkles, Plus, Minus } from 'lucide-react';
+import { ArrowRight, BookOpen, Sparkles, Plus, Minus, RotateCcw } from 'lucide-react';
 import AgentPortrait from './AgentPortrait';
 import useIsAdmin from '@/hooks/useIsAdmin';
 import { setSpaceChoice } from '@/lib/v3OpenState';
