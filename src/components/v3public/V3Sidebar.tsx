@@ -411,7 +411,7 @@ export default function V3Sidebar() {
 
         {renderGroup(REVISION_GROUP)}
 
-{DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
+        {DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
           <NavLink
             key={l.to}
             to={l.to}
