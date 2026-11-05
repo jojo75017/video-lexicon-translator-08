@@ -1,3 +1,4 @@
+import { requireUser, requireAdminOrService } from "../_shared/authGuard.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
@@ -15,7 +16,16 @@ Deno.serve(async (req) => {
   const supabase = createClient(supabaseUrl, serviceKey);
 
   try {
-    const { action, referral_code, referred_email, user_id } = await req.json();
+    const { action, referral_code, referred_email } = await req.json();
+    let user_id: string | undefined;
+    if (action === "get_code") {
+      const u = await requireUser(req);
+      if (u instanceof Response) return u;
+      user_id = u.id;
+    } else if (action !== "track") {
+      const g = await requireAdminOrService(req);
+      if (g instanceof Response) return g;
+    }
 
     // Action 1: Get or create referral code for authenticated user
     if (action === "get_code") {
