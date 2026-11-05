@@ -36,8 +36,8 @@ export default function V3ClusterSites() {
           Mes deux sites, faits avec cet outil
         </h2>
         <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: '#B9AFA6' }}>
-          Publier un livre, c'est bien. Le faire connaître, c'est mieux. Voici comment j'utilise moi-même
-          EbookStudio pour présenter mes livres et attirer des lecteurs, sans agence ni publicité coûteuse.
+          Publier un livre, c'est bien. Le faire vivre, c'est mieux. Voici comment j'utilise moi-même
+          EbookStudio pour présenter mes livres et donner à écouter mes histoires audio, sans agence ni publicité coûteuse.
         </p>
       </div>
 
