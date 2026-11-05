@@ -1,3 +1,4 @@
+import romanHero from '@/assets/livre-roman-hero.jpg';
 import { useParams, Navigate } from 'react-router-dom';
 import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
 import {
@@ -52,8 +53,11 @@ export default function V3SpecialBookPage() {
   const { title, Comp } = entry;
 
   return (
-    <div className="container mx-auto px-4 py-6 max-w-7xl">
+    <div className="v3-special-readable container mx-auto px-4 py-6 max-w-7xl">
       <V3AgentReturnBar />
+      {type === 'roman' && (
+        <img src={romanHero} alt="Roman ouvert sur un bureau à la lueur d'une lampe" width={1600} height={560} className="mt-4 w-full rounded-2xl object-cover" />
+      )}
       <h1 className="text-3xl font-bold mb-6 mt-4">{title}</h1>
       <Comp />
     </div>
