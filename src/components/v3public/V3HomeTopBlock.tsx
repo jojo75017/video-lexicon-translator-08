@@ -64,7 +64,9 @@ const SITUATIONS: Situation[] = [
     ],
     links: [
       { label: 'Écrire un livre', to: '/v3/lancer' },
-      { label: 'Ebookstudio-Génie', to: '/v3/create' },
+      { label: 'Créer mon livre (4 parcours)', to: '/v3/create' },
+      { label: 'Raconter ma vie (biographie)', to: '/v3/biographie' },
+      { label: 'J’ai déjà mon sommaire', to: '/v3/create?import=1' },
       { label: 'Sommaire IA — dialogue', to: '/v3/create?sommaire=ia' },
       { label: 'Sommaire Ultime', to: '/v3/outils/sommaire-ultime' },
       { label: 'Studio Pro (Gemini + ChatGPT)', to: '/v3/studio' },
