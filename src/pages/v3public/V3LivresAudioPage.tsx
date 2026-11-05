@@ -1,6 +1,6 @@
 import heroImg from '@/assets/livres-audio-hero.jpg';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Headphones, Mic, GraduationCap, ListMusic, MessageSquare } from 'lucide-react';
+import { ArrowRight, Headphones, Mic, GraduationCap, ListMusic } from 'lucide-react';
 import V3UpsellPromoCard from '@/components/v3public/V3UpsellPromoCard';
 import { V3_ADDON_LIST } from '@/data/v3Pricing';
 
