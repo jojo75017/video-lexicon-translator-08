@@ -11,6 +11,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ebookThemes } from '@/data/ebookIdeas';
 import { EbookAiChat } from '@/components/ebook/EbookAiChat';
+import ideesHero from '@/assets/idees-hero.jpg';
 
 const EbookIdeasPage: React.FC = () => {
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const EbookIdeasPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-background font-sans">
       {/* Hero Section - Magazine Style */}
-      <div className="relative overflow-hidden text-white" style={{background: 'linear-gradient(135deg, #7c3aed 0%, #ec4899 100%)'}}>
+      <div className="relative overflow-hidden text-white" style={{backgroundImage: `linear-gradient(90deg, rgba(11,17,32,0.92) 0%, rgba(11,17,32,0.55) 60%, rgba(11,17,32,0.2) 100%), url(${ideesHero})`, backgroundSize: 'cover', backgroundPosition: 'center'}}>
         <div className="absolute inset-0 bg-grid-white/10"></div>
         <div className="container mx-auto px-6 py-16 relative z-10">
           <Button 
