@@ -111,6 +111,12 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
+import PageHeroImage from './components/v3public/PageHeroImage';
+import plannerHero from './assets/planner-hero.jpg';
+import corrigerHero from './assets/corriger-hero.jpg';
+import bookperfectHero from './assets/bookperfect-hero.jpg';
+import ebookbotHero from './assets/ebookbot-hero.jpg';
+import assistantHero from './assets/assistant-hero.jpg';
 import V3HubAdminOnly from './components/v3public/V3HubAdminOnly';
 const V3HomePage = lazy(() => import('./pages/v3public/V3HomePage'));
 const EbookLongFormOfferPage = lazy(() => import('./pages/v3public/EbookLongFormOfferPage'));
@@ -697,8 +703,8 @@ const App = () => {
             {/* V2 tools */}
             <Route path="/ebook-ideas" element={<div className="v3-dark-page">{<EbookIdeasPage />}</div>} />
             <Route path="/ambiances" element={<div className="v3-dark-page">{<AmbiancesPage />}</div>} />
-            <Route path="/ebookbot" element={<div className="v3-dark-page">{<EbookbotPage />}</div>} />
-            <Route path="/assistant" element={<div className="v3-dark-page">{<AssistantPublicPage />}</div>} />
+            <Route path="/ebookbot" element={<div className="v3-dark-page">{<><PageHeroImage src={ebookbotHero} alt="Ebookbot, ton copilote" /><EbookbotPage /></>}</div>} />
+            <Route path="/assistant" element={<div className="v3-dark-page">{<><PageHeroImage src={assistantHero} alt="Assistant ebook" /><AssistantPublicPage /></>}</div>} />
             <Route path="/masterclass" element={<MasterclassPage />} />
             <Route path="/niches" element={<div className="v3-dark-page">{<NichesPage />}</div>} />
             <Route path="/niches-600" element={<div className="v3-dark-page">{<Niches600Page />}</div>} />
@@ -716,19 +722,19 @@ const App = () => {
               path="/ebook-planner"
               element={
                 <div className="v3-dark-page">{gated(
-                  <EbookPlannerPage
+                  <><PageHeroImage src={plannerHero} alt="Ebook Planner" /><EbookPlannerPage
                     subscriberEmail={subscriberEmail || ''}
                     subscriberData={subscriberData}
                     isDemo={false}
                     isAdmin={isAdmin}
                     onLogout={handleLogout}
-                  />
+                  /></>
                 )}</div>
               }
             />
             <Route path="/kdp-keywords" element={<div className="v3-dark-page">{gated(<KdpKeywordResearchPage />)}</div>} />
             <Route path="/audit-pilot" element={<div className="v3-dark-page">{gated(<AuditPilotPage />)}</div>} />
-            <Route path="/bookperfect" element={<div className="v3-dark-page">{<PlanGuard><BookPerfectGate><BookPerfectPage /></BookPerfectGate></PlanGuard>}</div>} />
+            <Route path="/bookperfect" element={<div className="v3-dark-page">{<PlanGuard><BookPerfectGate><PageHeroImage src={bookperfectHero} alt="BookPerfect AI" /><BookPerfectPage /></BookPerfectGate></PlanGuard>}</div>} />
             <Route path="/couverture-kdp" element={<div className="v3-dark-page">{gated(<CouvertureKdpPage />)}</div>} />
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/cover-studio-pro/edit" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
@@ -848,13 +854,13 @@ const App = () => {
 
               <Route path="recherche" element={<V3LockedGate><V3RecherchePage /></V3LockedGate>} />
               <Route path="outils" element={<V3LockedGate><V3ToolsIndexPage /></V3LockedGate>} />
-              <Route path="assistant" element={<V3LockedGate><V3AssistantPage /></V3LockedGate>} />
+              <Route path="assistant" element={<V3LockedGate><PageHeroImage src={assistantHero} alt="Assistant ebook" /><V3AssistantPage /></V3LockedGate>} />
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3PaidModuleRoute><V3TranslatorPage /></V3PaidModuleRoute>} />
               <Route path="revision-editoriale" element={<V3RevisionEditorialePage />} />
               <Route path="ebook-illustre" element={<V3EbookIllustrePage />} />
               <Route path="livres-audio" element={<V3LivresAudioPage />} />
-              <Route path="corriger" element={<PlanGuard><V3PaidModuleRoute><V3CorrecteurPage /></V3PaidModuleRoute></PlanGuard>} />
+              <Route path="corriger" element={<PlanGuard><V3PaidModuleRoute><PageHeroImage src={corrigerHero} alt="Corriger mon livre" /><V3CorrecteurPage /></V3PaidModuleRoute></PlanGuard>} />
               <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
               <Route path="posts" element={<V3PaidModuleRoute><V3PostsPage /></V3PaidModuleRoute>} />
               <Route path="acquisition" element={<V3PaidModuleRoute><V3AcquisitionPage /></V3PaidModuleRoute>} />
