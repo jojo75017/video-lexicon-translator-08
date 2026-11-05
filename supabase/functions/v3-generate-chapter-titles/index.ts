@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 // Nomme les chapitres dépourvus de titre, à partir d'un extrait de leur contenu.
 // Utilise Lovable AI (aucune clé côté abonné requise).
 
@@ -55,6 +56,8 @@ async function callOpenRouter(key: string, prompt: string, system: string): Prom
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
 
   try {
     const {

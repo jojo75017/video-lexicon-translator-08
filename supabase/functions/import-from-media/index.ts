@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -6,6 +7,8 @@ const corsHeaders = {
 /** Transcrit un fichier audio/vidéo via Lovable AI Gateway (openai/gpt-4o-transcribe). */
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
   try {
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY manquant');
