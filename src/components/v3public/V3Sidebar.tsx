@@ -246,8 +246,9 @@ export default function V3Sidebar() {
       seen.add(it.to);
       return true;
     });
-    const out = [...header, { key: 'autres', label: 'Compte, aide & autres', color: '#475569', items: others }];
-    if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: ADMIN_SECTION.items });
+    // « Compte, aide & autres » est réservé à l'administration : les abonnés ne le voient plus.
+    const out = [...header];
+    if (isAdmin) out.push({ key: 'admin', label: 'Administration', color: '#B91C1C', items: [...ADMIN_SECTION.items, ...others] });
     return out;
   }, [isAdmin]);
 
