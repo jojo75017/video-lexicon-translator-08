@@ -87,6 +87,7 @@ export default function V3HomePage() {
     return (
       <div className="v3-home pb-4" style={{ background: '#2A2624' }}>
         <V3SubscriberHome user={user} />
+        <V3CoversGallery />
       </div>
     );
   }
@@ -142,10 +143,8 @@ export default function V3HomePage() {
       {/* Le parcours public conserve ses offres aux emplacements historiques. */}
       {!user && <V3MicroSeriesSurpriseBanner />}
 
-      {user && <V3CoversGallery />}
-
       {/* PREUVE AUTEUR — livres publiés + nom d'auteur, avant les offres */}
-      {!user && (<section className="v3-shell py-8">
+      <section className="v3-shell py-8">
         <div
           className="rounded-3xl bg-white p-6 md:p-10"
           style={{ border: '1px solid var(--v3-joy-orange-soft)', boxShadow: '0 18px 40px -30px rgba(30, 41, 59, 0.35)' }}
@@ -203,7 +202,7 @@ export default function V3HomePage() {
             ))}
           </div>
         </div>
-      </section>)}
+      </section>
 
       {!user && <V3PricingOverview />}
 
