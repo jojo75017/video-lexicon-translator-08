@@ -25,6 +25,13 @@ export function parseV3PriceId(priceId: string): V3PlanInfo | null {
   if (priceId === "v3_edition_lifetime") {
     return { plan: "edition", interval: "year", label: "Édition — accès à vie (offre de lancement)", lifetime: true };
   }
+  // Formules mensuelles 19/29/59 € (nouveaux clients uniquement).
+  const MONTHLY: Record<string, { plan: V3PlanKey; label: string }> = {
+    v3m_debutant_monthly: { plan: "plume", label: "Plan Débutant — 19 €/mois" },
+    v3m_auteur_monthly: { plan: "edition", label: "Plan Auteur — 29 €/mois" },
+    v3m_vip_monthly: { plan: "maison", label: "Plan Édition VIP — 59 €/mois" },
+  };
+  if (MONTHLY[priceId]) return { ...MONTHLY[priceId], interval: "month" };
   const m = /^v3_(plume|edition|maison)_(monthly|annual)(_legacy)?$/.exec(priceId || "");
   if (!m) return null;
   const plan = m[1] as V3PlanKey;
