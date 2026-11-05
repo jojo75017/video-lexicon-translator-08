@@ -6,6 +6,7 @@ import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
 import V3CoversGallery from '@/components/v3public/V3CoversGallery';
 import V3SubscriberWorkshops from '@/components/v3public/V3SubscriberWorkshops';
 import V3SubscriberFaq from '@/components/v3public/V3SubscriberFaq';
+import V3ClusterSites from '@/components/v3public/V3ClusterSites';
 import V3SubscriberEditorial from '@/components/v3public/V3SubscriberEditorial';
 import {
   ArrowRight, AudioLines,
@@ -91,6 +92,7 @@ export default function V3HomePage() {
       <div className="v3-home pb-4" style={{ background: '#2A2624' }}>
         <V3SubscriberHome user={user} />
         <V3CoversGallery />
+        <V3ClusterSites />
         <V3SubscriberWorkshops />
         <V3SubscriberEditorial />
         <V3SubscriberFaq />
