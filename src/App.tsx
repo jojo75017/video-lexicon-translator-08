@@ -112,6 +112,18 @@ const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 // V3 hub + public site
 const V3HubPage = lazy(() => import('./pages/V3HubPage'));
 import PageHeroImage from './components/v3public/PageHeroImage';
+import parrainageHero from './assets/parrainage-hero.jpg';
+import communauteHero from './assets/communaute-hero.jpg';
+const PausedPage = ({ src, title, text }: { src: string; title: string; text: string }) => (
+  <div className="min-h-screen" style={{ background: '#0b1120', color: '#f5f5f5' }}>
+    <PageHeroImage src={src} alt={title} />
+    <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+      <h1 className="text-3xl font-bold mb-3" style={{ color: '#fff' }}>{title}</h1>
+      <p style={{ color: '#c4cad6' }}>{text}</p>
+      <a href="/v3" className="inline-block mt-6 px-5 py-2 rounded-lg font-semibold" style={{ background: '#FF9E2D', color: '#111' }}>← Retour à l'accueil</a>
+    </div>
+  </div>
+);
 import signatureHero from './assets/signature-hero.jpg';
 import studioCouvHero from './assets/studio-couverture-hero.jpg';
 import plannerHero from './assets/planner-hero.jpg';
@@ -613,7 +625,7 @@ const App = () => {
             <Route path="/valeur-offre" element={<Navigate to="/commander" replace />} />
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/mon-parrainage" replace />} />
-            <Route path="/mon-parrainage" element={<div className="v3-dark-page">{<ReferralKitPage />}</div>} />
+            <Route path="/mon-parrainage" element={<div className="v3-dark-page">{<PausedPage src={parrainageHero} title="Parrainage en pause" text="Le parrainage reviendra prochainement." />}</div>} />
             <Route path="/partenaires" element={<div className="min-h-screen flex items-center justify-center p-8 text-center"><div><h1 className="text-2xl font-bold mb-2">Programme partenaires en pause</h1><p className="opacity-80">Le parrainage reviendra prochainement.</p></div></div>} />
             <Route path="/outils-partenaires" element={<PartnerToolsPage />} />
             <Route path="/prestation-kdp" element={<Navigate to="/v3" replace />} />
@@ -631,7 +643,7 @@ const App = () => {
             <Route path="/guide-ebook" element={<Navigate to="/formation" replace />} />
             <Route path="/kdp-ads-guide" element={<Navigate to="/formation" replace />} />
             <Route path="/checklist-tournage" element={<Navigate to="/formation" replace />} />
-            <Route path="/communaute" element={<div className="v3-dark-page">{<V3CommunautePage />}</div>} />
+            <Route path="/communaute" element={<div className="v3-dark-page">{<PausedPage src={communauteHero} title="Communauté en pause" text="La communauté des auteurs reviendra prochainement." />}</div>} />
             <Route path="/communaute/post/:id" element={<V3CommunautePostPage />} />
             <Route path="/ai-chat" element={<Navigate to="/ebookbot" replace />} />
             <Route path="/business-center" element={<Navigate to={ADMIN_HOME_PATH} replace />} />
