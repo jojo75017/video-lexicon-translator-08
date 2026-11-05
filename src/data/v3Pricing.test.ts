@@ -53,6 +53,23 @@ describe("Nouvelles offres 97 € / 197 €", () => {
   });
 });
 
+import { V3_MONTHLY_OFFERS } from "./v3Pricing";
+describe("Nouvelle formule mensuelle 19/29/59 €", () => {
+  it("affiche les trois formules aux prix validés", () => {
+    expect(V3_MONTHLY_OFFERS.map((o) => [o.id, o.price])).toEqual([
+      ["debutant", 19],
+      ["auteur", 29],
+      ["vip", 59],
+    ]);
+  });
+  it("applique les quotas validés : 20/10, 50/30, illimité/50", () => {
+    expect([V3_MONTHLY_OFFERS[0].booksPerMonth, V3_MONTHLY_OFFERS[0].coversPerMonth]).toEqual([20, 10]);
+    expect([V3_MONTHLY_OFFERS[1].booksPerMonth, V3_MONTHLY_OFFERS[1].coversPerMonth]).toEqual([50, 30]);
+    expect(V3_MONTHLY_OFFERS[2].booksPerMonth).toBeNull();
+    expect(V3_MONTHLY_OFFERS[2].coversPerMonth).toBe(50);
+  });
+});
+
 import { NEW_OFFER_PAYMENTS, isOneTimeAuteur } from '../../supabase/functions/_shared/newOfferPayments';
 describe('Stripe new offer rules', () => {
   it('Auteur has exactly 1/2/3 installments totaling 9700 cents', () => {
