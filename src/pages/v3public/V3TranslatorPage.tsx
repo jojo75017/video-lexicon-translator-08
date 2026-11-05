@@ -3,7 +3,7 @@ import { Upload, Loader2 } from 'lucide-react';
 import { importAudioFile, type AudioBookContent } from '@/lib/audiobook/bookImport';
 import AudiobookBookPicker from '@/components/v3public/AudiobookBookPicker';
 import { parseManuscript } from '@/lib/manuscriptParser';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import EbookMultiTranslator from '@/components/ebook/EbookMultiTranslator';
 import { BackButton } from "@/components/v3/BackButton";
 import { supabase } from '@/integrations/supabase/client';
@@ -79,6 +79,25 @@ export default function V3TranslatorPage() {
       </div>
       <div id="traducteur" />
       <EbookMultiTranslator ebookTitle={book?.title || ''} chapters={chapters} preface={book?.preface || ''} conclusion={book?.conclusion || ''} />
+      <div className="mt-10 rounded-2xl p-6" style={{ background: '#111827', border: '1px solid #D97706' }}>
+        <h2 className="text-2xl font-bold mb-1" style={{ color: '#F6BD2A' }}>📦 Publier votre livre traduit sur Amazon KDP</h2>
+        <p className="text-[14px] mb-5" style={{ color: '#D1D5DB' }}>Chaque langue est une nouvelle édition : refaites sa couverture Kindle, sa fiche et ses mots-clés pour le marché visé.</p>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {[
+            { to: '/v3/couverture-express', t: '📱 Couverture Kindle (ebook)', d: 'Couverture traduite au format Kindle 1600 × 2560.', c: '#7C3AED' },
+            { to: '/v3/studio-v4', t: '🎨 Couverture brochée complète', d: 'Première, dos et 4e de couverture pour le livre papier.', c: '#7C3AED' },
+            { to: '/v3/kdp/fiche-audit', t: '📝 Fiche KDP', d: 'Titre, sous-titre, description et catégories dans la langue.', c: '#059669' },
+            { to: '/v3/kdp/mots-cles', t: '🔑 Mots-clés KDP', d: 'Les 7 mots-clés adaptés au pays de vente.', c: '#059669' },
+            { to: '/v3/kdp/lancement', t: '🚀 Plan de lancement', d: 'Préparer la sortie sur Amazon.fr, .com, .de, .es…', c: '#D97706' },
+            { to: '/v3/kdp/publicite', t: '📣 Publicité Amazon Ads', d: 'Trois campagnes prêtes à lancer vous-même.', c: '#D97706' },
+          ].map((x) => (
+            <Link key={x.to} to={x.to} className="block rounded-xl p-4 transition hover:brightness-125" style={{ background: '#1F2937', borderLeft: `4px solid ${x.c}` }}>
+              <div className="font-bold" style={{ color: '#F9FAFB' }}>{x.t}</div>
+              <div className="text-[13px] mt-1" style={{ color: '#9CA3AF' }}>{x.d}</div>
+            </Link>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
