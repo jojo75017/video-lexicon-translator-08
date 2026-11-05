@@ -1,3 +1,4 @@
+import coloriageHero from '@/assets/livre-coloriage-hero.jpg';
 import voyageHero from '@/assets/livre-voyage-hero.jpg';
 import cuisineHero from '@/assets/livre-cuisine-hero.jpg';
 import romanHero from '@/assets/livre-roman-hero.jpg';
@@ -51,6 +52,7 @@ const HEROES: Record<string, { src: string; alt: string }> = {
   roman: { src: romanHero, alt: "Roman ouvert sur un bureau à la lueur d'une lampe" },
   cuisine: { src: cuisineHero, alt: 'Livre de cuisine ouvert entouré de produits frais' },
   voyage: { src: voyageHero, alt: 'Guide de voyage ouvert avec carte, boussole et passeport' },
+  coloriage: { src: coloriageHero, alt: 'Livre de coloriage ouvert avec crayons de couleur' },
 };
 
 export default function V3SpecialBookPage() {
