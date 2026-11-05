@@ -18,8 +18,9 @@ const FAMILIES: Family[] = [
   {
     title: 'Écrire & créer', emoji: '✍️',
     rows: [
+      { label: 'Livres par mois', detail: '20 · 50 · illimités', min: 0 },
+      { label: 'Couvertures incluses', detail: '10/mois · 30/mois · 50/mois', min: 0 },
       { label: 'Écrire un livre (rédaction guidée)', min: 0 },
-      { label: 'Livres illimités', min: 0 },
       { label: 'Sommaire & chapitres (jusqu’à 40)', min: 0 },
       { label: 'Je raconte un livre', min: 1 },
       { label: 'Guides pratiques (5 spécialités & personas)', min: 1 },
@@ -77,22 +78,22 @@ const FAMILIES: Family[] = [
 
 const PLANS = [
   {
-    name: 'Starter', price: '27 €', period: 'à vie', Icon: Rocket,
+    name: 'Débutant', price: '19 €', period: '/mois', Icon: Rocket,
     color: '#008296', soft: 'rgba(0,130,150,0.10)',
-    tagline: 'Créez et publiez votre premier ebook, sans abonnement.',
-    cta: { label: 'Acheter Starter', to: '/paiement-offre?plan=starter27_1x' },
+    tagline: 'Créez et publiez vos premiers livres, sans engagement.',
+    cta: { label: 'Choisir Débutant', to: '/v3/forfaits' },
   },
   {
-    name: 'Auteur', price: '97 €', period: 'paiement unique', Icon: Feather,
+    name: 'Auteur', price: '29 €', period: '/mois', Icon: Feather,
     color: '#0b6e4c', soft: 'rgba(11,110,76,0.10)', popular: true,
     tagline: 'Tous les genres de livres, la BD, la correction et les outils d’auteur.',
-    cta: { label: 'Choisir Auteur', to: '/paiement-offre?plan=auteur97_1x' },
+    cta: { label: 'Choisir Auteur', to: '/v3/forfaits' },
   },
   {
-    name: 'Édition', price: '197 €', period: 'à vie', Icon: Crown,
+    name: 'Édition VIP', price: '59 €', period: '/mois', Icon: Crown,
     color: '#b8860b', soft: 'rgba(184,134,11,0.12)',
     tagline: 'Publiez comme un éditeur : broché KDP, albums illustrés, audio.',
-    cta: { label: 'Choisir Édition', to: '/paiement-offre?plan=edition247_1x' },
+    cta: { label: 'Choisir Édition VIP', to: '/v3/forfaits' },
   },
 ];
 
@@ -109,8 +110,8 @@ function Cell({ row, level }: { row: Row; level: Level }) {
 
 export default function V3PlansPage() {
   usePageMeta({
-    title: 'Comparer les 3 plans EbookStudio — Starter 27 €, Auteur 97 €, Édition 197 €',
-    description: 'Grille complète des onglets et outils inclus dans chaque plan EbookStudio : Starter, Auteur et Édition. Livres illimités dès 27 € à vie.',
+    title: 'Comparer les 3 formules EbookStudio — Débutant 19 €, Auteur 29 €, Édition VIP 59 € par mois',
+    description: 'Grille complète des onglets et outils inclus dans chaque formule EbookStudio : Débutant, Auteur et Édition VIP. Livres illimités dès 59 €/mois, formules dès 19 €/mois.',
   });
 
   return (
@@ -121,10 +122,10 @@ export default function V3PlansPage() {
           className="h-64 w-full object-cover sm:h-80" />
         <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'linear-gradient(180deg, rgba(35,47,62,0.35), rgba(35,47,62,0.65))' }}>
           <div className="px-4 text-center">
-            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#FF9E2D' }}>Un seul paiement, pas d’abonnement</p>
-            <h1 className="mt-2 text-3xl font-bold text-white sm:text-5xl">Les 3 plans EbookStudio</h1>
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: '#FF9E2D' }}>Abonnement mensuel, sans engagement</p>
+            <h1 className="mt-2 text-3xl font-bold text-white sm:text-5xl">Les 3 formules EbookStudio</h1>
             <p className="mx-auto mt-3 max-w-2xl text-sm text-white/90 sm:text-base">
-              Starter pour créer et publier votre premier ebook, Auteur pour écrire tous les genres, Édition pour publier comme un professionnel.
+              Débutant pour créer et publier vos premiers livres, Auteur pour écrire tous les genres, Édition VIP pour publier comme un professionnel.
             </p>
           </div>
         </div>
@@ -155,7 +156,7 @@ export default function V3PlansPage() {
               <Button asChild className="mt-5"><Link to={p.cta.to}>
                 {p.cta.label} <ArrowRight className="h-4 w-4" />
               </Link></Button>
-              {p.name !== 'Starter' && <p className="mt-2 text-center text-xs text-muted-foreground">Comptant, en 2 ou 3 fois — sans frais</p>}
+              {p.name !== 'Débutant' && <p className="mt-2 text-center text-xs text-muted-foreground">Sans engagement — résiliable à tout moment</p>}
             </article>
           ))}
         </section>
@@ -174,7 +175,7 @@ export default function V3PlansPage() {
               <h2 className="mt-3 text-2xl font-bold">VC Books : les livres qui se lisent… aux petits coins</h2>
               <p className="mt-2 text-sm leading-relaxed text-neutral-600">
                 Une collection de livres humoristiques à feuilleter confortablement installé, créée avec son propre robot spécial WC.
-                Anecdotes, quiz, histoires courtes et jeux : le cadeau insolite parfait. Inclus dans les plans <strong>Auteur</strong> et <strong>Édition</strong>.
+                Anecdotes, quiz, histoires courtes et jeux : le cadeau insolite parfait. Inclus dans les formules <strong>Auteur</strong> et <strong>Édition VIP</strong>.
               </p>
             </div>
           </div>
@@ -233,9 +234,9 @@ export default function V3PlansPage() {
             loading="lazy" className="h-48 w-full object-cover sm:h-64" />
           <div className="grid gap-6 p-6 sm:grid-cols-3 sm:p-8">
             {[
-              { t: 'Paiement unique', d: 'Aucun abonnement caché : vous payez une fois et vous gardez votre accès.' },
+              { t: 'Paiement mensuel', d: 'Sans engagement : vous payez mois par mois et vous pouvez arrêter quand vous voulez.' },
               { t: 'Droits conservés', d: 'Déjà client ? Vos achats et avantages acquis ne changent jamais.' },
-              { t: 'Évolution libre', d: 'Commencez avec Starter, passez à Auteur ou Édition quand vous voulez.' },
+              { t: 'Évolution libre', d: 'Commencez avec Débutant, passez à Auteur ou Édition VIP quand vous voulez.' },
             ].map(b => (
               <div key={b.t}>
                 <h3 className="font-bold" style={{ color: '#008296' }}>{b.t}</h3>
@@ -246,8 +247,8 @@ export default function V3PlansPage() {
         </section>
 
         <p className="mt-8 text-center text-sm text-neutral-500">
-          Une question sur les offres ? <Link to="/v3/forfaits" className="font-semibold underline" style={{ color: '#008296' }}>Voir la page des forfaits</Link>
-          {' '}ou <Link to="/starter" className="font-semibold underline" style={{ color: '#008296' }}>découvrir Starter à 27 €</Link>.
+          Une question sur les offres ? <Link to="/v3/forfaits" className="font-semibold underline" style={{ color: '#008296' }}>Voir les formules dès 19 €/mois</Link>
+          {' '}ou <Link to="/v3/plans" className="font-semibold underline" style={{ color: '#008296' }}>revenir à la grille complète</Link>.
         </p>
       </div>
     </main>
