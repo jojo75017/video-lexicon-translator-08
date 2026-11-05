@@ -1,3 +1,11 @@
+import journalH from '@/assets/livre-journal-hero.jpg';
+import aquaH from '@/assets/livre-aquariophilie-hero.jpg';
+import oiseauxH from '@/assets/livre-oiseaux-hero.jpg';
+import sagaH from '@/assets/livre-saga-hero.jpg';
+import universH from '@/assets/livre-univers-hero.jpg';
+import jeuxH from '@/assets/livre-jeux-enigmes-hero.jpg';
+import chercheH from '@/assets/livre-cherche-trouve-hero.jpg';
+import histH from '@/assets/livre-histoires-illustrees-hero.jpg';
 import documentaireHero from '@/assets/livre-documentaire-hero.jpg';
 import atlasHero from '@/assets/livre-atlas-hero.jpg';
 import encyclopedieHero from '@/assets/livre-encyclopedie-hero.jpg';
@@ -62,6 +70,14 @@ const HEROES: Record<string, { src: string; alt: string }> = {
   encyclopedie: { src: encyclopedieHero, alt: 'Collection d’encyclopédies reliées' },
   agenda: { src: agendaHero, alt: 'Agenda ouvert avec stylo et café' },
   scolaire: { src: scolaireHero, alt: 'Manuel scolaire ouvert avec cahier et crayons' },
+  'journal': { src: journalH, alt: 'Journal intime ouvert à la bougie' },
+  'aquariophilie': { src: aquaH, alt: 'Aquarium tropical et guide ouvert' },
+  'oiseaux': { src: oiseauxH, alt: 'Guide des oiseaux ouvert avec jumelles' },
+  'saga': { src: sagaH, alt: 'Saga en plusieurs tomes reliés' },
+  'univers': { src: universH, alt: 'Livres ouverts sur un univers imaginaire' },
+  'jeux-enigmes': { src: jeuxH, alt: 'Livre de jeux et d’énigmes ouvert' },
+  'cherche-trouve': { src: chercheH, alt: 'Livre cherche et trouve avec loupe' },
+  'histoires-illustrees': { src: histH, alt: 'Recueil de contes illustrés ouvert' },
   voyage: { src: voyageHero, alt: 'Guide de voyage ouvert avec carte, boussole et passeport' },
   bd: { src: bdHero, alt: 'Bande dessinée et manga ouverts sur un bureau de dessinateur' },
   coloriage: { src: coloriageHero, alt: 'Livre de coloriage ouvert avec crayons de couleur' },
