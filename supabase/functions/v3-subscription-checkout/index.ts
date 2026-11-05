@@ -11,6 +11,10 @@ const cors = {
 };
 
 const ALLOWED_PRICES = new Set([
+  // Formules mensuelles 19/29/59 € (validées par Georges, nov. 2026)
+  "v3m_debutant_monthly",
+  "v3m_auteur_monthly",
+  "v3m_vip_monthly",
   // V3 subscriptions — 2 forfaits (activation octobre 2026)
   "v3_plume_monthly",
   "v3_plume_annual",
@@ -195,7 +199,7 @@ Deno.serve(async (req) => {
     if (userId) sessionMeta.userId = userId;
     if (cleanRefCode) sessionMeta.ref_code = cleanRefCode;
 
-    const isV3Plan = priceId.startsWith("v3_plume_") || priceId.startsWith("v3_edition_") || priceId.startsWith("v3_maison_");
+    const isV3Plan = priceId.startsWith("v3m_") || priceId.startsWith("v3_plume_") || priceId.startsWith("v3_edition_") || priceId.startsWith("v3_maison_");
     let orderId: string | null = null;
     if (isV3Plan) {
       const supabase = createClient(

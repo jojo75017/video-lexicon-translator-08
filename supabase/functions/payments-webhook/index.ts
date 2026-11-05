@@ -305,7 +305,8 @@ async function suspendAccess(email: string) {
   const supabase = getSupabase();
   await supabase.from("subscribers")
     .update({ status: "cancelled", updated_at: new Date().toISOString() })
-    .eq("email", email);
+    .eq("email", email)
+    .neq("plan_type", "lifetime"); // jamais couper un accès à vie
 }
 
 // Email de confirmation pour l'offre "accès à vie" (tunnel /commander).
@@ -501,12 +502,16 @@ async function handleV3InvoicePaid(invoice: any, env: StripeEnv) {
 
   // Les abonnements Plume/Édition sont récurrents sans nombre d'échéances :
   // chaque facture payée maintient simplement l'accès actif.
-  if (String(order.plan ?? "").startsWith("v3_plume_") || String(order.plan ?? "").startsWith("v3_edition_") || String(order.plan ?? "").startsWith("v3_maison_")) {
+  if (String(order.plan ?? "").startsWith("v3m_") || String(order.plan ?? "").startsWith("v3_plume_") || String(order.plan ?? "").startsWith("v3_edition_") || String(order.plan ?? "").startsWith("v3_maison_")) {
     await supabase.from("v3_installment_orders").update({
       status: "active",
       installments_paid: 1,
       grace_until: null,
     }).eq("id", order.id);
+    // Formules mensuelles : un règlement après impayé rouvre l'accès.
+    if (String(order.plan ?? "").startsWith("v3m_") && order.email) {
+      await grantV3SubscriptionAccess(order.email as string, String(order.plan));
+    }
     return;
   }
 

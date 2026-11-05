@@ -71,11 +71,15 @@ export async function grantV3SubscriptionAccess(
 
   const { data: existing } = await supabase
     .from("subscribers")
-    .select("access_code")
+    .select("access_code, plan_type")
     .ilike("email", clean)
     .maybeSingle();
 
   const code = (existing as { access_code?: string } | null)?.access_code || generateAccessCode();
+  // Un client à vie garde ses droits : un abonnement ne le rétrograde jamais.
+  if ((existing as { plan_type?: string } | null)?.plan_type === "lifetime" && !info?.lifetime) {
+    return { code, info };
+  }
 
   await supabase.from("subscribers").upsert(
     {
