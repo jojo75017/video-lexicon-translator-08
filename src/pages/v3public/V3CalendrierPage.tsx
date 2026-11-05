@@ -21,7 +21,7 @@ export default function V3CalendrierPage() {
   const openingLabel = formatCalendarDate(V3_OPENING_ISO);
 
   return (
-    <div className="min-h-screen" style={{ background: '#FAFAFA', color: '#232F3E' }}>
+    <div className="v3-plans-dark min-h-screen" style={{ background: '#0b1120', color: '#f5f5f5' }}>
       <div className="v3-shell pt-4"><BackButton /></div>
 
       <header className="v3-shell pt-8 pb-6">
@@ -70,7 +70,7 @@ export default function V3CalendrierPage() {
                     <span className="font-semibold leading-snug">{entry.title}</span>
                   </div>
                   <p className="text-sm text-[#4B5563] mt-1.5">{entry.note}</p>
-                  <p className="text-xs mt-2 font-semibold" style={{ color: '#064E3B' }}>
+                  <p className="text-xs mt-2 font-semibold" style={{ color: '#2fd0a8' }}>
                     {entry.status === 'complement' ? 'Ouvert dès l’achat' : date ? date : 'Déjà ouvert'}
                   </p>
                 </>
@@ -80,7 +80,7 @@ export default function V3CalendrierPage() {
                 <li
                   key={entry.title}
                   className="rounded-lg p-4"
-                  style={{ background: '#fff', border: '1px solid #E5E7EB' }}
+                  style={{ background: '#151d2c', border: '1px solid #2a3448' }}
                 >
                   {entry.to ? (
                     <Link to={entry.to} className="block hover:opacity-90">{content}</Link>
@@ -95,7 +95,7 @@ export default function V3CalendrierPage() {
       ))}
 
       <section className="v3-shell pb-14">
-        <div className="rounded-lg p-5 text-sm" style={{ background: '#fff', border: '1px solid #E5E7EB' }}>
+        <div className="rounded-lg p-5 text-sm" style={{ background: '#151d2c', border: '1px solid #2a3448' }}>
           <div className="flex items-center gap-2 font-semibold mb-1.5">
             <Clock className="w-4 h-4" style={{ color: '#C9A84C' }} />
             Bon à savoir
@@ -113,5 +113,5 @@ export default function V3CalendrierPage() {
 function StatusIcon({ status }: { status: V3CalendarStatus }) {
   if (status === 'libre') return <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#0d7a5f' }} />;
   if (status === 'complement') return <ShoppingBag className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#C9A84C' }} />;
-  return <Lock className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#6B7280' }} />;
+  return <Lock className="w-4 h-4 mt-0.5 shrink-0" style={{ color: '#c4cad6' }} />;
 }
