@@ -15,7 +15,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const payload = await req.json();
+    const raw = await req.text();
+    if (!(await verifySvix(req, raw))) {
+      return new Response(JSON.stringify({ error: "Signature invalide" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const payload = JSON.parse(raw);
     const type: string = payload?.type || "";
     const data = payload?.data || {};
     const messageId: string | undefined = data?.email_id || data?.id;
@@ -65,3 +69,16 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+// Vérifie la signature Resend (format Svix). Sans secret configuré, tout est refusé.
+async function verifySvix(req: Request, body: string): Promise<boolean> {
+  const secret = Deno.env.get("RESEND_WEBHOOK_SECRET");
+  const id = req.headers.get("svix-id"), ts = req.headers.get("svix-timestamp"), sig = req.headers.get("svix-signature");
+  if (!secret || !id || !ts || !sig) return false;
+  if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false;
+  const keyBytes = Uint8Array.from(atob(secret.replace(/^whsec_/, "")), (c) => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey("raw", keyBytes, { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${id}.${ts}.${body}`));
+  const expected = btoa(String.fromCharCode(...new Uint8Array(mac)));
+  return sig.split(" ").some((p) => p.split(",")[1] === expected);
+}
