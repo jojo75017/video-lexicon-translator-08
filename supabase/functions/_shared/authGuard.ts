@@ -24,6 +24,7 @@ export async function requireUser(req: Request): Promise<GuardUser | Response> {
   const url = Deno.env.get("SUPABASE_URL")!;
   const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
   if (token === anon) return deny(401, "Connexion requise.");
+  if (token === Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")) return { id: "service", email: null };
   const client = createClient(url, anon, { global: { headers: { Authorization: `Bearer ${token}` } } });
   const { data, error } = await client.auth.getUser(token);
   if (error || !data.user) return deny(401, "Connexion requise.");
