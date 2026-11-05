@@ -250,7 +250,7 @@ export default function V3Sidebar() {
   }, [isAdmin]);
 
   const activeSection = useMemo(() => {
-    const match = groups.find((g) => g.items.some((it) => !it.external && pathname === it.to.split('?')[0]));
+    const match = [REVISION_GROUP, ...groups].find((g) => g.items.some((it) => !it.external && pathname === it.to.split('?')[0]));
     return match?.key ?? '';
   }, [pathname, groups]);
 
