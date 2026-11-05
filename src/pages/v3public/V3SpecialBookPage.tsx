@@ -1,3 +1,4 @@
+import cuisineHero from '@/assets/livre-cuisine-hero.jpg';
 import romanHero from '@/assets/livre-roman-hero.jpg';
 import { useParams, Navigate } from 'react-router-dom';
 import V3AgentReturnBar from '@/components/v3public/V3AgentReturnBar';
@@ -55,8 +56,8 @@ export default function V3SpecialBookPage() {
   return (
     <div className="v3-special-readable container mx-auto px-4 py-6 max-w-7xl">
       <V3AgentReturnBar />
-      {type === 'roman' && (
-        <img src={romanHero} alt="Roman ouvert sur un bureau à la lueur d'une lampe" width={1600} height={560} className="mt-4 w-full rounded-2xl object-cover" />
+      {(type === 'roman' || type === 'cuisine') && (
+        <img src={type === 'cuisine' ? cuisineHero : romanHero} alt={type === 'cuisine' ? 'Livre de cuisine ouvert entouré de produits frais' : "Roman ouvert sur un bureau à la lueur d'une lampe"} width={1600} height={560} className="mt-4 w-full rounded-2xl object-cover" />
       )}
       <h1 className="text-3xl font-bold mb-6 mt-4">{title}</h1>
       <Comp />
