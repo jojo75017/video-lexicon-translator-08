@@ -141,6 +141,7 @@ const V3AuthorSettingsPage = lazy(() => import('./pages/v3public/V3AuthorSetting
 // (sommaire ultime, traduction, correcteur, avis clients…).
 const V3TocUltimatePage = lazy(() => import('./pages/v3public/V3TocUltimatePage'));
 const V3TranslatorPage = lazy(() => import('./pages/v3public/V3TranslatorPage'));
+const V3EbookIllustrePage = lazy(() => import('./pages/v3public/V3EbookIllustrePage'));
 const V3RevisionEditorialePage = lazy(() => import('./pages/v3public/V3RevisionEditorialePage'));
 const V3CorrecteurPage = lazy(() => import('./pages/v3public/V3CorrecteurPage'));
 const V3AvisClientsPage = lazy(() => import('./pages/v3public/V3AvisClientsPage'));
@@ -846,6 +847,7 @@ const App = () => {
               <Route path="outils/sommaire-ultime" element={<V3LockedGate><V3TocUltimatePage /></V3LockedGate>} />
               <Route path="outils/traduction" element={<V3PaidModuleRoute><V3TranslatorPage /></V3PaidModuleRoute>} />
               <Route path="revision-editoriale" element={<V3RevisionEditorialePage />} />
+              <Route path="ebook-illustre" element={<V3EbookIllustrePage />} />
               <Route path="corriger" element={<PlanGuard><V3PaidModuleRoute><V3CorrecteurPage /></V3PaidModuleRoute></PlanGuard>} />
               <Route path="avis" element={<V3LockedGate><TrialGate label="Avis clients"><V3AvisClientsPage /></TrialGate></V3LockedGate>} />
               <Route path="posts" element={<V3PaidModuleRoute><V3PostsPage /></V3PaidModuleRoute>} />
