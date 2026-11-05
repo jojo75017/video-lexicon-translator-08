@@ -405,7 +405,7 @@ const ProspectManagerPage = () => {
   }));
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="dark min-h-screen bg-background text-foreground">
       <div className="max-w-6xl mx-auto px-4 py-8">
         <AdminPanelNav className="mb-6" />
 
