@@ -38,7 +38,7 @@ export default function V3GuestAuthorPage() {
               ✨ Auteur invité
             </span>
             <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-3">Mr Georges Boubet</h1>
-            <p className="mt-2 text-white/60 max-w-xl">
+            <p className="mt-2 max-w-xl" style={{ color: "#c4cad6" }}>
               91 livres publiés. Thrillers, sagas d'espionnage, aventure — un catalogue passionnant à découvrir.
             </p>
           </div>
@@ -51,7 +51,7 @@ export default function V3GuestAuthorPage() {
             {STATS.map((s) => (
               <div key={s.label}>
                 <div className="v3-serif text-3xl font-bold text-[var(--v3-orange)]">{s.value}</div>
-                <div className="text-xs text-white/60 mt-1">{s.label}</div>
+                <div className="text-xs mt-1" style={{ color: "#c4cad6" }}>{s.label}</div>
               </div>
             ))}
           </div>
