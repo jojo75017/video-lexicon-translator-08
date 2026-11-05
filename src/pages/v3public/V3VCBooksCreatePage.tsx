@@ -17,6 +17,7 @@ import {
 } from '@/data/vcBooksIdeas';
 import robot from '@/assets/plans/vc-books-robot.png';
 import robotWriting from '@/assets/plans/vc-books-robot-writing.png';
+import vcBooksHero from '@/assets/vc-books-hero.jpg';
 
 const FORMATS = [
   { value: 'poche', label: 'Poche (12,7 × 20,3 cm)' },
@@ -131,6 +132,7 @@ export default function V3VCBooksCreatePage() {
       <Button asChild variant="ghost" size="sm">
         <Link to="/v3/vc-books/bibliotheque"><ArrowLeft className="mr-2 h-4 w-4" />Bibliothèque VC Books</Link>
       </Button>
+      <img src={vcBooksHero} alt="VC Books" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mt-4" />
       <header className="mb-8 mt-4 flex items-center gap-4 border-b border-border pb-6">
         <img src={robot} alt="Robot VC Books" className="h-20 w-20 object-contain" />
         <div>
