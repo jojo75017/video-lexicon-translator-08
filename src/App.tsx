@@ -626,7 +626,7 @@ const App = () => {
             <Route path="/coaching-vip" element={<Navigate to="/offres" replace />} />
             <Route path="/parrainage" element={<Navigate to="/mon-parrainage" replace />} />
             <Route path="/mon-parrainage" element={<div className="v3-dark-page">{<PausedPage src={parrainageHero} title="Parrainage en pause" text="Le parrainage reviendra prochainement." />}</div>} />
-            <Route path="/partenaires" element={<div className="min-h-screen flex items-center justify-center p-8 text-center"><div><h1 className="text-2xl font-bold mb-2">Programme partenaires en pause</h1><p className="opacity-80">Le parrainage reviendra prochainement.</p></div></div>} />
+            <Route path="/partenaires" element={<PausedPage src={parrainageHero} title="Programme partenaires en pause" text="Le parrainage reviendra prochainement." />} />
             <Route path="/outils-partenaires" element={<PartnerToolsPage />} />
             <Route path="/prestation-kdp" element={<Navigate to="/v3" replace />} />
             <Route path="/partenariat" element={<Navigate to="/partenaires" replace />} />
