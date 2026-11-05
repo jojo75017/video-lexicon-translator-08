@@ -6,8 +6,8 @@ import reference from '@/assets/vc-books/style-reference.png.asset.json';
 
 export default function V3VCBooksBanner() {
   return (
-    <section id="vc-books" aria-labelledby="vc-books-home-title" className="scroll-mt-40 border-y border-border bg-background">
-      <div className="v3-shell grid items-center gap-6 py-8 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_160px] md:gap-10">
+    <section id="vc-books" aria-labelledby="vc-books-home-title" className="v3-vcbooks-dark scroll-mt-40 rounded-3xl" style={{ background: 'linear-gradient(135deg,#0B0F17,#1A1614)', border: '1px solid rgba(246,189,42,0.35)' }}>
+      <div className="grid items-center gap-6 py-8 sm:grid-cols-[180px_1fr] lg:grid-cols-[180px_1fr_160px] md:gap-10">
         <img
           src={vcRobot}
           alt="La mascotte robot VC Books, installée aux petits coins avec son livre"

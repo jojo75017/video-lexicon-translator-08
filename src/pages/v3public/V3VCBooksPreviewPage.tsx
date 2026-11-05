@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, FileText, ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import V3VCBooksBanner from '@/components/v3public/V3VCBooksBanner';
 import robot from '@/assets/plans/vc-books-robot.png';
 import cover from '@/assets/vc-books/style-reference.png.asset.json';
 import interior from '@/assets/vc-books/interior-model.jpg.asset.json';
@@ -20,6 +21,7 @@ export default function V3VCBooksPreviewPage() {
   return (
     <main className="v3-shell py-6 md:py-10">
       <Button asChild variant="ghost" size="sm"><Link to="/v3"><ArrowLeft />Accueil</Link></Button>
+      <div className="mt-4"><V3VCBooksBanner /></div>
       <header className="mt-4 flex items-center gap-4 border-b border-border pb-6">
         <img src={robot} alt="Robot VC Books" className="h-20 w-20 shrink-0 object-contain" />
         <div className="min-w-0">
