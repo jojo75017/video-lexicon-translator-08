@@ -1,4 +1,5 @@
 # Architecture
+- Home blank-start actions call the shared draft reset before opening direct writing, so restored local state cannot reopen the previous book and saved library records remain untouched.
 - V3 navigation search lives beside the offer category and reuses the tools index query parameter, avoiding a duplicate search in the brand header.
 - V3Header is a welcome-only band; category menus and quick-access bars remain responsible for navigation to avoid duplicated header controls.
 - V3 audio reuses the V2 generator, Audio Express, audio library and training; bookImport reads ownership-filtered metadata then only the selected manuscript, preserving chapter boundaries and existing payment gates.

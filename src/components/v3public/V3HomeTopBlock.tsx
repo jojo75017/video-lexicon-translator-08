@@ -10,6 +10,9 @@ import photoCreate from '@/assets/template-fiction.jpg';
 import photoVisual from '@/assets/bd-studio-hero.jpg';
 import photoAudio from '@/assets/v3-kdp-auto-formatting.jpg';
 import { supabase } from '@/integrations/supabase/client';
+import { Button } from '@/components/ui/button';
+import { resetBookProject } from '@/lib/v3/bookBrief';
+import { clearWrittenChapters } from '@/lib/v3/writtenChapters';
 
 /**
  * Haut de l'accueil abonné (refonte du 5 novembre) :
@@ -215,6 +218,13 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
     navigate('/v3/lancer?ecrire=1');
   };
 
+  const startFresh = () => {
+    if (!window.confirm('Repartir avec une fiche vide ?\n\nLe brouillon en cours sera remis à zéro. Vos livres enregistrés dans « Mes livres » restent intacts.')) return;
+    resetBookProject();
+    clearWrittenChapters();
+    navigate('/v3/lancer?ecrire=1');
+  };
+
   return (
     <div className="space-y-6" style={{ background: '#332E2B', borderRadius: 32, padding: '1.25rem' }}>
       {/* 0. Accès directs */}
@@ -262,9 +272,9 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
           </div>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <Link to="/v3/lancer" className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold" style={{ background: 'rgba(234,88,12,.14)', border: '1px solid rgba(234,88,12,.55)', color: '#FDBA74' }}>
-            <span style={{ color: '#FDBA74' }}>Je repars de zéro</span> <RotateCcw className="h-4 w-4" style={{ color: '#FDBA74' }} />
-          </Link>
+          <Button type="button" variant="outline" onClick={startFresh} className="rounded-full px-5 py-2.5 font-semibold">
+            Je repars de zéro <RotateCcw className="h-4 w-4" />
+          </Button>
           {book && (
             <Link to={`/v3/book/${book.id}`} className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-semibold" style={{ background: '#EA580C', color: '#fff' }}>
               <span style={{ color: '#fff' }}>Continuer mon livre</span> <ArrowRight className="h-4 w-4" style={{ color: '#fff' }} />
