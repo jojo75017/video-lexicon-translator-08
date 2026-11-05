@@ -574,7 +574,7 @@ const App = () => {
             <Route path="/59" element={<Navigate to="/commander" replace />} />
 
             <Route path="/demo-classique" element={<DemoPage />} />
-            <Route path="/faq" element={<div className="v3-dark-page">{<FaqAssistancePage />}</div>} />
+            <Route path="/faq" element={<div className="v3-dark-page dark v3-plans-dark min-h-screen" style={{ background: "#0b1120", color: "#f5f5f5" }}>{<FaqAssistancePage />}</div>} />
             <Route path="/assistance" element={<div className="v3-dark-page">{<FaqAssistancePage />}</div>} />
             <Route path="/paiement-succes" element={<PaymentSuccessPage />} />
             <Route path="/paiement-offre" element={<NouvelleOffrePaiementPage />} />
