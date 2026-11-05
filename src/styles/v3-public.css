@@ -916,3 +916,11 @@
 .kdp-hero { background: linear-gradient(135deg, hsl(222 47% 11%), hsl(164 70% 20%), hsl(222 47% 11%)) !important; }
 .kdp-hero span { background-color: hsl(0 0% 100% / 0.12) !important; }
 .kdp-hero .bg-amber-400 { background-color: hsl(43 96% 56%) !important; color: hsl(222 47% 11%) !important; -webkit-text-fill-color: hsl(222 47% 11%) !important; }
+
+/* Page Compléments : encarts sombres lisibles */
+.v3-upsells-dark {
+  --v3-ink: #f5f5f5; --v3-muted: #c4cad6; --v3-surface: #151d2c; --v3-cream: #1b2436;
+  --v3-line: rgba(255,255,255,0.12); --v3-paper: #151d2c; --v3-gold-600: #e8c96a; --v3-emerald-600: #2fd0a8;
+}
+.v3-upsells-dark .bg-white, .v3-upsells-dark [class*="bg-white"] { background-color: #151d2c !important; }
+.v3-upsells-dark h1, .v3-upsells-dark h2, .v3-upsells-dark h3, .v3-upsells-dark h4 { color: #f5f5f5 !important; }

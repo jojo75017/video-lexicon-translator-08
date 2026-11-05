@@ -18,7 +18,7 @@ export default function V3UpsellsPage() {
         content="Ajoutez la direction éditoriale, les traductions relues, l'audiolivre premium ou l'accompagnement à votre forfait."
       />
 
-      <div className="mx-auto max-w-6xl px-4 py-10">
+      <div className="v3-upsells-dark mx-auto max-w-6xl px-4 py-10">
         <header className="mb-8">
           <p className="text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: 'var(--v3-gold-600)' }}>
             Espace auteur
