@@ -238,7 +238,7 @@ export default function V3ComptePage() {
             <Link
               to="/subscription"
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white"
-              style={{ background: "#f5f5f5" }}
+              style={{ background: "#008296" }}
             >
               Mon abonnement <ExternalLink size={14} />
             </Link>
