@@ -31,6 +31,7 @@ import { useBrandTitle } from '@/hooks/useBrandTitle';
 import V2V3FloatingSwitch from '@/components/admin/V2V3FloatingSwitch';
 import LeadCapturePopup from '@/components/marketing/LeadCapturePopup';
 import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
+import GlobalBackBar from '@/components/navigation/GlobalBackBar';
 import StickySignupBar from '@/components/marketing/StickySignupBar';
 import BackToTopButton from '@/components/common/BackToTopButton';
 import V3LaunchGlobalBanner from '@/components/V3LaunchGlobalBanner';
@@ -933,6 +934,7 @@ const App = () => {
           </Suspense>
           {!isAdminAuthRoute && <SubscriberActivityPopup />}
           {isAuthenticated && <FirstEbookOnboarding subscriberEmail={subscriberEmail} />}
+          <GlobalBackBar isAuthenticated={!!isAuthenticated} />
           {!isAdminAuthRoute && <AssistantFloatingButton />}
           {!isAdminAuthRoute && <ScrollToTopButton />}
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
