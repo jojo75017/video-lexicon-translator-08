@@ -4,7 +4,7 @@ import {
   ChevronLeft, ChevronRight, ChevronDown,
   GraduationCap, Gem, FileText, User,
   LifeBuoy, Mail, HelpCircle, Video, ListTree, Award,
-  Rocket, Crown, Search, Plus, Minus, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film,
+  Rocket, Crown, Search, Plus, Minus, Target, BarChart3, Image as ImageIcon, LayoutGrid, Star, Wand2, Layers, Megaphone, Puzzle, Lock, Film, KeyRound,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import useV3Entitlement from '@/hooks/useV3Entitlement';
@@ -50,6 +50,7 @@ const NAV: NavSection[] = [
   {
     section: 'Démarrer',
     items: [
+      { to: '/v3/fonctionnalites/cles', label: 'Clés API — première étape', icon: KeyRound, end: true },
       { to: '/v3/commence-ici', label: '🚀 Commence ici — 25 agents', icon: Rocket, end: true, badge: 'Start' },
       { to: '/v3', label: 'Accueil V3', icon: Home, end: true },
       { to: '/v3/fonctionnalites', label: 'Fonctionnalités (12 modules)', icon: LayoutGrid, end: true, badge: 'Hub' },
@@ -192,6 +193,7 @@ const REVISION_GROUP: SidebarGroup = {
 /** Accès directs en tête de barre, comme sur la maquette du 5 novembre. */
 const DIRECT_LINKS = [
   { to: '/v3', label: 'Accueil V3', icon: Home, color: '#3F3A37' },
+  { to: '/v3/fonctionnalites/cles', label: 'Clés API · première étape', icon: KeyRound, color: 'var(--v3-api-nav)' },
   { to: '/v3/commence-ici', label: 'Commence ici', icon: Rocket, color: '#EA580C' },
   { to: '/v3/mes-livres', label: 'Bibliothèque / Mes livres', icon: LibraryBig, color: '#2563EB' },
   { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
