@@ -145,15 +145,13 @@ Tout est automatisé. Vous entrez votre sujet, l'IA fait le reste !`
     {
       category: 'usage',
       question: "Combien d'ebooks puis-je créer ?",
-      answer: `Avec l'accès Pro Lifetime à 67€, vous avez un accès **illimité** :
+      answer: `Les formules EbookStudio V3 sont disponibles **à partir de 19 €/mois** :
 
-✅ Nombre d'ebooks illimité
-✅ Générations de chapitres illimitées  
-✅ Couvertures illimitées
-✅ Exports Google Docs/Word illimités
-✅ Mises à jour gratuites à vie
+✅ Débutant : 20 livres et 10 couvertures par mois
+✅ Auteur : 50 livres et 30 couvertures par mois
+✅ Édition VIP : livres illimités et 50 couvertures par mois
 
-La seule limite est votre imagination !`
+Les droits acquis des anciens clients sont conservés.`
     },
     {
       category: 'usage',
@@ -404,7 +402,7 @@ Vos ebooks vous appartiennent à 100%.`
             onClick={() => navigate('/offres')}
             className="bg-gradient-to-r from-primary to-fuchsia-500 hover:opacity-90"
           >
-            Découvrir Ebookstudio Pro V2 → 67€ à vie
+            Découvrir EbookStudio V3 → à partir de 19 €/mois
           </Button>
         </div>
       </div>
