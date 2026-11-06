@@ -796,7 +796,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-forf-06',
     question: 'Jusqu’à quand la V2 reste-t-elle accessible ?',
     answer:
-      'La V2 reste incluse dans les trois offres jusqu’au 31 décembre 2026, puis elle ferme pour tous en attendant la V4.',
+      'La V2 reste incluse dans les trois offres jusqu’au 31 décembre 2027, puis elle ferme pour tous en attendant la V4.',
     theme: 'Forfaits & paiement',
     action: { label: 'En savoir plus', route: '/v3/forfaits' },
   },

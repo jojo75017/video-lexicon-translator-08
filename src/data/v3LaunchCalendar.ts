@@ -113,7 +113,7 @@ export const V3_LAUNCH_CALENDAR: V3CalendarGroup[] = [
   },
   {
     key: 'v2-fermeture',
-    label: 'Fermeture de la V2 — 31 décembre 2026',
+    label: 'Fermeture de la V2 — 31 décembre 2027',
     intro:
       'La V2 reste utilisable par tout le monde — anciens abonnés, Plume et Édition — jusqu’à cette date, en attendant la V4.',
     entries: [
@@ -121,8 +121,8 @@ export const V3_LAUNCH_CALENDAR: V3CalendarGroup[] = [
         title: 'Accès V2 (ancien tableau de bord)',
         to: '/ebook-planner',
         status: 'libre',
-        opensAt: '2026-12-31T23:59:00+01:00',
-        note: 'Utilisable jusqu’au 31 décembre 2026 inclus. Rien n’est coupé avant cette date.',
+        opensAt: '2027-12-31T23:59:00+01:00',
+        note: 'Utilisable jusqu’au 31 décembre 2027 inclus. Rien n’est coupé avant cette date.',
       },
     ],
   },
