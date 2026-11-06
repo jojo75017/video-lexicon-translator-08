@@ -37,7 +37,7 @@ function buildPartnerHtml(name: string, partnerUrl: string) {
         <h1 style="margin:0;font-size:22px;">Bienvenue dans le programme Partenaires EbookStudio</h1>
       </div>
       <div style="background:#fff;padding:28px 24px;border:1px solid #e6e6e6;border-top:none;border-radius:0 0 12px 12px;">
-        <p>${escapeHtml(hello)}</p>
+        <p>${hello}</p>
         <p>Merci pour votre candidature : vous faites désormais partie des partenaires <strong>EbookStudio V3</strong>.</p>
         <p>Vous touchez <strong>${PARTNER_COMMISSION_PCT} % du premier paiement</strong> de chaque abonnement souscrit grâce à votre lien (Plume 27 €/mois ou 270 €/an, Édition 47 €/mois ou 470 €/an), soit jusqu'à <strong>70,50 €</strong> pour un abonnement Édition annuel.</p>
         <div style="text-align:center;margin:24px 0;">
@@ -61,7 +61,7 @@ function buildHtml(name: string, kitUrl: string, joinUrl: string, pdfUrl: string
         <h1 style="margin:0;font-size:22px;">Bienvenue dans le programme Ambassadeur 🚀</h1>
       </div>
       <div style="background:#fff;padding:28px 24px;border:1px solid #e6e6e6;border-top:none;border-radius:0 0 12px 12px;">
-        <p>${escapeHtml(hello)}</p>
+        <p>${hello}</p>
         <p>Merci pour ta candidature ! Tu fais maintenant partie des ambassadeurs <strong>Ebookstudio Pro</strong> 🎉</p>
         <p>Tu touches <strong>30% de commission</strong> sur chaque vente générée via ton lien. Voici comment activer ton lien de suivi perso :</p>
         <div style="text-align:center;margin:24px 0;">
