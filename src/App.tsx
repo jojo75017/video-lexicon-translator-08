@@ -120,7 +120,6 @@ import seriesAudioHero from './assets/series-audio-hero.jpg';
 import formationAudioHero from './assets/formation-audio-hero.jpg';
 import kdpHero from './assets/kdp-hero.jpg';
 import mesLivresHero from './assets/mes-livres-hero.jpg';
-import ancienClientHero from './assets/ancien-client-hero.jpg';
 import calendrierHero from './assets/calendrier-hero.jpg';
 const KdpHero = () => <PageHeroImage src={kdpHero} alt="Outils Amazon KDP" />;
 const PausedPage = ({ src, title, text }: { src: string; title: string; text: string }) => (

@@ -23,14 +23,14 @@ export default function V3MigrationPage() {
   if (!hasV2) {
     return (
       <div className="v3-plans-dark py-10 md:py-16 grid place-items-center px-4" style={{ background: "#0b1120" }}>
-        <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ border: "1px solid #2a3448" }}>
+        <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ background: "#1c2638", border: "1px solid #2a3448" }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Tarif fidélité -20 % à vie
           </p>
           <h1 className="text-2xl font-serif mb-3" style={{ color: "#f5f5f5" }}>
             Connectez-vous pour voir votre tarif fidélité
           </h1>
-          <p className="text-sm mb-6" style={{ color: "#4b5563" }}>
+          <p className="text-sm mb-6" style={{ color: "#c4cad6" }}>
             Utilisez l'adresse email de votre abonnement EbookStudio : votre remise
             d'ancien abonné est reconnue automatiquement.
           </p>
@@ -68,7 +68,7 @@ export default function V3MigrationPage() {
           <h1 className="text-4xl md:text-5xl font-serif mb-4" style={{ color: "#f5f5f5" }}>
             Bienvenue dans la V3 — avec votre tarif fidélité
           </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#c4cad6" }}>
             Vos livres et vos projets restent avec vous, et votre espace V2 reste accessible
             jusqu'au 31 décembre 2026. Des modules V3 vous sont offerts, vos droits et avantages fidélité déjà acquis sont conservés.
           </p>
@@ -76,7 +76,7 @@ export default function V3MigrationPage() {
 
         {/* 5 modules offerts */}
         <section
-          className="rounded-2xl p-8 mb-10"
+          className="rounded-2xl p-8 mb-10 bg-[#111a2b]"
           style={{ border: "1px solid #2a3448", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}
         >
           <div className="flex items-center gap-3 mb-6">
