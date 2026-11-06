@@ -119,7 +119,7 @@ export default function MerciPaiementPage() {
                     : checking
                       ? 'Activation de votre accès…'
                       : waiting
-                        ? 'Votre accès est en cours d'activation'
+                        ? "Votre accès est en cours d'activation"
                         : 'Votre accès arrive encore'}
                 </h2>
                 <p className="text-sm text-[#232F3E]/75">
