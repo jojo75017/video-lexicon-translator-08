@@ -70,7 +70,7 @@ export default function V3MigrationPage() {
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#c4cad6" }}>
             Vos livres et vos projets restent avec vous, et votre espace V2 reste accessible
-            jusqu'au 31 décembre 2026. Des modules V3 vous sont offerts, vos droits et avantages fidélité déjà acquis sont conservés.
+            jusqu'au 31 décembre 2027. Des modules V3 vous sont offerts, vos droits et avantages fidélité déjà acquis sont conservés.
           </p>
         </header>
 
@@ -120,7 +120,7 @@ export default function V3MigrationPage() {
                 <li>{V2_LEGACY_QUOTAS.chaptersMax} chapitres max · {V2_LEGACY_QUOTAS.wordsPerChapter.toLocaleString("fr-FR")} mots / chapitre</li>
                 <li>Export PDF / DOCX / EPUB avec sommaire stylé</li>
                 <li className="flex items-center gap-1">
-                  <InfinityIcon size={14} /> Votre V2 complète, jusqu'au 31/12/2026
+                  <InfinityIcon size={14} /> Votre V2 complète, jusqu'au 31/12/2027
                 </li>
               </ul>
             </div>

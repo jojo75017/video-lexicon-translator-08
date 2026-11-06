@@ -30,8 +30,8 @@ export const V2_LEGACY_DISCOUNT = 0.2;
  * tout le monde — anciens abonnés, Plume et Édition — jusqu'à cette date,
  * en attendant la V4. Aucun verrou technique n'est posé ici.
  */
-export const V2_ACCESS_UNTIL_ISO = "2026-12-31T23:59:59+01:00";
-export const V2_ACCESS_UNTIL_LABEL = "31 décembre 2026";
+export const V2_ACCESS_UNTIL_ISO = "2027-12-31T23:59:59+01:00";
+export const V2_ACCESS_UNTIL_LABEL = "31 décembre 2027";
 export const V2_ACCESS_NOTE = `Accès V2 conservé jusqu'au ${V2_ACCESS_UNTIL_LABEL}, en attendant la V4.`;
 
 export const legacyPrice = (amount: number): number =>
@@ -60,7 +60,7 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: false,
     idealFor: "Les auteurs qui publient régulièrement et veulent un atelier complet, simple et maîtrisé.",
     features: [
-      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
+      "Accès V2 inclus jusqu'au 31 décembre 2027 (vous avez les deux)",
       "50 livres / mois",
       "Tous les onglets : Plan, Écrire, Habiller, Publier, Vendre",
       "40 chapitres max · 5 000 mots/ch · 8 personnages",
@@ -96,7 +96,7 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: false,
     idealFor: "Les auteurs et éditeurs qui produisent sans limite et utilisent les studios professionnels.",
     features: [
-      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
+      "Accès V2 inclus jusqu'au 31 décembre 2027 (vous avez les deux)",
       "Livres illimités",
       "Tout ce que contient Plume, en version professionnelle",
       "Mode Recherche Approfondie (workflow renforcé)",
@@ -134,7 +134,7 @@ export const V3_PLANS: V3Plan[] = [
     allAddonsIncluded: true,
     idealFor: "Les auteurs-éditeurs qui veulent tous les studios et tous les compléments, sans jamais payer de supplément.",
     features: [
-      "Accès V2 inclus jusqu'au 31 décembre 2026 (vous avez les deux)",
+      "Accès V2 inclus jusqu'au 31 décembre 2027 (vous avez les deux)",
       "Tout ce que contient Édition",
       "Tous les compléments payants inclus, sans achat séparé",
       "Version Longue, Histoires illustrées",

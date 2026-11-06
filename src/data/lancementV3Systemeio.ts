@@ -53,7 +53,7 @@ J’ai entièrement repensé le studio pour rendre la création d’un livre plu
 
 Vos livres et vos projets restent avec vous. Vous ne perdez rien.
 
-Votre espace V2 reste accessible jusqu’au 31 décembre 2026, afin que vous puissiez terminer tranquillement ce que vous avez commencé et découvrir la V3 à votre rythme.
+Votre espace V2 reste accessible jusqu’au 31 décembre 2027, afin que vous puissiez terminer tranquillement ce que vous avez commencé et découvrir la V3 à votre rythme.
 
 Ce qui vous attend dans la V3 :
 
@@ -85,7 +85,7 @@ Merci de faire partie de l’aventure EbookStudio.
 Georges Boubet
 EbookStudio — écrire son livre, simplement
 
-P.S. Votre accès V2 reste disponible jusqu’au 31 décembre 2026. Vos livres et vos projets ne sont pas supprimés lors du passage à la V3.`,
+P.S. Votre accès V2 reste disponible jusqu’au 31 décembre 2027. Vos livres et vos projets ne sont pas supprimés lors du passage à la V3.`,
     ctaLabel: 'Découvrir ma V3 et mon tarif fidélité',
     ctaUrl: `${SITE_ORIGIN}/r/v3fidelite`,
     note: 'Envoyer uniquement aux abonnés V2. Exclure les désabonnés et les clients ayant déjà choisi une formule V3.',
