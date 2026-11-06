@@ -118,6 +118,7 @@ import communauteHero from './assets/communaute-hero.jpg';
 import seriesAudioHero from './assets/series-audio-hero.jpg';
 import formationAudioHero from './assets/formation-audio-hero.jpg';
 import kdpHero from './assets/kdp-hero.jpg';
+import mesLivresHero from './assets/mes-livres-hero.jpg';
 import ancienClientHero from './assets/ancien-client-hero.jpg';
 import calendrierHero from './assets/calendrier-hero.jpg';
 const KdpHero = () => <PageHeroImage src={kdpHero} alt="Outils Amazon KDP" />;
@@ -860,8 +861,8 @@ const App = () => {
               <Route path="gallery" element={<V3LockedGate><TrialGate label="Galerie publique"><V3GalleryPage /></TrialGate></V3LockedGate>} />
               <Route path="auteur" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3GuestAuthorPage /></TrialGate></V3LockedGate>} />
               <Route path="u/:slug" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3AuthorProfilePage /></TrialGate></V3LockedGate>} />
-              <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
-              <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
+              <Route path="mes-livres" element={<V3LockedGate><PageHeroImage src={mesLivresHero} alt="Ma bibliothèque" /><V3BookManagerPage /></V3LockedGate>} />
+              <Route path="livres-corriges" element={<V3LockedGate><PageHeroImage src={mesLivresHero} alt="Ma bibliothèque" /><V3BookManagerPage /></V3LockedGate>} />
               <Route path="donnees-kdp" element={<V3PaidModuleRoute><V3KdpDataPage /></V3PaidModuleRoute>} />
               <Route path="kdp-pilot" element={<><KdpHero /><V3KdpPilotPage /></>} />
               <Route path="kdp" element={<V3LockedGate><KdpHero /><V3KdpHubPage /></V3LockedGate>} />
