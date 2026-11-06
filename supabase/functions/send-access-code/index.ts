@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/escapeHtml.ts";
 import { requireAdminOrService } from "../_shared/authGuard.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
@@ -118,7 +119,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div class="code-box">
                 <div class="plan-badge">Plan ${planType.toUpperCase()}</div>
-                <div class="code">${accessCode}</div>
+                <div class="code">${escapeHtml(accessCode)}</div>
               </div>
               
               <div class="steps">
@@ -129,11 +130,11 @@ const handler = async (req: Request): Promise<Response> => {
                 </div>
                 <div class="step">
                   <div class="step-number">2</div>
-                  <span>Entrez votre email : <strong>${email}</strong></span>
+                  <span>Entrez votre email : <strong>${escapeHtml(email)}</strong></span>
                 </div>
                 <div class="step">
                   <div class="step-number">3</div>
-                  <span>Entrez votre code d'accès : <strong>${accessCode}</strong></span>
+                  <span>Entrez votre code d'accès : <strong>${escapeHtml(accessCode)}</strong></span>
                 </div>
                 <div class="step">
                   <div class="step-number">4</div>
@@ -151,7 +152,7 @@ const handler = async (req: Request): Promise<Response> => {
             </div>
             <div class="footer">
               <p>© 2024 Ebook Studio AI - Tous droits réservés</p>
-              <p>Cet email a été envoyé à ${email}</p>
+              <p>Cet email a été envoyé à ${escapeHtml(email)}</p>
             </div>
           </div>
         </body>

@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/escapeHtml.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
@@ -37,7 +38,7 @@ const handler = async (req: Request): Promise<Response> => {
     const emailResponse = await resend.emails.send({
       from: "EbookStudio Pro <noreply@ebookstudio.fr>",
       to: [adminEmail],
-      subject: `🎉 Nouvelle confirmation de paiement - ${email}`,
+      subject: `🎉 Nouvelle confirmation de paiement - ${escapeHtml(email)}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -59,7 +60,7 @@ const handler = async (req: Request): Promise<Response> => {
               
               <div style="background: #f3e8ff; border: 2px solid #7c3aed; border-radius: 8px; padding: 20px; text-align: center; margin-bottom: 20px;">
                 <p style="color: #6b21a8; margin: 0 0 10px 0; font-size: 14px;">Email du client</p>
-                <p style="color: #7c3aed; margin: 0; font-size: 20px; font-weight: bold;">${email}</p>
+                <p style="color: #7c3aed; margin: 0; font-size: 20px; font-weight: bold;">${escapeHtml(email)}</p>
               </div>
               
               <p style="font-size: 14px; color: #6b7280; margin-bottom: 20px;">

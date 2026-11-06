@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/escapeHtml.ts";
 import { requireAdminOrService } from "../_shared/authGuard.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
@@ -57,7 +58,7 @@ const handler = async (req: Request): Promise<Response> => {
       </h1>
       
       <p style="color:#a78bfa;font-size:16px;margin:0 0 30px 0;">
-        Merci pour votre confiance, ${displayName} !
+        Merci pour votre confiance, ${escapeHtml(displayName)} !
       </p>
 
       <!-- Access Code Box -->
@@ -67,7 +68,7 @@ const handler = async (req: Request): Promise<Response> => {
             Votre code d'acces personnel
           </p>
           <p style="color:#ffffff;font-size:32px;font-weight:bold;margin:0;letter-spacing:4px;font-family:monospace;">
-            ${accessCode}
+            ${escapeHtml(accessCode)}
           </p>
         </div>
       </div>
@@ -86,7 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
         
         <div style="background:rgba(124,58,237,0.1);border-radius:12px;padding:15px;margin-bottom:10px;">
           <p style="color:#e2d8f5;font-size:14px;margin:0;">
-            <span style="color:#a78bfa;font-weight:bold;">2.</span> Entrez votre code <strong style="color:#ffffff;">${accessCode}</strong>
+            <span style="color:#a78bfa;font-weight:bold;">2.</span> Entrez votre code <strong style="color:#ffffff;">${escapeHtml(accessCode)}</strong>
           </p>
         </div>
         
