@@ -1,4 +1,5 @@
 # Architecture
+- Assistance and FAQ share scoped semantic contrast styles and exclude acquisition overlays so help remains readable without changing other pages.
 - Home blank-start actions call the shared draft reset before opening direct writing, so restored local state cannot reopen the previous book and saved library records remain untouched.
 - V3 navigation search lives beside the offer category and reuses the tools index query parameter, avoiding a duplicate search in the brand header.
 - V3Header is a welcome-only band; category menus and quick-access bars remain responsible for navigation to avoid duplicated header controls.

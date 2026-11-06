@@ -1,0 +1,34 @@
+.v3-dark-page .assistance-page {
+  --muted-foreground: 215 20% 80%;
+  --input: 186 45% 44%;
+  --charter-text-primary: hsl(var(--foreground));
+  --charter-text-secondary: hsl(var(--foreground));
+  --charter-text-muted: hsl(var(--muted-foreground));
+  color: hsl(var(--foreground));
+}
+
+.v3-dark-page .assistance-page :is(h1, h2, h3, h4, label, span, [data-radix-collection-item]) {
+  color: hsl(var(--foreground)) !important;
+}
+
+.v3-dark-page .assistance-page :is(p, .text-muted-foreground, [role="region"]) {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.v3-dark-page .assistance-page :is(input, textarea) {
+  background-color: hsl(var(--muted)) !important;
+  color: hsl(var(--foreground)) !important;
+  border-color: hsl(var(--input)) !important;
+  -webkit-text-fill-color: hsl(var(--foreground));
+}
+
+.v3-dark-page .assistance-page :is(input, textarea)::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+  -webkit-text-fill-color: hsl(var(--muted-foreground));
+  opacity: 1;
+}
+
+.v3-dark-page .assistance-page button:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 3px;
+}

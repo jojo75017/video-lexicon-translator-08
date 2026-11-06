@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import assistanceHero from '@/assets/assistance-hero.jpg';
+import '@/styles/assistance.css';
 
 // SEO Meta + Schema.org FAQ pour la page
 const useFaqSeo = (faqItems: { question: string; answer: string }[]) => {
@@ -226,7 +227,7 @@ Vos ebooks vous appartiennent à 100%.`
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
+    <div className="assistance-page min-h-screen bg-background text-foreground">
       {/* Header */}
       <div className="bg-card/80 backdrop-blur-sm border-b border-border sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -373,7 +374,7 @@ Vos ebooks vous appartiennent à 100%.`
         </Card>
 
         {/* Contact Card */}
-        <Card className="bg-gradient-to-r from-card to-background text-white">
+        <Card className="bg-card text-card-foreground">
           <CardContent className="p-8 text-center space-y-4">
             <AlertCircle className="h-10 w-10 mx-auto text-amber-400" />
             <h3 className="text-2xl font-bold">Vous n'avez pas trouvé votre réponse ?</h3>
