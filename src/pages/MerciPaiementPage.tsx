@@ -200,6 +200,19 @@ export default function MerciPaiementPage() {
           </Button>
         </div>
 
+        <div className="text-center">
+          <Button
+            asChild
+            variant="ghost"
+            className="text-[#008296] font-semibold"
+          >
+            <Link to="/v3">
+              Aller directement à mon espace V3
+              <ArrowRight className="w-4 h-4 ml-2" />
+            </Link>
+          </Button>
+        </div>
+
         <p className="text-center text-xs text-[#232F3E]/60">
           Vous avez payé sans être connecté&nbsp;? Le code part à l'adresse
           indiquée dans Stripe. Écrivez-nous depuis l'assistance si rien
