@@ -70,7 +70,7 @@ serve(async (req) => {
       });
       if (r.ok) results.push({ email, ok: true });
       else {
-        console.error("Resend error", email: "***", r.status, r.detail);
+        console.error("Resend error", "***", r.status, r.detail);
         results.push({ email, ok: false, error: `${r.status ?? ""}` });
       }
       if (isQuotaExhausted()) { console.warn("[beta-feedback] Resend daily quota atteint, arrêt"); break; }

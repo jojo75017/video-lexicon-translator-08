@@ -79,7 +79,7 @@ serve(async (req) => {
         const email = session.metadata?.email || session.customer_details?.email;
         const planId = session.metadata?.planId;
 
-        console.log("Checkout completed for:", email: "***", "plan:", planId, "mode:", session.mode);
+        console.log("Checkout completed for:", "***", "plan:", planId, "mode:", session.mode);
 
         // --- Achat d'un module premium ponctuel (ex: BookPerfect AI) ---
         // Ne crée PAS d'abonnement complet : enregistre seulement le droit d'accès au module.
@@ -101,7 +101,7 @@ serve(async (req) => {
               stripe_session_id: session.id,
             });
           if (entErr) console.error("Error creating module entitlement:", entErr);
-          else console.log("Granted BookPerfect entitlement to:", email: "***", environment);
+          else console.log("Granted BookPerfect entitlement to:", "***", environment);
           break;
         }
 
@@ -171,7 +171,7 @@ serve(async (req) => {
               });
             
             if (insertError) console.error("Error creating subscriber:", insertError);
-            else console.log("Created new subscriber:", email: "***", "with code:", "***");
+            else console.log("Created new subscriber:", "***", "with code:", "***");
 
             await sendEmail(email, accessCode, planType, false);
           }
@@ -218,7 +218,7 @@ serve(async (req) => {
         if (updateError) {
           console.error("Error updating subscription status:", updateError);
         } else {
-          console.log("Updated subscription status for:", email: "***", "to:", dbStatus);
+          console.log("Updated subscription status for:", "***", "to:", dbStatus);
         }
         break;
       }
@@ -234,7 +234,7 @@ serve(async (req) => {
         const email = (customer as Stripe.Customer).email;
         if (!email) break;
 
-        console.log("Payment succeeded for:", email: "***", "billing_reason:", (invoice as any).billing_reason);
+        console.log("Payment succeeded for:", "***", "billing_reason:", (invoice as any).billing_reason);
 
         // After trial ends and payment succeeds, mark as fully active with no expiry (lifetime access)
         if ((invoice as any).billing_reason === "subscription_cycle" || (invoice as any).billing_reason === "subscription_create") {

@@ -76,7 +76,7 @@ serve(async (req) => {
 
     const { planId, email, successUrl, cancelUrl, addons } = await req.json();
 
-    console.log("Creating checkout for plan:", planId, "email:", email: "***", "addons:", addons);
+    console.log("Creating checkout for plan:", planId, "email:", "***", "addons:", addons);
 
     if (!email) throw new Error("Email requis");
 

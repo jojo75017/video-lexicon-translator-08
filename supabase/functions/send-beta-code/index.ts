@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
       html: buildHtml(email, code, activateUrl),
     });
 
-    console.log('Beta code email sent to', email: "***", res);
+    console.log('Beta code email sent to', "***", res);
 
     // Record the recipient so the admin can track sent invitations
     await admin

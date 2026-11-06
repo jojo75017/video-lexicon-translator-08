@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
             : new Date(Date.now() + 10 * 60_000).toISOString(),
         })
         .eq("id", created.id);
-      if (!res.ok) console.error("Systeme.io push failed for trial", email: "***", res.detail);
+      if (!res.ok) console.error("Systeme.io push failed for trial", "***", res.detail);
     } catch (e) {
       console.error("Systeme.io push exception", (e as Error).message);
       await supabase
