@@ -80,11 +80,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (email) {
         const { data: subscriber } = await supabase
           .from('subscribers')
-          .select('plan_type')
+          .select('plan_type,status')
           .eq('email', email)
           .single();
 
-        if (subscriber?.plan_type === 'lifetime' || subscriber?.plan_type === 'pro') {
+        const revoked = ['canceled', 'cancelled', 'revoked', 'expired', 'inactive', 'suspended', 'past_due'];
+        const status = String(subscriber?.status ?? '').toLowerCase();
+        if ((subscriber?.plan_type === 'lifetime' || subscriber?.plan_type === 'pro') && !revoked.includes(status)) {
           return 'pro';
         }
       }
