@@ -255,7 +255,13 @@ export default function V3PremiumVentePage() {
               </div>
             ))}
           </div>
-          <p className="text-center mt-8" style={{ color: C.muted }}>
+          <div className="mt-8 rounded-2xl px-6 py-5 text-center" style={{ background: 'rgba(255,158,45,0.12)', border: `1px solid ${C.orange}` }}>
+            <p className="text-xl md:text-2xl font-bold">
+              Valeur totale du pack : <span className="line-through" style={{ color: C.muted }}>{VALEUR_TOTALE_PACK}</span>
+            </p>
+            <p className="mt-1 text-lg font-bold" style={{ color: C.orange }}>Inclus dans votre abonnement</p>
+          </div>
+          <p className="text-center mt-6" style={{ color: C.muted }}>
             Les tutoriels, les outils et la banque d'idées vous attendent dans votre espace dès la connexion.
             L'appel avec Georges se réserve en ligne, sur rendez-vous, selon les disponibilités.
           </p>
