@@ -95,10 +95,15 @@ export default function V3TutorielsPage() {
                 className="rounded-lg border bg-card p-4 text-left hover:border-primary">
                 <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Tuto {t.num} · {t.duree}</span>
-                  {t.videos?.length && <Badge>🎬 Vidéo{t.videos.length > 1 ? `s (${t.videos.length})` : ''}</Badge>}
+                  {t.videos?.length ? <Badge>🎬 Vidéo{t.videos.length > 1 ? `s (${t.videos.length})` : ''}</Badge> : <Badge variant="secondary">📘 Guide illustré</Badge>}
                 </div>
                 <div className="mt-1 font-medium">{t.titre}</div>
-                <div className="mt-2 flex items-center gap-1 text-sm text-primary"><PlayCircle className="h-4 w-4" /> {t.videos?.length ? 'Regarder la vidéo' : 'Voir le tuto'}</div>
+                {t.videos?.length
+                  ? <div className="mt-2 flex items-center gap-1 text-sm text-primary"><PlayCircle className="h-4 w-4" /> Regarder la vidéo</div>
+                  : <>
+                      <div className="mt-2 flex items-center gap-1 text-sm text-primary"><BookOpen className="h-4 w-4" /> Consulter le guide pas-à-pas</div>
+                      <div className="mt-1 text-xs text-muted-foreground">Vidéo à venir prochainement</div>
+                    </>}
               </button>
             ))}
           </div>
@@ -169,7 +174,12 @@ export default function V3TutorielsPage() {
                     </div>
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                <div className="rounded-lg border bg-muted/40 p-3 text-sm">
+                  <div className="flex items-center gap-2 font-medium"><BookOpen className="h-4 w-4 text-primary" /> Guide illustré pas-à-pas</div>
+                  <p className="mt-1 text-muted-foreground">La vidéo de ce tutoriel arrive prochainement. En attendant, suivez les écrans ci-dessous puis cliquez sur « Essayer maintenant ».</p>
+                </div>
+              )}
               <Progress value={((i + 1) / open.etapes.length) * 100} />
               <div className="min-h-32 py-4">
                 {!open.videos?.length && <img src={`/tutoriels/tuto-${open.num}.jpg`} alt={`Capture : ${open.titre}`}
