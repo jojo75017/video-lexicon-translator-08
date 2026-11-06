@@ -18,7 +18,7 @@ const journeys = [
 const usefulTools = [
   { label: 'Prospects', tab: 'prospects' }, { label: 'Inscrits', tab: 'inscrits' }, { label: 'Envoi manuel', tab: 'send' },
 { label: 'Templates', tab: 'templates' }, { label: 'Pipeline', tab: 'stats' },
-  { label: 'CRM', path: '/crm' }, { label: 'Aperçu emails', path: '/apercu-emails' }, { label: 'Tunnel de vente', path: '/commander' }, { label: 'Page connexion', path: '/connexion-abonne' },
+  { label: 'CRM', path: '/crm' }, { label: 'Aperçu emails', path: '/apercu-emails' }, { label: 'Tunnel de vente', path: '/commander' }, { label: 'Page de vente V3 Premium', path: '/v3-premium' }, { label: 'Page connexion', path: '/connexion-abonne' },
 ];
 
 function describeEmail(templateName: string | null) {
