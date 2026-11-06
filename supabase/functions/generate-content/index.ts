@@ -96,7 +96,8 @@ function cleanJsonResponse(text: string): string {
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
-  }  const __guard = await requireUser(req);
+  }
+  const __guard = await requireUser(req);
   if (__guard instanceof Response) return __guard;
 
 
