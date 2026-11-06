@@ -54,7 +54,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
 
       { label: 'Ebookbot — Chat IA', to: '/ebookbot', desc: 'Assistant conversationnel pour brainstormer' },
       { label: "Assistant Ebookstudio", to: '/v3/assistant', badge: 'Nouveau', desc: 'Posez votre question : réponse claire + bouton vers le bon outil' },
-      { label: 'Traduction 10 langues', to: '/v3/outils/traduction', badge: 'Nouveau', desc: 'EN, ES, DE, IT, PT, NL, PL, JA, ZH, AR — IA + relecture' },
+      { label: 'Traduction 10 à 15 langues', to: '/v3/outils/traduction', badge: 'Nouveau', desc: '10 langues (Débutant, Auteur) · 15 langues (Édition VIP)' },
     ],
   },
   {
