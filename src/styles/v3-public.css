@@ -957,3 +957,11 @@
 .v3-plans-dark .text-gray-500, .v3-plans-dark .text-gray-600, .v3-plans-dark .text-gray-700, .v3-plans-dark .text-slate-600 { color: #c4cad6 !important; }
 .v3-plans-dark .v3-section-dark h1, .v3-plans-dark .v3-section-dark h2, .v3-plans-dark .v3-section-dark div { color: #f5f5f5 !important; }
 .v3-plans-dark .v3-section-dark p { color: #c4cad6 !important; }
+
+/* Bandeau « La fiche de mon livre » : reste sombre et lisible malgré l'ambiance claire */
+.v3-ambiance details.v3-genie-more,
+details.v3-genie-more {
+  background: #151d2c !important;
+  color: #E6F4F1 !important;
+}
+details.v3-genie-more > summary { color: #E6F4F1 !important; }
