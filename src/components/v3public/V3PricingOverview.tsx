@@ -25,7 +25,7 @@ const MONTHLY_PRICE_IDS = {
   vip: 'v3m_vip_monthly',
 } as const;
 
-export default function V3PricingOverview({ detailsHref = "/v3/plans" }: { baseAvailable?: boolean; detailsHref?: string }) {
+export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotPlanLabel }: { baseAvailable?: boolean; detailsHref?: string; kdpPilotPlanLabel?: string }) {
   const [checkout, setCheckout] = useState<{ priceId: string; name: string } | null>(null);
   return (
     <section className="v3-shell py-7" aria-labelledby="v3-offers-title">
@@ -69,7 +69,7 @@ export default function V3PricingOverview({ detailsHref = "/v3/plans" }: { baseA
       {checkout && (
         <V3SubscribeCheckout priceId={checkout.priceId} planName={checkout.name} onClose={() => setCheckout(null)} />
       )}
-      <V3StarterKdpPilotBanner />
+      <V3StarterKdpPilotBanner planLabel={kdpPilotPlanLabel} />
       <section className="mt-6 border-y py-5 text-foreground">
         <Gift className="h-6 w-6 text-primary" />
         <h3 className="mt-3 text-xl font-semibold">Déjà client ? Vous gardez vos droits</h3>
