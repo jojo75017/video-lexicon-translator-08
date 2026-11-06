@@ -90,6 +90,17 @@ export default function V3HomePage() {
   if (user) {
     return (
       <div className="v3-home pb-4" style={{ background: '#2A2624' }}>
+        <div className="v3-shell flex justify-end pt-3">
+          <a
+            href="https://calendly.com/pro-georgesboubet/30min"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors hover:opacity-90"
+            style={{ borderColor: 'rgba(94,234,212,0.45)', color: '#5EEAD4', background: 'rgba(94,234,212,0.08)' }}
+          >
+            📞 Besoin d'aide ? Réserver un appel de 30 min
+          </a>
+        </div>
         <V3SubscriberHome user={user} />
         <V3CoversGallery />
         <V3ClusterSites />
