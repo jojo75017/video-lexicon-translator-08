@@ -217,7 +217,7 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
           )}
 
           <p className="text-xs text-muted-foreground">
-            Vos clés restent stockées sur votre navigateur (BYOK). Elles ne sont jamais transmises à nos serveurs.
+            Vos clés sont conservées dans ce navigateur. Elles sont transmises au fournisseur ou au service de génération concerné lorsque vous utilisez un atelier. Gardez-les privées.
           </p>
         </section>
 
