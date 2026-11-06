@@ -7,6 +7,10 @@ const PLANS: Record<string, { priceId: string; name: string }> = {
   debutant: { priceId: 'v3m_debutant_monthly', name: 'Débutant · 19 €/mois' },
   auteur: { priceId: 'v3m_auteur_monthly', name: 'Auteur · 29 €/mois' },
   vip: { priceId: 'v3m_vip_monthly', name: 'Édition VIP · 59 €/mois' },
+  // Tarif fidélité -20 % : le serveur vérifie que le compte connecté est ancien client V2.
+  'debutant-fidelite': { priceId: 'v3m_debutant_monthly_legacy', name: 'Débutant fidélité · 15,20 €/mois' },
+  'auteur-fidelite': { priceId: 'v3m_auteur_monthly_legacy', name: 'Auteur fidélité · 23,20 €/mois' },
+  'vip-fidelite': { priceId: 'v3m_vip_monthly_legacy', name: 'Édition VIP fidélité · 47,20 €/mois' },
 };
 
 export default function AbonnementMensuelPaiementPage() {
