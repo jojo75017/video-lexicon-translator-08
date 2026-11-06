@@ -755,7 +755,7 @@ const App = () => {
               }
             />
             <Route path="/kdp-keywords" element={<div className="v3-dark-page">{gated(<KdpKeywordResearchPage />)}</div>} />
-            <Route path="/audit-pilot" element={<div className="v3-dark-page">{gated(<AuditPilotPage />)}</div>} />
+            <Route path="/audit-pilot" element={<div className="v3-dark-page">{gated(<><KdpHero /><AuditPilotPage /></>)}</div>} />
             <Route path="/bookperfect" element={<div className="v3-dark-page">{<PlanGuard><BookPerfectGate><PageHeroImage src={bookperfectHero} alt="BookPerfect AI" /><BookPerfectPage /></BookPerfectGate></PlanGuard>}</div>} />
             <Route path="/couverture-kdp" element={<div className="v3-dark-page">{gated(<CouvertureKdpPage />)}</div>} />
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
