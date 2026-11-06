@@ -9,7 +9,7 @@ import V3StartIdeaCTA from '@/components/v3public/V3StartIdeaCTA';
 export default function V3StartHerePage() {
   return (
     <div className="v3-dark-page"><div className="container mx-auto max-w-7xl px-4 py-8 space-y-8">
-      <img src={heroImg} alt="Un robot assistant devant un livre ouvert lumineux" width={1600} height={640} className="w-full h-48 md:h-72 object-cover rounded-2xl border border-border" />
+      <img src={heroImg} alt="Un robot assistant devant un livre ouvert lumineux" width={1600} height={640} className="w-full h-auto rounded-2xl border border-border" />
       <header className="space-y-2">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
           Commence ici
