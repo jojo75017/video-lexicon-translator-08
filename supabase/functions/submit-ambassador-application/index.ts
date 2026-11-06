@@ -123,9 +123,6 @@ Deno.serve(async (req) => {
           .from('ambassador_outreach')
           .update({
             status: 'inscrit',
-            handle: handle || name,
-            platform,
-            niche: niche || null,
             last_contact_at: new Date().toISOString(),
           })
           .eq('id', existing.id);
