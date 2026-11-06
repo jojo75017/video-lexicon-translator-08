@@ -115,10 +115,24 @@ export default function V3ByokChatPage() {
       <BackButton to="/v3" label="Retour à l'accueil" />
 
       <header className="mb-5 mt-2">
-        <h1 className="flex items-center gap-2 text-3xl font-bold" style={{ color: 'var(--v3-ink)' }}>
-          <Bot className="h-6 w-6" style={{ color: 'var(--v3-emerald)' }} />
-          Discuter avec votre IA
-        </h1>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="flex items-center gap-2 text-3xl font-bold" style={{ color: 'var(--v3-ink)' }}>
+            <Bot className="h-6 w-6" style={{ color: 'var(--v3-emerald)' }} />
+            Discuter avec votre IA
+          </h1>
+          <Button
+            onClick={() => {
+              setMessages([]);
+              setInput('');
+              localStorage.removeItem(LS_KEY);
+              toast.success('Discussion remise à zéro');
+            }}
+            disabled={isLoading}
+            className="bg-orange-500 text-white hover:bg-orange-600"
+          >
+            <RotateCcw className="mr-1.5 h-4 w-4" /> Repartir à zéro
+          </Button>
+        </div>
         <p className="mt-2 text-[14.5px]" style={{ color: 'var(--v3-muted)' }}>
           Une vraie discussion ouverte, avec votre propre clé. Moteur utilisé :{' '}
           <strong>{PROVIDER_LABELS[provider]}</strong>.{' '}
