@@ -23,7 +23,7 @@ const CURATED: QuestionEntry[] = [
     id: 'q-cle-unique',
     question: 'Faut-il une clé OpenAI et OpenRouter, ou la clé Gemini suffit-elle ?',
     answer:
-      'La clé Gemini seule fait tourner l’écriture, la correction et l’humaniseur. OpenAI et OpenRouter sont facultatifs, et sans aucune clé le moteur intégré prend le relais.',
+      'La clé Gemini seule fait tourner l’écriture, la correction et l’humaniseur. OpenAI et OpenRouter sont facultatifs selon les ateliers. Sans aucune clé enregistrée, la rédaction ne démarre pas : collez vos propres clés dans la page « Clés API ».',
     theme: 'Clés & moteurs IA',
     action: { label: 'Paramétrer mes clés', route: '/v3/fonctionnalites/cles' },
   },
