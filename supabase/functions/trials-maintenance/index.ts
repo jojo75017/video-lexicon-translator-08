@@ -1,4 +1,5 @@
 import { requireAdminOrService } from "../_shared/authGuard.ts";
+import { createClient as __cc } from "npm:@supabase/supabase-js@2";
 // Maintenance quotidienne des essais gratuits 7 jours.
 //
 // Passage automatique (cron) :
@@ -119,8 +120,17 @@ async function retrySync(row: {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-  const __guard = await requireAdminOrService(req);
-  if (__guard instanceof Response) return __guard;
+  const __cronToken = req.headers.get("x-cron-token");
+  let __cronOk = false;
+  if (__cronToken) {
+    const __sb = __cc(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const { data: __t } = await __sb.from("internal_cron_tokens").select("token").eq("name", "trials-maintenance").maybeSingle();
+    __cronOk = !!__t?.token && __t.token === __cronToken;
+  }
+  if (!__cronOk) {
+    const __guard = await requireAdminOrService(req);
+    if (__guard instanceof Response) return __guard;
+  }
 
 
   const body = await req.json().catch(() => ({} as Record<string, unknown>));
