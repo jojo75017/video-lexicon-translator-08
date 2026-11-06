@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import { X } from 'lucide-react';
 import { getStripe, getStripeEnvironment } from '@/lib/stripe';
+import { stripeThankYouUrl } from '@/lib/paymentReturnUrl';
 import { supabase } from '@/integrations/supabase/client';
 
 interface Props {
@@ -37,9 +38,7 @@ export default function V3SubscribeCheckout({
 
   const fetchClientSecret = useCallback(async (): Promise<string> => {
     const { data: { user } } = await supabase.auth.getUser();
-    const target =
-      returnUrl ??
-      `${window.location.origin}/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(planName)}`;
+    const target = returnUrl ?? stripeThankYouUrl(window.location.origin, planName);
     const { data, error } = await supabase.functions.invoke('v3-subscription-checkout', {
       body: {
         priceId,
