@@ -318,6 +318,7 @@ export function defaultElement(role: WrapRole, text?: string): WrapTextElement {
     align: spec.align,
     bold: spec.bold,
     italic: false,
+    underline: false,
     lineHeight: spec.lineHeight,
     hidden: false,
   };

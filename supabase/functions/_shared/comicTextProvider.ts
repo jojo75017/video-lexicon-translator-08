@@ -24,9 +24,7 @@ export async function comicTextProvider(body: Record<string, unknown>, systemPro
   const payload = provider === 'gemini'
     ? { system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: 'user', parts: [{ text: body.prompt }] }], generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7, responseMimeType: 'application/json' } }
     : provider === 'claude' ? { model, system: systemPrompt, messages: messages.slice(1), max_tokens: maxTokens }
-    : provider === 'openrouter'
-      ? { models: [...new Set([model, 'google/gemini-2.5-flash', 'openai/gpt-4o-mini'])], messages, max_tokens: maxTokens }
-      : { model, messages, max_tokens: maxTokens };
+    : { model, messages, max_tokens: maxTokens };
   try {
     const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(maxTokens > 6000 ? 145000 : 120000) });
     const data = await response.json().catch(() => ({}));
