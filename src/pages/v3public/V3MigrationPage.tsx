@@ -176,7 +176,7 @@ export default function V3MigrationPage() {
                     ))}
                   </ul>
                   <Link
-                    to="/contact-support?sujet=remise-fidelite"
+                    to={`/paiement-mensuel?plan=${p.id}-fidelite`}
                     className="block rounded-lg py-3 text-center font-semibold"
                     style={{ background: "#008296", color: "#fff" }}
                   >

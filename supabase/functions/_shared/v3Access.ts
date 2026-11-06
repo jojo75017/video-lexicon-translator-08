@@ -30,6 +30,9 @@ export function parseV3PriceId(priceId: string): V3PlanInfo | null {
     v3m_debutant_monthly: { plan: "plume", label: "Plan Débutant — 19 €/mois" },
     v3m_auteur_monthly: { plan: "edition", label: "Plan Auteur — 29 €/mois" },
     v3m_vip_monthly: { plan: "maison", label: "Plan Édition VIP — 59 €/mois" },
+    v3m_debutant_monthly_legacy: { plan: "plume", label: "Plan Débutant — 15,20 €/mois (fidélité V2)" },
+    v3m_auteur_monthly_legacy: { plan: "edition", label: "Plan Auteur — 23,20 €/mois (fidélité V2)" },
+    v3m_vip_monthly_legacy: { plan: "maison", label: "Plan Édition VIP — 47,20 €/mois (fidélité V2)" },
   };
   if (MONTHLY[priceId]) return { ...MONTHLY[priceId], interval: "month" };
   const m = /^v3_(plume|edition|maison)_(monthly|annual)(_legacy)?$/.exec(priceId || "");

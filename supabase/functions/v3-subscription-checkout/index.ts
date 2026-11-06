@@ -15,6 +15,10 @@ const ALLOWED_PRICES = new Set([
   "v3m_debutant_monthly",
   "v3m_auteur_monthly",
   "v3m_vip_monthly",
+  // Mêmes formules à -20 % à vie pour anciens clients V2 (droit revérifié)
+  "v3m_debutant_monthly_legacy",
+  "v3m_auteur_monthly_legacy",
+  "v3m_vip_monthly_legacy",
   // V3 subscriptions — 2 forfaits (activation octobre 2026)
   "v3_plume_monthly",
   "v3_plume_annual",
