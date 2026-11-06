@@ -163,7 +163,16 @@ Deno.serve(async (req) => {
     // La remise ancien client est revérifiée en base : impossible de l'obtenir
     // en modifiant la requête côté navigateur.
     const wantsLegacy = legacyV2 === true;
-    const legacyOk = wantsLegacy ? await isLegacyV2Buyer(supabase, String(email)) : false;
+    let legacyOk = false;
+    if (wantsLegacy) {
+      const bearer = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+      const { data: who } = bearer ? await supabase.auth.getUser(bearer) : { data: { user: null } };
+      const callerEmail = who?.user?.email?.toLowerCase();
+      if (!callerEmail || callerEmail !== String(email).toLowerCase()) {
+        throw new Error("Connectez-vous avec votre propre compte pour la remise ancien client V2");
+      }
+      legacyOk = await isLegacyV2Buyer(supabase, callerEmail);
+    }
     if (wantsLegacy && !legacyOk) {
       throw new Error("Remise ancien client V2 non applicable à cet email");
     }
