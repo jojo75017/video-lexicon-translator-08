@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/escapeHtml.ts";
 import { requireAdminOrService } from "../_shared/authGuard.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from "../_shared/emailSendingGuard.ts";
@@ -52,10 +53,10 @@ serve(async (req: Request) => {
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           ${coverUrl ? `<td style="width:80px;vertical-align:top;padding-right:16px;">
-            <img src="${coverUrl}" alt="${bookTitle}" style="width:72px;height:72px;border-radius:12px;object-fit:cover;border:1px solid #e5e7eb;" />
+            <img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(bookTitle)}" style="width:72px;height:72px;border-radius:12px;object-fit:cover;border:1px solid #e5e7eb;" />
           </td>` : ''}
           <td style="vertical-align:top;">
-            <h2 style="font-size:18px;font-weight:700;color:#111;margin:0 0 4px;">${bookTitle}</h2>
+            <h2 style="font-size:18px;font-weight:700;color:#111;margin:0 0 4px;">${escapeHtml(bookTitle)}</h2>
             <p style="color:#6b7280;font-size:13px;margin:0 0 8px;">Par ${bookAuthor || 'EbookStudio'}</p>
             <span style="display:inline-block;background:#fef3c7;color:#92400e;font-size:11px;font-weight:600;padding:2px 10px;border-radius:20px;">🎧 MP3 Haute Définition</span>
           </td>
@@ -64,7 +65,7 @@ serve(async (req: Request) => {
     </div>
 
     <div style="text-align:center;margin-bottom:32px;">
-      <a href="${downloadUrl}" 
+      <a href="${escapeHtml(downloadUrl)}" 
          style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:#fff;font-size:16px;font-weight:700;text-decoration:none;padding:16px 40px;border-radius:12px;box-shadow:0 4px 14px rgba(16,185,129,0.3);">
         📥 Télécharger mon livre audio
       </a>
@@ -96,7 +97,7 @@ serve(async (req: Request) => {
       body: JSON.stringify({
         from: "EbookStudio <noreply@ebookstudio.fr>",
         to: [email],
-        subject: `📥 Votre livre audio "${bookTitle}" est prêt !`,
+        subject: `📥 Votre livre audio "${escapeHtml(bookTitle)}" est prêt !`,
         html: htmlContent,
       }),
     });

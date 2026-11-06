@@ -40,11 +40,11 @@ function buildHtml(email: string, code: string, activateUrl: string) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders }
+    return new Response(null, { headers: corsHeaders });
+  }
   const __guard = await requireAdmin(req);
   if (__guard instanceof Response) return __guard;
-);
-  }
+
 
   try {
     if (!EMAIL_SENDING_ENABLED) {
@@ -100,7 +100,7 @@ Deno.serve(async (req) => {
       html: buildHtml(email, code, activateUrl),
     });
 
-    console.log('Beta code email sent to', email: "***", res);
+    console.log('Beta code email sent to', "***", res);
 
     // Record the recipient so the admin can track sent invitations
     await admin

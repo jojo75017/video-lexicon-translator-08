@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
       html: buildHtml(name, link, commission, commissionV3, kitUrl, pdfUrl),
     });
 
-    console.log('Influencer invite sent to', email: "***", res);
+    console.log('Influencer invite sent to', "***", res);
 
     return new Response(
       JSON.stringify({ success: true }),

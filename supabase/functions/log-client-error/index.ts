@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/escapeHtml.ts";
 // Log client errors to error_logs table + send email alert if severity >= critical or rate threshold passed
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
@@ -124,12 +125,12 @@ serve(async (req) => {
                 from: "EbookStudio Pro <onboarding@resend.dev>",
                 to: [ADMIN_EMAIL],
                 subject: isCritical
-                  ? `🚨 CRITIQUE: ${error_type}`
+                  ? `🚨 CRITIQUE: ${escapeHtml(error_type)}`
                   : `⚠️ Pic d'erreurs (${count}/h)`,
                 html: `
                   <h2>${isCritical ? "Erreur critique" : "Pic d'erreurs détecté"}</h2>
-                  <p><strong>Type:</strong> ${error_type}</p>
-                  <p><strong>Message:</strong> ${error_message}</p>
+                  <p><strong>Type:</strong> ${escapeHtml(error_type)}</p>
+                  <p><strong>Message:</strong> ${escapeHtml(error_message)}</p>
                   <p><strong>URL:</strong> ${url || "N/A"}</p>
                   <p><strong>Utilisateur:</strong> ${user_email || "Anonyme"}</p>
                   <p><strong>Total dernière heure:</strong> ${count}</p>

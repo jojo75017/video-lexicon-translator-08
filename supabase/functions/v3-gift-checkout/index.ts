@@ -1,3 +1,4 @@
+import { isSafeRedirect } from "../_shared/safeRedirect.ts";
 // V3 — Achat d'une CARTE CADEAU Noël (Base 197€ offerte à -20% = 158€).
 // Paiement unique via la gateway Lovable Payments.
 // La carte ne débloque QUE la Base — les packs premium restent payants.
@@ -24,7 +25,7 @@ function getSupabase() {
 function genCode(): string {
   const part = () =>
     Array.from({ length: 4 }, () =>
-      "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random() * 32)],
+      "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[crypto.getRandomValues(new Uint32Array(1))[0] % 32],
     ).join("");
   return `NOEL-${part()}-${part()}`;
 }
@@ -51,7 +52,7 @@ Deno.serve(async (req) => {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(r)) throw new Error("Email bénéficiaire invalide");
       recipient = r;
     }
-    if (typeof returnUrl !== "string" || !/^https?:\/\//.test(returnUrl)) {
+    if (!isSafeRedirect(returnUrl)) {
       throw new Error("returnUrl invalide");
     }
 

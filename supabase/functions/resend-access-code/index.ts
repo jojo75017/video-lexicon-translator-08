@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
         `,
       });
 
-      console.log('Email sent successfully to:', normalizedEmail: "***", emailResponse);
+      console.log('Email sent successfully to:', "***", emailResponse);
 
       return new Response(
         JSON.stringify({ 

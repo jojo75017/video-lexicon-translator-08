@@ -402,7 +402,7 @@ async function handleV3SubscriptionReferral(session: any) {
       converted_at: new Date().toISOString(),
     });
   }
-  console.log("Subscription referral commission recorded:", email: "***", commission);
+  console.log("Subscription referral commission recorded:", "***", commission);
 }
 
 async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {

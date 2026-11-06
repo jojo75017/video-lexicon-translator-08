@@ -1,3 +1,4 @@
+import { escapeHtml } from "../_shared/escapeHtml.ts";
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { Resend } from 'npm:resend@2.0.0';
 // Systeme.io désactivé — les ambassadeurs restent dans la base interne.
@@ -26,7 +27,7 @@ const PARTNER_COMMISSION_PCT = 15;
 
 /** Email du programme Partenaires V3 (abonnements Plume 27 €/mois, Édition 47 €/mois). */
 function buildPartnerHtml(name: string, partnerUrl: string) {
-  const hello = name ? `Bonjour ${name},` : 'Bonjour,';
+  const hello = name ? `Bonjour ${escapeHtml(name)},` : 'Bonjour,';
   return `
   <!DOCTYPE html>
   <html lang="fr"><head><meta charset="utf-8" /></head>
@@ -50,7 +51,7 @@ function buildPartnerHtml(name: string, partnerUrl: string) {
 }
 
 function buildHtml(name: string, kitUrl: string, joinUrl: string, pdfUrl: string) {
-  const hello = name ? `Salut ${name} 👋` : 'Salut 👋';
+  const hello = name ? `Salut ${escapeHtml(name)} 👋` : 'Salut 👋';
   return `
   <!DOCTYPE html>
   <html lang="fr"><head><meta charset="utf-8" /></head>
@@ -122,9 +123,6 @@ Deno.serve(async (req) => {
           .from('ambassador_outreach')
           .update({
             status: 'inscrit',
-            handle: handle || name,
-            platform,
-            niche: niche || null,
             last_contact_at: new Date().toISOString(),
           })
           .eq('id', existing.id);
@@ -147,7 +145,7 @@ Deno.serve(async (req) => {
     // const sioTags = [
     //   'promoteur-interesse',
     //   'ambassadeur-ebookstudio',
-    //   `ambassadeur-${platform}`,
+    //   `ambassadeur-${escapeHtml(platform)}`,
     // ];
     // if (niche) sioTags.push('client-prospect');
     // const systemeio = EMAIL_SENDING_ENABLED ? await pushToSystemeIo(...) : { ... };

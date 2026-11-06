@@ -1,3 +1,4 @@
+import { safeRedirectOr } from "../_shared/safeRedirect.ts";
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@14.21.0";
 
@@ -75,7 +76,7 @@ serve(async (req) => {
 
     const { planId, email, successUrl, cancelUrl, addons } = await req.json();
 
-    console.log("Creating checkout for plan:", planId, "email:", email: "***", "addons:", addons);
+    console.log("Creating checkout for plan:", planId, "email:", "***", "addons:", addons);
 
     if (!email) throw new Error("Email requis");
 
@@ -172,9 +173,8 @@ serve(async (req) => {
         },
       },
       success_url:
-        successUrl ||
-        `${req.headers.get("origin")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancelUrl || `${req.headers.get("origin")}/offres`,
+        safeRedirectOr(successUrl, `${safeRedirectOr(req.headers.get("origin"), "https://ebookstudio.fr")}/paiement-succes?session_id={CHECKOUT_SESSION_ID}`),
+      cancel_url: safeRedirectOr(cancelUrl, `${safeRedirectOr(req.headers.get("origin"), "https://ebookstudio.fr")}/offres`),
       metadata: {
         planId: planId || "pro",
         email,

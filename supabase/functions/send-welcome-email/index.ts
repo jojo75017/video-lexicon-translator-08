@@ -150,7 +150,7 @@ const handler = async (req: Request): Promise<Response> => {
 </html>`,
     });
 
-    console.log("Welcome email sent to", email: "***", "code joined:", Boolean("***"));
+    console.log("Welcome email sent to", "***", "code joined:", Boolean("***"));
 
     return new Response(JSON.stringify({ success: true, data: emailResponse }), {
       status: 200,

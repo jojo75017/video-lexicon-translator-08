@@ -186,7 +186,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
       html: html,
     });
 
-    console.log('Welcome email sent successfully to:', email: "***", emailResponse);
+    console.log('Welcome email sent successfully to:', "***", emailResponse);
     return { success: true };
   } catch (error: any) {
     console.error('Failed to send welcome email:', error);
@@ -350,7 +350,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log('New subscriber created:', email: "***", 'with tier:', assignedTier);
+      console.log('New subscriber created:', "***", 'with tier:', assignedTier);
 
       // Send welcome email + admin notification
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, true);
