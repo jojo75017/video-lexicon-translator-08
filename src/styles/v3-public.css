@@ -965,4 +965,19 @@ details.v3-genie-more {
   background: #151d2c !important;
   color: #E6F4F1 !important;
 }
+
+/* Guide des clés : contraste autonome, y compris avant hydratation du compte. */
+.v3pub .v3-api-guide {
+  --background: 220 20% 6%; --foreground: 210 20% 96%;
+  --card: 220 22% 11%; --card-foreground: 210 20% 96%;
+  --secondary: 190 24% 13%; --secondary-foreground: 210 20% 96%;
+  --muted-foreground: 214 16% 76%; --border: 200 22% 28%;
+  --primary: 184 65% 56%; --primary-foreground: 220 20% 6%;
+  background: hsl(var(--background)); color: hsl(var(--foreground));
+}
+.v3pub .v3-api-guide :is(h1,h2,h3,label) { color: hsl(var(--foreground)) !important; }
+.v3pub .v3-api-guide :is(p,li) { color: hsl(var(--muted-foreground)) !important; }
+.v3pub .v3-api-guide :is(.bg-card,.bg-secondary) { background: hsl(var(--card)) !important; }
+.v3pub .v3-api-guide .bg-secondary { background: hsl(var(--secondary)) !important; }
+.v3pub .v3-api-guide button { letter-spacing: 0; }
 details.v3-genie-more > summary { color: #E6F4F1 !important; }
