@@ -40,11 +40,10 @@ function buildHtml(email: string, code: string, activateUrl: string) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders }
-  const __guard = await requireAdmin(req);
+    return new Response(null, { headers: corsHeaders });
+  }  const __guard = await requireAdmin(req);
   if (__guard instanceof Response) return __guard;
-);
-  }
+
 
   try {
     if (!EMAIL_SENDING_ENABLED) {

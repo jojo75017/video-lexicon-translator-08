@@ -89,11 +89,10 @@ Instructions CRITIQUES:
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders }
-  const __guard = await requireUser(req);
+    return new Response(null, { headers: corsHeaders });
+  }  const __guard = await requireUser(req);
   if (__guard instanceof Response) return __guard;
-);
-  }
+
 
   try {
     const { characterName, characterDescription, useOpenAI = false, openaiApiKey } = await req.json();

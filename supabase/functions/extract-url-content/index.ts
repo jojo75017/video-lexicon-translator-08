@@ -132,11 +132,10 @@ async function scrapeUrl(url: string): Promise<{ title: string; content: string 
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders }
-  const __guard = await requireUser(req);
+    return new Response(null, { headers: corsHeaders });
+  }  const __guard = await requireUser(req);
   if (__guard instanceof Response) return __guard;
-);
-  }
+
 
   try {
     const { youtubeUrl, articleUrl, websiteUrl }: ExtractRequest = await req.json();
