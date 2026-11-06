@@ -1,3 +1,4 @@
+import { requireAdmin } from "../_shared/authGuard.ts";
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
 
 const STRIPE_KEY = Deno.env.get('STRIPE_SECRET_KEY')!;
@@ -18,6 +19,9 @@ const EVENTS = [
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __guard = await requireAdmin(req);
+  if (__guard instanceof Response) return __guard;
+
 
   try {
     // Check existing endpoints first

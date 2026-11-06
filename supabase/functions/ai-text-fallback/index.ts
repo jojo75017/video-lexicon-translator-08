@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
 const corsHeaders = {
@@ -13,6 +14,9 @@ const LANGUE_RULE =
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
+
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Méthode non autorisée' }), {
       status: 405,

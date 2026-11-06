@@ -1,3 +1,4 @@
+import { requireAdminOrService } from "../_shared/authGuard.ts";
 // Maintenance quotidienne des essais gratuits 7 jours.
 //
 // Passage automatique (cron) :
@@ -118,6 +119,9 @@ async function retrySync(row: {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const __guard = await requireAdminOrService(req);
+  if (__guard instanceof Response) return __guard;
+
 
   const body = await req.json().catch(() => ({} as Record<string, unknown>));
   const action = typeof body.action === "string" ? body.action : null;
