@@ -9,7 +9,7 @@ export default function FormulesPubliquesPage() {
     <div className="mx-auto max-w-7xl">
       <img src={offresHero} alt="Les offres EbookStudio" width={1600} height={560} className="w-full h-48 md:h-64 object-cover rounded-2xl mb-6" />
       <h1 className="text-center text-4xl font-bold">Les offres EbookStudio</h1>
-      <V3PricingOverview />
+      <V3PricingOverview detailsHref="/v3-premium#studios" />
     </div>
   </main>;
 }
