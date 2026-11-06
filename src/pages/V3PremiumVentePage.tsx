@@ -237,10 +237,16 @@ export default function V3PremiumVentePage() {
           <h2 className="text-center text-3xl md:text-4xl font-bold mt-2 mb-8">Le pack de démarrage « Auteur KDP »</h2>
           <div className="grid md:grid-cols-2 gap-5">
             {cadeaux.map((c) => (
-              <div key={c.t} className="rounded-2xl p-6" style={{ background: C.card }}>
+              <div key={c.t} className="rounded-2xl p-6 flex flex-col" style={{ background: C.card }}>
                 <div className="text-3xl">{c.e}</div>
                 <h3 className="mt-2 text-lg font-bold">{c.t}</h3>
                 <p className="mt-1" style={{ color: C.muted }}>{c.d}</p>
+                <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <span className="text-lg line-through" style={{ color: C.muted }}>{c.v}</span>
+                  <span className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide" style={{ background: C.orange, color: '#111827' }}>
+                    Offert avec votre abonnement — 0 € supplémentaire
+                  </span>
+                </div>
                 {c.lien ? (
                   <a href={c.lien} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-sm font-semibold underline" style={{ color: C.teal }}>
                     Réserver mon appel (sur rendez-vous, selon les disponibilités)
