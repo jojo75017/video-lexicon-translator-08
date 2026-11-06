@@ -114,7 +114,7 @@ const SalesFaq: React.FC = () => {
                 Accès Pro - 67€ à vie
                 <ArrowRight className="w-5 h-5 ml-2" />
               </Button>
-              <a href="https://calendly.com/boubetgeorges/nouvelle-reunion" target="_blank" rel="noopener noreferrer">
+              <a href="https://calendly.com/pro-georgesboubet/30min" target="_blank" rel="noopener noreferrer">
                 <Button variant="outline" size="lg" className="gap-2 border-border text-foreground hover:text-foreground hover:border-primary/30 hover:bg-muted/50">
                   <MessageCircle className="w-4 h-4" />
                   Réserver un Zoom gratuit

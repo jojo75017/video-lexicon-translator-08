@@ -212,7 +212,7 @@ export default function ContactSupportPage({ subscriberEmail }: Props) {
                 Préférez un échange en visio ? Réservez un créneau gratuit avec moi (Georges).
               </p>
               <a
-                href="https://calendly.com/boubetgeorges/nouvelle-reunion"
+                href="https://calendly.com/pro-georgesboubet/30min"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-[#008296] font-semibold px-4 py-2 rounded-full text-sm hover:bg-[#FF9E2D] hover:text-white transition w-full justify-center"

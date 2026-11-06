@@ -76,7 +76,7 @@ const FormationVideosPage = () => {
               Réservez un Zoom gratuit pour une démonstration personnalisée.
             </p>
             <div className="flex gap-3 justify-center flex-wrap">
-              <Button onClick={() => window.open('https://calendly.com/boubetgeorges/nouvelle-reunion', '_blank')} className="gap-2">
+              <Button onClick={() => window.open('https://calendly.com/pro-georgesboubet/30min', '_blank')} className="gap-2">
                 <Play className="h-4 w-4" />
                 Réserver un Zoom
               </Button>

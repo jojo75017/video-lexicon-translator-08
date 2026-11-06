@@ -64,7 +64,7 @@ const RUBRIQUE_IMAGES: Record<string, string> = {
   'Écrire et corriger': rubEcrire, 'Habiller': rubHabiller, 'Publier et vendre': rubPublier,
 };
 
-const BOOKING_URL = 'https://calendly.com/boubetgeorges/nouvelle-reunion';
+const BOOKING_URL = 'https://calendly.com/pro-georgesboubet/30min';
 
 export default function V3TutorielsPage() {
   const [open, setOpen] = useState<TutorielV3 | null>(null);

@@ -1,7 +1,7 @@
 import { CalendarDays, CheckCircle2, Video } from 'lucide-react';
 import { trackZoomBooking } from '@/utils/analytics';
 
-const BOOKING_URL = 'https://calendly.com/boubetgeorges/nouvelle-reunion';
+const BOOKING_URL = 'https://calendly.com/pro-georgesboubet/30min';
 
 const HELP_POINTS = [
   'Débloquer une étape de votre livre',
