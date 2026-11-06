@@ -477,7 +477,7 @@ export default function V3GenieDialog({ initialIdea = '', onReady, mode = 'book'
       )}
 
       {/* La fiche du livre et les autres voies : repliées, elles servent à l'étape 2. */}
-      <details className="mt-4 rounded-2xl border p-3" style={{ borderColor: 'rgba(94,234,212,0.35)', background: '#151d2c' }}>
+      <details className="v3-genie-more mt-4 rounded-2xl border p-3" style={{ borderColor: 'rgba(94,234,212,0.35)', background: '#151d2c' }}>
         <summary className="cursor-pointer text-[13px] font-semibold" style={{ color: '#E6F4F1' }}>
           La fiche de mon livre et les autres façons de commencer
         </summary>
