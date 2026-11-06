@@ -26,8 +26,8 @@ export default function V3Header({ isAuthed }: { isAuthed?: boolean; isAdmin?: b
 
   return (
     <header data-v3-nav="" className="relative overflow-hidden" style={{ background: '#080B11', borderBottom: '1px solid rgba(246,189,42,.35)' }}>
-      <img src={banner} alt="" width={1920} height={640} className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 0.9 }} />
-      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(8,11,17,.25) 0%, rgba(8,11,17,.55) 70%, rgba(8,11,17,.9) 100%)' }} />
+      <img src={banner} alt="" width={1920} height={640} className="absolute inset-0 h-full w-full object-cover" style={{ opacity: 1, filter: 'brightness(1.18) saturate(1.25) contrast(1.05)' }} />
+      <div className="absolute inset-0" style={{ background: 'linear-gradient(180deg, rgba(8,11,17,.05) 0%, rgba(8,11,17,.3) 65%, rgba(8,11,17,.75) 100%)' }} />
       <div className="relative mx-auto flex max-w-5xl flex-col items-center px-4 pb-10 pt-20 text-center md:pb-12 md:pt-24">
         <p className="text-[11px] font-bold uppercase tracking-[0.35em]" style={{ color: '#F6BD2A' }}>Votre maison d'édition IA</p>
         <h1 className="mt-3 font-serif text-4xl md:text-6xl" style={{ fontFamily: '"Cormorant Garamond", serif', color: '#F3EDE6', textShadow: '0 2px 18px rgba(0,0,0,.7)' }}>
