@@ -78,29 +78,36 @@ const studios: Studio[] = [
   },
 ];
 
+// Valeurs habituelles validées par Georges (06/11/2026) : 67 + 47 + 97 + 27 = 238 €
 const cadeaux = [
   {
     e: '🎓',
     t: "L'Académie : 25 tutoriels pas-à-pas",
     d: "Créer son premier livre, réussir ses couvertures et préparer sa publication Amazon, sans jargon. Disponibles à tout moment dans votre espace, dès la connexion.",
+    v: '67 €',
   },
   {
     e: '🧰',
     t: 'La boîte à outils Amazon KDP',
     d: "Analyse des catégories, recherche de mots-clés et audit avant publication. Ces outils font partie de votre formule : vous les retrouvez dans votre espace, sans rien installer.",
+    v: '47 €',
   },
   {
     e: '📞',
     t: 'Un appel de 30 min avec Georges',
     d: "Pour faire le point sur votre premier projet et lever vos blocages. Sur rendez-vous, selon les disponibilités : la réservation se fait en ligne depuis votre espace.",
     lien: CALENDLY_URL,
+    v: '97 €',
   },
   {
     e: '📚',
     t: "La banque d'idées et les 17 genres prêts",
     d: "Des idées de livres et des parcours guidés pour démarrer dès le premier jour, directement dans l'atelier d'écriture de votre espace.",
+    v: '27 €',
   },
 ];
+
+const VALEUR_TOTALE_PACK = '238 €';
 
 const faq = [
   ["Amazon accepte-t-il les livres écrits avec l'IA ?", "Amazon autorise les contenus créés avec l'aide de l'IA, à condition de le déclarer lors de la publication dans votre compte KDP — une simple case à cocher. La décision finale d'acceptation appartient toujours à Amazon, comme pour n'importe quel livre. C'est pour cela qu'EbookStudio vous laisse la main à chaque étape : vous relisez, ajustez et validez vos textes et vos couvertures avant de les envoyer. Un livre soigné, relu et conforme aux règles KDP a toutes ses chances ; un contenu brut publié sans relecture, lui, peut être refusé."],
@@ -223,7 +230,7 @@ export default function V3PremiumVentePage() {
         </div>
       </section>
 
-      {/* Ressources incluses (ex-cadeaux, sans valorisation barrée) */}
+      {/* Cadeaux inclus : titre, utilité, valeur barrée, mention OFFERT et total du pack */}
       <section className="px-4 py-14 mx-auto max-w-5xl">
         <div className="rounded-3xl p-8 md:p-12" style={{ background: 'linear-gradient(135deg,#1f1a0b,#131c2e)', border: `2px solid ${C.orange}` }}>
           <p className="text-center font-bold uppercase tracking-widest" style={{ color: C.orange }}>🎁 Inclus dans votre espace</p>
