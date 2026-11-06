@@ -206,7 +206,7 @@ export default function V3OutlinePanel({ brief, onChange, initialMode }: Props) 
         onChange({ outline: normalizeOutline(chapters), chapters: chapters.length, outlineValidated: false });
 
         toast.success(`Sommaire généré (${chapters.length} chapitres) — relisez puis validez-le.`, {
-          description: 'Astuce : branchez votre clé Gemini gratuite pour générer plus vite et sans limite.',
+          description: 'Branchez maintenant votre clé Gemini gratuite dans « Clés API » : sans clé, la rédaction des chapitres ne démarre pas.',
         });
       } catch (e: any) {
         console.error('[Sommaire] génération serveur impossible', e);
