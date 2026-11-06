@@ -7,6 +7,8 @@ import {
 } from "@/data/v2LegacyAccess";
 import { BackButton } from "@/components/v3/BackButton";
 import useV3Entitlement from "@/hooks/useV3Entitlement";
+import { V2_LEGACY_DISCOUNT, legacyPrice, V3_MONTHLY_OFFERS } from "@/data/v3Pricing";
+import fideliteHero from "@/assets/migration-fidelite-hero.jpg";
 
 export default function V3MigrationPage() {
   const { loading, hasV2 } = useV3Entitlement();
@@ -21,14 +23,14 @@ export default function V3MigrationPage() {
   if (!hasV2) {
     return (
       <div className="v3-plans-dark py-10 md:py-16 grid place-items-center px-4" style={{ background: "#0b1120" }}>
-        <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #2a3448" }}>
+        <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ background: "#1c2638", border: "1px solid #2a3448" }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Tarif fidélité -20 % à vie
           </p>
           <h1 className="text-2xl font-serif mb-3" style={{ color: "#f5f5f5" }}>
             Connectez-vous pour voir votre tarif fidélité
           </h1>
-          <p className="text-sm mb-6" style={{ color: "#4b5563" }}>
+          <p className="text-sm mb-6" style={{ color: "#c4cad6" }}>
             Utilisez l'adresse email de votre abonnement EbookStudio : votre remise
             d'ancien abonné est reconnue automatiquement.
           </p>
@@ -51,6 +53,13 @@ export default function V3MigrationPage() {
     <div className="v3-plans-dark min-h-screen py-12 px-4" style={{ background: "#0b1120" }}>
       <div className="max-w-5xl mx-auto">
         <BackButton className="mb-4" />
+        <img
+          src={fideliteHero}
+          alt="Cadeau fidélité devant une bibliothèque"
+          width={1600}
+          height={640}
+          className="w-full h-48 md:h-64 object-cover rounded-2xl mb-8"
+        />
 
         <header className="text-center mb-10">
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
@@ -59,7 +68,7 @@ export default function V3MigrationPage() {
           <h1 className="text-4xl md:text-5xl font-serif mb-4" style={{ color: "#f5f5f5" }}>
             Bienvenue dans la V3 — avec votre tarif fidélité
           </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#4b5563" }}>
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#c4cad6" }}>
             Vos livres et vos projets restent avec vous, et votre espace V2 reste accessible
             jusqu'au 31 décembre 2026. Des modules V3 vous sont offerts, vos droits et avantages fidélité déjà acquis sont conservés.
           </p>
@@ -67,7 +76,7 @@ export default function V3MigrationPage() {
 
         {/* 5 modules offerts */}
         <section
-          className="rounded-2xl bg-white p-8 mb-10"
+          className="rounded-2xl p-8 mb-10 bg-[#111a2b]"
           style={{ border: "1px solid #2a3448", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}
         >
           <div className="flex items-center gap-3 mb-6">
@@ -129,6 +138,57 @@ export default function V3MigrationPage() {
               </ul>
             </div>
           </div>
+        </section>
+
+        <section className="mb-10" aria-labelledby="fidelite-title">
+          <p className="text-xs font-bold uppercase tracking-[0.3em] mb-2 text-center" style={{ color: "#FF9E2D" }}>
+            Votre remise fidélité : -{Math.round(V2_LEGACY_DISCOUNT * 100)} % à vie
+          </p>
+          <h2 id="fidelite-title" className="text-3xl font-serif text-center mb-2" style={{ color: "#f5f5f5" }}>
+            Ce que chaque formule vous apporte en plus
+          </h2>
+          <p className="text-sm text-center mb-6" style={{ color: "#c4cad6" }}>
+            Vous gardez tout ce qui est ci-dessus. Chaque formule ajoute ses outils, et inclut ceux des formules précédentes.
+          </p>
+          <div className="grid gap-5 md:grid-cols-3">
+            {V3_MONTHLY_OFFERS.map((p) => {
+              const Icon = p.id === "vip" ? Crown : p.id === "auteur" ? Feather : Gift;
+              const highlight = p.id === "auteur";
+              return (
+                <article
+                  key={p.id}
+                  className="flex flex-col rounded-2xl p-6"
+                  style={{ background: "#1c2638", border: highlight ? "2px solid #008296" : "1px solid #2a3448" }}
+                >
+                  <Icon size={22} style={{ color: "#2dd4bf" }} />
+                  <h3 className="mt-3 text-xl font-semibold" style={{ color: "#f5f5f5" }}>{p.name}</h3>
+                  <p className="mt-3 text-sm line-through" style={{ color: "#8b93a7" }}>{p.price} €/mois</p>
+                  <p className="text-3xl font-bold" style={{ color: "#FF9E2D" }}>
+                    {legacyPrice(p.price).toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €
+                    <span className="text-base font-medium" style={{ color: "#c4cad6" }}> /mois</span>
+                  </p>
+                  <ul className="my-5 flex-1 space-y-2">
+                    {p.features.map((f) => (
+                      <li key={f} className="flex gap-2 text-sm" style={{ color: "#e5e7eb" }}>
+                        <Check size={15} className="mt-0.5 shrink-0" style={{ color: "#2dd4bf" }} />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to="/contact-support?sujet=remise-fidelite"
+                    className="block rounded-lg py-3 text-center font-semibold"
+                    style={{ background: "#008296", color: "#fff" }}
+                  >
+                    Demander mon tarif fidélité
+                  </Link>
+                </article>
+              );
+            })}
+          </div>
+          <p className="mt-4 text-center text-xs" style={{ color: "#8b93a7" }}>
+            La remise est vérifiée avec l'adresse email de votre achat V2, puis appliquée à votre abonnement.
+          </p>
         </section>
 
         <section className="border-t py-8 text-center">

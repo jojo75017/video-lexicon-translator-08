@@ -120,7 +120,6 @@ import seriesAudioHero from './assets/series-audio-hero.jpg';
 import formationAudioHero from './assets/formation-audio-hero.jpg';
 import kdpHero from './assets/kdp-hero.jpg';
 import mesLivresHero from './assets/mes-livres-hero.jpg';
-import ancienClientHero from './assets/ancien-client-hero.jpg';
 import calendrierHero from './assets/calendrier-hero.jpg';
 const KdpHero = () => <PageHeroImage src={kdpHero} alt="Outils Amazon KDP" />;
 const PausedPage = ({ src, title, text }: { src: string; title: string; text: string }) => (
@@ -900,7 +899,7 @@ const App = () => {
               <Route path="plans" element={<V3PlansPage />} />
               <Route path="upsells" element={<V3UpsellsPage />} />
               {/* Onglet ancien client V2 : visible sans attendre l'ouverture publique */}
-              <Route path="migration" element={<><PageHeroImage src={ancienClientHero} alt="Ancien client" /><V3MigrationPage /></>} />
+              <Route path="migration" element={<V3MigrationPage />} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />

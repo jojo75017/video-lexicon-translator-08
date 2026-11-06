@@ -143,7 +143,17 @@ Deno.serve(async (req) => {
     // Un prix `_legacy` n'est accepté que si le droit ancien client V2 est
     // confirmé côté base : le front ne peut pas s'octroyer la remise.
     if (String(priceId).endsWith("_legacy")) {
-      const ok = await isLegacyV2Buyer(email, userId);
+      // La remise n'est vérifiée que pour la personne connectée, jamais pour
+      // un email saisi : impossible d'utiliser l'achat V2 de quelqu'un d'autre.
+      const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+      const authClient = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_ANON_KEY")!);
+      const { data: auth } = token ? await authClient.auth.getUser(token) : { data: { user: null } };
+      const caller = auth?.user;
+      if (!caller?.email) throw new Error("Connectez-vous pour bénéficier du tarif ancien client V2");
+      if (email && String(email).toLowerCase() !== caller.email.toLowerCase()) {
+        throw new Error("Le tarif ancien client V2 s'applique uniquement à votre propre compte");
+      }
+      const ok = await isLegacyV2Buyer(caller.email, caller.id);
       if (!ok) throw new Error("Tarif ancien client V2 non applicable à ce compte");
     }
 
