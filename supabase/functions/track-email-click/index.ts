@@ -1,3 +1,4 @@
+import { isSafeRedirect } from "../_shared/safeRedirect.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.78.0";
 import { CHECKOUT_URL } from "../_shared/checkoutUrl.ts";
 
@@ -72,7 +73,7 @@ Deno.serve(async (req) => {
   return new Response(null, {
     status: 302,
     headers: {
-      Location: target,
+      Location: (isSafeRedirect(target) || /^https:\/\/([a-z0-9-]+\.)*(amazon\.[a-z.]+|systeme\.io|trafic-affiliation\.com)(\/|$)/i.test(target)) ? target : "https://ebookstudio.fr",
       "Cache-Control": "no-store, no-cache, must-revalidate, max-age=0",
     },
   });
