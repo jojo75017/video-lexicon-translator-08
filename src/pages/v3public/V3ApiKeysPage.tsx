@@ -24,8 +24,8 @@ export default function V3ApiKeysPage() {
           Paramétrage des clés
         </h1>
         <p className="mt-2 max-w-2xl text-[14.5px]" style={{ color: 'var(--v3-muted)' }}>
-          Une seule clé suffit : Gemini fait tourner l'écriture, la correction et l'humaniseur.
-          OpenAI et OpenRouter sont facultatifs. Sans clé, le moteur intégré prend le relais.
+          Une seule clé suffit pour démarrer : Gemini fait tourner l'écriture, la correction et l'humaniseur.
+          OpenAI et OpenRouter sont facultatifs selon les ateliers. Sans clé enregistrée, la rédaction ne démarre pas.
         </p>
         <p
           className="mt-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold"
