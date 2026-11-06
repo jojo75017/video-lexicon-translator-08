@@ -30,7 +30,7 @@ const downloadCSV = (filename: string, rows: any[]) => {
     ...rows.map((r) => headers.map((h) => {
       const v = r[h];
       if (v == null) return '';
-      const s = String(v).replace(/"/g, '""');
+      const s = String(v).replace(/^([=+\-@\t\r])/, "'$1").replace(/"/g, '""');
       return /[",\n]/.test(s) ? `"${s}"` : s;
     }).join(',')),
   ].join('\n');
