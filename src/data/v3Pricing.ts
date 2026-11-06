@@ -400,7 +400,7 @@ export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
       "Rédaction chapitre par chapitre avec les robots",
       "Mise en page et exports PDF, Word (DOCX) et EPUB",
       "Outils KDP de base : description, mots-clés, catégories",
-      "Possibilité d'utiliser votre propre clé IA compatible. Les éventuels frais du fournisseur sont distincts de l'abonnement EbookStudio.",
+      "Vos propres clés IA (Gemini, OpenAI ou OpenRouter) à connecter une fois — les éventuels frais du fournisseur sont distincts de l'abonnement EbookStudio.",
     ],
   },
   {
