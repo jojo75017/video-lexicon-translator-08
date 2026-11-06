@@ -171,7 +171,7 @@ async function grantAddonEntitlement(session: any, plan: string, env: StripeEnv)
     stripe_session_id: session.id,
   });
   if (error) console.error("Addon entitlement insert failed:", error);
-  else console.log("Granted addon module", module, "to", email);
+  else console.log("Granted addon module", module, "to", "***");
 }
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
@@ -206,7 +206,7 @@ async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
         stripe_session_id: session.id,
       });
       if (error) console.error("Upsell entitlement insert failed:", error);
-      else console.log("Granted upsell module", module, "to", email);
+      else console.log("Granted upsell module", module, "to", "***");
     }
   }
 }
@@ -402,7 +402,7 @@ async function handleV3SubscriptionReferral(session: any) {
       converted_at: new Date().toISOString(),
     });
   }
-  console.log("Subscription referral commission recorded:", email, commission);
+  console.log("Subscription referral commission recorded:", email: "***", commission);
 }
 
 async function handleV3CheckoutCompleted(session: any, env: StripeEnv) {
@@ -626,7 +626,7 @@ Deno.serve(async (req) => {
               stripe_session_id: session.id,
             });
             if (error) console.error("BookPerfect entitlement insert failed:", error);
-            else console.log("Granted BookPerfect entitlement to:", email);
+            else console.log("Granted BookPerfect entitlement to:", "***");
           }
           break;
         }

@@ -89,7 +89,7 @@ serve(async (req) => {
     });
 
     if (signInData?.session) {
-      console.log('Subscriber signed in:', normalizedEmail);
+      console.log('Subscriber signed in:', "***");
       return new Response(
         JSON.stringify({
           success: true,
@@ -101,7 +101,7 @@ serve(async (req) => {
     }
 
     // User doesn't exist yet — create via admin API (auto-confirms email)
-    console.log('Creating auth user for subscriber:', normalizedEmail);
+    console.log('Creating auth user for subscriber:', "***");
     const { data: newUser, error: createError } = await adminClient.auth.admin.createUser({
       email: normalizedEmail,
       password,
@@ -111,7 +111,7 @@ serve(async (req) => {
     if (createError) {
       // L'utilisateur existe déjà (abonnés V2 créés avant, ou code d'accès modifié).
       // On retrouve son id puis on réaligne son mot de passe déterministe.
-      console.log('Auth user already exists, realigning password:', normalizedEmail);
+      console.log('Auth user already exists, realigning password:', "***");
 
       let existingUserId: string | null =
         typeof subscriber.user_id === 'string' ? subscriber.user_id : null;
@@ -169,7 +169,7 @@ serve(async (req) => {
 
         console.error('Retry sign-in failed:', retryError);
       } else {
-        console.error('No auth user found for subscriber:', normalizedEmail);
+        console.error('No auth user found for subscriber:', "***");
       }
 
 

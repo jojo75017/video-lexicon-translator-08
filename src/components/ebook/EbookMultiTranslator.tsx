@@ -1,3 +1,4 @@
+import { getAccessToken } from "@/lib/getAccessToken";
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -89,7 +90,7 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          'Authorization': `Bearer ${await getAccessToken()}`,
         },
         body: JSON.stringify({
           text,

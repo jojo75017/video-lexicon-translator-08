@@ -68,7 +68,7 @@ Deno.serve(async (req) => {
 
     // Check rate limit
     if (!checkRateLimit(normalizedEmail)) {
-      console.log('Rate limit exceeded for:', normalizedEmail);
+      console.log('Rate limit exceeded for:', "***");
       return new Response(
         JSON.stringify({ 
           error: 'Trop de tentatives. Veuillez réessayer dans une heure.',
@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       .single();
 
     if (dbError || !subscriber) {
-      console.log('Subscriber not found:', normalizedEmail);
+      console.log('Subscriber not found:', "***");
       // Don't reveal if email exists or not for security
       return new Response(
         JSON.stringify({ 
@@ -102,7 +102,7 @@ Deno.serve(async (req) => {
     }
 
     if (subscriber.status !== 'active') {
-      console.log('Inactive subscriber:', normalizedEmail);
+      console.log('Inactive subscriber:', "***");
       return new Response(
         JSON.stringify({ 
           error: 'Votre abonnement n\'est pas actif. Contactez le support.'
@@ -193,7 +193,7 @@ Deno.serve(async (req) => {
         `,
       });
 
-      console.log('Email sent successfully to:', normalizedEmail, emailResponse);
+      console.log('Email sent successfully to:', normalizedEmail: "***", emailResponse);
 
       return new Response(
         JSON.stringify({ 

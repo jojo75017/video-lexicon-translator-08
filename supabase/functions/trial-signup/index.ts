@@ -121,7 +121,7 @@ serve(async (req) => {
         
         if (!existing.access_code) {
           await supabase.from("subscribers").update({ access_code: accessCode }).eq("id", existing.id);
-          console.log("Restored missing access code for existing subscriber:", email);
+          console.log("Restored missing access code for existing subscriber:", "***");
         }
       } else {
         // Un seul essai gratuit autorisé par email : ne pas réactiver un essai déjà utilisé

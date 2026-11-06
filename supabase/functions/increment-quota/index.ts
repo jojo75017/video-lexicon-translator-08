@@ -43,7 +43,7 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    console.log('Increment quota request:', { email, action, count });
+    console.log('Increment quota request:', { email: "***", action, count });
 
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -101,7 +101,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Quota incremented:', { email, action, field, newValue });
+    console.log('Quota incremented:', { email: "***", action, field, newValue });
     return new Response(
       JSON.stringify({ 
         success: true,

@@ -1,3 +1,4 @@
+import { requireAdmin } from "../_shared/authGuard.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
 import { Resend } from 'npm:resend@2.0.0';
 import { EMAIL_SENDING_ENABLED, emailSendingBlockedResult } from '../_shared/emailSendingGuard.ts';
@@ -39,7 +40,10 @@ function buildHtml(email: string, code: string, activateUrl: string) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders }
+  const __guard = await requireAdmin(req);
+  if (__guard instanceof Response) return __guard;
+);
   }
 
   try {
@@ -96,7 +100,7 @@ Deno.serve(async (req) => {
       html: buildHtml(email, code, activateUrl),
     });
 
-    console.log('Beta code email sent to', email, res);
+    console.log('Beta code email sent to', email: "***", res);
 
     // Record the recipient so the admin can track sent invitations
     await admin

@@ -150,7 +150,7 @@ serve(async (req) => {
     // Le code est envoyé par e-mail, jamais renvoyé dans la réponse
     await sendTrialEmail(normalizedEmail, accessCode, trialEndsAt);
 
-    console.log('Trial started for:', normalizedEmail);
+    console.log('Trial started for:', "***");
 
     return new Response(
       JSON.stringify({

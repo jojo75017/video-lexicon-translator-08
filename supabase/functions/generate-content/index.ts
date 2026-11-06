@@ -1,3 +1,4 @@
+import { requireUser } from "../_shared/authGuard.ts";
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -94,13 +95,16 @@ function cleanJsonResponse(text: string): string {
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders }
+  const __guard = await requireUser(req);
+  if (__guard instanceof Response) return __guard;
+);
   }
 
   try {
     const body = await req.json();
     const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens, userApiKey, temperature } = body;
-    console.log('Content generation request:', { email, actionType, type, hasUserKey: !!userApiKey });
+    console.log('Content generation request:', { email: "***", actionType, type, hasUserKey: !!userApiKey });
 
     // ====== FLOATING AI EDIT ======
     if (type === 'floating-ai-edit') {

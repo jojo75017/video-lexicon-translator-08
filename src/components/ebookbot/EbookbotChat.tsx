@@ -1,3 +1,4 @@
+import { getAccessToken } from "@/lib/getAccessToken";
 import { useState, useRef, useEffect, KeyboardEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Send, Sparkles, Loader2, RotateCcw } from 'lucide-react';
@@ -55,7 +56,7 @@ const EbookbotChat = ({ variant = 'page', className }: EbookbotChatProps) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${await getAccessToken()}`,
         },
         body: JSON.stringify({ messages: newHistory, geminiApiKey }),
         signal: controller.signal,

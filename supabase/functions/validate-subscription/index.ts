@@ -19,7 +19,7 @@ serve(async (req) => {
     const normalizedEmail = email?.trim().toLowerCase();
     const normalizedCode = access_code?.trim().toUpperCase();
     
-    console.log('Validating subscription for:', normalizedEmail);
+    console.log('Validating subscription for:', "***");
     console.log('Access code provided:', normalizedCode ? 'yes' : 'no');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -56,14 +56,14 @@ serve(async (req) => {
       .single();
 
     if (error || !subscriber) {
-      console.log('Subscriber not found for email:', normalizedEmail);
+      console.log('Subscriber not found for email:', "***");
       return new Response(
         JSON.stringify({ valid: false, message: 'Aucun abonnement trouvé pour cet email' }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    console.log('Found subscriber for', normalizedEmail);
+    console.log('Found subscriber for', "***");
 
     // Compare access codes (case-insensitive) — sauf si la session a déjà été vérifiée
     const storedCode = subscriber.access_code?.trim().toUpperCase();
@@ -75,7 +75,7 @@ serve(async (req) => {
       );
     }
     if (!sessionVerified && storedCode !== normalizedCode) {
-      console.log('Code mismatch for', normalizedEmail);
+      console.log('Code mismatch for', "***");
       await recordFailure(supabase, normalizedEmail, ip);
       return new Response(
         JSON.stringify({ valid: false, message: 'Code d\'accès incorrect' }),
@@ -117,7 +117,7 @@ serve(async (req) => {
       );
     }
 
-    console.log('Subscription valid for:', normalizedEmail);
+    console.log('Subscription valid for:', "***");
     return new Response(
       JSON.stringify({ 
         valid: true, 
