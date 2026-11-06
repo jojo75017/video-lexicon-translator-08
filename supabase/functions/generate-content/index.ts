@@ -100,7 +100,7 @@ serve(async (req) => {
   try {
     const body = await req.json();
     const { email, actionType, prompt, numberOfChapters, ebookTitle, authorName, apiKey, type, content, openaiApiKey, useOpenAI, maxTokens, userApiKey, temperature } = body;
-    console.log('Content generation request:', { email, actionType, type, hasUserKey: !!userApiKey });
+    console.log('Content generation request:', { email: "***", actionType, type, hasUserKey: !!userApiKey });
 
     // ====== FLOATING AI EDIT ======
     if (type === 'floating-ai-edit') {

@@ -166,7 +166,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error(`Email sending failed: ${JSON.stringify(data)}`);
     }
 
-    console.log(`[WELCOME-VIP] Email sent to ${email} with code ${accessCode}`);
+    console.log(`[WELCOME-VIP] Email sent to *** with code ***`);
 
     return new Response(
       JSON.stringify({ success: true, message: 'Email envoyé' }),

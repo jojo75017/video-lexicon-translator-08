@@ -59,7 +59,7 @@ serve(async (req) => {
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    console.log('Quota check request:', { email, action });
+    console.log('Quota check request:', { email: "***", action });
 
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -74,7 +74,7 @@ serve(async (req) => {
       .single();
 
     if (subError || !subscriber) {
-      console.log('No active subscription found for:', email);
+      console.log('No active subscription found for:', "***");
       return new Response(
         JSON.stringify({ 
           error: 'Aucun abonnement actif trouvé',
@@ -154,7 +154,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('Quota check passed:', { email, plan: planType });
+    console.log('Quota check passed:', { email: "***", plan: planType });
     return new Response(
       JSON.stringify({ 
         quotas,

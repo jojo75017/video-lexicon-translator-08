@@ -37,7 +37,7 @@ function checkRateLimit(email: string): boolean {
   }
   
   if (limit.count >= 3) {
-    console.warn(`Rate limit exceeded for ${email}`);
+    console.warn(`Rate limit exceeded for ***`);
     return false;
   }
   
@@ -80,7 +80,7 @@ const handler = async (req: Request): Promise<Response> => {
       );
     }
 
-    console.log(`Sending access code to ${email}`);
+    console.log(`Sending access code to ***`);
 
     const emailResponse = await resend.emails.send({
       from: "EbookStudio <noreply@ebookstudio.fr>",

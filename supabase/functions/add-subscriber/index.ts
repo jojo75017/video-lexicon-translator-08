@@ -177,7 +177,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
       </html>
     `;
 
-    console.log('Sending welcome email to:', email);
+    console.log('Sending welcome email to:', "***");
 
     const emailResponse = await resend.emails.send({
       from: 'EbookStudio <noreply@ebookstudio.fr>',
@@ -186,7 +186,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, planType: str
       html: html,
     });
 
-    console.log('Welcome email sent successfully to:', email, emailResponse);
+    console.log('Welcome email sent successfully to:', email: "***", emailResponse);
     return { success: true };
   } catch (error: any) {
     console.error('Failed to send welcome email:', error);
@@ -236,7 +236,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    console.log('Admin verified:', user.email);
+    console.log('Admin verified:', "***");
 
     // Parse request body
     const { email, plan_type, expires_at } = await req.json();
@@ -318,7 +318,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log("Subscriber updated:", email);
+      console.log("Subscriber updated:", "***");
 
       // Send update email + admin notification
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, false);
@@ -350,7 +350,7 @@ Deno.serve(async (req) => {
         );
       }
 
-      console.log('New subscriber created:', email, 'with tier:', assignedTier);
+      console.log('New subscriber created:', email: "***", 'with tier:', assignedTier);
 
       // Send welcome email + admin notification
       const emailResult = await sendWelcomeEmail(email, accessCode, plan_type, true);

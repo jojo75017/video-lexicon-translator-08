@@ -64,7 +64,7 @@ async function sendWelcomeEmail(email: string, accessCode: string, loginUrl: str
       subject: 'Bienvenue chez EbookStudio Pro V2 — Votre accès est activé',
       html,
     });
-    console.log('Welcome email sent to', email, res);
+    console.log('Welcome email sent to', email: "***", res);
     return true;
   } catch (e) {
     console.error('Failed to send welcome email:', e);

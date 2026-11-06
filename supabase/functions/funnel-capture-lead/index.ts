@@ -287,7 +287,7 @@ serve(async (req) => {
         const res = await pushToSystemeIo(email, first_name, tags, [
           ...(ref_code ? [{ slug: "ref_code", value: ref_code }] : []),
         ]);
-        if (res.ok) console.log("Systeme.io sync ok pour", email);
+        if (res.ok) console.log("Systeme.io sync ok pour", "***");
         else console.warn("Systeme.io sync échouée:", res.detail);
       } catch (e) {
         console.warn("Systeme.io sync exception", (e as Error).message);
