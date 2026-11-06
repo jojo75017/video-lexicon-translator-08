@@ -117,6 +117,8 @@ import parrainageHero from './assets/parrainage-hero.jpg';
 import communauteHero from './assets/communaute-hero.jpg';
 import seriesAudioHero from './assets/series-audio-hero.jpg';
 import formationAudioHero from './assets/formation-audio-hero.jpg';
+import kdpHero from './assets/kdp-hero.jpg';
+const KdpHero = () => <PageHeroImage src={kdpHero} alt="Outils Amazon KDP" />;
 const PausedPage = ({ src, title, text }: { src: string; title: string; text: string }) => (
   <div className="min-h-screen" style={{ background: '#0b1120', color: '#f5f5f5' }}>
     <PageHeroImage src={src} alt={title} />
@@ -859,15 +861,15 @@ const App = () => {
               <Route path="mes-livres" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="livres-corriges" element={<V3LockedGate><V3BookManagerPage /></V3LockedGate>} />
               <Route path="donnees-kdp" element={<V3PaidModuleRoute><V3KdpDataPage /></V3PaidModuleRoute>} />
-              <Route path="kdp-pilot" element={<V3KdpPilotPage />} />
-              <Route path="kdp" element={<V3LockedGate><V3KdpHubPage /></V3LockedGate>} />
-              <Route path="kdp/fiche-audit" element={<V3LockedGate><V3KdpFicheAuditPage /></V3LockedGate>} />
-              <Route path="kdp/lancement" element={<V3LockedGate><V3KdpLancementPage /></V3LockedGate>} />
-              <Route path="kdp/mots-cles" element={<V3LockedGate><V3KdpMotsClesPage /></V3LockedGate>} />
-              <Route path="kdp/publicite" element={<V3LockedGate><V3KdpPublicitePage /></V3LockedGate>} />
-              <Route path="kdp/radar-niches" element={<V3LockedGate><V3KdpRadarNichesPage /></V3LockedGate>} />
-              <Route path="kdp/agents" element={<V3LockedGate><V3KdpAgentsPage /></V3LockedGate>} />
-              <Route path="kdp/bibliotheque" element={<V3LockedGate><V3KdpBibliothequePage /></V3LockedGate>} />
+              <Route path="kdp-pilot" element={<><KdpHero /><V3KdpPilotPage /></>} />
+              <Route path="kdp" element={<V3LockedGate><KdpHero /><V3KdpHubPage /></V3LockedGate>} />
+              <Route path="kdp/fiche-audit" element={<V3LockedGate><KdpHero /><V3KdpFicheAuditPage /></V3LockedGate>} />
+              <Route path="kdp/lancement" element={<V3LockedGate><KdpHero /><V3KdpLancementPage /></V3LockedGate>} />
+              <Route path="kdp/mots-cles" element={<V3LockedGate><KdpHero /><V3KdpMotsClesPage /></V3LockedGate>} />
+              <Route path="kdp/publicite" element={<V3LockedGate><KdpHero /><V3KdpPublicitePage /></V3LockedGate>} />
+              <Route path="kdp/radar-niches" element={<V3LockedGate><KdpHero /><V3KdpRadarNichesPage /></V3LockedGate>} />
+              <Route path="kdp/agents" element={<V3LockedGate><KdpHero /><V3KdpAgentsPage /></V3LockedGate>} />
+              <Route path="kdp/bibliotheque" element={<V3LockedGate><KdpHero /><V3KdpBibliothequePage /></V3LockedGate>} />
               <Route path="parametres" element={<V3LockedGate><V3AuthorSettingsPage /></V3LockedGate>} />
               <Route path="livres/:type" element={<V3LockedGate><TrialGate label="Livres spéciaux"><V3SpecialBookPage /></TrialGate></V3LockedGate>} />
 
