@@ -8,6 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Languages, Globe, Download, RefreshCw, Check, AlertCircle, FileText, BookOpen } from 'lucide-react';
 import Flag from 'react-world-flags';
+import { usePlanTier } from '@/hooks/usePlanTier';
 
 interface Chapter {
   id: string;
@@ -50,7 +51,10 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
   const [isTranslating, setIsTranslating] = useState(false);
   const [globalProgress, setGlobalProgress] = useState(0);
 
-  const availableLanguages = [
+  const { tier } = usePlanTier();
+  // Débutant & Auteur : 10 langues. Édition VIP, admin et clients historiques : 15 langues.
+  const isLimitedTier = tier === 'starter' || tier === 'auteur';
+  const allLanguages = [
     { code: 'fr', name: 'Français', flag: 'FR', market: '🇫🇷🇧🇪🇨🇦 Livre importé dans une autre langue' },
     { code: 'en', name: 'Anglais', flag: 'GB', market: '🇺🇸🇬🇧 Marché #1 mondial' },
     { code: 'es', name: 'Espagnol', flag: 'ES', market: '🇪🇸🇲🇽 500M+ locuteurs' },
@@ -67,6 +71,9 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
     { code: 'vi', name: 'Vietnamien', flag: 'VN', market: '🇻🇳 100M+ locuteurs' },
     { code: 'th', name: 'Thaïlandais', flag: 'TH', market: '🇹🇭 70M+ locuteurs' },
   ];
+
+  const availableLanguages = isLimitedTier ? allLanguages.slice(0, 10) : allLanguages;
+  const lockedLanguages = isLimitedTier ? allLanguages.slice(10) : [];
 
   const toggleLanguage = (code: string) => {
     setSelectedLanguages(prev =>
@@ -363,7 +370,20 @@ const EbookMultiTranslator: React.FC<EbookMultiTranslatorProps> = ({
                 <p className="text-xs text-muted-foreground mt-1">{lang.market}</p>
               </button>
             ))}
+            {lockedLanguages.map((lang) => (
+              <div key={lang.code} className="p-4 rounded-xl border-2 border-dashed border-border opacity-60 text-left" title="Réservé à Édition VIP">
+                <div className="flex items-center gap-3 mb-2">
+                  <Flag code={lang.flag} className="h-6 w-8 rounded shadow-sm" />
+                  <span aria-hidden>🔒</span>
+                </div>
+                <p className="font-medium">{lang.name}</p>
+                <p className="text-xs text-muted-foreground mt-1">Édition VIP (15 langues)</p>
+              </div>
+            ))}
           </div>
+          {isLimitedTier && (
+            <p className="mt-3 text-sm text-muted-foreground">Votre formule inclut 10 langues. Passez à Édition VIP pour débloquer les 15 langues.</p>
+          )}
 
           {/* Global Progress */}
           {isTranslating && (
