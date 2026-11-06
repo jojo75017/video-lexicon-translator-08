@@ -51,7 +51,7 @@ export default function V3PremiumVentePage() {
         <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: C.muted }}>Vos idées et votre style, sans compétence graphique, en respectant les règles KDP. Un seul atelier pour écrire, illustrer, traduire et publier.</p>
         <div className="mt-8"><Btn>Découvrir les formules — dès 19 €/mois</Btn></div>
         <p className="mt-4 text-sm" style={{ color: C.muted }}>Kindle et broché · Sans engagement · Assistance en français · 🎁 4 cadeaux offerts</p>
-        <img src={hero} alt="Livres créés avec EbookStudio" className="mx-auto mt-10 w-full max-w-5xl rounded-2xl shadow-2xl" />
+        <img src={hero} alt="Livres créés avec EbookStudio" className="mx-auto mt-10 w-full max-w-5xl h-64 md:h-96 object-cover rounded-2xl shadow-2xl" />
       </section>
 
       <section className="px-4 py-14 mx-auto max-w-6xl grid md:grid-cols-2 gap-6">
