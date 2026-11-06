@@ -73,7 +73,7 @@ async function convertTrial(row: { id: string; email: string; first_name: string
         .eq("id", row.id);
     }
   } catch (e) {
-    console.error("convertTrial systemeio error", row.email, (e as Error).message);
+    console.error("convertTrial systemeio error", "***", (e as Error).message);
   }
   return tagged;
 }
