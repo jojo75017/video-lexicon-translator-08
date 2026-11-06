@@ -69,7 +69,7 @@ export default function V3PremiumVentePage() {
         </div>
       </section>
 
-      <section className="px-4 py-14 mx-auto max-w-6xl">
+      <section id="studios" className="px-4 py-14 mx-auto max-w-6xl">
         <h2 className="text-center text-3xl md:text-4xl font-bold mb-10">Tout ce qu'il faut, dans un seul atelier</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {studios.map((s) => (
@@ -103,7 +103,7 @@ export default function V3PremiumVentePage() {
       <section id="formules" className="px-4 py-14 mx-auto max-w-7xl">
         <h2 className="text-center text-3xl md:text-4xl font-bold">Choisissez votre formule</h2>
         <p className="text-center mt-2" style={{ color: C.muted }}>Sans engagement · les 4 cadeaux inclus dans chaque formule</p>
-        <V3PricingOverview />
+        <V3PricingOverview detailsHref="#studios" />
       </section>
 
       <section className="px-4 py-14 mx-auto max-w-3xl">

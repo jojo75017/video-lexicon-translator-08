@@ -25,7 +25,7 @@ const MONTHLY_PRICE_IDS = {
   vip: 'v3m_vip_monthly',
 } as const;
 
-export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
+export default function V3PricingOverview({ detailsHref = "/v3/plans" }: { baseAvailable?: boolean; detailsHref?: string }) {
   const [checkout, setCheckout] = useState<{ priceId: string; name: string } | null>(null);
   return (
     <section className="v3-shell py-7" aria-labelledby="v3-offers-title">
@@ -57,7 +57,7 @@ export default function V3PricingOverview(_props: { baseAvailable?: boolean }) {
               <Button onClick={() => setCheckout({ priceId: MONTHLY_PRICE_IDS[p.id], name: `${p.name} — ${p.price} €/mois` })}>
                 S'abonner — {p.price} €/mois <ArrowRight />
               </Button>
-              <Button asChild variant="ghost" className="mt-2"><Link to="/v3/plans">Voir tout ce qui est inclus</Link></Button>
+              <Button asChild variant="ghost" className="mt-2">{detailsHref.startsWith("#") ? <a href={detailsHref}>Voir tout ce qui est inclus</a> : <Link to={detailsHref}>Voir tout ce qui est inclus</Link>}</Button>
             </article>
           );
         })}
