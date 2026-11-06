@@ -118,6 +118,8 @@ import communauteHero from './assets/communaute-hero.jpg';
 import seriesAudioHero from './assets/series-audio-hero.jpg';
 import formationAudioHero from './assets/formation-audio-hero.jpg';
 import kdpHero from './assets/kdp-hero.jpg';
+import ancienClientHero from './assets/ancien-client-hero.jpg';
+import calendrierHero from './assets/calendrier-hero.jpg';
 const KdpHero = () => <PageHeroImage src={kdpHero} alt="Outils Amazon KDP" />;
 const PausedPage = ({ src, title, text }: { src: string; title: string; text: string }) => (
   <div className="min-h-screen" style={{ background: '#0b1120', color: '#f5f5f5' }}>
@@ -817,7 +819,7 @@ const App = () => {
               <Route path="auth" element={<V3AuthPage />} />
               <Route path="bienvenue" element={<V3BienvenuePage />} />
               <Route path="pourquoi" element={<V3PourquoiPage />} />
-              <Route path="calendrier" element={<V3CalendrierPage />} />
+              <Route path="calendrier" element={<><PageHeroImage src={calendrierHero} alt="Calendrier d'ouverture" /><V3CalendrierPage /></>} />
               <Route path="realite-kdp" element={<V3RealiteKdpPage />} />
               <Route path="contact" element={<ContactSupportPage subscriberEmail={subscriberEmail || ''} />} />
               <Route path="offre-couverture-v4" element={<V3CoverOfferPage />} />
@@ -896,7 +898,7 @@ const App = () => {
               <Route path="plans" element={<V3PlansPage />} />
               <Route path="upsells" element={<V3UpsellsPage />} />
               {/* Onglet ancien client V2 : visible sans attendre l'ouverture publique */}
-              <Route path="migration" element={<V3MigrationPage />} />
+              <Route path="migration" element={<><PageHeroImage src={ancienClientHero} alt="Ancien client" /><V3MigrationPage /></>} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />
