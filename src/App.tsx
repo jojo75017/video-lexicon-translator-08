@@ -900,7 +900,7 @@ const App = () => {
               <Route path="plans" element={<V3PlansPage />} />
               <Route path="upsells" element={<V3UpsellsPage />} />
               {/* Onglet ancien client V2 : visible sans attendre l'ouverture publique */}
-              <Route path="migration" element={<><PageHeroImage src={ancienClientHero} alt="Ancien client" /><V3MigrationPage /></>} />
+              <Route path="migration" element={<V3MigrationPage />} />
               <Route path="paypal-retour" element={<V3LockedGate><V3PayPalReturnPage /></V3LockedGate>} />
               <Route path="script-heygen" element={<V3LockedGate><V3ScriptHeygenPage /></V3LockedGate>} />
               <Route path="upsell-17" element={<V3LockedGate><V3Upsell17Page /></V3LockedGate>} />

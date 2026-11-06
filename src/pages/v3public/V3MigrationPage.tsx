@@ -23,7 +23,7 @@ export default function V3MigrationPage() {
   if (!hasV2) {
     return (
       <div className="v3-plans-dark py-10 md:py-16 grid place-items-center px-4" style={{ background: "#0b1120" }}>
-        <div className="max-w-md w-full rounded-2xl bg-white p-8 text-center" style={{ border: "1px solid #2a3448" }}>
+        <div className="max-w-md w-full rounded-2xl p-8 text-center" style={{ border: "1px solid #2a3448" }}>
           <p className="text-xs font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#b45309" }}>
             Tarif fidélité -20 % à vie
           </p>
@@ -76,7 +76,7 @@ export default function V3MigrationPage() {
 
         {/* 5 modules offerts */}
         <section
-          className="rounded-2xl bg-white p-8 mb-10"
+          className="rounded-2xl p-8 mb-10"
           style={{ border: "1px solid #2a3448", boxShadow: "0 4px 12px rgba(0,0,0,0.04)" }}
         >
           <div className="flex items-center gap-3 mb-6">
