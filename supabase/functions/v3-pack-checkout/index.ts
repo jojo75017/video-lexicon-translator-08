@@ -1,3 +1,4 @@
+import { isSafeRedirect } from "../_shared/safeRedirect.ts";
 // V3 Pack Tout Complet — checkout embarqué via la gateway Lovable Payments.
 // Formules : 1×547€ (paiement unique) / 3×189€ / 4×144€ (échéancier mensuel).
 // Les échéances sont gérées via un abonnement Stripe mensuel ; le webhook
@@ -90,7 +91,7 @@ Deno.serve(async (req) => {
     const normalizedPlan = plan === "v2_59_1x" ? "v2_1x" : plan;
     const planDef = PLANS[normalizedPlan];
     if (!planDef) throw new Error("Formule inconnue");
-    if (typeof returnUrl !== "string" || !/^https?:\/\//.test(returnUrl)) {
+    if (!isSafeRedirect(returnUrl)) {
       throw new Error("returnUrl invalide");
     }
 

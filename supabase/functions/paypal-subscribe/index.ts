@@ -1,3 +1,4 @@
+import { isSafeRedirect, safeRedirectOr } from "../_shared/safeRedirect.ts";
 // PayPal Subscription creator — creates a PayPal Product+Plan on demand
 // and starts a subscription for the chosen V3 plan (Plume / Édition / Studio Pro)
 // in monthly or yearly interval. Returns the PayPal approval URL.
@@ -185,8 +186,9 @@ Deno.serve(async (req) => {
       req.headers.get("origin") ||
       (req.headers.get("referer") ? new URL(req.headers.get("referer")!).origin : null) ||
       new URL(req.url).origin;
-    const finalReturn = returnUrl || `${callerOrigin}/v3/paypal-retour`;
-    const finalCancel = cancelUrl || `${callerOrigin}/v3/forfaits?paypal=cancelled`;
+    const __origin = isSafeRedirect(callerOrigin) ? callerOrigin : "https://ebookstudio.fr";
+    const finalReturn = safeRedirectOr(returnUrl, `${__origin}/v3/paypal-retour`);
+    const finalCancel = safeRedirectOr(cancelUrl, `${__origin}/v3/forfaits?paypal=cancelled`);
 
     // Create subscription
     const subRes = await fetch(`${PAYPAL_BASE}/v1/billing/subscriptions`, {

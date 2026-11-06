@@ -1,3 +1,4 @@
+import { isSafeRedirect } from "../_shared/safeRedirect.ts";
 // V3 — Checkout embarqué pour l'achat d'UN pack premium à la carte.
 // Paiement unique (one-time) via la gateway Lovable Payments.
 // Les prix sont définis côté serveur pour éviter toute manipulation client.
@@ -67,7 +68,7 @@ Deno.serve(async (req) => {
     }
     const packDef = PACKS[packId];
     if (!packDef) throw new Error("Pack inconnu");
-    if (typeof returnUrl !== "string" || !/^https?:\/\//.test(returnUrl)) {
+    if (!isSafeRedirect(returnUrl)) {
       throw new Error("returnUrl invalide");
     }
 
