@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import tutorielsHero from '@/assets/tutoriels-hero.jpg';
+import tutorielsHero from '@/assets/tutoriels-hero-v2.jpg';
+import rubDemarrer from '@/assets/tuto-rub-demarrer.jpg';
+import rubEtapes from '@/assets/tuto-rub-etapes.jpg';
+import rubCreer from '@/assets/tuto-rub-creer.jpg';
+import rubEcrire from '@/assets/tuto-rub-ecrire.jpg';
+import rubHabiller from '@/assets/tuto-rub-habiller.jpg';
+import rubPublier from '@/assets/tuto-rub-publier.jpg';
 import { Link } from 'react-router-dom';
 import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, FileText, PlayCircle, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -53,6 +59,11 @@ const KDP_RESOURCES = [
   },
 ] as const;
 
+const RUBRIQUE_IMAGES: Record<string, string> = {
+  'Démarrer': rubDemarrer, 'Les 5 étapes': rubEtapes, 'Créer': rubCreer,
+  'Écrire et corriger': rubEcrire, 'Habiller': rubHabiller, 'Publier et vendre': rubPublier,
+};
+
 const BOOKING_URL = 'https://calendly.com/boubetgeorges/nouvelle-reunion';
 
 export default function V3TutorielsPage() {
@@ -72,7 +83,12 @@ export default function V3TutorielsPage() {
 
       {RUBRIQUES_V3.map((r) => (
         <section key={r} className="mb-8">
-          <h2 className="mb-3 text-xl font-semibold">{r}</h2>
+          <div className="relative mb-4 overflow-hidden rounded-xl">
+            <img src={RUBRIQUE_IMAGES[r]} alt={`Illustration de la rubrique ${r}`} width={1088} height={608} loading="lazy"
+              className="h-32 w-full object-cover md:h-40" />
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(90deg, rgba(8,11,17,0.75), rgba(8,11,17,0.1))' }} />
+            <h2 className="absolute bottom-3 left-4 text-2xl font-bold" style={{ color: '#fff' }}>{r}</h2>
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {TUTORIELS_V3.filter((t) => t.rubrique === r).map((t) => (
               <button key={t.id} type="button" onClick={() => start(t)}
