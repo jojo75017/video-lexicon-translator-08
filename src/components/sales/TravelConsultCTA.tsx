@@ -1,6 +1,6 @@
 import { Check, Video } from "lucide-react";
 
-const CALENDLY_URL = "https://calendly.com/boubetgeorges/nouvelle-reunion";
+const CALENDLY_URL = "https://calendly.com/pro-georgesboubet/30min";
 
 const BENEFITS = [
   "Appel de 30 minutes pour concevoir ensemble votre itinéraire idéal.",
