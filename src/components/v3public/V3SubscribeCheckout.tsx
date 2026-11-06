@@ -39,7 +39,7 @@ export default function V3SubscribeCheckout({
     const { data: { user } } = await supabase.auth.getUser();
     const target =
       returnUrl ??
-      `${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(planName)}`;
+      `${window.location.origin}/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(planName)}`;
     const { data, error } = await supabase.functions.invoke('v3-subscription-checkout', {
       body: {
         priceId,

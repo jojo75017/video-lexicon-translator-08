@@ -179,7 +179,7 @@ export default function V3UpsellPromoCard({
           priceId={priceId}
           planName={title}
           onClose={() => setCheckout(false)}
-          returnUrl={`${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(title)}`}
+          returnUrl={`${window.location.origin}/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(title)}`}
         />
       )}
       {checkout && packForCheckout && (
