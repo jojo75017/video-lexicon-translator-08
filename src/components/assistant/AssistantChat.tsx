@@ -1,3 +1,4 @@
+import { getAccessToken } from "@/lib/getAccessToken";
 import { useState, useRef, useEffect, type KeyboardEvent } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Link } from 'react-router-dom';
@@ -78,7 +79,7 @@ const AssistantChat = ({ variant = 'page', className }: AssistantChatProps) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          Authorization: `Bearer ${await getAccessToken()}`,
         },
         body: JSON.stringify({
           messages: history.map(({ role, content }) => ({ role, content })),
