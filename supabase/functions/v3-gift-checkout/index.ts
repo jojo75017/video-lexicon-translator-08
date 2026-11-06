@@ -25,7 +25,7 @@ function getSupabase() {
 function genCode(): string {
   const part = () =>
     Array.from({ length: 4 }, () =>
-      "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[Math.floor(Math.random() * 32)],
+      "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"[crypto.getRandomValues(new Uint32Array(1))[0] % 32],
     ).join("");
   return `NOEL-${part()}-${part()}`;
 }
