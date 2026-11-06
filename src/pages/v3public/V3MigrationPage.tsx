@@ -180,7 +180,7 @@ export default function V3MigrationPage() {
                     className="block rounded-lg py-3 text-center font-semibold"
                     style={{ background: "#008296", color: "#fff" }}
                   >
-                    Demander mon tarif fidélité
+                    S'abonner au tarif fidélité
                   </Link>
                 </article>
               );
