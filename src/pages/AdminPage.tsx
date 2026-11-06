@@ -352,6 +352,12 @@ export const AdminPage = () => {
             <Button onClick={() => navigate('/v3/create')} size="lg" variant="outline">
               Créer un livre (V3)
             </Button>
+            <Button onClick={() => window.open('/v3-premium', '_blank')} size="lg" variant="outline">
+              Page de vente V3 Premium
+            </Button>
+            <Button onClick={() => { navigator.clipboard.writeText('https://ebookstudio.fr/v3-premium'); toast.success('Lien copié : https://ebookstudio.fr/v3-premium'); }} size="lg" variant="outline">
+              Copier le lien de vente
+            </Button>
             <Button onClick={() => navigate('/v3/livres-corriges')} size="lg" variant="outline">
               <BookOpen className="w-4 h-4 mr-2" />
               Livres corrigés
