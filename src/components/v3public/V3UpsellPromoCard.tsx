@@ -6,6 +6,7 @@ import V3SubscribeCheckout from '@/components/v3public/V3SubscribeCheckout';
 import useModuleAccess from '@/hooks/useModuleAccess';
 import { resolveModuleKey } from '@/data/v3ModuleAccess';
 import { getUpsellFigure, type UpsellFigure } from '@/data/v3UpsellFigures';
+import { stripeThankYouUrl } from '@/lib/paymentReturnUrl';
 import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
 import type { V3UpsellPack, V3PackId } from '@/data/roadmapV3';
 
@@ -179,7 +180,7 @@ export default function V3UpsellPromoCard({
           priceId={priceId}
           planName={title}
           onClose={() => setCheckout(false)}
-          returnUrl={`${window.location.origin}/v3/offres/merci?session_id={CHECKOUT_SESSION_ID}&plan=${encodeURIComponent(title)}`}
+          returnUrl={stripeThankYouUrl(window.location.origin, title)}
         />
       )}
       {checkout && packForCheckout && (

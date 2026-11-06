@@ -85,6 +85,7 @@ const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'));
 const NouvelleOffrePaiementPage = lazy(() => import('./pages/NouvelleOffrePaiementPage'));
 const V3OtoEditionProPage = lazy(() => import('./pages/v3public/V3OtoEditionProPage'));
 const ConfirmationPaiementPage = lazy(() => import('./pages/ConfirmationPaiementPage'));
+const MerciPaiementPage = lazy(() => import('./pages/MerciPaiementPage'));
 const PaiementManuelPage = lazy(() => import('./pages/PaiementManuelPage'));
 const UpsellPage = lazy(() => import('./pages/UpsellPage'));
 const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
@@ -614,6 +615,8 @@ const App = () => {
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
             <Route path="/confirmation-paiement" element={<ConfirmationPaiementPage />} />
+            {/* Retour de Stripe : page « Merci » + activation vérifiée en base. */}
+            <Route path="/merci" element={<MerciPaiementPage />} />
             <Route path="/upsell" element={<UpsellPage />} />
             <Route path="/upsell-paiement" element={<UpsellPaiementPage />} />
             <Route path="/commande-v3" element={<Navigate to="/commander" replace />} />
