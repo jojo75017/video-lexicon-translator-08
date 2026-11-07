@@ -83,8 +83,8 @@ serve(async (req) => {
       .single();
 
     if (existing) {
-      // Already has an active/trialing subscription
-      if (existing.status === 'active' || existing.status === 'trialing') {
+      // Public trial requests cannot reactivate, extend or rewrite any existing customer's rights.
+      {
         // SECURITY: ne jamais renvoyer le code d'accès à un appelant non authentifié
         return new Response(
           JSON.stringify({ 
@@ -92,7 +92,7 @@ serve(async (req) => {
             alreadyExists: true,
             email: existing.email,
             status: existing.status,
-            message: 'Vous avez déjà un accès actif. Votre code d\'accès vous a été envoyé par e-mail.'
+            message: 'Utilisez votre accès habituel ou contactez l’assistance pour votre compte existant.'
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
