@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Audit V3 du 7 novembre : harmoniser les textes confirmés (clés personnelles, tutoriels, langues et KDP) et vérifier les tests.
+- [ ] Audit sécurité du 7 novembre : analyser les 8 alertes d'accès et les dépendances, puis traiter les vulnérabilités confirmées ; analyse approfondie en cours. Aucune publication autorisée.
+
 - [x] Page Clés API V3 : guide illustré détaillé Gemini/OpenAI/OpenRouter et accès avant « Commence ici », vérifications ordinateur/mobile sans paiement ni publication.
 
 - [x] Sécurité : 49 failles graves corrigées (outils payants, emails, admin, accès payants, données)
