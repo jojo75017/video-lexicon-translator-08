@@ -8,7 +8,7 @@ const guarded = [
   'generate-chapter-images', 'agent-category-finder', 'autofill-target-promise',
   'v3-generate-outline', 'agent-kids-kdp-metadata', 'analyze-book-title',
   'generate-cover-prompt', 'generate-aquarium-image', 'book-memory-extract',
-  'generate-ab-variants',
+  'generate-ab-variants', 'amazon-spy', 'puzzle-book-generate',
 ];
 
 function loadHandler(name: string, signedIn = false, client?: unknown) {
@@ -70,13 +70,14 @@ describe('Subscriber BYOK is never replaced by operator keys', () => {
 });
 
 describe('Public signup cannot rewrite existing customer records', () => {
-  for (const name of ['free-trial-signup', 'redeem-beta-code', 'quiz-lead']) {
+  for (const name of ['free-trial-signup', 'redeem-beta-code', 'quiz-lead', 'start-trial']) {
     it(`${name} leaves an existing record untouched and sends nothing`, async () => {
       const update = vi.fn();
       const insert = vi.fn();
       const chain = {
         select: () => chain, eq: () => chain, ilike: () => chain,
         maybeSingle: async () => ({ data: { id: 'existing-account' }, error: null }),
+        single: async () => ({ data: { id: 'existing-account', email: 'customer@example.invalid', status: 'inactive' }, error: null }),
         update, insert,
       };
       const { handler, provider } = loadHandler(name, false, { from: () => chain });

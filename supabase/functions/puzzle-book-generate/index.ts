@@ -3,6 +3,7 @@
 // BYOK Gemini prioritaire (clé abonné), sinon repli sur Lovable AI.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUser } from '../_shared/authGuard.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -103,6 +104,8 @@ Seules exceptions : noms propres réels.`;
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const caller = await requireUser(req);
+  if (caller instanceof Response) return caller;
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "Method not allowed" }), {
       status: 405, headers: { ...corsHeaders, "Content-Type": "application/json" },

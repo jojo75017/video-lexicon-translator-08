@@ -84,7 +84,6 @@ serve(async (req) => {
 
     if (existing) {
       // Public trial requests cannot reactivate, extend or rewrite any existing customer's rights.
-      {
         // SECURITY: ne jamais renvoyer le code d'accès à un appelant non authentifié
         return new Response(
           JSON.stringify({ 
@@ -96,37 +95,6 @@ serve(async (req) => {
           }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
-      }
-
-      // Expired trial or inactive — reactivate trial
-      const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-      const accessCode = existing.access_code || generateAccessCode();
-
-      const { error: updateError } = await supabase
-        .from('subscribers')
-        .update({
-          status: 'trialing',
-          trial_ends_at: trialEndsAt,
-          access_code: accessCode,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existing.id);
-
-      if (updateError) throw updateError;
-
-      // Le code est envoyé par e-mail, jamais renvoyé dans la réponse
-      await sendTrialEmail(normalizedEmail, accessCode, trialEndsAt);
-
-      return new Response(
-        JSON.stringify({
-          ok: true,
-          email: normalizedEmail,
-          trialEndsAt,
-          status: 'trialing',
-          message: 'Votre essai est réactivé. Votre code d\'accès vous a été envoyé par e-mail.'
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
 
     }
 
