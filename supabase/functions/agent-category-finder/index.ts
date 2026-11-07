@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { requireUser } from '../_shared/authGuard.ts';
 
 interface Body {
   title: string;
@@ -63,6 +64,8 @@ Sois précis, chirurgical. Utilise les vrais chemins Amazon existants. Priorise 
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  const caller = await requireUser(req);
+  if (caller instanceof Response) return caller;
   try {
     const key = Deno.env.get('LOVABLE_API_KEY');
     if (!key) return new Response(JSON.stringify({ error: 'LOVABLE_API_KEY missing' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });

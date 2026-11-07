@@ -81,8 +81,8 @@ export default function MerciPaiementPage() {
   return (
     <div className="min-h-screen bg-[#FAFAFA] px-4 py-14">
       <SeoHead
-        title="Merci ! Votre paiement est confirmé"
-        description="Votre accès EbookStudio V3 est en cours d'activation et votre code d'accès arrive par email."
+        title={accessActive ? 'Merci ! Votre accès V3 est actif' : 'Merci — vérification de votre accès V3'}
+        description="Retrouvez les étapes après paiement : confirmation, activation de votre accès et réception du code personnel par email."
         canonical="/merci"
         noindex
       />
@@ -91,7 +91,7 @@ export default function MerciPaiementPage() {
         <div className="text-center space-y-4">
           <CheckCircle2 className="w-16 h-16 text-[#008296] mx-auto" />
           <h1 className="text-3xl md:text-4xl font-bold text-[#232F3E]">
-            Merci, c'est réglé&nbsp;! 🎉
+            {accessActive ? 'Merci, votre accès est actif ! 🎉' : 'Merci, bienvenue sur EbookStudio V3'}
           </h1>
           {planLabel ? (
             <p className="text-lg text-[#232F3E]/80">
@@ -99,8 +99,8 @@ export default function MerciPaiementPage() {
             </p>
           ) : null}
           <p className="text-[#232F3E]/80 max-w-xl mx-auto">
-            Votre code d'accès <strong>EBK-XXXXXX</strong> part par email dans
-            quelques minutes. Vérifiez vos indésirables si vous ne le voyez pas.
+            Après confirmation de votre paiement, votre code d'accès personnel est envoyé par email.
+            Une visite de cette page ne confirme pas un paiement. Vérifiez vos indésirables si vous ne voyez pas le message.
           </p>
         </div>
 
@@ -124,7 +124,7 @@ export default function MerciPaiementPage() {
                 </h2>
                 <p className="text-sm text-[#232F3E]/75">
                   {accessActive
-                    ? 'Ouvrez votre atelier : tout est déjà ouvert dans votre espace.'
+                    ? 'Ouvrez votre atelier : les outils disponibles de votre formule vous attendent.'
                     : loggedIn
                       ? 'Cette vérification se fait toute seule, sans recharger la page. Gardez simplement cet onglet ouvert.'
                       : 'Vous n\'êtes pas connecté ici : ouvrez votre email et utilisez le code reçu pour entrer dans votre espace.'}
@@ -168,12 +168,12 @@ export default function MerciPaiementPage() {
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
           <h2 className="text-lg font-bold text-[#232F3E] flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-[#FF9E2D]" />
-            Ce qui vous attend dès maintenant
+            Les ressources incluses avec votre abonnement actif
           </h2>
           <ul className="text-sm text-[#232F3E]/80 space-y-2 list-disc pl-5">
             <li>Vos livres, vos couvertures et vos traductions dans un seul atelier.</li>
-            <li>Vos guides pas-à-pas et vos 25 tutoriels, accessibles à tout moment.</li>
-            <li>Une session d'aide de 30 minutes offerte avec Georges.</li>
+            <li>Les guides de vos 25 tutoriels ; les vidéos non encore publiées sont annoncées à venir prochainement.</li>
+            <li>Avec votre abonnement actif, un appel de 30 minutes inclus avec Georges, sur réservation et selon les disponibilités.</li>
           </ul>
         </div>
 
@@ -214,7 +214,7 @@ export default function MerciPaiementPage() {
         </div>
 
         <p className="text-center text-xs text-[#232F3E]/60">
-          Vous avez payé sans être connecté&nbsp;? Le code part à l'adresse
+          Vous avez payé sans être connecté&nbsp;? Après confirmation du paiement, le code est envoyé à l'adresse
           indiquée dans Stripe. Écrivez-nous depuis l'assistance si rien
           n'arrive d'ici une heure.
         </p>

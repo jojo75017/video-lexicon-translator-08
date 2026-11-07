@@ -53,8 +53,20 @@ describe("Nouvelles offres 97 € / 197 €", () => {
   });
 });
 
-import { V3_MONTHLY_OFFERS } from "./v3Pricing";
+import { V3_MONTHLY_OFFERS, legacyPrice, V2_ACCESS_UNTIL_ISO } from "./v3Pricing";
 describe("Nouvelle formule mensuelle 19/29/59 €", () => {
+  it('keeps the beginner loyalty price at 15.20 euros', () => {
+    expect(legacyPrice(V3_MONTHLY_OFFERS[0].price)).toBe(15.20);
+  });
+  it('keeps the author loyalty price at 23.20 euros', () => {
+    expect(legacyPrice(V3_MONTHLY_OFFERS[1].price)).toBe(23.20);
+  });
+  it('keeps the VIP loyalty price at 47.20 euros', () => {
+    expect(legacyPrice(V3_MONTHLY_OFFERS[2].price)).toBe(47.20);
+  });
+  it('keeps V2 access until the end of 31 December 2027 Paris time', () => {
+    expect(V2_ACCESS_UNTIL_ISO).toBe('2027-12-31T23:59:59+01:00');
+  });
   it("affiche les trois formules aux prix validés", () => {
     expect(V3_MONTHLY_OFFERS.map((o) => [o.id, o.price])).toEqual([
       ["debutant", 19],

@@ -396,11 +396,11 @@ export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
     coversPerMonth: 10,
     features: [
       "20 livres par mois · 10 couvertures par mois",
-      "Écriture guidée : écrire un livre, raconter un livre ou partir de son sommaire",
+      "Écriture guidée : écrire un livre à partir d'une idée ou de son sommaire",
       "Rédaction chapitre par chapitre avec les robots",
       "Mise en page et exports PDF, Word (DOCX) et EPUB",
       "Outils KDP de base : description, mots-clés, catégories",
-      "Vos propres clés IA (Gemini, OpenAI ou OpenRouter) à connecter une fois — les éventuels frais du fournisseur sont distincts de l'abonnement EbookStudio.",
+      "Vos propres clés Gemini et OpenAI, ainsi qu'OpenRouter selon les ateliers, à renseigner dans votre navigateur. Les éventuels frais des fournisseurs sont distincts de l'abonnement EbookStudio.",
     ],
   },
   {
@@ -427,8 +427,8 @@ export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
     coversPerMonth: 50,
     features: [
       "Tout le plan Auteur",
-      "Livres illimités (extensible avec votre propre clé IA)",
-      "50 couvertures par mois (extensible avec votre propre clé API)",
+      "Livres illimités, sous réserve des limites techniques et de votre fournisseur IA",
+      "50 couvertures par mois ; connecter une clé ne supprime pas ce quota",
       "Studio Couverture Broché KDP : tranche, 4e de couverture, PDF 300 DPI",
       "Studio Album illustré jeunesse",
       "Audiolivres et voix off",

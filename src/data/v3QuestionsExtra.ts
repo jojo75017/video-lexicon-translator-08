@@ -524,7 +524,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-trad-02',
     question: 'Combien de langues sont proposées ?',
     answer:
-      'Dix langues principales sont disponibles, dont l’anglais, l’espagnol, l’allemand et l’italien.',
+      'Le traducteur propose 10 langues avec Débutant et Auteur, et 15 langues avec Édition VIP. Choisissez les langues accessibles à votre formule dans le traducteur, puis relisez chaque version avant publication.',
     theme: 'Traductions & langues',
     action: { label: 'Voir les langues', route: '/v3/traduire' },
   },
@@ -844,7 +844,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-forf-12',
     question: 'Que se passe-t-il si je m’abonne après le lancement ?',
     answer:
-      'Vous accédez immédiatement à tout ce que votre offre comprend, sans attendre une date.',
+      'Après confirmation du paiement et activation de votre compte, vous accédez aux ateliers disponibles inclus dans votre offre. Un module annoncé à venir reste soumis à son calendrier d’ouverture.',
     theme: 'Forfaits & paiement',
     action: { label: 'Choisir mon offre', route: '/v3/forfaits' },
   },
@@ -854,7 +854,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-cle-01',
     question: 'Où enregistrer ma clé IA ?',
     answer:
-      'Dans la page des clés : collez-la, elle est vérifiée puis conservée pour votre compte uniquement.',
+      'Dans la page « Clés API », choisissez le fournisseur et collez votre propre clé. Elle est enregistrée automatiquement dans ce navigateur ; cliquez sur « Tester » pour vérifier la connexion. Sur un autre appareil ou navigateur, renseignez-la à nouveau.',
     theme: 'Clés & moteurs IA',
     action: { label: 'Mes clés', route: '/v3/fonctionnalites/cles' },
   },
@@ -862,7 +862,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-cle-02',
     question: 'Ma clé est-elle visible par quelqu’un d’autre ?',
     answer:
-      'Non, elle reste privée et n’est utilisée que pour vos propres générations.',
+      'La saisie est masquée, mais les clés sont conservées dans votre navigateur : évitez les appareils partagés et protégez votre session. La clé est transmise au fournisseur ou au service de génération concerné lorsque vous utilisez un atelier. Ne la communiquez jamais à l’assistance.',
     theme: 'Clés & moteurs IA',
     action: { label: 'Gérer mes clés', route: '/v3/fonctionnalites/cles' },
   },
@@ -870,7 +870,7 @@ export const EXTRA_CURATED: QuestionEntry[] = [
     id: 'x-cle-03',
     question: 'Comment obtenir une clé Gemini gratuitement ?',
     answer:
-      'Créez un compte sur la plateforme Google AI Studio, générez une clé commençant par AIza, puis collez-la ici.',
+      'Créez votre clé sur votre propre compte Google AI Studio, puis collez-la dans le champ Gemini. Google propose un niveau gratuit pour certains modèles, sous conditions et avec des quotas ; vérifiez les tarifs et la facturation avant utilisation. Une clé n’offre pas une génération gratuite illimitée.',
     theme: 'Clés & moteurs IA',
     action: { label: 'Ajouter ma clé', route: '/v3/fonctionnalites/cles' },
   },

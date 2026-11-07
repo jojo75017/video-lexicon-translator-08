@@ -2,6 +2,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { corsHeaders } from '../_shared/cs-ai.ts';
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { json, jsonError } from '../_shared/cs-ai.ts';
+import { safeFetch } from '../_shared/safeFetch.ts';
 
 interface CoverRequest {
   project_id: string;
@@ -78,7 +79,7 @@ serve(async (req) => {
     if (!imageUrl) return jsonError('Aucune image reçue', 502);
 
     // Télécharge l'image et la stocke dans le bucket contentstudio
-    const imgRes = await fetch(imageUrl);
+    const imgRes = await safeFetch(imageUrl);
     const imgBlob = await imgRes.blob();
     const path = `${user.id}/${body.project_id}/cover-${Date.now()}.png`;
     const { error: uploadError } = await supabase.storage

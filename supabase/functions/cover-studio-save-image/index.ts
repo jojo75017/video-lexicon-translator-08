@@ -6,6 +6,7 @@
 // un projet de couverture appartenant à l'utilisateur.
 
 import { authenticate, corsHeaders, json, scrub, serviceClient } from "../_shared/coverPro.ts";
+import { safeFetch } from '../_shared/safeFetch.ts';
 
 const MAX_BYTES = 15 * 1024 * 1024;
 
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
       bytes = decoded.bytes;
       contentType = decoded.contentType;
     } else if (/^https?:\/\//i.test(imageUrl)) {
-      const res = await fetch(imageUrl);
+      const res = await safeFetch(imageUrl);
       if (!res.ok) throw new Error("L'image n'est plus accessible chez le moteur d'images.");
       contentType = res.headers.get("content-type") || "image/png";
       bytes = new Uint8Array(await res.arrayBuffer());
