@@ -102,11 +102,11 @@ serve(async (req) => {
     // jamais plan_type / status / expires_at ici, pour ne pas écraser un accès
     // annuel ou Starter correctement attribué.
     const packPlan: string = session.metadata?.plan || "";
-    if (/^(starter27_|auteur97_|edition247_)/.test(packPlan)) {
+    if (/^(starter27_|auteur97_|edition247_)/.test(packPlan) || ['v3_subscription', 'v3_full_pack', 'v3_upsell_pack'].includes(session.metadata?.kind || '')) {
       const packLabel = packPlan.startsWith("starter27_")
         ? "EbookStudio Starter — 27 € à vie"
         : packPlan.startsWith("auteur97_")
-          ? "EbookStudio Auteur — 97 €/an"
+          ? "EbookStudio Auteur — 97 € paiement unique"
           : "EbookStudio Édition — 197 € à vie";
 
       const { data: packSubscriber } = await supabase
@@ -145,6 +145,16 @@ serve(async (req) => {
       );
     }
 
+    // Only the recognized historical base checkout may use this compatibility path.
+    // All current packs and monthly rights remain webhook-owned.
+    const legacyItems = String(session.metadata?.items || '').split(',');
+    if (session.mode !== 'payment' || paymentStatus !== 'paid' || session.currency !== 'eur' ||
+        !legacyItems.includes('pro_lifetime') || !['pro', undefined, ''].includes(planId)) {
+      return new Response(JSON.stringify({ ok: false, pending: true, error: 'Votre paiement doit être confirmé par le service de paiement. Consultez votre email ou contactez l’assistance.' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Determine plan type and trial status
     let planType = "pro";
     let expiresAt: string | null = null;
@@ -180,33 +190,16 @@ serve(async (req) => {
 
     if (existingErr) {
       console.error("Error checking subscriber:", existingErr);
+      return new Response(JSON.stringify({ ok: false, error: 'Vérification indisponible.' }), {
+        status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     const accessCode =
       existingSubscriber?.access_code || `EBK-${crypto.randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`;
 
     if (existingSubscriber) {
-      const { error: updateError } = await supabase
-        .from("subscribers")
-        .update({
-          plan_type: planType,
-          status: subscriberStatus,
-          expires_at: expiresAt,
-          trial_ends_at: trialEndsAt,
-          stripe_customer_id: session.customer as string,
-          stripe_subscription_id: (session as any).subscription as string,
-          updated_at: new Date().toISOString(),
-          access_code: accessCode,
-        })
-        .eq("email", email);
-
-      if (updateError) {
-        console.error("Error updating subscriber:", updateError);
-      }
-
-      await sendEmail(email, accessCode, planType, true).catch((e) => {
-        console.error("Email send failed (renewal):", e);
-      });
+      // Visiting a return URL cannot change existing rights or resend codes.
 
       return new Response(
         // Compte existant : le code n'est jamais renvoyé ici, seulement par email au titulaire.
@@ -228,6 +221,9 @@ serve(async (req) => {
 
     if (insertError) {
       console.error("Error creating subscriber:", insertError);
+      return new Response(JSON.stringify({ ok: false, pending: true, error: 'Activation en cours. Consultez votre email.' }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     }
 
     await sendEmail(email, accessCode, planType, false).catch((e) => {

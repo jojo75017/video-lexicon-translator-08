@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { isAdmin } from '../_shared/authGuard.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -136,16 +137,11 @@ Deno.serve(async (req) => {
         return plan.startsWith("full") || plan.includes("documentation");
       });
     } catch { unlocked = false; }
-    // Fallback admin : rôle via has_role (source de vérité), puis app_metadata
+    // Admin privileges come only from the protected roles table.
     if (!unlocked) {
       try {
-        const { data: hasRole } = await supabase.rpc("has_role", { _user_id: user.id, _role: "admin" });
-        if (hasRole === true) unlocked = true;
+        if (await isAdmin(user.id)) unlocked = true;
       } catch { /* ignore */ }
-    }
-    if (!unlocked) {
-      const role = String((user.app_metadata as any)?.role || (user.user_metadata as any)?.role || "").toLowerCase();
-      if (role === "admin") unlocked = true;
     }
 
     // Démo : 1 seul livrable, version courte
