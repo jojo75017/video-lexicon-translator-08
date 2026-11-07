@@ -726,7 +726,7 @@ Réponds UNIQUEMENT avec un tableau JSON valide.`;
                     <Hash className="w-6 h-6 text-emerald-500" />
                     <div>
                       <h3 className="font-bold text-foreground">7 Mots-Clés Backend Amazon KDP</h3>
-                      <p className="text-sm text-muted-foreground">Les 7 mots-clés cachés que seul Amazon voit - optimisés selon les règles KDP</p>
+                      <p className="text-sm text-muted-foreground">Sept champs de mots-clés backend, non affichés comme tels sur la fiche produit publique ; à vérifier avant publication.</p>
                     </div>
                   </div>
                   <Button onClick={generateBackend7} disabled={isGenerating7 || !seedKeyword.trim()}

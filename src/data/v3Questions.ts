@@ -23,7 +23,7 @@ const CURATED: QuestionEntry[] = [
     id: 'q-cle-unique',
     question: 'Faut-il une clé OpenAI et OpenRouter, ou la clé Gemini suffit-elle ?',
     answer:
-      'La clé Gemini seule fait tourner l’écriture, la correction et l’humaniseur. OpenAI et OpenRouter sont facultatifs selon les ateliers. Sans aucune clé enregistrée, la rédaction ne démarre pas : collez vos propres clés dans la page « Clés API ».',
+      'Préparez vos propres clés Gemini et OpenAI ; OpenRouter est utilisé selon les ateliers. Chaque atelier indique le fournisseur nécessaire, et le Studio Pro hybride utilise Gemini et OpenAI pour des rôles distincts. Sans la clé personnelle nécessaire à l’atelier, la rédaction ne démarre pas. Georges ne fournit pas sa clé ; les éventuels frais du fournisseur restent à votre charge.',
     theme: 'Clés & moteurs IA',
     action: { label: 'Paramétrer mes clés', route: '/v3/fonctionnalites/cles' },
   },
@@ -71,7 +71,7 @@ const CURATED: QuestionEntry[] = [
     id: 'q-paypal',
     question: 'Puis-je payer avec PayPal ?',
     answer:
-      'Oui. Le paiement carte et le paiement PayPal sont proposés côte à côte sur la page de commande.',
+      'Utilisez les moyens de paiement réellement affichés par Stripe au moment de votre commande. La disponibilité de PayPal et des autres moyens dépend de la formule, de votre pays et de votre appareil.',
     theme: 'Forfaits & paiement',
     action: { label: 'Voir les offres à vie', route: '/v3/forfaits' },
   },
@@ -79,7 +79,7 @@ const CURATED: QuestionEntry[] = [
     id: 'q-forfaits',
     question: 'Comment fonctionnent les formules mensuelles ?',
     answer:
-      'Trois formules mensuelles sans engagement : Débutant 19 €/mois (20 livres et 10 couvertures), Auteur 29 €/mois (50 livres et 30 couvertures) et Édition VIP 59 €/mois (livres illimités et 50 couvertures, extensible avec votre propre clé IA). Les formules à vie restent valables pour ceux qui les ont déjà prises ; les droits acquis des anciens clients sont conservés.',
+      'Trois formules mensuelles sans engagement : Débutant 19 €/mois (20 livres et 10 couvertures), Auteur 29 €/mois (50 livres et 30 couvertures) et Édition VIP 59 €/mois (livres illimités et 50 couvertures). Vos propres clés IA sont nécessaires aux ateliers concernés ; elles ne suppriment pas les quotas de votre formule. Les droits acquis des anciens clients sont conservés.',
     theme: 'Forfaits & paiement',
     action: { label: 'Voir les formules', route: '/v3/forfaits' },
   },

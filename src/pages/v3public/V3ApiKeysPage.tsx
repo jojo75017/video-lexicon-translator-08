@@ -41,13 +41,13 @@ const guides = [
       ['Copiez et collez la clé', 'Copiez la clé complète. Revenez à « Mes réglages », choisissez OpenRouter dans « Provider » et collez-la dans « Clé API OpenRouter ». N’utilisez pas ce champ pour une clé OpenAI ou Gemini.'],
       ['Choisissez votre modèle et testez', 'Sélectionnez un modèle dans « Modèle OpenRouter », puis cliquez sur « Tester ». Les tarifs et disponibilités diffèrent selon les modèles. La validation de la clé ne garantit pas que chaque modèle soit disponible pour votre compte.'],
     ],
-    note: 'OpenRouter est un fournisseur distinct d’OpenAI et de Google. Il n’est pas nécessaire de créer toutes les clés pour démarrer : ajoutez les fournisseurs utiles aux ateliers que vous souhaitez utiliser.',
+    note: 'OpenRouter est un fournisseur distinct d’OpenAI et de Google. Préparez vos propres clés Gemini et OpenAI pour leurs ateliers respectifs, puis ajoutez OpenRouter lorsque l’atelier le demande. Aucun fournisseur n’est remplacé automatiquement par la clé de Georges.',
   },
 ];
 
 const questions = [
   ['Qu’est-ce qu’une clé API, exactement ?', 'C’est un identifiant secret créé chez votre fournisseur d’IA. Il autorise EbookStudio à lui transmettre votre demande avec votre compte. Ce n’est ni votre code d’accès EBK, ni votre mot de passe, ni une clé fournie par Georges. Votre abonnement donne accès aux ateliers ; votre clé sert à appeler votre fournisseur d’IA.'],
-  ['Dois-je créer les trois clés avant de commencer ?', 'Non. Configurez d’abord votre propre clé Gemini, puis ajoutez OpenAI ou OpenRouter selon les ateliers utilisés. Certains ateliers peuvent demander une clé particulière : suivez leur indication. Vous pouvez conserver plusieurs clés et sélectionner le fournisseur de rédaction dans les réglages.'],
+  ['Dois-je créer les trois clés avant de commencer ?', 'Préparez vos propres clés Gemini et OpenAI : le Studio Pro hybride utilise les deux pour des rôles distincts. Ajoutez OpenRouter pour les ateliers qui l’utilisent. Chaque atelier indique la clé nécessaire ; sans elle, sa génération ne démarre pas. Vous pouvez conserver plusieurs clés dans les réglages, sans utiliser les clés de Georges.'],
   ['Faut-il cliquer sur un bouton Enregistrer ?', 'Pour les clés et le fournisseur de rédaction, non : les changements sont enregistrés automatiquement lorsque vous saisissez la clé ou changez la sélection. « Tester » vérifie la clé auprès du fournisseur, ce n’est pas un bouton d’enregistrement. Revenez sur cette page pour retrouver vos réglages dans le même navigateur.'],
   ['Pourquoi ma clé n’apparaît-elle pas sur mon autre ordinateur ?', 'Les réglages actuels des clés sont conservés dans le navigateur utilisé. Ils ne sont pas automatiquement synchronisés entre vos appareils ou navigateurs. Sur un nouvel appareil, renseignez à nouveau vos propres clés. Effacer les données du site ou utiliser une fenêtre privée peut aussi faire disparaître ces réglages.'],
   ['Le test est accepté mais une génération échoue : pourquoi ?', 'Le test contrôle la connexion et la reconnaissance de la clé. Une génération peut néanmoins rencontrer un quota atteint, un solde insuffisant, un modèle indisponible ou une limite temporaire du fournisseur. Lisez le message de l’atelier, vérifiez votre compte chez le fournisseur et réessayez après avoir corrigé la cause.'],
@@ -73,7 +73,7 @@ export default function V3ApiKeysPage() {
         <img src={guideImage} alt="Bureau d’auteur lumineux avec une clé sur un carnet, pour préparer ses clés IA" width={1536} height={768} className="mb-6 aspect-[2/1] w-full rounded-lg object-cover" />
         <p className="mb-3 flex items-center gap-2 font-semibold text-primary"><KeyRound className="h-5 w-5" /> Première phase : préparer vos clés personnelles</p>
         <h1 className="text-3xl font-bold sm:text-4xl">Clés API : branchez votre IA</h1>
-        <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">Avant « Commence ici », préparez vos propres clés. Ce guide vous accompagne pour créer votre clé Gemini, puis coller vos clés OpenAI ou OpenRouter selon vos ateliers. Sans votre clé personnelle, la rédaction ne démarre pas.</p>
+        <p className="mt-4 max-w-3xl text-base leading-7 text-muted-foreground">Avant « Commence ici », préparez vos propres clés Gemini et OpenAI. Ce guide explique comment les créer et les coller, puis ajouter OpenRouter pour les ateliers concernés. Chaque atelier utilise la clé de son fournisseur : sans la clé personnelle nécessaire, sa rédaction ne démarre pas. Les clés de Georges ne remplacent jamais les vôtres.</p>
       </header>
       <nav aria-label="Sommaire du guide des clés API" className="mb-10 flex flex-wrap gap-2">
         {guides.map(guide => <Button key={guide.id} asChild variant="outline"><a href={`#${guide.id}`}>{guide.id === 'gemini' ? '1. Gemini' : guide.id === 'openai' ? '2. OpenAI' : '3. OpenRouter'}</a></Button>)}

@@ -127,7 +127,7 @@ export default function V3KdpMotsClesPage() {
     try {
       const ctx = nettoyer(contexteDepart ?? contexte);
       const prompt = `Tu es spécialiste du référencement des livres sur Amazon KDP, marché ${paysLabel}.
-Écris en français courant uniquement : jamais de latin, jamais de mot inventé, jamais de mot étranger décoratif.
+Rédige les explications (intention, concurrence, pourquoi, raisons à éviter, conseil) en français courant. Rédige les expressions backend, les pistes de recherche, les titres et sous-titres dans la langue du marché ${paysLabel}, comme les lecteurs de ce marché les recherchent. Pour un marché francophone, tout reste en français. Jamais de latin, de mot inventé ni de mot étranger décoratif : les expressions étrangères ne servent qu’au marché sélectionné.
 N'invente aucun chiffre : pas de volume de recherche, pas de nombre de ventes, pas de pourcentage. Les niveaux de concurrence sont des estimations qualitatives (« faible », « moyenne », « forte ») et doivent être présentés comme telles.
 
 Sujet de départ : ${mot}
@@ -448,7 +448,7 @@ Réponds uniquement avec ce JSON :
                 ))}
               </div>
               <p className="mt-2 text-[12px]" style={{ color: 'var(--v3-muted)' }}>
-                Un mot-clé par champ dans KDP, 50 caractères maximum par champ. Vous pouvez les modifier ici avant de les copier.
+                Une expression pertinente par champ dans KDP, composée de plusieurs mots si nécessaire, dans la limite de 50 caractères. Relisez et modifiez les propositions avant de les copier.
               </p>
             </section>
           )}
