@@ -1,6 +1,7 @@
 // Génère la fiche KDP (description + 7 mots-clés + 3 catégories Amazon)
 // pour un livre jeunesse. Utilise Lovable AI Gateway (aucune clé requise).
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { requireUser } from '../_shared/authGuard.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,6 +12,8 @@ const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") ?? "";
 
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const caller = await requireUser(req);
+  if (caller instanceof Response) return caller;
   try {
     const {
       title,

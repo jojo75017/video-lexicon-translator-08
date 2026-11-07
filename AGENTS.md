@@ -1,4 +1,5 @@
 # Architecture
+- Security handler regression tests execute isolated handler code with mocked identity, storage and provider calls, so denied requests can be verified without real AI spending, emails or customer changes.
 - The V3 API-key guide reuses EbookSettingsPanel and its existing browser persistence at /v3/fonctionnalites/cles, so onboarding instructions never create duplicate key storage or alter generation providers.
 - Assistance and FAQ share scoped semantic contrast styles and exclude acquisition overlays so help remains readable without changing other pages.
 - Home blank-start actions call the shared draft reset before opening direct writing, so restored local state cannot reopen the previous book and saved library records remain untouched.

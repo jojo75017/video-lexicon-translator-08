@@ -1,5 +1,6 @@
 // Studio Pro — Phase 2 : Gemini analyse un chapitre rédigé et produit sa MÉMOIRE.
 // Rôle Gemini = analyse et contrôle de cohérence (jamais la rédaction).
+import { requireUser, isAdmin } from '../_shared/authGuard.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -92,6 +93,8 @@ const arr = (v: unknown): string[] =>
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
+  const caller = await requireUser(req);
+  if (caller instanceof Response) return caller;
 
   try {
     const body = await req.json();
@@ -132,15 +135,17 @@ Forme attendue :
 }`;
 
     const userKey = sanitizeApiKey(body?.userApiKey);
+    const serverAllowed = caller.id === 'service' || await isAdmin(caller.id);
+    if (!serverAllowed && !isValidGoogleKey(userKey)) return json(400, { error: 'Renseignez votre propre clé Gemini dans la page Clés API.' });
     const serverKey = sanitizeApiKey(Deno.env.get("GEMINI_API_KEY") || "");
 
     let raw = "";
     let engine = "gemini";
-    for (const k of [userKey, serverKey].filter(isValidGoogleKey)) {
+    for (const k of (userKey ? [userKey] : serverAllowed ? [serverKey] : []).filter(isValidGoogleKey)) {
       const r = await callGemini(prompt, k, 4000);
       if (r.ok && r.text) { raw = r.text; break; }
     }
-    if (!raw) {
+    if (!raw && serverAllowed && !userKey) {
       const r = await callLovableAI(prompt, 4000);
       if (r.ok && r.text) { raw = r.text; engine = "gemini-lovable"; }
     }
