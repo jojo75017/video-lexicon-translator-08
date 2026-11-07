@@ -14,7 +14,7 @@ const guarded = [
 function loadHandler(name: string, signedIn = false, client?: unknown) {
   let handler: Handler | undefined;
   const source = readFileSync(`supabase/functions/${name}/index.ts`, 'utf8');
-  const stripped = source.replace(/^import[\s\S]*?;\s*$/gm, '');
+  const stripped = source.replace(/^import[\s\S]*?;\s*$/gm, '').replace(/^export /gm, '');
   const code = ts.transpileModule(stripped, {
     compilerOptions: { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.None },
   }).outputText.replace(/^export /gm, '');
