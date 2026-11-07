@@ -11,7 +11,7 @@ const guarded = [
   'generate-ab-variants', 'amazon-spy', 'puzzle-book-generate',
 ];
 
-function loadHandler(name: string, signedIn = false, client?: unknown) {
+function loadHandler(name: string, signedIn = false, client?: unknown, session?: unknown) {
   let handler: Handler | undefined;
   const source = readFileSync(`supabase/functions/${name}/index.ts`, 'utf8');
   const stripped = source.replace(/^import[\s\S]*?;\s*$/gm, '').replace(/^export /gm, '');
@@ -25,10 +25,11 @@ function loadHandler(name: string, signedIn = false, client?: unknown) {
     : new Response(JSON.stringify({ error: 'Connexion requise.' }), { status: 401 }));
   const storage = vi.fn(() => client);
   const resend = class { emails = { send: provider }; };
+  const stripe = class { checkout = { sessions: { retrieve: async () => session } }; };
   new Function('serve', 'Deno', 'requireUser', 'isAdmin', 'fetch', 'createClient',
-    'Resend', 'EMAIL_SENDING_ENABLED', `const importedCorsHeaders = {};\n${code.replace(/\bcorsHeaders\b/g, source.includes('const corsHeaders') ? 'corsHeaders' : 'importedCorsHeaders')}`)(
-    capture, { serve: capture, env: { get: () => undefined } }, requireUser,
-    async () => false, provider, storage, resend, false,
+    'Resend', 'EMAIL_SENDING_ENABLED', 'Stripe', `const importedCorsHeaders = {};\n${code.replace(/\bcorsHeaders\b/g, source.includes('const corsHeaders') ? 'corsHeaders' : 'importedCorsHeaders')}`)(
+    capture, { serve: capture, env: { get: (name: string) => name === 'STRIPE_SECRET_KEY' ? 'mock-only' : undefined } }, requireUser,
+    async () => false, provider, storage, resend, false, stripe,
   );
   if (!handler) throw new Error(`No handler registered for ${name}`);
   return { handler, provider, storage };
@@ -44,6 +45,30 @@ describe('Paid handlers require a verified identity before side effects', () => 
       expect(result.status).toBe(401);
       expect(provider).not.toHaveBeenCalled();
       expect(storage).not.toHaveBeenCalled();
+    });
+  }
+});
+
+describe('Payment return never grants unrelated purchases or rewrites existing rights', () => {
+  const existing = { id: 'existing-account', access_code: 'never-disclosed', status: 'active', plan_type: 'lifetime' };
+  for (const recognized of [false, true]) {
+    it(recognized ? 'preserves an existing lifetime customer on recognized legacy return' : 'rejects an unrelated paid session', async () => {
+      const update = vi.fn();
+      const insert = vi.fn();
+      const chain = { select: () => chain, eq: () => chain,
+        maybeSingle: async () => ({ data: existing, error: null }), update, insert };
+      const session = { status: 'complete', payment_status: 'paid', mode: 'payment', currency: 'eur',
+        metadata: { email: 'customer@example.invalid', ...(recognized ? { planId: 'pro', items: 'pro_lifetime' } : {}) } };
+      const { handler, provider } = loadHandler('stripe-verify-session', false, { from: () => chain }, session);
+      const response = await handler(new Request('https://app.test', { method: 'POST', body: JSON.stringify({ sessionId: 'cs_test_mock' }) }));
+      const payload = await response.json();
+      expect(payload.ok).toBe(recognized);
+      expect(update).not.toHaveBeenCalled();
+      expect(insert).not.toHaveBeenCalled();
+      expect(provider).not.toHaveBeenCalled();
+      expect(JSON.stringify(payload)).not.toContain('never-disclosed');
+      expect(payload).not.toHaveProperty('accessCode');
+      expect(payload).not.toHaveProperty('subscriber');
     });
   }
 });
