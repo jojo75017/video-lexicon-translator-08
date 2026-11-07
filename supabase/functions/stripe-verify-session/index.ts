@@ -126,9 +126,8 @@ serve(async (req) => {
           JSON.stringify({
             ok: true,
             email,
-            accessCode: packSubscriber.access_code,
             packPlan,
-            subscriber: packSubscriber,
+            codeSentByEmail: true,
           }),
           { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
@@ -236,7 +235,7 @@ serve(async (req) => {
     });
 
     return new Response(
-      JSON.stringify({ ok: true, email, accessCode, trialEndsAt, subscriber: { email, access_code: accessCode, plan_type: planType, status: subscriberStatus, trial_ends_at: trialEndsAt } }),
+      JSON.stringify({ ok: true, email, trialEndsAt, codeSentByEmail: true }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error: any) {

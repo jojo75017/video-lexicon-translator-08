@@ -123,6 +123,15 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
+    // A promotional code never authorizes changes to an existing customer's account.
+    const { data: protectedSubscriber, error: lookupError } = await admin
+      .from('subscribers').select('id').eq('email', email).maybeSingle();
+    if (lookupError || protectedSubscriber) {
+      return new Response(JSON.stringify({ success: false, reason: 'invalid', error: INVALID_MSG }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Look up the code
     const { data: codeRow, error: codeErr } = await admin
       .from('beta_promo_codes')
@@ -179,19 +188,9 @@ Deno.serve(async (req) => {
       .maybeSingle();
 
     if (existing) {
-      accessCode = existing.access_code || accessCode;
-      await admin
-        .from('subscribers')
-        .update({
-          plan_type: 'lifetime',
-          plan_tier: 'vip',
-          status: 'active',
-          license_type: 'commercial',
-          access_code: accessCode,
-          expires_at: null,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', existing.id);
+      return new Response(JSON.stringify({ success: false, reason: 'invalid', error: INVALID_MSG }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     } else {
       await admin.from('subscribers').insert({
         email,
@@ -203,14 +202,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    const origin = req.headers.get('origin') || 'https://ebookstudio.fr';
-    const loginUrl = `${origin}/subscription`;
+    const loginUrl = 'https://ebookstudio.fr/subscription';
 
     await sendWelcomeEmail(email, accessCode, loginUrl);
     await notifyAdmin(email, code, accessCode);
 
     return new Response(
-      JSON.stringify({ success: true, message: SUCCESS_MSG, access_code: accessCode }),
+      JSON.stringify({ success: true, message: SUCCESS_MSG, codeSentByEmail: true }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
     );
   } catch (error) {

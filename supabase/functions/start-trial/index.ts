@@ -10,8 +10,8 @@ const corsHeaders = {
 function generateAccessCode(): string {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let code = 'EBK-';
-  for (let i = 0; i < 6; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  for (let i = 0; i < 12; i++) {
+    code += chars.charAt(crypto.getRandomValues(new Uint32Array(1))[0] % chars.length);
   }
   return code;
 }
@@ -42,7 +42,7 @@ async function sendTrialEmail(toEmail: string, accessCode: string, trialEndsAt: 
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
             <p style="color: #999; font-size: 12px; text-align: center;">
               Votre essai expire le ${new Date(trialEndsAt).toLocaleDateString('fr-FR')}.
-              Pour continuer après l'essai, il suffira de régler 67€ (paiement unique, accès à vie).
+              Pour continuer après l'essai, consultez les formules actuelles à partir de 19 €/mois. Vos éventuels droits déjà acquis restent conservés.
             </p>
           </div>
         `,

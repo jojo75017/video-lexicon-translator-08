@@ -49,6 +49,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    // A public trial request must never rewrite an existing customer's rights.
+    const { data: protectedSubscriber, error: subscriberLookupError } = await supabase
+      .from('subscribers').select('id').ilike('email', email).maybeSingle();
+    if (subscriberLookupError) return json({ ok: false, error: 'Vérification indisponible. Réessayez.' }, 503);
+    if (protectedSubscriber) return json({ ok: true, message: 'Si vous disposez déjà d’un compte, utilisez votre accès habituel ou contactez l’assistance.' });
+
     // 1) Anti-duplication : un essai déjà enregistré bloque toute nouvelle demande.
     const { data: existing } = await supabase
       .from("free_trials")
@@ -112,17 +118,7 @@ Deno.serve(async (req) => {
       .ilike("email", email)
       .maybeSingle();
 
-    if (subscriber) {
-      await supabase
-        .from("subscribers")
-        .update({
-          status: "trialing",
-          plan_type: "essai",
-          plan_tier: "essai",
-          trial_ends_at: endsAt.toISOString(),
-        })
-        .eq("id", subscriber.id);
-    } else {
+    if (!subscriber) {
       await supabase.from("subscribers").insert({
         email,
         status: "trialing",

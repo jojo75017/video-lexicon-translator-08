@@ -1,6 +1,6 @@
 // Génération du sommaire (table des matières) pour le workflow V3.
-// Fonctionne SANS clé personnelle : repli sur la clé serveur puis sur Lovable AI,
-// afin qu'un abonné puisse toujours créer un livre.
+// Les abonnés utilisent leur propre clé ; les clés serveur restent réservées aux administrateurs.
+import { requireUser, isAdmin } from '../_shared/authGuard.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -120,6 +120,8 @@ function parseChapters(raw: string, expected: number) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
+  const caller = await requireUser(req);
+  if (caller instanceof Response) return caller;
 
   try {
     const body = (await req.json()) as Body;
@@ -129,6 +131,10 @@ Deno.serve(async (req) => {
     const count = Math.min(60, Math.max(3, Number(body.chapters) || 12));
     const maxTokens = Math.min(12000, 1800 + count * 180);
     const userKey = sanitizeApiKey(body.userApiKey);
+    const serverAllowed = caller.id === 'service' || await isAdmin(caller.id);
+    if (!serverAllowed && !isValidGoogleKey(userKey)) {
+      return json(400, { error: 'Renseignez votre propre clé Gemini dans la page Clés API.' });
+    }
     const serverKeyEarly = sanitizeApiKey(Deno.env.get("GEMINI_API_KEY") || "");
 
     // ---- Mode dialogue : propositions pour le prochain chapitre ----
@@ -168,8 +174,8 @@ Règles :
 
       let r: { ok: boolean; status?: number; text?: string } | null = null;
       if (isValidGoogleKey(userKey)) r = await callGemini(nextPrompt, userKey, 1200);
-      if (!r?.ok && isValidGoogleKey(serverKeyEarly)) r = await callGemini(nextPrompt, serverKeyEarly, 1200);
-      if (!r?.ok) r = await callLovableAI(nextPrompt, 1200);
+      if (!r?.ok && serverAllowed && !userKey && isValidGoogleKey(serverKeyEarly)) r = await callGemini(nextPrompt, serverKeyEarly, 1200);
+      if (!r?.ok && serverAllowed && !userKey) r = await callLovableAI(nextPrompt, 1200);
       if (!r?.ok) {
         const status = r?.status === 429 ? 429 : r?.status === 402 ? 402 : 502;
         return json(status, {
@@ -239,8 +245,8 @@ Règles :
       const enrichTokens = Math.min(14000, 1200 + toEnrich.length * 260);
       let enrichResult: { ok: boolean; status?: number; text?: string } | null = null;
       if (isValidGoogleKey(userKey)) enrichResult = await callGemini(enrichPrompt, userKey, enrichTokens);
-      if (!enrichResult?.ok && isValidGoogleKey(serverKeyEarly)) enrichResult = await callGemini(enrichPrompt, serverKeyEarly, enrichTokens);
-      if (!enrichResult?.ok) enrichResult = await callLovableAI(enrichPrompt, enrichTokens);
+      if (!enrichResult?.ok && serverAllowed && !userKey && isValidGoogleKey(serverKeyEarly)) enrichResult = await callGemini(enrichPrompt, serverKeyEarly, enrichTokens);
+      if (!enrichResult?.ok && serverAllowed && !userKey) enrichResult = await callLovableAI(enrichPrompt, enrichTokens);
 
       if (!enrichResult?.ok) {
         const status = enrichResult?.status === 429 ? 429 : enrichResult?.status === 402 ? 402 : 502;
@@ -306,8 +312,8 @@ Règles :
     let result: { ok: boolean; status?: number; text?: string } | null = null;
 
     if (isValidGoogleKey(userKey)) result = await callGemini(prompt, userKey, maxTokens);
-    if (!result?.ok && isValidGoogleKey(serverKey)) result = await callGemini(prompt, serverKey, maxTokens);
-    if (!result?.ok) result = await callLovableAI(prompt, maxTokens);
+    if (!result?.ok && serverAllowed && !userKey && isValidGoogleKey(serverKey)) result = await callGemini(prompt, serverKey, maxTokens);
+    if (!result?.ok && serverAllowed && !userKey) result = await callLovableAI(prompt, maxTokens);
 
     if (!result?.ok) {
       const status = result?.status === 429 ? 429 : result?.status === 402 ? 402 : 502;

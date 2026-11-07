@@ -64,7 +64,10 @@ serve(async (req) => {
 
     let leadId = existing?.id;
     if (leadId) {
-      await supabase.from("funnel_leads").update(leadPayload).eq("id", leadId);
+      // Do not let an anonymous email claim overwrite or retag an existing contact.
+      return new Response(JSON.stringify({ ok: true, profile_key, profile_title }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
     } else {
       const { data: inserted, error: insErr } = await supabase
         .from("funnel_leads")

@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireUser, isAdmin } from '../_shared/authGuard.ts';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,9 +101,10 @@ async function callLovableAI(prompt: string) {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json(405, { error: "Method not allowed" });
+  const caller = await requireUser(req);
+  if (caller instanceof Response) return caller;
 
   try {
-    // Guest mode allowed (V3 public wizard) — auth optional
     const body = (await req.json()) as Body;
     const title = (body.title || "").trim();
     const subtitle = (body.subtitle || "").trim();
@@ -110,6 +112,10 @@ Deno.serve(async (req) => {
     const intro = (body.bookIntroduction || "").trim();
     const language = body.language || "fr";
     const userKey = sanitizeApiKey(body.userApiKey);
+    const serverAllowed = caller.id === 'service' || await isAdmin(caller.id);
+    if (!serverAllowed && !isValidGoogleKey(userKey)) {
+      return json(400, { error: 'Renseignez votre propre clé Gemini dans la page Clés API.' });
+    }
 
     if (!title) {
       return json(400, { error: "Titre requis" });
@@ -141,10 +147,10 @@ Renvoie uniquement cet objet JSON:
     if (userKey && !isValidGoogleKey(userKey)) {
       return json(400, { error: "Clé Gemini invalide ou incomplète. Collez la clé complète." });
     }
-    if (!aiResult?.ok && !userKey && isValidGoogleKey(serverGeminiKey)) aiResult = await callGemini(prompt, serverGeminiKey);
-    if (!aiResult?.ok && !userKey) aiResult = await callLovableAI(prompt);
-    if (!aiResult.ok) {
-      const status = aiResult.status === 429 ? 429 : aiResult.status === 402 ? 402 : 502;
+    if (!aiResult?.ok && !userKey && serverAllowed && isValidGoogleKey(serverGeminiKey)) aiResult = await callGemini(prompt, serverGeminiKey);
+    if (!aiResult?.ok && !userKey && serverAllowed) aiResult = await callLovableAI(prompt);
+    if (!aiResult?.ok) {
+      const status = aiResult?.status === 429 ? 429 : aiResult?.status === 402 ? 402 : 502;
       const message = status === 429
         ? "Limite IA atteinte. Réessaye dans quelques secondes."
         : status === 402

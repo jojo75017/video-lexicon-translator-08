@@ -37,6 +37,7 @@ const GeminiKeyAlertBanner = () => {
   }, []);
 
   if (!userId || dismissed) return null;
+  if (location.pathname === '/v3-premium' || location.pathname === '/v3/fonctionnalites/cles') return null;
   if (!VISIBLE_PREFIXES.some((p) => location.pathname.startsWith(p))) return null;
 
   const provider = getProvider();
@@ -57,8 +58,7 @@ const GeminiKeyAlertBanner = () => {
         <div className="text-sm flex-1 min-w-0">
           <strong>Clé IA manquante.</strong>{' '}
           <span className="opacity-95">
-            Sans clé Gemini, l'EBOOKBOT, la recherche Amazon KDP et le workflow ne fonctionnent pas.
-            Configurez-la en 90 sec (gratuit).
+            Renseignez votre propre clé pour le fournisseur sélectionné. Les frais éventuels de l’IA sont distincts de votre abonnement.
           </span>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0">
