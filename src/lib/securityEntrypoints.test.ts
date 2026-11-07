@@ -26,9 +26,9 @@ function loadHandler(name: string, signedIn = false, client?: unknown) {
   const storage = vi.fn(() => client);
   const resend = class { emails = { send: provider }; };
   new Function('serve', 'Deno', 'requireUser', 'isAdmin', 'fetch', 'createClient',
-    'corsHeaders', 'Resend', 'EMAIL_SENDING_ENABLED', code)(
+    'Resend', 'EMAIL_SENDING_ENABLED', `const importedCorsHeaders = {};\n${code.replace(/\bcorsHeaders\b/g, source.includes('const corsHeaders') ? 'corsHeaders' : 'importedCorsHeaders')}`)(
     capture, { serve: capture, env: { get: () => undefined } }, requireUser,
-    async () => false, provider, storage, {}, resend, false,
+    async () => false, provider, storage, resend, false,
   );
   if (!handler) throw new Error(`No handler registered for ${name}`);
   return { handler, provider, storage };
