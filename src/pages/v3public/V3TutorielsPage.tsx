@@ -7,6 +7,8 @@ import rubEcrire from '@/assets/tuto-rub-ecrire.jpg';
 import rubHabiller from '@/assets/tuto-rub-habiller.jpg';
 import rubPublier from '@/assets/tuto-rub-publier.jpg';
 import georgesVideo from '@/assets/georges_boubet_pourquoi_ebookstudio_v3.mp4.asset.json';
+import bienvenueVideo from '@/assets/bienvenue_tutoriels_v3.mp4.asset.json';
+import jamaisSeulVideo from '@/assets/jamais_seul_accompagnement_v3.mp4.asset.json';
 import { Link } from 'react-router-dom';
 import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, FileText, PlayCircle, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -65,11 +67,33 @@ const RUBRIQUE_IMAGES: Record<string, string> = {
   'Écrire et corriger': rubEcrire, 'Habiller': rubHabiller, 'Publier et vendre': rubPublier,
 };
 
+const INTRO_VIDEOS = [
+  {
+    tab: 'Le mot de Georges', src: georgesVideo.url, badge: 'Bienvenue · Le mot du fondateur',
+    title: "Pourquoi j'ai créé EbookStudio V3",
+    text: "Georges Boubet, auteur publié sur Amazon, vous explique en 1 min 30 pourquoi il a créé cet outil et comment il peut vous aider à publier votre livre.",
+    steps: ['Découvrez la démarche, de l’idée au livre prêt pour KDP.', 'Suivez les tutoriels pas à pas, atelier par atelier.', 'Retrouvez articles et conseils KDP sur le site de Georges.'],
+  },
+  {
+    tab: 'Bienvenue dans vos tutoriels', src: bienvenueVideo.url, badge: 'Ouverture · 1 min 30',
+    title: 'Bienvenue dans vos tutoriels',
+    text: "Comment suivre la formation : l'ordre conseillé des tutoriels et la façon d'en tirer le meilleur pour avancer sur votre livre.",
+    steps: ['Commencez par la rubrique « Démarrer ».', 'Suivez les tutoriels dans l’ordre, à votre rythme.', 'Revenez ici quand vous en avez besoin.'],
+  },
+  {
+    tab: "Vous n'êtes jamais seul", src: jamaisSeulVideo.url, badge: 'Accompagnement · 1 min 35',
+    title: "Vous n'êtes jamais seul",
+    text: 'Les 4 piliers de votre accompagnement pour avancer sereinement jusqu’à la publication.',
+    steps: ['EBOOKBOT vous guide dans les ateliers.', 'La FAQ répond aux questions fréquentes.', 'Un appel de 30 minutes et l’assistance restent disponibles.'],
+  },
+];
+
 const BOOKING_URL = 'https://calendly.com/pro-georgesboubet/30min';
 
 export default function V3TutorielsPage() {
   const [open, setOpen] = useState<TutorielV3 | null>(null);
   const [i, setI] = useState(0);
+  const [intro, setIntro] = useState(0);
   const start = (t: TutorielV3) => { setOpen(t); setI(0); };
 
   return (
@@ -82,28 +106,45 @@ export default function V3TutorielsPage() {
         <p className="mt-1 text-muted-foreground">{TUTORIELS_V3.length} tutoriels courts, pas à pas, pour tout faire de A à Z.</p>
       </div>
 
-      <section className="mb-10 grid gap-6 rounded-2xl border bg-card p-5 md:grid-cols-2 md:p-6" aria-labelledby="mot-fondateur">
-        <video src={georgesVideo.url} controls preload="metadata" playsInline
-          className="aspect-video w-full rounded-xl bg-black" aria-label="Vidéo : Pourquoi j'ai créé EbookStudio V3, par Georges Boubet" />
-        <div className="flex flex-col justify-center">
-          <Badge variant="secondary" className="w-fit">Bienvenue · Le mot du fondateur</Badge>
-          <h2 id="mot-fondateur" className="mt-2 text-2xl font-bold">Pourquoi j'ai créé EbookStudio V3</h2>
-          <p className="mt-2 text-muted-foreground">
-            Avant de commencer les tutoriels, Georges Boubet, auteur publié sur Amazon, vous explique en 1 min 30 pourquoi il a créé cet outil et comment il peut vous aider à publier votre livre. Vous n'êtes pas seul.
-          </p>
-          <ol className="mt-4 space-y-2 text-sm">
-            {['Découvrez la démarche, de l’idée au livre prêt pour KDP.', 'Suivez les tutoriels pas à pas, atelier par atelier.', 'Retrouvez articles et conseils KDP sur le site de Georges.'].map((s, n) => (
-              <li key={s} className="flex gap-3 rounded-lg border p-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary text-xs text-primary">{n + 1}</span>{s}
-              </li>
-            ))}
-          </ol>
-          <Button asChild className="mt-5 w-full gap-2 sm:w-auto v3-btn-action-orange">
-            <a href="https://georgesboubet.com" target="_blank" rel="noopener noreferrer">
-              Découvrir Georgesboubet.com <ExternalLink className="h-4 w-4" />
-            </a>
-          </Button>
+      <section className="mb-10 rounded-2xl border bg-card p-5 md:p-6" aria-labelledby="videos-ouverture">
+        <h2 id="videos-ouverture" className="sr-only">Vidéos d'ouverture</h2>
+        <div role="tablist" className="mb-5 flex flex-wrap gap-2">
+          {INTRO_VIDEOS.map((v, n) => (
+            <button key={v.title} type="button" role="tab" aria-selected={intro === n} onClick={() => setIntro(n)}
+              className={`v3-chip-toggle rounded-full border px-4 py-2 text-sm font-medium ${intro === n ? 'border-primary bg-primary text-primary-foreground' : 'bg-transparent text-foreground hover:border-primary'}`}>
+              {n + 1}. {v.tab}
+            </button>
+          ))}
         </div>
+        {(() => { const v = INTRO_VIDEOS[intro]; return (
+        <div className="grid gap-6 md:grid-cols-2">
+          <video key={v.src} src={v.src} controls preload="metadata" playsInline
+            className="aspect-video w-full rounded-xl bg-black" aria-label={`Vidéo : ${v.title}`} />
+          <div className="flex flex-col justify-center">
+            <Badge variant="secondary" className="w-fit">{v.badge}</Badge>
+            <h3 className="mt-2 text-2xl font-bold">{v.title}</h3>
+            <p className="mt-2 text-muted-foreground">{v.text}</p>
+            <ol className="mt-4 space-y-2 text-sm">
+              {v.steps.map((s, k) => (
+                <li key={s} className="flex gap-3 rounded-lg border p-3">
+                  <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary text-xs text-primary">{k + 1}</span>{s}
+                </li>
+              ))}
+            </ol>
+            {intro === 0 && (
+              <Button asChild className="mt-5 w-full gap-2 sm:w-auto v3-btn-action-orange">
+                <a href="https://georgesboubet.com" target="_blank" rel="noopener noreferrer">
+                  Découvrir Georgesboubet.com <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
+            )}
+            {intro < INTRO_VIDEOS.length - 1 && (
+              <Button variant="outline" className="mt-3 w-full gap-2 sm:w-auto" onClick={() => setIntro(intro + 1)}>
+                Vidéo suivante <ChevronRight className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>); })()}
       </section>
 
       {RUBRIQUES_V3.map((r) => (
