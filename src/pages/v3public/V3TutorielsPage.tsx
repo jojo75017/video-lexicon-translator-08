@@ -6,6 +6,7 @@ import rubCreer from '@/assets/tuto-rub-creer.jpg';
 import rubEcrire from '@/assets/tuto-rub-ecrire.jpg';
 import rubHabiller from '@/assets/tuto-rub-habiller.jpg';
 import rubPublier from '@/assets/tuto-rub-publier.jpg';
+import georgesVideo from '@/assets/georges_boubet_pourquoi_ebookstudio_v3.mp4.asset.json';
 import { Link } from 'react-router-dom';
 import { BookOpen, CalendarDays, ChevronLeft, ChevronRight, ExternalLink, FileText, PlayCircle, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -80,6 +81,30 @@ export default function V3TutorielsPage() {
         <h1 className="mt-2 text-3xl font-bold">Tutoriels V3</h1>
         <p className="mt-1 text-muted-foreground">{TUTORIELS_V3.length} tutoriels courts, pas à pas, pour tout faire de A à Z.</p>
       </div>
+
+      <section className="mb-10 grid gap-6 rounded-2xl border bg-card p-5 md:grid-cols-2 md:p-6" aria-labelledby="mot-fondateur">
+        <video src={georgesVideo.url} controls preload="metadata" playsInline
+          className="aspect-video w-full rounded-xl bg-black" aria-label="Vidéo : Pourquoi j'ai créé EbookStudio V3, par Georges Boubet" />
+        <div className="flex flex-col justify-center">
+          <Badge variant="secondary" className="w-fit">Bienvenue · Le mot du fondateur</Badge>
+          <h2 id="mot-fondateur" className="mt-2 text-2xl font-bold">Pourquoi j'ai créé EbookStudio V3</h2>
+          <p className="mt-2 text-muted-foreground">
+            Avant de commencer les tutoriels, Georges Boubet, auteur publié sur Amazon, vous explique en 1 min 30 pourquoi il a créé cet outil et comment il peut vous aider à publier votre livre. Vous n'êtes pas seul.
+          </p>
+          <ol className="mt-4 space-y-2 text-sm">
+            {['Découvrez la démarche, de l’idée au livre prêt pour KDP.', 'Suivez les tutoriels pas à pas, atelier par atelier.', 'Retrouvez articles et conseils KDP sur le site de Georges.'].map((s, n) => (
+              <li key={s} className="flex gap-3 rounded-lg border p-3">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-primary text-xs text-primary">{n + 1}</span>{s}
+              </li>
+            ))}
+          </ol>
+          <Button asChild className="mt-5 w-full gap-2 sm:w-auto v3-btn-action-orange">
+            <a href="https://georgesboubet.com" target="_blank" rel="noopener noreferrer">
+              Découvrir Georgesboubet.com <ExternalLink className="h-4 w-4" />
+            </a>
+          </Button>
+        </div>
+      </section>
 
       {RUBRIQUES_V3.map((r) => (
         <section key={r} className="mb-8">
