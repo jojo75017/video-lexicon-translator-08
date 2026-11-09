@@ -576,10 +576,11 @@ const App = () => {
             {/* Tunnel de commande : toujours accessible (les CTA emails/bannières doivent
                 arriver sur le paiement, même pour un admin ou un abonné connecté). */}
             <Route path="/commander" element={<CommanderRedirect />} />
-            {/* Tunnel de lancement du 1er octobre : capture → offres → remerciement */}
-            <Route path="/lancement" element={<LancementCapturePage />} />
-            <Route path="/starter" element={<StarterPage />} />
-            <Route path="/lancement/offres" element={<LancementOffresPage />} />
+            {/* Offre Starter 27 € terminée (décision du 09/11/2026) : les anciennes
+                adresses renvoient vers les formules d'abonnement 19/29/59 €. */}
+            <Route path="/lancement" element={<CommanderRedirect />} />
+            <Route path="/starter" element={<CommanderRedirect />} />
+            <Route path="/lancement/offres" element={<CommanderRedirect />} />
             <Route path="/lancement/merci" element={<LancementMerciPage />} />
 
             <Route path="/essai" element={<EssaiPage />} />
