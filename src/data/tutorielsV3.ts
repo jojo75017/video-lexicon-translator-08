@@ -3,21 +3,17 @@ import etape2Video from '@/assets/videos/tuto-etape-2.mp4.asset.json';
 import etape3Video from '@/assets/videos/tuto-etape-3.mp4.asset.json';
 import etape4Video from '@/assets/videos/tuto-etape-4.mp4.asset.json';
 import etape5Video from '@/assets/videos/tuto-etape-5.mp4.asset.json';
-import tuto2Video from '@/assets/videos/tuto-2-commence-ici.mp4.asset.json';
-import tuto3Video from '@/assets/videos/tuto-3-cle-ia.mp4.asset.json';
-import tuto4Video from '@/assets/videos/tuto-4-offres.mp4.asset.json';
 import bienvenueVideo from '@/assets/videos/bienvenue-v3-30s.mp4.asset.json';
 import tuto5Video from '@/assets/videos/tuto-5-cinq-etapes.mp4.asset.json';
 import tuto10Video from '@/assets/videos/tuto-10-creer-livre.mp4.asset.json';
-import tuto11Video from '@/assets/videos/tuto-11-ecrire-maintenant-v2.mp4.asset.json';
 import tuto12Video from '@/assets/videos/tuto-12-avatar-lecteur.mp4.asset.json';
 import tuto13Video from '@/assets/videos/tuto-13-remise-a-zero.mp4.asset.json';
 import tuto14Video from '@/assets/videos/tuto-14-histoires-courtes.mp4.asset.json';
 import tuto15Video from '@/assets/videos/tuto-15-je-raconte-ma-vie.mp4.asset.json';
 import tuto17Video from '@/assets/videos/tuto-17-correction-editoriale.mp4.asset.json';
-import tuto16Video from '@/assets/videos/tuto-16-studio-pro.mp4.asset.json';
-import tuto19Video from '@/assets/videos/tuto-19-mes-livres.mp4.asset.json';
 import tuto18Video from '@/assets/videos/tuto-18-humanizeai.mp4.asset.json';
+import { SERIE_V3, CLOTURE_V3 } from '@/data/videosSerieV3';
+const S = (n: number) => SERIE_V3[n - 1].src;
 // Source unique des tutoriels V3 (diaporamas + futures vidéos).
 export type TutoRubrique = 'Démarrer' | 'Les 5 étapes' | 'Créer' | 'Écrire et corriger' | 'Habiller' | 'Publier et vendre';
 
@@ -170,5 +166,5 @@ export const TUTORIELS_V3: TutorielV3[] = [
 export const RUBRIQUES_V3: TutoRubrique[] = ['Démarrer', 'Les 5 étapes', 'Créer', 'Écrire et corriger', 'Habiller', 'Publier et vendre'];
 
 // Tutoriel 8 = vidéos des Étapes 3 et 4 réunies.
-const VIDEOS: Record<number, string[]> = { 1: [bienvenueVideo.url], 2: [tuto2Video.url], 3: [tuto3Video.url], 4: [tuto4Video.url], 5: [tuto5Video.url], 6: [etape1Video.url], 7: [etape2Video.url], 8: [etape3Video.url, etape4Video.url], 9: [etape5Video.url], 10: [tuto10Video.url], 11: [tuto11Video.url], 12: [tuto12Video.url], 13: [tuto13Video.url], 14: [tuto14Video.url], 15: [tuto15Video.url], 16: [tuto16Video.url], 17: [tuto17Video.url], 18: [tuto18Video.url], 19: [tuto19Video.url] };
+const VIDEOS: Record<number, string[]> = { 1: [bienvenueVideo.url], 2: [S(2)], 3: [S(1)], 4: [CLOTURE_V3[0].src], 5: [tuto5Video.url], 6: [etape1Video.url], 7: [etape2Video.url], 8: [etape3Video.url, etape4Video.url], 9: [etape5Video.url], 10: [tuto10Video.url], 11: [S(3)], 12: [tuto12Video.url], 13: [tuto13Video.url], 14: [tuto14Video.url], 15: [tuto15Video.url], 16: [S(5)], 17: [tuto17Video.url], 18: [tuto18Video.url], 19: [S(12)], 20: [S(7)], 23: [S(11)] };
 TUTORIELS_V3.forEach((x) => { if (VIDEOS[x.num]?.length) x.videos = VIDEOS[x.num]; });
