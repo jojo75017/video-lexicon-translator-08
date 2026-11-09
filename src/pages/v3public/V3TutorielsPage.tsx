@@ -202,8 +202,8 @@ export default function V3TutorielsPage() {
             {TUTORIELS_V3.filter((t) => t.rubrique === r).map((t) => (
               <button key={t.id} type="button" onClick={() => start(t)}
                 className="v3-flat-btn rounded-lg border bg-card p-4 text-left text-card-foreground transition-colors hover:border-primary">
-                <div className="flex items-center justify-between text-xs text-muted-foreground">
-                  <span>Tuto {t.num} · {t.duree}</span>
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-card-foreground/75">Tuto {t.num} · {t.duree}</span>
                   {t.videos?.length ? <Badge>🎬 Vidéo{t.videos.length > 1 ? `s (${t.videos.length})` : ''}</Badge> : <Badge variant="secondary">📘 Guide illustré</Badge>}
                 </div>
                 <div className="mt-1 font-medium">{t.titre}</div>
