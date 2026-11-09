@@ -606,6 +606,61 @@ Réponds uniquement avec ce JSON :
               ))}
             </div>
           </Bloc>
+
+          {fiche.amazon && (
+            <Bloc titre="Améliorations à apporter sur Amazon" sous="Diagnostic de la fiche actuelle et actions prioritaires pour mieux ressortir.">
+              <p className="whitespace-pre-line text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>{fiche.amazon.diagnostic}</p>
+              <ol className="mt-3 space-y-2">
+                {fiche.amazon.actions.map((a, i) => (
+                  <li key={i} className="flex gap-2 text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold" style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-emerald)' }}>{i + 1}</span>
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ol>
+            </Bloc>
+          )}
+
+          {fiche.google && (
+            <Bloc titre="Visibilité sur Google" sous="Recherches tapées par vos futurs lecteurs, et texte de présentation pour Google.">
+              <div className="flex flex-wrap gap-1.5">
+                {fiche.google.requetes.map((r, i) => (
+                  <span key={i} className="rounded-full border px-2.5 py-1 text-[12px]" style={{ borderColor: 'var(--v3-line)', color: 'var(--v3-ink)' }}>{r}</span>
+                ))}
+              </div>
+              {[['Méta-titre', fiche.google.metaTitre], ['Méta-description', fiche.google.metaDescription]].map(([k, v]) => (
+                <div key={k} className="mt-3 flex items-start gap-2">
+                  <div className="flex-1">
+                    <Label className="text-[11px]">{k} ({v.length} car.)</Label>
+                    <p className="text-[13px]" style={{ color: 'var(--v3-ink)' }}>{v}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="[color:var(--v3-ink)!important]" onClick={() => copy(v, `${k} copié`)} aria-label={`Copier ${k}`}><Copy className="h-3.5 w-3.5" /></Button>
+                </div>
+              ))}
+            </Bloc>
+          )}
+
+          {fiche.posts && (
+            <Bloc titre="Posts pour les réseaux sociaux" sous="Prêts à copier. Remplacez [LIEN AMAZON] par le lien de votre livre.">
+              <div className="space-y-4">
+                {[
+                  ['Facebook / Groupes', fiche.posts.facebook],
+                  ['Instagram', `${fiche.posts.instagram}\n\n${fiche.posts.hashtags.join(' ')}`.trim()],
+                  ['Vidéo courte (Reels, TikTok, Shorts)', fiche.posts.video],
+                ].filter(([, v]) => v).map(([k, v]) => (
+                  <div key={k} className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>{k}</span>
+                      <Button variant="outline" size="sm" className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important]" onClick={() => copy(v, 'Post copié')}>
+                        <Copy className="h-3.5 w-3.5" /> Copier
+                      </Button>
+                    </div>
+                    <p className="whitespace-pre-line text-[13px]" style={{ color: 'var(--v3-ink)' }}>{v}</p>
+                  </div>
+                ))}
+              </div>
+            </Bloc>
+          )}
         </div>
       )}
     </div>
