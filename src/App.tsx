@@ -93,9 +93,6 @@ const UpsellPaiementPage = lazy(() => import('./pages/UpsellPaiementPage'));
 const EssaiPage = lazy(() => import('./pages/launch/EssaiPage'));
 const DecouvertePage = lazy(() => import('./pages/launch/DecouvertePage'));
 const AvantPremiereV3Page = lazy(() => import('./pages/AvantPremiereV3Page'));
-const LancementCapturePage = lazy(() => import('./pages/lancement/LancementCapturePage'));
-const StarterPage = lazy(() => import('./pages/starter/StarterPage'));
-const LancementOffresPage = lazy(() => import('./pages/lancement/LancementOffresPage'));
 const LancementMerciPage = lazy(() => import('./pages/lancement/LancementMerciPage'));
 
 const EssaiInscriptionPage = lazy(() => import('./pages/launch/EssaiInscriptionPage'));
