@@ -95,6 +95,7 @@ export default function V3TutorielsPage() {
   const [open, setOpen] = useState<TutorielV3 | null>(null);
   const [i, setI] = useState(0);
   const [intro, setIntro] = useState(0);
+  const [rub, setRub] = useState<(typeof RUBRIQUES_V3)[number]>(RUBRIQUES_V3[0]);
   const start = (t: TutorielV3) => { setOpen(t); setI(0); };
 
   return (
@@ -176,7 +177,20 @@ export default function V3TutorielsPage() {
         </div>
       </section>
 
-      {RUBRIQUES_V3.map((r) => (
+      <section className="mb-4" aria-labelledby="guides-ecrits">
+        <h2 id="guides-ecrits" className="text-2xl font-bold">Les guides écrits, pas à pas</h2>
+        <p className="mt-1 mb-4 text-muted-foreground">Choisissez un onglet pour retrouver les étapes détaillées de chaque tutoriel.</p>
+        <div className="flex flex-wrap gap-2" role="tablist">
+          {RUBRIQUES_V3.map((r) => (
+            <Button key={r} type="button" role="tab" aria-selected={rub === r} size="sm"
+              variant={rub === r ? 'default' : 'outline'} className="v3-chip-toggle" onClick={() => setRub(r)}>
+              {r} ({TUTORIELS_V3.filter((t) => t.rubrique === r).length})
+            </Button>
+          ))}
+        </div>
+      </section>
+
+      {RUBRIQUES_V3.filter((r) => r === rub).map((r) => (
         <section key={r} className="mb-8">
           <div className="relative mb-4 overflow-hidden rounded-xl">
             <img src={RUBRIQUE_IMAGES[r]} alt={`Illustration de la rubrique ${r}`} width={1088} height={608} loading="lazy"
