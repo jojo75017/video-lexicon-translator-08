@@ -76,6 +76,26 @@ export default function V3AuthPage() {
     }
   };
 
+  const sendMagicLink = async () => {
+    if (!email) {
+      toast.error('Entrez d’abord votre adresse email ci-dessus.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/v3/auth`, shouldCreateUser: false },
+      });
+      if (error) throw error;
+      toast.success('Lien envoyé ✓ Ouvrez votre boîte email et cliquez sur le lien.');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Impossible d'envoyer le lien");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (checkingSession) {
     return (
       <main className="min-h-[calc(100vh-4rem)] grid place-items-center" aria-busy="true">
@@ -130,6 +150,20 @@ export default function V3AuthPage() {
             {mode === 'signup' ? 'Créer mon compte' : 'Se connecter'}
           </button>
         </form>
+
+        {mode === 'signin' && (
+          <div className="v3-card mt-4 space-y-2 text-center">
+            <p className="text-sm text-[var(--v3-muted)]">Pas de mot de passe ? Recevez un lien de connexion par email.</p>
+            <button
+              type="button"
+              disabled={loading}
+              onClick={sendMagicLink}
+              className="v3-btn w-full justify-center"
+            >
+              Recevoir mon lien de connexion par email
+            </button>
+          </div>
+        )}
 
         <div className="text-center mt-6 text-sm text-[var(--v3-muted)]">
           {mode === 'signup' ? 'Déjà un compte ?' : 'Pas encore de compte ?'}{' '}
