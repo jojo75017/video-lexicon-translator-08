@@ -23,7 +23,13 @@ interface FicheAudit {
   description: string;
   keywords: string[];
   aplus: AplusModule[];
+  amazon?: { diagnostic: string; actions: string[] };
+  google?: { requetes: string[]; metaTitre: string; metaDescription: string };
+  posts?: { facebook: string; instagram: string; hashtags: string[]; video: string };
 }
+
+const str = (v: unknown) => String(v ?? '').trim();
+const strList = (v: unknown, max: number) => (Array.isArray(v) ? v.map(str).filter(Boolean).slice(0, max) : []);
 
 const HISTORY_KEY = 'v3:kdp:fiche-audit:historique';
 const DESC_LIMIT = 4000;
@@ -145,11 +151,14 @@ Produis exactement trois livrables :
 1. "description" : une description de vente prête à coller dans KDP, ${DESC_LIMIT} caractères maximum, structure accroche / promesse / bénéfices / invitation à commander. Texte simple, pas de balise HTML.
 2. "keywords" : exactement 7 expressions de mots-clés backend KDP, chacune de 50 caractères maximum, sans répétition, sans le nom de l'auteur, sans marque.
 3. "aplus" : exactement 4 modules de contenu A+, dans cet ordre : bannière avec texte, trois colonnes de bénéfices, texte enrichi de présentation, tableau comparatif. Chaque module a un titre, un texte à coller, et une suggestion de visuel.
+4. "amazon" : un "diagnostic" franc de la fiche actuelle (titre, sous-titre, prix, classement, description, catégories) en 4 à 6 phrases, basé uniquement sur les données ci-dessus, et "actions" : 3 à 5 améliorations prioritaires concrètes pour mieux ressortir sur Amazon. N'invente aucun chiffre.
+5. "google" : "requetes" : 6 recherches Google réalistes que tapent les futurs lecteurs ; "metaTitre" (60 caractères max) et "metaDescription" (155 caractères max) pour une page de présentation du livre.
+6. "posts" : "facebook" (post narratif avec accroche, bénéfices, invitation à voir le livre sur Amazon, écrire [LIEN AMAZON] à la place du lien), "instagram" (texte aéré avec puces), "hashtags" (10 hashtags de la niche, avec #), "video" (script de 30 à 45 secondes sans visage pour Reels, TikTok ou Shorts : accroche des 3 premières secondes, plans suggérés, appel à l'action). Aucune promesse de résultat, aucun faux avis.
 
 Réponds uniquement avec ce JSON :
-{"description":"...","keywords":["...","...","...","...","...","...","..."],"aplus":[{"titre":"...","texte":"...","visuel":"..."}]}`;
+{"description":"...","keywords":["..."],"aplus":[{"titre":"...","texte":"...","visuel":"..."}],"amazon":{"diagnostic":"...","actions":["..."]},"google":{"requetes":["..."],"metaTitre":"...","metaDescription":"..."},"posts":{"facebook":"...","instagram":"...","hashtags":["..."],"video":"..."}}`;
 
-      const brut = await callAIWriting(prompt, { temperature: 0.7, jsonMode: true, maxTokens: 4096 });
+      const brut = await callAIWriting(prompt, { temperature: 0.7, jsonMode: true, maxTokens: 8192 });
       const bloc = brut.match(/\{[\s\S]*\}/);
       if (!bloc) throw new Error('Réponse illisible du moteur IA. Relancez l’analyse.');
       const parsed = JSON.parse(bloc[0]) as FicheAudit;
@@ -162,6 +171,18 @@ Réponds uniquement avec ce JSON :
           texte: String(m?.texte || '').trim(),
           visuel: String(m?.visuel || '').trim(),
         })),
+        amazon: parsed.amazon ? { diagnostic: str(parsed.amazon.diagnostic), actions: strList(parsed.amazon.actions, 5) } : undefined,
+        google: parsed.google ? {
+          requetes: strList(parsed.google.requetes, 8),
+          metaTitre: str(parsed.google.metaTitre).slice(0, 70),
+          metaDescription: str(parsed.google.metaDescription).slice(0, 170),
+        } : undefined,
+        posts: parsed.posts ? {
+          facebook: str(parsed.posts.facebook),
+          instagram: str(parsed.posts.instagram),
+          hashtags: strList(parsed.posts.hashtags, 12),
+          video: str(parsed.posts.video),
+        } : undefined,
       });
       setHistorique(pushHistory({ asin: code, marketplace: market, titre: donnees.title, date: new Date().toISOString() }));
     } catch (e: any) {
@@ -185,6 +206,9 @@ Réponds uniquement avec ce JSON :
       '',
       '=== CONTENU A+ (4 MODULES) ===',
       ...fiche.aplus.flatMap((m, i) => [`Module ${i + 1} — ${m.titre}`, m.texte, `[Visuel : ${m.visuel}]`, '']),
+      ...(fiche.amazon ? ['=== AMÉLIORATIONS AMAZON ===', fiche.amazon.diagnostic, ...fiche.amazon.actions.map((a, i) => `${i + 1}. ${a}`), ''] : []),
+      ...(fiche.google ? ['=== VISIBILITÉ GOOGLE ===', ...fiche.google.requetes.map((r) => `- ${r}`), `Méta-titre : ${fiche.google.metaTitre}`, `Méta-description : ${fiche.google.metaDescription}`, ''] : []),
+      ...(fiche.posts ? ['=== POSTS RÉSEAUX SOCIAUX ===', '--- Facebook ---', fiche.posts.facebook, '', '--- Instagram ---', fiche.posts.instagram, fiche.posts.hashtags.join(' '), '', '--- Vidéo courte ---', fiche.posts.video] : []),
     ];
     const blob = new Blob([lignes.join('\n')], { type: 'text/plain;charset=utf-8' });
     const url = URL.createObjectURL(blob);
@@ -582,6 +606,61 @@ Réponds uniquement avec ce JSON :
               ))}
             </div>
           </Bloc>
+
+          {fiche.amazon && (
+            <Bloc titre="Améliorations à apporter sur Amazon" sous="Diagnostic de la fiche actuelle et actions prioritaires pour mieux ressortir.">
+              <p className="whitespace-pre-line text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>{fiche.amazon.diagnostic}</p>
+              <ol className="mt-3 space-y-2">
+                {fiche.amazon.actions.map((a, i) => (
+                  <li key={i} className="flex gap-2 text-[13.5px]" style={{ color: 'var(--v3-ink)' }}>
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[11px] font-bold" style={{ background: 'var(--v3-gold-soft)', color: 'var(--v3-emerald)' }}>{i + 1}</span>
+                    <span>{a}</span>
+                  </li>
+                ))}
+              </ol>
+            </Bloc>
+          )}
+
+          {fiche.google && (
+            <Bloc titre="Visibilité sur Google" sous="Recherches tapées par vos futurs lecteurs, et texte de présentation pour Google.">
+              <div className="flex flex-wrap gap-1.5">
+                {fiche.google.requetes.map((r, i) => (
+                  <span key={i} className="rounded-full border px-2.5 py-1 text-[12px]" style={{ borderColor: 'var(--v3-line)', color: 'var(--v3-ink)' }}>{r}</span>
+                ))}
+              </div>
+              {[['Méta-titre', fiche.google.metaTitre], ['Méta-description', fiche.google.metaDescription]].map(([k, v]) => (
+                <div key={k} className="mt-3 flex items-start gap-2">
+                  <div className="flex-1">
+                    <Label className="text-[11px]">{k} ({v.length} car.)</Label>
+                    <p className="text-[13px]" style={{ color: 'var(--v3-ink)' }}>{v}</p>
+                  </div>
+                  <Button variant="ghost" size="sm" className="[color:var(--v3-ink)!important]" onClick={() => copy(v, `${k} copié`)} aria-label={`Copier ${k}`}><Copy className="h-3.5 w-3.5" /></Button>
+                </div>
+              ))}
+            </Bloc>
+          )}
+
+          {fiche.posts && (
+            <Bloc titre="Posts pour les réseaux sociaux" sous="Prêts à copier. Remplacez [LIEN AMAZON] par le lien de votre livre.">
+              <div className="space-y-4">
+                {[
+                  ['Facebook / Groupes', fiche.posts.facebook],
+                  ['Instagram', `${fiche.posts.instagram}\n\n${fiche.posts.hashtags.join(' ')}`.trim()],
+                  ['Vidéo courte (Reels, TikTok, Shorts)', fiche.posts.video],
+                ].filter(([, v]) => v).map(([k, v]) => (
+                  <div key={k} className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: 'var(--v3-cream)' }}>
+                    <div className="mb-2 flex items-center justify-between gap-2">
+                      <span className="text-[13px] font-semibold" style={{ color: 'var(--v3-emerald)' }}>{k}</span>
+                      <Button variant="outline" size="sm" className="gap-1.5 border-[var(--v3-emerald)] [background:var(--v3-paper)!important] [color:var(--v3-ink)!important]" onClick={() => copy(v, 'Post copié')}>
+                        <Copy className="h-3.5 w-3.5" /> Copier
+                      </Button>
+                    </div>
+                    <p className="whitespace-pre-line text-[13px]" style={{ color: 'var(--v3-ink)' }}>{v}</p>
+                  </div>
+                ))}
+              </div>
+            </Bloc>
+          )}
         </div>
       )}
     </div>
