@@ -77,7 +77,7 @@ const NAV: NavSection[] = [
       { to: '/v3/create/illustre?preset=histoires-du-soir-3-7', label: 'Histoires du soir 3-7 ans', icon: BookOpen },
       { to: '/v3/corriger', label: 'Corriger mon livre', icon: Wand2 },
       { to: '/v3/outils/humanizer', label: 'HumanizeAI', icon: Wand2, badge: 'Nouveau' },
-      { to: '/v3/tutoriels-v3', label: 'Tutoriels V3 (25)', icon: Video, badge: 'Nouveau' },
+  { to: '/v3/tutoriels-v3', label: 'Tutoriels V3 (25)', icon: Video, badge: 'Nouveau' },
       { to: '/v3/outils/editeur', label: 'Éditeur WYSIWYG', icon: FileText },
       { to: '/v3/outils/traduction', label: 'Traduction 10 à 15 langues', icon: ListTree },
     ],
@@ -196,6 +196,7 @@ const DIRECT_LINKS = [
   { to: '/v3/fonctionnalites/cles', label: 'Clés API · première étape', icon: KeyRound, color: 'var(--v3-api-nav)' },
   { to: '/v3/commence-ici', label: 'Commence ici', icon: Rocket, color: '#EA580C' },
   { to: '/v3/mes-livres', label: 'Bibliothèque / Mes livres', icon: LibraryBig, color: '#2563EB' },
+  { to: '/v3/cadeaux', label: '🎁 Mes cadeaux', icon: Video, color: '#D97706' },
   { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
   { to: '/v3/outils', label: 'Tous les outils V3', icon: ListTree, color: '#7C3AED' },
 ];
