@@ -197,7 +197,6 @@ const DIRECT_LINKS = [
   { to: '/v3/commence-ici', label: 'Commence ici', icon: Rocket, color: '#EA580C' },
   { to: '/v3/mes-livres', label: 'Bibliothèque / Mes livres', icon: LibraryBig, color: '#2563EB' },
   { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
-  { to: '/v3/kdp', label: 'Ebookstudio KDP', icon: LibraryBig, color: '#064e3b' },
   { to: '/v3/outils', label: 'Tous les outils V3', icon: ListTree, color: '#7C3AED' },
 ];
 
@@ -436,8 +435,8 @@ export default function V3Sidebar() {
         </NavLink>
 
         {DIRECT_LINKS.slice(BIB_INDEX + 1).map((l) => (
+          <div key={l.to} className="space-y-1.5">
           <NavLink
-            key={l.to}
             to={l.to}
             end
             title={l.label}
@@ -447,13 +446,16 @@ export default function V3Sidebar() {
             <l.icon className="h-4 w-4 shrink-0" />
             {!collapsed && <span className="truncate">{l.label}</span>}
           </NavLink>
+          {/* « Ebookstudio KDP » et ses sous-onglets juste sous « Tutoriels de A à Z ». */}
+          {l.to === '/v3/tutoriels-v3' && groups.filter((g) => g.key === 'kdp').map((g) => renderGroup(g))}
+          </div>
         ))}
 
         {/* Abonnement & aide juste sous « Tous les outils V3 », facile à trouver pour les abonnés. */}
         {groups.filter((g) => g.key === 'compte').map((g) => renderGroup(g))}
 
         {!collapsed && <p className="v3-sb-heading">Mes ateliers</p>}
-        {groups.filter((g) => g.key !== 'compte').map((g) => renderGroup(g))}
+        {groups.filter((g) => g.key !== 'compte' && g.key !== 'kdp').map((g) => renderGroup(g))}
       </nav>
 
       {/* Retour vers l'espace habituel : le choix reste réversible à tout moment. */}
