@@ -197,6 +197,7 @@ const DIRECT_LINKS = [
   { to: '/v3/commence-ici', label: 'Commence ici', icon: Rocket, color: '#EA580C' },
   { to: '/v3/mes-livres', label: 'Bibliothèque / Mes livres', icon: LibraryBig, color: '#2563EB' },
   { to: '/v3/tutoriels-v3', label: 'Tutoriels de A à Z', icon: Video, color: '#0891B2' },
+  { to: '/v3/kdp', label: 'Ebookstudio KDP', icon: LibraryBig, color: '#064e3b' },
   { to: '/v3/outils', label: 'Tous les outils V3', icon: ListTree, color: '#7C3AED' },
 ];
 
