@@ -243,6 +243,7 @@ const V3Upsell17Page = lazy(() => import('./pages/v3public/V3Upsell17Page'));
 const V3NouveautesPage = lazy(() => import('./pages/v3public/V3NouveautesPage'));
 const V3RoyaltiesPage = lazy(() => import('./pages/v3public/V3RoyaltiesPage'));
 const V3HumanizerPage = lazy(() => import('./pages/v3public/V3HumanizerPage'));
+const V3CadeauxPage = lazy(() => import('./pages/v3public/V3CadeauxPage'));
 const V3TutorielsPage = lazy(() => import('./pages/v3public/V3TutorielsPage'));
 const V3MockupPage = lazy(() => import('./pages/v3public/V3MockupPage'));
 const V3AudiobookPage = lazy(() => import('./pages/v3public/V3AudiobookPage'));
@@ -839,6 +840,7 @@ const App = () => {
               <Route path="workflow" element={<V3WorkflowPage />} />
               <Route path="commence-ici" element={<V3StartHerePage />} />
               <Route path="tutoriels-v3" element={<V3TutorielsPage />} />
+              <Route path="cadeaux" element={<V3CadeauxPage />} />
               <Route path="contentstudio" element={<V3LockedGate><TrialGate label="ContentStudio Engine"><ContentStudioPage /></TrialGate></V3LockedGate>} />
               <Route path="contentstudio/:id" element={<V3LockedGate><TrialGate label="ContentStudio Engine"><ContentStudioProjectPage /></TrialGate></V3LockedGate>} />
               <Route path="version-longue" element={<V3LockedGate><VersionLongueLibraryPage /></V3LockedGate>} />
