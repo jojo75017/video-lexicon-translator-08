@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, Navigate, Outlet, useLocation } from 'react-router-dom';
+import AtelierTutoVideo from './AtelierTutoVideo';
 import { Home, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import '@/styles/v3-public.css';
@@ -131,7 +132,7 @@ export default function V3PublicLayout({ isAdmin, isAdminChecking, isSubscriber 
                 </Link>
               </div>
             )}
-            {isAuthed && !isHome ? <div className="v3-dark-page"><Outlet /></div> : <Outlet />}
+            {isAuthed && !isHome ? <div className="v3-dark-page"><AtelierTutoVideo /><Outlet /></div> : <Outlet />}
           </main>
         </div>
         <V3Footer />

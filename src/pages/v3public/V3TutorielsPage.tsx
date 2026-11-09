@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 import { RUBRIQUES_V3, TUTORIELS_V3, type TutorielV3 } from '@/data/tutorielsV3';
+import { SERIE_V3, CLOTURE_V3 } from '@/data/videosSerieV3';
 
 const KDP_RESOURCES = [
   {
@@ -145,6 +146,34 @@ export default function V3TutorielsPage() {
             )}
           </div>
         </div>); })()}
+      </section>
+
+      <section className="mb-10" aria-labelledby="serie-officielle">
+        <h2 id="serie-officielle" className="text-2xl font-bold">La série officielle : 12 vidéos d’une minute</h2>
+        <p className="mt-1 mb-4 text-muted-foreground">Chaque vidéo se retrouve aussi en haut de son atelier, avec le bouton « Voir le tutoriel vidéo ».</p>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {SERIE_V3.map((v) => (
+            <div key={v.num} className="rounded-xl border bg-card p-3">
+              <video src={v.src} controls preload="metadata" playsInline className="aspect-video w-full rounded-lg bg-black" aria-label={`Vidéo ${v.num} : ${v.titre}`} />
+              <div className="mt-2 flex items-start justify-between gap-2">
+                <div><div className="text-xs text-muted-foreground">Vidéo {v.num}/12 · {v.duree}</div><div className="font-semibold">{v.titre}</div></div>
+                <Button asChild size="sm" variant="outline"><Link to={v.route}>Ouvrir l’atelier</Link></Button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-10" aria-labelledby="cloture">
+        <h2 id="cloture" className="mb-4 text-2xl font-bold">Pour finir en beauté</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          {CLOTURE_V3.map((v) => (
+            <div key={v.titre} className="rounded-xl border bg-card p-3">
+              <video src={v.src} controls preload="metadata" playsInline className="aspect-video w-full rounded-lg bg-black" aria-label={`Vidéo : ${v.titre}`} />
+              <div className="mt-2 text-xs text-muted-foreground">{v.duree}</div><div className="font-semibold">{v.titre}</div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {RUBRIQUES_V3.map((r) => (
