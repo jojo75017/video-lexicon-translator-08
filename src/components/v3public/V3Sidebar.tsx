@@ -459,19 +459,6 @@ export default function V3Sidebar() {
         {groups.filter((g) => g.key !== 'compte' && g.key !== 'kdp').map((g) => renderGroup(g))}
       </nav>
 
-      {/* Retour vers l'espace habituel : le choix reste réversible à tout moment. */}
-      <div className="px-2 pb-3">
-        <a
-          href={SUBSCRIBER_HOME_PATH}
-          onClick={() => setSpaceChoice('v2')}
-          className="v3-sb-tile"
-          style={{ background: '#EA580C' }}
-          title="Revenir à mon espace habituel"
-        >
-          <ChevronLeft className="w-4 h-4 shrink-0" />
-          {!collapsed && <span className="truncate">Revenir à la V2</span>}
-        </a>
-      </div>
     </aside>
 
   );

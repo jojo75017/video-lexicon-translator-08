@@ -252,9 +252,6 @@ export default function V3HomeTopBlock({ userId }: { userId: string }) {
             )}
           </div>
         )}
-        <a href={SUBSCRIBER_HOME_PATH} onClick={() => setSpaceChoice('v2')} className="rounded-md px-3 py-2 text-sm font-bold" style={{ background: '#EA580C', color: '#fff' }}>
-          <span style={{ color: '#fff' }}>Revenir à la V2</span>
-        </a>
       </div>
 
       {/* 1. Reprise du livre */}
