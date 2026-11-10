@@ -1,5 +1,6 @@
 # Roadmap
-- [ ] Ajouter et vérifier « Voir votre Flipbook » dans les deux bibliothèques, contrôler /essai et /v3/ebook-illustre, puis publier à la demande de Georges du 10 novembre.
+- [x] Ajouter « Voir votre Flipbook » aux deux bibliothèques : lecture depuis le compte de Georges vérifiée, affichage mobile contrôlé et trois tests réussis ; /essai et spécimen /v3/ebook-illustre ouverts à l’écran.
+- [ ] Publication demandée le 10 novembre : confirmer la lecture vidéo sur le site public ; le fichier CDN est valide (52,33 secondes), mais localhost ne sert pas le CDN. Les anciennes alertes approfondies du 7 novembre restent à requalifier.
 
 - [x] Audit V3 du 7 novembre : harmoniser les textes confirmés (clés personnelles, tutoriels, langues et KDP), tester tarifs/droits et vérifier les pages depuis le compte connecté sur ordinateur/mobile.
 - [x] Audit sécurité du 7 novembre : protéger 15 services IA contre les appels anonymes, préserver les clients dans les essais/paiements, ne plus renvoyer les codes, retirer le rôle modifiable et protéger les téléchargements d’images ; tests sans email ni paiement.
