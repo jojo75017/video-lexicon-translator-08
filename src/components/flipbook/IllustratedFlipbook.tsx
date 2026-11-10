@@ -66,7 +66,7 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
         </div>
         <div aria-hidden className="hidden bg-gradient-to-r from-black/0 via-black/15 to-black/0 md:block" />
         <div className="flex flex-col px-6 py-7 text-[#2A2118]">
-          {page.title && <h3 className="v3-serif mb-3 text-xl font-bold">{page.title}</h3>}
+          {page.title && <h3 className="v3-serif mb-3 text-xl font-bold !text-inherit">{page.title}</h3>}
           <div className="max-h-[400px] flex-1 overflow-y-auto whitespace-pre-line text-[15px] leading-[1.7]">{page.text}</div>
           {page.caption && <p className="mt-3 text-xs italic text-[#8A8072]">{page.caption}</p>}
           <p className="mt-4 text-center text-xs text-[#8A8072]">{index + 1}</p>
