@@ -4,6 +4,7 @@ import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket,
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
+import ChapterFlipbook from '@/components/essai/ChapterFlipbook';
 
 interface OutlineItem {
   title: string;
@@ -200,7 +201,7 @@ export default function EssaiPage() {
     q.set('src', 'essai');
     const cleanEmail = email.trim().toLowerCase();
     if (cleanEmail && cleanEmail.includes('@')) q.set('email', cleanEmail);
-    return `/commander?${q.toString()}`;
+    return `/formules?${q.toString()}`;
   })();
 
   return (
@@ -369,11 +370,11 @@ export default function EssaiPage() {
               )}
 
               {claimed && fullChapter ? (
-                <div className="mt-4 space-y-4 text-[17px] leading-[1.75] text-[#2A2118]">
-                  {fullParagraphs.map((p, i) => (
-                    <p key={i}>{p}</p>
-                  ))}
-                </div>
+                <ChapterFlipbook
+                  title={outlineResult.title}
+                  chapterTitle={chapter?.chapterTitle || outlineResult.outline[0]?.title || 'Chapitre 1'}
+                  paragraphs={fullParagraphs}
+                />
               ) : (
                 chapter && (
                   <>
@@ -475,7 +476,7 @@ export default function EssaiPage() {
                     Pour écrire la suite
                   </p>
                   <h2 className="v3-serif mt-2 text-2xl font-bold leading-tight text-[#18261E]">
-                    L'accès à vie à 47 € — jusqu'au 30 septembre 2026
+                    Votre abonnement dès 19 €/mois, sans engagement
                   </h2>
                   <ul className="mt-4 space-y-2 text-sm font-medium text-[#263D30]">
                     {LOCKED.map((l) => (
@@ -493,8 +494,7 @@ export default function EssaiPage() {
                     <Rocket className="h-4 w-4" /> Écrire les chapitres 2 à 60
                   </a>
                   <p className="mt-3 text-center text-xs font-medium text-[#5B5245]">
-                    Paiement unique de 47 € · aucun abonnement. Après le 30 septembre 2026 :
-                    abonnement mensuel 27 € ou 47 €, sans engagement.
+                    Débutant 19 €/mois · Auteur 29 €/mois · Édition VIP 59 €/mois. Sans engagement.
                   </p>
                   <p className="mt-3 text-center text-xs">
                     <a href="/demo" className="font-semibold text-[#0F2E1F] underline underline-offset-2 hover:text-[#14532D]">
