@@ -27,6 +27,8 @@ export const MARKETING_EXCLUDED_PREFIXES = [
   '/avant-premiere',
   // Tunnel de lancement : message unique, aucune offre concurrente affichée.
   '/lancement',
+  // Essai gratuit : uniquement le parcours Kindle 12 chapitres + flipbook.
+  '/essai',
 
 ];
 
