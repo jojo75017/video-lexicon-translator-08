@@ -52,6 +52,7 @@ async function callAI(messages: Array<{ role: string; content: string }>, maxTok
       model: "google/gemini-2.5-flash",
       messages,
       max_tokens: maxTokens,
+      response_format: { type: "json_object" },
     }),
   });
   if (!res.ok) {
@@ -74,7 +75,20 @@ function extractJson(raw: string): any {
   const start = cleaned.indexOf("{");
   const end = cleaned.lastIndexOf("}");
   if (start === -1 || end === -1) throw new Error("Réponse IA illisible");
-  return JSON.parse(cleaned.slice(start, end + 1));
+  const slice = cleaned.slice(start, end + 1);
+  try {
+    return JSON.parse(slice);
+  } catch {
+    // Réparation légère : virgules manquantes entre éléments, virgules finales, retours ligne bruts.
+    const repaired = slice
+      .replace(/,\s*([\]}])/g, "$1")
+      .replace(/"\s*\n\s*"/g, '",\n"')
+      .replace(/}\s*\n?\s*{/g, "},{")
+      .replace(/]\s*\n?\s*\[/g, "],[")
+      .replace(/"\s*\n\s*{/g, '",{')
+      .replace(/}\s*\n\s*"/g, '},"');
+    return JSON.parse(repaired);
+  }
 }
 
 const LANGUAGES: Record<string, string> = {
