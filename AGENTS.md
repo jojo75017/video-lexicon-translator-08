@@ -1,4 +1,5 @@
 # Architecture
+- Library Flipbook previews load only the selected ownership-filtered ebook and its saved pages through SavedBookFlipbook, reusing the illustrated reader without AI generation or changing exports.
 - Security handler regression tests execute isolated handler code with mocked identity, storage and provider calls, so denied requests can be verified without real AI spending, emails or customer changes.
 - The V3 API-key guide reuses EbookSettingsPanel and its existing browser persistence at /v3/fonctionnalites/cles, so onboarding instructions never create duplicate key storage or alter generation providers.
 - Assistance and FAQ share scoped semantic contrast styles and exclude acquisition overlays so help remains readable without changing other pages.
