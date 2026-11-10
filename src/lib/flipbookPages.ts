@@ -10,7 +10,7 @@ export function savedFlipbookPages(chapters: unknown, images: unknown): FlipPage
     const chapter = record(value);
     const subs = Array.isArray(chapter.subChapters) ? chapter.subChapters : [];
     const content = [text(chapter.content || chapter.contenu || chapter.text), ...subs.map(v => text(record(v).content))].filter(Boolean).join('\n\n');
-    const image = illustrations.find(v => v.type !== 'front_cover' && (v.page === index + 1 || v.story_id === chapter.id || v.chapter_number === index + 1));
+    const image = illustrations.find(v => v.type !== 'front_cover' && (v.page === index + 1 || (typeof chapter.id === 'string' && v.story_id === chapter.id) || v.chapter_number === index + 1));
     const imageUrl = text(chapter.illustration_url || chapter.illustrationUrl || image?.url);
     if (!content.trim() && !imageUrl) return [];
     return [{ title: text(chapter.title) || `Page ${index + 1}`, text: content, imageUrl: imageUrl || undefined }];
