@@ -268,6 +268,9 @@ export default function EssaiPage() {
                   </button>
                 ))}
               </div>
+              <p className="text-sm font-medium text-[#5B5245]">
+                … ou écrivez <strong className="text-[#0F2E1F]">le vôtre</strong> dans le champ ci-dessus ✍️
+              </p>
 
               <button
                 type="button"
