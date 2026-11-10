@@ -10,7 +10,6 @@ import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 import { Button } from '@/components/ui/button';
 import AgentPortrait from '@/components/v3public/AgentPortrait';
-import { V2V3ModeButton } from '@/components/admin/V2V3FloatingSwitch';
 import V3ToolSearch from './V3ToolSearch';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
@@ -244,7 +243,7 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
               <span aria-hidden>🤖</span>
               <span>Nouveau · EbookStudio AI Team</span>
             </a>
-            <V2V3ModeButton variant="inline" />
+            {null}
             <NavLink
               to="/v3/tutoriels-v3"
               className="v3-btn h-9 rounded-full text-[12px] shrink-0"
@@ -462,7 +461,7 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
             >
               🤖 Nouveau · EbookStudio AI Team
             </a>
-            <V2V3ModeButton variant="inline" />
+            {null}
             <NavLink
               to="/v3/tutoriels-v3"
               onClick={() => setMobileOpen(false)}
