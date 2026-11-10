@@ -44,6 +44,7 @@ export default function V3IllustratedAlbumPage() {
   const [imageProgress, setImageProgress] = useState({ done: 0, total: 0 });
   const [projectId, setProjectId] = useState<string | null>(() => localStorage.getItem(PROJECT_KEY));
   const [showCheckout, setShowCheckout] = useState(false);
+  const [flip, setFlip] = useState(false);
   const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const { loading: accessLoading, hasAccess } = useModuleAccess('studio-jeunesse');
 
