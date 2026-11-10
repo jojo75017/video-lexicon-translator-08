@@ -42,7 +42,7 @@ function rateLimited(ip: string): boolean {
   return false;
 }
 
-async function callAI(messages: Array<{ role: string; content: string }>, maxTokens = 4000) {
+async function callAI(messages: Array<{ role: string; content: string }>, maxTokens = 4000, jsonMode = true) {
   const key = Deno.env.get("LOVABLE_API_KEY");
   if (!key) throw new Error("Moteur IA non configuré");
   const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -52,7 +52,7 @@ async function callAI(messages: Array<{ role: string; content: string }>, maxTok
       model: "google/gemini-2.5-flash",
       messages,
       max_tokens: maxTokens,
-      response_format: { type: "json_object" },
+      ...(jsonMode ? { response_format: { type: "json_object" } } : {}),
     }),
   });
   if (!res.ok) {
@@ -257,7 +257,7 @@ Deno.serve(async (req) => {
             `(une ligne vide, puis le texte intégral du chapitre, paragraphes séparés par une ligne vide)\n` +
             `Ouverture forte, développement, fin de chapitre qui donne envie de lire le suivant.`,
         },
-      ], 8000);
+      ], 8000, false);
 
       const cleanedRaw = raw.replace(/```[a-z]*|```/g, "").trim();
       const titleMatch = cleanedRaw.match(/^\s*TITRE\s*:\s*(.+)$/im);
