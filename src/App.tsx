@@ -943,9 +943,6 @@ const App = () => {
           {!isAdminAuthRoute && <ScrollToTopButton />}
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
           {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
-          {!isAdminAuthRoute && !pathname.startsWith('/v3') && (isAuthenticated || isAdmin) && (
-            {null}
-          )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}
           {!isAdminAuthRoute && !isAuthenticated && <LeadCapturePopup />}
