@@ -28,7 +28,6 @@ import GeminiKeyAlertBanner from '@/components/ebook/GeminiKeyAlertBanner';
 import AISosModal from '@/components/shared/AISosModal';
 import AICostBadge from '@/components/shared/AICostBadge';
 import { useBrandTitle } from '@/hooks/useBrandTitle';
-import V2V3FloatingSwitch from '@/components/admin/V2V3FloatingSwitch';
 import LeadCapturePopup from '@/components/marketing/LeadCapturePopup';
 import FloatingToolCTA from '@/components/marketing/FloatingToolCTA';
 import GlobalBackBar from '@/components/navigation/GlobalBackBar';

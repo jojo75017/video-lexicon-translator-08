@@ -10,7 +10,6 @@ import useIsAdmin from '@/hooks/useIsAdmin';
 import { isPreviewingAsSubscriber } from '@/components/v3/V3ContemplationMode';
 import { Button } from '@/components/ui/button';
 import AgentPortrait from '@/components/v3public/AgentPortrait';
-import { V2V3ModeButton } from '@/components/admin/V2V3FloatingSwitch';
 import V3ToolSearch from './V3ToolSearch';
 
 /** Couleur « voyant robot » + spécialiste référent par catégorie du menu. */
