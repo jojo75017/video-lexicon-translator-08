@@ -42,10 +42,15 @@ const LANGUAGES: Array<{ code: string; label: string }> = [
   { code: 'nl', label: 'Néerlandais' },
 ];
 
-const EXAMPLES = [
-  'Un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours.',
-  "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël.",
-  'Un livre de recettes simples pour cuisiner sain en moins de 20 minutes le soir.',
+const EXAMPLES: Array<{ label: string; idea: string }> = [
+  { label: '😴 Bébé dort enfin', idea: 'Un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours.' },
+  { label: '🔎 Le boulanger disparu', idea: "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël." },
+  { label: '🥗 Cuisine saine en 20 min', idea: 'Un livre de recettes simples pour cuisiner sain en moins de 20 minutes le soir.' },
+  { label: '🌱 Mon potager sur balcon', idea: 'Un guide pratique pour cultiver ses légumes sur un balcon de ville, même sans expérience.' },
+  { label: '🧸 Le petit renard courageux', idea: "Une histoire pour enfants de 4 à 7 ans : un petit renard qui apprend à vaincre sa peur du noir." },
+  { label: '💶 Retraite sereine', idea: 'Un guide simple pour bien préparer sa retraite, gérer son budget et profiter de son temps libre.' },
+  { label: '💔 Amour à Lisbonne', idea: "Un roman d'amour : deux inconnus se rencontrent dans un tramway de Lisbonne et se retrouvent dix ans plus tard." },
+  { label: '🐕 Éduquer son chiot', idea: 'Un guide bienveillant pour éduquer son chiot pendant ses six premiers mois.' },
 ];
 
 const LOCKED = [
@@ -256,10 +261,10 @@ export default function EssaiPage() {
                   <button
                     key={i}
                     type="button"
-                    onClick={() => setIdea(ex)}
+                    onClick={() => setIdea(ex.idea)}
                     className="rounded-full border border-black/10 bg-[#FBF8F3] px-3 py-1 text-xs text-[#5B5245] transition hover:border-[#0F2E1F]/40 hover:text-[#0F2E1F]"
                   >
-                    Exemple {i + 1}
+                    {ex.label}
                   </button>
                 ))}
               </div>
