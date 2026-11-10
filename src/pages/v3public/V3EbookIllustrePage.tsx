@@ -1,7 +1,12 @@
 import heroImg from '@/assets/ebook-illustre-hero.jpg';
 import pagesImg from '@/assets/ebook-illustre-pages.jpg';
+import albumImg from '@/assets/livre-histoires-illustrees-hero.jpg';
+import guideImg from '@/assets/v3-kdp-ai-illustrations.jpg';
+import tutoVideo from '@/assets/tutoriel-livre-illustre.mp4.asset.json';
+import IllustratedFlipbook from '@/components/flipbook/IllustratedFlipbook';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Baby, BookImage, GraduationCap, Layers, Image, Smile } from 'lucide-react';
+import { ArrowRight, BookOpen, Baby, BookImage, GraduationCap, Layers, Image, Smile } from 'lucide-react';
 
 const HOW = [
   "Racontez votre idée et choisissez le genre de l'histoire",
@@ -26,11 +31,28 @@ const TUTO = [
   { q: 'Étape 5 : exporter et publier', a: "Téléchargez votre livre en PDF ou en Word au format de votre choix, puis publiez-le sur Amazon KDP." },
 ];
 
+const SAMPLE = [
+  { imageUrl: heroImg, text: "Au cœur de la forêt vivait un petit renard roux. Chaque matin, il regardait la grande colline en rêvant de voir ce qu'il y avait derrière." },
+  { imageUrl: pagesImg, text: "Un jour, il prit son courage à deux pattes. Il traversa la rivière, salua la baleine du lac et passa devant la grotte du vieux dragon endormi." },
+  { imageUrl: albumImg, text: "Arrivé en haut, il découvrit une vallée pleine de lumière. Le petit renard sourit : le monde était bien plus grand et plus beau qu'il ne l'imaginait." },
+  { imageUrl: guideImg, text: "Le soir venu, il rentra chez lui, fier de son aventure. Et cette nuit-là, il s'endormit en rêvant déjà de la prochaine colline. Fin." },
+];
+
 export default function V3EbookIllustrePage() {
+  const [flip, setFlip] = useState(false);
   return (
     <div style={{ background: '#0B0F17', color: '#E5E7EB', minHeight: '100vh' }} className="px-6 py-10">
       <div className="mx-auto max-w-6xl">
         <img src={heroImg} alt="Livre illustré ouvert, un enfant et un renard dans la forêt" width={1600} height={640} className="mb-6 w-full rounded-2xl object-cover" style={{ maxHeight: 340, border: '1px solid #1F2937' }} />
+        <section className="mb-8 rounded-2xl p-5" style={{ background: '#111827', border: '1px solid #1F2937' }}>
+          <span className="inline-block rounded-full px-3 py-1 text-xs font-bold tracking-widest" style={{ background: '#14B8A6', color: '#0B0F17' }}>🎥 TUTORIEL RAPIDE · 52 SECONDES</span>
+          <h2 className="mt-3 text-xl font-bold" style={{ color: '#F9FAFB' }}>Créer son premier livre illustré</h2>
+          <video src={tutoVideo.url} controls preload="metadata" playsInline className="mt-4 w-full rounded-xl" style={{ maxHeight: 480, background: '#000' }} />
+          <button type="button" onClick={() => setFlip((v) => !v)} className="v3-flat-btn mt-4 inline-flex items-center gap-2 rounded-lg px-5 py-3 font-bold" style={{ background: '#EA580C', color: '#fff' }}>
+            <BookOpen className="h-4 w-4" /> {flip ? "Fermer l'exemple" : 'Feuilleter un exemple d’album en direct'}
+          </button>
+          {flip && <div className="mt-4"><IllustratedFlipbook bookTitle="Le petit renard courageux (exemple)" pages={SAMPLE} onClose={() => setFlip(false)} /></div>}
+        </section>
         <span className="inline-block rounded-full px-4 py-1 text-xs font-bold tracking-widest" style={{ background: '#EA580C', color: '#fff' }}>INCLUS DANS VOTRE ESPACE</span>
         <div className="mt-4 grid gap-8 lg:grid-cols-2">
           <div>
