@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { AdminPanelNav } from '@/components/admin/AdminPanelNav';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Download, RefreshCw, Users, ShoppingCart, TrendingUp, Mail } from 'lucide-react';
+import { Download, RefreshCw, Users, ShoppingCart, TrendingUp, Mail, MousePointerClick } from 'lucide-react';
 import { toast } from 'sonner';
 
 type Period = '24h' | '7d' | '30d' | 'all';
@@ -63,28 +63,32 @@ export default function AdminFunnelPage() {
   const [referrals, setReferrals] = useState<any[]>([]);
   const [codes, setCodes] = useState<any[]>([]);
   const [clicks, setClicks] = useState<any[]>([]);
+  const [intents, setIntents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const [l, o, r, c, k] = await Promise.all([
+      const [l, o, r, c, k, i] = await Promise.all([
         supabase.from('funnel_leads').select('*').order('created_at', { ascending: false }).limit(2000),
         supabase.from('funnel_orders').select('*').order('created_at', { ascending: false }).limit(2000),
         supabase.from('referrals').select('*').order('created_at', { ascending: false }).limit(2000),
         supabase.from('referral_codes').select('*'),
         supabase.from('affiliate_clicks').select('ref_code'),
+        supabase.from('checkout_intents').select('*').order('created_at', { ascending: false }).limit(2000),
       ]);
       if (l.error) throw l.error;
       if (o.error) throw o.error;
       if (r.error) throw r.error;
       if (c.error) throw c.error;
       if (k.error) throw k.error;
+      if (i.error) throw i.error;
       setLeads(l.data || []);
       setOrders(o.data || []);
       setReferrals(r.data || []);
       setCodes(c.data || []);
       setClicks(k.data || []);
+      setIntents(i.data || []);
     } catch (e: any) {
       toast.error('Erreur de chargement : ' + (e?.message ?? 'inconnue'));
     } finally {
@@ -114,6 +118,19 @@ export default function AdminFunnelPage() {
       return true;
     });
   }, [orders, periodDate, search, statusFilter]);
+
+  const paidEmails = useMemo(
+    () => new Set(orders.filter((o) => o.status === 'paid').map((o) => String(o.email || '').toLowerCase())),
+    [orders],
+  );
+
+  const filteredIntents = useMemo(() => {
+    return intents.filter((it) => {
+      if (periodDate && new Date(it.created_at) < periodDate) return false;
+      if (search && !String(it.email || '').toLowerCase().includes(search.toLowerCase())) return false;
+      return true;
+    });
+  }, [intents, periodDate, search]);
 
   // Stats leads
   const leadsStats = {
@@ -217,6 +234,9 @@ export default function AdminFunnelPage() {
             </TabsTrigger>
             <TabsTrigger value="orders">
               <ShoppingCart className="mr-2 h-4 w-4" /> Commandes ({orders.length})
+            </TabsTrigger>
+            <TabsTrigger value="intents">
+              <MousePointerClick className="mr-2 h-4 w-4" /> Intentions ({intents.length})
             </TabsTrigger>
             <TabsTrigger value="affiliates">
               <TrendingUp className="mr-2 h-4 w-4" /> Affiliés ({affiliates.length})
@@ -387,6 +407,85 @@ export default function AdminFunnelPage() {
                         <TableCell className="text-sm text-muted-foreground">{fmtDate(o.created_at)}</TableCell>
                       </TableRow>
                     ))
+                  )}
+                </TableBody>
+              </Table>
+            </Card>
+          </TabsContent>
+
+          {/* INTENTIONS DE COMMANDE (email validé avant le paiement) */}
+          <TabsContent value="intents" className="space-y-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <StatCard label="Intentions totales" value={intents.length} />
+              <StatCard
+                label="Intentions 7j"
+                value={intents.filter((it) => new Date(it.created_at) > new Date(Date.now() - 7 * 24 * 3600 * 1000)).length}
+              />
+              <StatCard label="Ont payé" value={intents.filter((it) => paidEmails.has(String(it.email || '').toLowerCase())).length} />
+              <StatCard
+                label="À relancer"
+                value={intents.filter((it) => !paidEmails.has(String(it.email || '').toLowerCase())).length}
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  downloadCSV(
+                    `intentions-commande-${new Date().toISOString().slice(0, 10)}.csv`,
+                    filteredIntents.map((it) => ({
+                      email: it.email,
+                      formule: it.plan_name,
+                      page: it.page_path,
+                      statut: paidEmails.has(String(it.email || '').toLowerCase()) ? 'payé' : 'à relancer',
+                      date: it.created_at,
+                    })),
+                  )
+                }
+              >
+                <Download className="mr-2 h-4 w-4" /> Export CSV
+              </Button>
+            </div>
+
+            <Card className="overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Formule cliquée</TableHead>
+                    <TableHead>Page</TableHead>
+                    <TableHead>Statut</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredIntents.length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                        Aucune intention de commande pour cette période
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    filteredIntents.map((it) => {
+                      const hasPaid = paidEmails.has(String(it.email || '').toLowerCase());
+                      return (
+                        <TableRow key={it.id}>
+                          <TableCell className="font-medium">{it.email}</TableCell>
+                          <TableCell><Badge variant="outline">{it.plan_name || '—'}</Badge></TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{it.page_path || '—'}</TableCell>
+                          <TableCell>
+                            {hasPaid ? (
+                              <Badge className="bg-green-600">✓ Payé</Badge>
+                            ) : (
+                              <Badge variant="outline">À relancer</Badge>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-sm text-muted-foreground">{fmtDate(it.created_at)}</TableCell>
+                        </TableRow>
+                      );
+                    })
                   )}
                 </TableBody>
               </Table>

@@ -84,7 +84,18 @@ export default function V3SubscribeCheckout({
               className="max-w-md mx-auto py-8 space-y-4"
               onSubmit={(e) => {
                 e.preventDefault();
-                if (email.includes('@')) setReady(true);
+                if (email.includes('@')) {
+                  // Trace « intention de commande » (sans bloquer le paiement)
+                  void supabase.functions.invoke('capture-checkout-intent', {
+                    body: {
+                      email,
+                      plan_name: planName,
+                      price_id: priceId,
+                      page_path: window.location.pathname,
+                    },
+                  }).catch(() => undefined);
+                  setReady(true);
+                }
               }}
             >
               <label className="block text-sm font-medium text-[var(--v3-ink)]">

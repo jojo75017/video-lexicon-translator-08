@@ -43,7 +43,7 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
       </div>
 
       <div
-        className="mx-auto grid min-h-[420px] overflow-hidden rounded-md bg-[#FBF8F1] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/10 md:grid-cols-[1fr_24px_1fr]"
+        className="mx-auto grid h-[380px] max-w-4xl overflow-hidden rounded-md bg-[#FBF8F1] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/10 md:h-[440px] md:grid-cols-[1fr_24px_1fr]"
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
           if (touchX.current === null) return;
@@ -57,9 +57,9 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
           opacity: turning ? 0.6 : 1,
         }}
       >
-        <div className="flex items-center justify-center bg-[#F1ECE2] p-3">
+        <div className="flex items-center justify-center overflow-hidden bg-[#F1ECE2]">
           {page.imageUrl ? (
-            <img src={page.imageUrl} alt={page.title || `Page ${index + 1}`} className="max-h-[480px] w-full rounded object-contain" />
+            <img src={page.imageUrl} alt={page.title || `Page ${index + 1}`} className="h-full w-full object-cover" />
           ) : (
             <p className="text-sm text-[#8A8072]">Illustration à venir</p>
           )}
@@ -67,7 +67,7 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
         <div aria-hidden className="hidden bg-gradient-to-r from-black/0 via-black/15 to-black/0 md:block" />
         <div className="flex flex-col px-6 py-7 text-[#2A2118]">
           {page.title && <h3 className="v3-serif mb-3 text-xl font-bold !text-inherit">{page.title}</h3>}
-          <div className="max-h-[400px] flex-1 overflow-y-auto whitespace-pre-line text-[15px] leading-[1.7]">{page.text}</div>
+          <div className="flex-1 overflow-y-auto whitespace-pre-line text-[15px] leading-[1.7]">{page.text}</div>
           {page.caption && <p className="mt-3 text-xs italic text-[#8A8072]">{page.caption}</p>}
           <p className="mt-4 text-center text-xs text-[#8A8072]">{index + 1}</p>
         </div>
