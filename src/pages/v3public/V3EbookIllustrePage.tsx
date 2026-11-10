@@ -1,7 +1,9 @@
 import heroImg from '@/assets/ebook-illustre-hero.jpg';
 import pagesImg from '@/assets/ebook-illustre-pages.jpg';
-import albumImg from '@/assets/livre-histoires-illustrees-hero.jpg';
-import guideImg from '@/assets/v3-kdp-ai-illustrations.jpg';
+import foxStart from '@/assets/renard-depart.jpg';
+import foxStream from '@/assets/renard-ruisseau.jpg';
+import foxHill from '@/assets/renard-colline.jpg';
+import foxHome from '@/assets/renard-retour.jpg';
 import tutoVideo from '@/assets/tutoriel-livre-illustre.mp4.asset.json';
 import IllustratedFlipbook from '@/components/flipbook/IllustratedFlipbook';
 import { useState } from 'react';
@@ -32,10 +34,50 @@ const TUTO = [
 ];
 
 const SAMPLE = [
-  { imageUrl: heroImg, text: "Au cœur de la forêt vivait un petit renard roux. Chaque matin, il regardait la grande colline en rêvant de voir ce qu'il y avait derrière." },
-  { imageUrl: pagesImg, text: "Un jour, il prit son courage à deux pattes. Il traversa la rivière, salua la baleine du lac et passa devant la grotte du vieux dragon endormi." },
-  { imageUrl: albumImg, text: "Arrivé en haut, il découvrit une vallée pleine de lumière. Le petit renard sourit : le monde était bien plus grand et plus beau qu'il ne l'imaginait." },
-  { imageUrl: guideImg, text: "Le soir venu, il rentra chez lui, fier de son aventure. Et cette nuit-là, il s'endormit en rêvant déjà de la prochaine colline. Fin." },
+  {
+    imageUrl: foxStart,
+    title: '1. Le premier petit pas',
+    text: `Au pied d’un vieux chêne, un petit renard roux vivait dans un terrier bien chaud. Chaque matin, il sortait le museau entre les racines et regardait la colline qui se dressait au loin. Derrière les arbres, le soleil dessinait un chemin doré. Que pouvait-il y avoir de l’autre côté ?
+
+Le petit renard connaissait chaque fougère autour de sa maison, mais il n’avait jamais suivi le sentier jusqu’au sommet. Quand le vent faisait craquer les branches, ses oreilles se dressaient et il rentrait vite se blottir contre sa maman.
+
+Ce matin-là, pourtant, son envie de découvrir le monde était plus grande que sa peur. Sa maman frotta doucement son museau contre le sien. « Avance tranquillement, regarde où tu poses tes pattes et reviens avant la nuit. »
+
+Il respira l’odeur des feuilles, regarda une dernière fois le terrier et fit un pas. Puis un deuxième. Son aventure venait de commencer.`,
+  },
+  {
+    imageUrl: foxStream,
+    title: '2. Le ruisseau qui chantait',
+    text: `Le sentier descendait entre les fougères. Bientôt, le petit renard entendit un murmure, puis un clapotis joyeux. Un ruisseau traversait le chemin. L’eau claire glissait entre les pierres et faisait danser de petits éclats de lumière.
+
+Il s’arrêta sur la berge. De l’autre côté, le sentier continuait vers la colline, mais il fallait traverser. Le petit renard posa une patte sur une pierre plate. Elle était humide. Il la retira aussitôt, le cœur battant.
+
+Alors, il se souvint des paroles de sa maman : regarder où poser ses pattes. Il observa le ruisseau sans se presser. Trois grosses pierres dépassaient de l’eau. La première était proche, la deuxième assez large et la dernière touchait presque l’autre rive.
+
+Une patte après l’autre, il avança. Une goutte lui chatouilla le nez ; il secoua les oreilles et continua. Lorsqu’il atteignit la berge, il se retourna, étonné. Le ruisseau n’avait pas changé, mais lui se sentait déjà un peu plus courageux.`,
+  },
+  {
+    imageUrl: foxHill,
+    title: '3. Le monde derrière la colline',
+    text: `La montée était plus longue que le petit renard ne l’avait imaginé. Il passa sous les branches basses, contourna une racine et s’arrêta à l’ombre d’un sapin. Ses pattes étaient fatiguées. Pendant un instant, il pensa faire demi-tour.
+
+Puis une brise apporta une odeur nouvelle, un mélange d’herbe fraîche et de fleurs. Il leva le museau. Encore quelques pas, juste jusqu’au prochain arbre. Là, le sentier s’ouvrit soudain et le petit renard découvrit toute la vallée.
+
+Des prés fleuris descendaient jusqu’à un ruban d’eau argentée. Les arbres semblaient minuscules au loin. Un papillon blanc passa devant son nez, et les oiseaux chantaient comme si la forêt entière lui souhaitait la bienvenue.
+
+Il resta longtemps à regarder. Il n’avait pas vaincu un monstre ni accompli un grand exploit. Il avait simplement continué, doucement, malgré ses hésitations. Et grâce à tous ces petits pas, un paysage qu’il ne connaissait pas encore s’offrait à lui. Il avait maintenant une merveilleuse histoire à raconter.`,
+  },
+  {
+    imageUrl: foxHome,
+    title: '4. Une aventure à partager',
+    text: `Quand la lumière devint plus douce, le petit renard reprit le chemin de la maison. Cette fois, il reconnut le sapin, la grande racine et les pierres du ruisseau. Il traversa avec précaution, fier de retrouver seul les repères de son voyage.
+
+Près du vieux chêne, sa maman l’attendait. Il courut vers elle et leurs museaux se touchèrent. Puis les mots se bousculèrent : le ruisseau qui chantait, les fleurs de la vallée, le papillon blanc et le sentier qui semblait ne jamais finir.
+
+« Tu n’as donc pas eu peur ? » demanda sa maman. Le petit renard réfléchit. « Si, un peu. Mais j’ai regardé, j’ai respiré et j’ai avancé petit à petit. » Elle sourit et l’invita à se reposer contre elle.
+
+Bien au chaud dans le terrier, il ferma les yeux. Il savait maintenant qu’être courageux ne voulait pas dire ne jamais avoir peur. C’était prendre le temps d’essayer, savoir rentrer chez soi et partager ses découvertes avec ceux qu’on aime. Demain, la forêt serait encore là. Pour ce soir, son aventure était complète.`,
+  },
 ];
 
 export default function V3EbookIllustrePage() {
