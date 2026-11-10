@@ -227,7 +227,7 @@ export default function AdminFunnelPage() {
           </div>
         </Card>
 
-        <Tabs defaultValue="leads" className="space-y-4">
+        <Tabs defaultValue={new URLSearchParams(window.location.search).get('tab') || 'leads'} className="space-y-4">
           <TabsList>
             <TabsTrigger value="leads">
               <Users className="mr-2 h-4 w-4" /> Leads ({leads.length})
@@ -235,7 +235,7 @@ export default function AdminFunnelPage() {
             <TabsTrigger value="orders">
               <ShoppingCart className="mr-2 h-4 w-4" /> Commandes ({orders.length})
             </TabsTrigger>
-            <TabsTrigger value="intents">
+            <TabsTrigger value="intents" className="bg-orange-500 font-bold text-white data-[state=active]:bg-orange-600 data-[state=active]:text-white">
               <MousePointerClick className="mr-2 h-4 w-4" /> Intentions ({intents.length})
             </TabsTrigger>
             <TabsTrigger value="affiliates">

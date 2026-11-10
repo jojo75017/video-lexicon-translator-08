@@ -424,6 +424,23 @@ export const AdminPage = () => {
           </div>
         </div>
 
+        <Card className="border-4 border-orange-500 bg-orange-500 p-6 text-white shadow-lg">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-wide">⭐ À regarder en ce moment</p>
+              <h2 className="text-3xl font-extrabold">Qui a cliqué sur S'abonner ?</h2>
+              <p className="text-lg">Les emails des visiteurs qui ont cliqué sur une formule (payés ou à relancer).</p>
+            </div>
+            <Button
+              onClick={() => navigate('/admin/funnel?tab=intents')}
+              size="lg"
+              className="w-full bg-white text-lg font-bold text-orange-600 hover:bg-orange-50 md:w-auto"
+            >
+              👉 Voir les emails
+            </Button>
+          </div>
+        </Card>
+
         <Card className="border-primary/30 bg-primary/5 p-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
