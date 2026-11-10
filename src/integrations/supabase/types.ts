@@ -842,6 +842,33 @@ export type Database = {
         }
         Relationships: []
       }
+      checkout_intents: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          page_path: string | null
+          plan_name: string | null
+          price_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          page_path?: string | null
+          plan_name?: string | null
+          price_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          page_path?: string | null
+          plan_name?: string | null
+          price_id?: string | null
+        }
+        Relationships: []
+      }
       comic_books: {
         Row: {
           age_group: string | null
