@@ -15,6 +15,8 @@ import {
   boxKind, photoQuery, storeGuideImage,
 } from '@/lib/illustratedGuide';
 
+import IllustratedFlipbook from '@/components/flipbook/IllustratedFlipbook';
+
 type Row = GuideBook & { id: string; updated_at?: string };
 const EMPTY = { title: '', subtitle: '', author_name: '', subject: '', audience: '', description: '', categories: '', image_style: 'photo', format: '6x9', chapter_count: 12 };
 const sel = 'h-10 w-full rounded-md border border-input bg-background px-3 text-sm';
@@ -28,6 +30,7 @@ export default function V3GuidesIllustresPage() {
   const [params] = useSearchParams();
   const nav = useNavigate();
   const id = params.get('guide');
+  const [flip, setFlip] = useState(false);
   const [list, setList] = useState<Row[]>([]);
   const [form, setForm] = useState(EMPTY);
   const [guide, setGuide] = useState<Row | null>(null);
@@ -274,8 +277,18 @@ export default function V3GuidesIllustresPage() {
           <Button variant="secondary" onClick={photosForAll} disabled={!!busy || !guide.chapters.length}>{busy === 'photos-all' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Search className="mr-2 h-4 w-4" />}3. Photos réalistes pour tous les chapitres</Button>
           <Button variant="outline" onClick={() => exportAs('docx')} disabled={!!busy}><FileText className="mr-2 h-4 w-4" />Export Word</Button>
           <Button variant="outline" onClick={() => exportAs('pdf')} disabled={!!busy}><FileDown className="mr-2 h-4 w-4" />Export PDF</Button>
+          <Button variant="secondary" onClick={() => setFlip((v) => !v)}><BookOpen className="mr-2 h-4 w-4" />Feuilleter mon guide</Button>
         </>}
       </div>
+      {flip && (
+        <div className="mb-6">
+          <IllustratedFlipbook
+            bookTitle={guide.title}
+            onClose={() => setFlip(false)}
+            pages={guide.chapters.filter((c) => c.text).map((c) => ({ imageUrl: c.imageUrl, title: c.title, text: c.text || '', caption: c.caption }))}
+          />
+        </div>
+      )}
       {busy === 'write' && <p className="mb-4 flex items-center gap-2 text-sm text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" />Rédaction en cours, chapitre {written + 1}… chaque chapitre est enregistré dès qu’il est prêt.</p>}
       <p className="mb-4 text-sm text-muted-foreground">La rédaction utilise votre clé IA personnelle. Chaque illustration utilise le moteur d’images inclus.</p>
       <ol className="space-y-5">

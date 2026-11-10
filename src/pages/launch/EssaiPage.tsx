@@ -54,7 +54,7 @@ const EXAMPLES: Array<{ label: string; idea: string }> = [
 ];
 
 const LOCKED = [
-  'Les chapitres 2 à 60, écrits dans la continuité du premier',
+  'Les chapitres 2 à 12, écrits dans la continuité du premier (jusqu’à 40 chapitres possibles)',
   'La correction professionnelle en 4 passes',
   'La couverture complète (recto, tranche, 4e de couverture)',
   'Les exports Word, PDF et EPUB prêts pour Amazon KDP',
@@ -233,12 +233,12 @@ export default function EssaiPage() {
               className="v3-serif mt-4 text-4xl font-bold leading-tight md:text-5xl"
               style={{ color: 'var(--v3-ink, #2A2118)' }}
             >
-              Donnez votre idée. Voyez votre livre commencer.
+              Essayez votre ebook Kindle en 12 chapitres
             </h1>
             <p className="mt-4 text-base leading-relaxed text-[#5B5245]">
               Une phrase suffit. Vous recevez immédiatement le titre, le sous-titre, le{' '}
-              <strong>sommaire complet</strong> et le début de votre <strong>chapitre 1</strong>, écrits
-              pour vous. Vous lisez avant de décider quoi que ce soit.
+              <strong>plan complet en 12 chapitres</strong> et votre <strong>chapitre 1</strong>, à
+              feuilleter comme un vrai livre. Gratuit et sans carte bancaire.
             </p>
 
             <div className="mt-8 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
@@ -284,7 +284,7 @@ export default function EssaiPage() {
                   </>
                 ) : (
                   <>
-                    <PenLine className="h-5 w-5" /> Voir mon livre commencer
+                    <PenLine className="h-5 w-5" /> Découvrir mon plan Kindle en 12 chapitres
                   </>
                 )}
               </button>
@@ -386,11 +386,11 @@ export default function EssaiPage() {
               ) : (
                 chapter && (
                   <>
-                    <div className="mt-4 space-y-4 text-[17px] leading-[1.75] text-[#2A2118]">
-                      {chapter.excerpt.map((p, i) => (
-                        <p key={i}>{p}</p>
-                      ))}
-                    </div>
+                    <ChapterFlipbook
+                      title={outlineResult.title}
+                      chapterTitle={chapter.chapterTitle || outlineResult.outline[0]?.title || 'Chapitre 1'}
+                      paragraphs={chapter.excerpt}
+                    />
 
                     {/* Mur doux : on montre avant de demander. */}
                     <div className="relative mt-2">
@@ -499,7 +499,7 @@ export default function EssaiPage() {
                     onClick={() => void track('commander_click', params)}
                     className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-5 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-[#14532D]"
                   >
-                    <Rocket className="h-4 w-4" /> Écrire les chapitres 2 à 60
+                    <Rocket className="h-4 w-4" /> Écrire les chapitres 2 à 12 de mon ebook
                   </a>
                   <p className="mt-3 text-center text-xs font-medium text-[#5B5245]">
                     Débutant 19 €/mois · Auteur 29 €/mois · Édition VIP 59 €/mois. Sans engagement.
