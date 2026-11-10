@@ -63,28 +63,32 @@ export default function AdminFunnelPage() {
   const [referrals, setReferrals] = useState<any[]>([]);
   const [codes, setCodes] = useState<any[]>([]);
   const [clicks, setClicks] = useState<any[]>([]);
+  const [intents, setIntents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
   const fetchAll = async () => {
     setLoading(true);
     try {
-      const [l, o, r, c, k] = await Promise.all([
+      const [l, o, r, c, k, i] = await Promise.all([
         supabase.from('funnel_leads').select('*').order('created_at', { ascending: false }).limit(2000),
         supabase.from('funnel_orders').select('*').order('created_at', { ascending: false }).limit(2000),
         supabase.from('referrals').select('*').order('created_at', { ascending: false }).limit(2000),
         supabase.from('referral_codes').select('*'),
         supabase.from('affiliate_clicks').select('ref_code'),
+        supabase.from('checkout_intents').select('*').order('created_at', { ascending: false }).limit(2000),
       ]);
       if (l.error) throw l.error;
       if (o.error) throw o.error;
       if (r.error) throw r.error;
       if (c.error) throw c.error;
       if (k.error) throw k.error;
+      if (i.error) throw i.error;
       setLeads(l.data || []);
       setOrders(o.data || []);
       setReferrals(r.data || []);
       setCodes(c.data || []);
       setClicks(k.data || []);
+      setIntents(i.data || []);
     } catch (e: any) {
       toast.error('Erreur de chargement : ' + (e?.message ?? 'inconnue'));
     } finally {
