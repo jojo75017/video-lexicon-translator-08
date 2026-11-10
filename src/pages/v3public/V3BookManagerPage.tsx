@@ -8,6 +8,8 @@ import V3ExportPanel from '@/components/admin/V3ExportPanel';
 import EditorialReviewPanel from '@/components/v3public/EditorialReviewPanel';
 import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 import type { Chapter } from '@/hooks/useSubscriptionGeneration';
+import { Button } from '@/components/ui/button';
+import SavedBookFlipbook from '@/components/flipbook/SavedBookFlipbook';
 
 type Book = {
   id: string;
@@ -59,6 +61,7 @@ export default function V3BookManagerPage() {
   const [cleaning, setCleaning] = useState(false);
   const [tab, setTab] = useState<'books' | 'editorial'>('books');
   const [selectedBookId, setSelectedBookId] = useState<string>('');
+  const [flipBook, setFlipBook] = useState<Book | null>(null);
 
 
   const load = async () => {
@@ -256,6 +259,9 @@ export default function V3BookManagerPage() {
                 </div>
               </div>
               <div className="flex flex-wrap justify-end gap-2">
+                <Button variant="secondary" size="sm" onClick={() => setFlipBook(b)}>
+                  <BookOpen className="mr-2 h-4 w-4" /> Voir votre Flipbook
+                </Button>
                 <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
                   <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
                 </button>
@@ -284,6 +290,7 @@ export default function V3BookManagerPage() {
         </div>
       )}
 
+      {flipBook && <SavedBookFlipbook key={flipBook.id} book={flipBook} onClose={() => setFlipBook(null)} />}
       {exporting && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 px-4 py-8" onClick={() => setExporting(null)}>
           <div className="mx-auto w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>

@@ -14,6 +14,7 @@ import {
 } from '@/lib/studioCovers';
 import { getSignedCoverUrl } from '@/lib/coverProjects';
 import { Button } from '@/components/ui/button';
+import SavedBookFlipbook from '@/components/flipbook/SavedBookFlipbook';
 
 type Row = {
   id: string;
@@ -41,6 +42,7 @@ export default function V3LibraryPage() {
   const [loadError, setLoadError] = useState(false);
   const [studioCovers, setStudioCovers] = useState<StudioCover[]>([]);
   const [pickerFor, setPickerFor] = useState<Row | null>(null);
+  const [flipBook, setFlipBook] = useState<Row | null>(null);
 
   // Couvertures déjà créées dans le studio : chargées une seule fois pour toute la page.
   useEffect(() => {
@@ -229,7 +231,7 @@ export default function V3LibraryPage() {
                 <h2 className="text-lg font-bold">Terminés <span className="text-sm font-normal text-[var(--v3-muted)]">· {done.length}</span></h2>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {done.map((r) => <BookCard key={r.id} r={r} done studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => nav(`/v3/outils/audiobook?livre=${r.id}`)} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {done.map((r) => <BookCard key={r.id} r={r} done onFlip={() => setFlipBook(r)} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => nav(`/v3/outils/audiobook?livre=${r.id}`)} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
@@ -237,13 +239,14 @@ export default function V3LibraryPage() {
             <div className="mt-12">
               <h2 className="text-lg font-bold mb-4">En cours <span className="text-sm font-normal text-[var(--v3-muted)]">· {started.length}</span></h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-                {started.map((r) => <BookCard key={r.id} r={r} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => nav(`/v3/outils/audiobook?livre=${r.id}`)} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
+                {started.map((r) => <BookCard key={r.id} r={r} onFlip={() => setFlipBook(r)} studioCover={coverIndex[normalizeTitle(r.title)]} onPickCover={() => setPickerFor(r)} hasStudioCovers={studioCovers.length > 0} onAudio={() => nav(`/v3/outils/audiobook?livre=${r.id}`)} onUpdated={() => setRefreshTick((t) => t + 1)} onDelete={() => deleteOne(r.id)} />)}
               </div>
             </div>
           )}
         </>
       )}
 
+      {flipBook && <SavedBookFlipbook key={flipBook.id} book={flipBook} onClose={() => setFlipBook(null)} />}
       {pickerFor && (
         <div className="fixed inset-0 z-[100] bg-black/50 flex items-center justify-center p-4" onClick={() => setPickerFor(null)}>
           <div className="v3-card max-w-3xl w-full max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
@@ -290,7 +293,7 @@ export default function V3LibraryPage() {
   );
 }
 
-function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio, onUpdated, onDelete }: { r: Row; done?: boolean; studioCover?: StudioCover; hasStudioCovers?: boolean; onPickCover: () => void; onAudio: () => void; onUpdated: () => void; onDelete: () => void }) {
+function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio, onUpdated, onDelete, onFlip }: { r: Row; done?: boolean; studioCover?: StudioCover; hasStudioCovers?: boolean; onPickCover: () => void; onAudio: () => void; onUpdated: () => void; onDelete: () => void; onFlip: () => void }) {
   // Couverture déjà enregistrée sur le livre : image rattachée, sinon visuel généré (cover_concepts).
   const concept = typeof r.cover_concepts === 'string' && r.cover_concepts.length > 20 ? r.cover_concepts : undefined;
   const ownImage = (Array.isArray(r.ebook_images) && r.ebook_images[0]?.url) || concept || undefined;
@@ -407,6 +410,9 @@ function BookCard({ r, done, studioCover, hasStudioCovers, onPickCover, onAudio,
           {genLoading ? 'Génération…' : 'Générer la couverture'}
         </button>
       )}
+      <Button onClick={onFlip} variant="secondary" className="mt-2 w-full gap-1.5 whitespace-normal text-xs">
+        <BookOpen className="h-3.5 w-3.5 shrink-0" /> Voir votre Flipbook
+      </Button>
       <Button
         onClick={onAudio}
         className="mt-2 w-full gap-1.5 text-xs"
