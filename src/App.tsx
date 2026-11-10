@@ -944,7 +944,7 @@ const App = () => {
           {!isAdminAuthRoute && <ApiKeysFloatingButton />}
           {!isAdminAuthRoute && <GeminiKeyAlertBanner />}
           {!isAdminAuthRoute && !pathname.startsWith('/v3') && (isAuthenticated || isAdmin) && (
-            <V2V3FloatingSwitch forceVisible={isAdmin} />
+            {/* bouton V2 retiré */}
           )}
           {isAuthenticated && <AISosModal />}
           {isAuthenticated && <AICostBadge />}

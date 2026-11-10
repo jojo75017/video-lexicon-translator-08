@@ -244,7 +244,7 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
               <span aria-hidden>🤖</span>
               <span>Nouveau · EbookStudio AI Team</span>
             </a>
-            <V2V3ModeButton variant="inline" />
+            {null}
             <NavLink
               to="/v3/tutoriels-v3"
               className="v3-btn h-9 rounded-full text-[12px] shrink-0"
@@ -462,7 +462,7 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
             >
               🤖 Nouveau · EbookStudio AI Team
             </a>
-            <V2V3ModeButton variant="inline" />
+            {null}
             <NavLink
               to="/v3/tutoriels-v3"
               onClick={() => setMobileOpen(false)}
