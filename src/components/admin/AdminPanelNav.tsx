@@ -13,33 +13,13 @@ type AdminNavItem = {
   isNew?: boolean;
 };
 
+// Menu simplifié : trois entrées seulement. Les autres pages restent
+// accessibles par leur adresse, mais n'encombrent plus la navigation.
 const adminNavItems: AdminNavItem[] = [
-  { label: 'Lancement V3', path: '/admin/lancement', icon: Rocket, exact: true, isNew: true },
-  { label: 'Emails lancement', path: '/admin/emails-lancement', icon: Mail, exact: true, isNew: true },
-  { label: 'Tunnel V3 (avant-première)', path: '/admin/tunnel-v3', icon: TrendingUp, exact: true, isNew: true },
-  { label: 'Voir le tunnel de lancement', path: '/lancement', icon: Rocket, exact: true, isNew: true },
   { label: 'Tableau de bord admin', path: ADMIN_HOME_PATH, icon: BarChart3, exact: true },
-  { label: 'Business Center', path: '/business-center', icon: Gauge, exact: true },
-  { label: 'Tunnel', path: '/admin/funnel', icon: TrendingUp, exact: true },
-  { label: 'PDF', path: '/admin/cadeaux-pdf', icon: FileText, exact: true },
-  { label: 'Codes Bêta', path: '/admin/codes-beta', icon: Ticket, exact: true },
-  { label: 'Bêta-testeurs', path: '/admin/beta-testeurs', icon: Users, exact: true },
-  { label: 'Profil', path: '/admin/profile', icon: User, exact: true },
-  { label: 'Prospects', path: '/gestion-prospects', icon: Users, exact: true },
-  { label: 'Emails', path: '/apercu-emails', icon: Mail, exact: true },
-  { label: 'Posts', path: '/admin/kit-publication', icon: MessageSquare, exact: true },
-  { label: 'Marketing', path: '/dashboard-marketing', icon: BarChart3, exact: true },
-  { label: 'Partenaires', path: '/admin/partenaires', icon: Handshake, exact: true },
-  { label: 'Influenceurs', path: '/influenceurs', icon: Megaphone, exact: true },
-  { label: 'Guide Ebook', path: '/guide-ebook', icon: BookMarked, exact: true },
-  { label: 'CRM', path: '/crm', icon: Contact, exact: true },
-  { label: 'Plans V3', path: '/admin/plans-v3', icon: Table, exact: true },
-  { label: 'Campagnes', path: '/admin/campagnes', icon: Send, exact: true },
-  { label: 'Script vidéo V3', path: '/admin/script-video', icon: Video, exact: true },
-  { label: 'Scripts tutoriels Loom', path: '/admin/scripts-tutoriels', icon: Video, exact: true },
-  { label: 'Attente', path: '/admin/attente', icon: Snowflake, exact: true },
-  { label: 'Tester PayPal', path: '/admin/tester-paypal', icon: CreditCard, exact: true },
-  { label: 'Tester BD', path: '/admin/tester-bd', icon: Palette, exact: true },
+  { label: 'Essai gratuit & Leads', path: '/admin/lancement', icon: Mail, exact: true },
+  { label: 'Ventes & Abonnements', path: '/admin/funnel', icon: CreditCard, exact: true },
+  { label: 'Membres & Formules', path: '/admin/plans-v3', icon: Users, exact: true },
 ];
 
 interface AdminPanelNavProps {
