@@ -386,6 +386,49 @@ function AdminLancementContent() {
             <CardTitle className="text-base">Chapitres d’essai ({trials.length})</CardTitle>
           </CardHeader>
           <CardContent className="overflow-x-auto">
+            {(() => {
+              const withEmail = trials.filter((t) => t.email);
+              const uniq = Array.from(new Set(withEmail.map((t) => t.email!.trim().toLowerCase())));
+              const rate = trials.length ? Math.round((withEmail.length / trials.length) * 100) : 0;
+              const copyAll = async () => {
+                try {
+                  await navigator.clipboard.writeText(uniq.join('\n'));
+                  toast.success(`${uniq.length} emails copiés.`);
+                } catch {
+                  toast.error('Impossible de copier.');
+                }
+              };
+              const exportCsv = () => {
+                const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
+                const rows = withEmail.map((t) =>
+                  [t.email ?? '', t.proposed_title ?? t.book_idea ?? '', t.created_at ?? '', t.delivered_at ? 'pdf' : ''].map(esc).join(','),
+                );
+                const csv = ['email,titre,date,statut', ...rows].join('\n');
+                const url = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'prospects-essai.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+              };
+              return (
+                <div className="mb-4 space-y-3">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Essais démarrés</p><p className="text-2xl font-bold">{trials.length}</p></div>
+                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Emails capturés</p><p className="text-2xl font-bold">{uniq.length}</p></div>
+                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Taux avec email</p><p className="text-2xl font-bold">{rate} %</p></div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" className="rounded-lg" onClick={() => void copyAll()} disabled={!uniq.length}>
+                      <Copy className="mr-2 h-4 w-4" /> Copier tous les emails
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-lg" onClick={exportCsv} disabled={!uniq.length}>
+                      Exporter en CSV
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
             {loading ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : trials.length === 0 ? (
