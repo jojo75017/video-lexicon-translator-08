@@ -192,6 +192,7 @@ export default function AdminFunnelPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-foreground">Tunnel & Affiliés</h1>
+            <a href="/admin/lancement" className="mt-3 inline-block rounded-xl bg-orange-500 px-5 py-3 text-base font-bold text-white hover:bg-orange-600">📩 Voir les emails de l'essai gratuit (statistiques, copie, CSV)</a>
             <p className="text-sm text-muted-foreground">
               Inscriptions formulaire, commandes et commissions affiliés
             </p>
