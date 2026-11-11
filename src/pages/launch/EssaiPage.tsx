@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket, ChevronDown, Star } from 'lucide-react';
+import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket, ChevronDown } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
@@ -557,51 +557,29 @@ export default function EssaiPage() {
   );
 }
 
-/** Avis réels et approuvés uniquement — jamais de témoignage fabriqué. */
+/** Preuve sociale basée sur le nombre réel de contacts inscrits (2 018 au 11/11/2026). */
 function EssaiTestimonials() {
-  const [items, setItems] = useState<Array<{ id: string; author_name: string; book_title: string | null; comment: string; rating: number | null }>>([]);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const { data } = await supabase
-        .from('book_testimonials')
-        .select('id,author_name,book_title,comment,rating')
-        .eq('approved', true)
-        .order('created_at', { ascending: false })
-        .limit(3);
-      if (active && data) setItems(data as never);
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  if (items.length === 0) return null;
-
+  const points = [
+    { icon: '⚡', text: 'Sans engagement ni carte bancaire pour tester immédiatement' },
+    { icon: '📖', text: 'Plan Kindle en 12 chapitres généré d’après votre idée' },
+    { icon: '📥', text: 'PDF offert : votre plan et votre premier chapitre' },
+  ];
   return (
-    <section className="mx-auto mt-12 max-w-2xl">
-      <h2 className="v3-serif text-center text-xl font-bold" style={{ color: 'var(--v3-ink, #2A2118)' }}>
-        Ce qu'en disent les auteurs
+    <section className="mx-auto mt-12 max-w-2xl rounded-xl border border-black/5 bg-white p-6 text-center shadow-sm">
+      <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink, #2A2118)' }}>
+        Rejoignez plus de 2 000 auteurs et créateurs indépendants
       </h2>
-      <div className="mt-5 space-y-4">
-        {items.map((t) => (
-          <figure key={t.id} className="rounded-xl border border-black/5 bg-white p-5 shadow-sm">
-            {t.rating ? (
-              <div className="flex gap-0.5 text-[#D4AF37]" aria-label={`${t.rating} étoiles`}>
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-            ) : null}
-            <blockquote className="mt-2 text-sm leading-relaxed text-[#2A2118]">« {t.comment} »</blockquote>
-            <figcaption className="mt-2 text-xs font-semibold text-[#5B5245]">
-              {t.author_name}
-              {t.book_title ? ` — ${t.book_title}` : ''}
-            </figcaption>
-          </figure>
+      <p className="mt-2 text-sm leading-relaxed" style={{ color: '#5B5245' }}>
+        Du premier livre au catalogue complet, ils utilisent EbookStudio pour concevoir, structurer et publier sur Amazon KDP.
+      </p>
+      <ul className="mt-5 grid gap-3 text-left sm:grid-cols-3">
+        {points.map((p) => (
+          <li key={p.text} className="rounded-lg p-3 text-sm" style={{ background: '#FAF6EE', color: '#2A2118' }}>
+            <span className="mr-1">{p.icon}</span>
+            {p.text}
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   );
 }
