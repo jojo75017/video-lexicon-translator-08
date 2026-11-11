@@ -236,6 +236,26 @@ function AdminLancementContent({ trialsOnly = false }: { trialsOnly?: boolean })
                       Exporter en CSV
                     </Button>
                   </div>
+                  <div className="rounded-xl border-2 border-orange-500 p-3">
+                    <p className="mb-2 text-sm font-bold text-orange-400">📩 Emails capturés ({withEmail.length})</p>
+                    {withEmail.length === 0 ? (
+                      <p className="text-sm text-muted-foreground">Aucun email pour l’instant.</p>
+                    ) : (
+                      <table className="w-full text-sm">
+                        <thead><tr className="border-b text-left text-xs uppercase text-muted-foreground"><th className="py-1 pr-3">Email</th><th className="py-1 pr-3">Livre</th><th className="py-1 pr-3">PDF / chapitre reçu</th><th className="py-1">Date</th></tr></thead>
+                        <tbody>
+                          {withEmail.map((t) => (
+                            <tr key={t.id} className="border-b border-border/50">
+                              <td className="py-1 pr-3 font-medium">{t.email}</td>
+                              <td className="py-1 pr-3">{t.proposed_title ?? t.book_idea}</td>
+                              <td className="py-1 pr-3">{t.delivered_at ? 'Oui' : 'Non'}</td>
+                              <td className="py-1">{fmtDate(t.created_at)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    )}
+                  </div>
                 </div>
               );
             })()}
