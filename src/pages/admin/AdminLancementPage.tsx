@@ -79,7 +79,12 @@ function fmtDate(value: string | null) {
 /** Pilotage du lancement du 1er septembre → ouverture du 1er octobre 2026. */
 function AdminLancementContent({ trialsOnly = false }: { trialsOnly?: boolean }) {
   const { settings, loading: settingsLoading, update, reload } = useLaunchSettings();
-  const [trials, setTrials] = useState<TrialRow[]>([]);
+  const [allTrials, setTrials] = useState<TrialRow[]>([]);
+  const [hideAdmin, setHideAdmin] = useState(true);
+  const trials = useMemo(
+    () => (hideAdmin ? allTrials.filter((t) => !(t.email ?? '').toLowerCase().includes('boubetgeorges')) : allTrials),
+    [allTrials, hideAdmin],
+  );
   const [waitlist, setWaitlist] = useState<WaitlistRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<LaunchSettingKey | null>(null);
@@ -229,6 +234,9 @@ function AdminLancementContent({ trialsOnly = false }: { trialsOnly?: boolean })
                     <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Taux avec email</p><p className="text-2xl font-bold">{rate} %</p></div>
                   </div>
                   <div className="flex flex-wrap gap-2">
+                    <Button size="sm" variant={hideAdmin ? 'default' : 'outline'} className="rounded-lg" onClick={() => setHideAdmin((v) => !v)}>
+                      {hideAdmin ? '✅ Mes essais admin (boubetgeorges) retirés — les afficher' : 'Retirer mes essais admin (boubetgeorges)'}
+                    </Button>
                     <Button size="sm" className="rounded-lg" onClick={() => void copyAll()} disabled={!uniq.length}>
                       <Copy className="mr-2 h-4 w-4" /> Copier tous les emails
                     </Button>
