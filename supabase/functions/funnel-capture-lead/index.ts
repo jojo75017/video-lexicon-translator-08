@@ -269,7 +269,7 @@ serve(async (req) => {
       source === "v3-reservation"
         ? await sendV3ReservationEmail(email, first_name)
         : await sendLeadMagnetEmail(email, first_name, magnetKey);
-    if (sent) {
+    if (sent && !existing) {
       await supabase
         .from("funnel_leads")
         .update({ lead_magnet_sent_at: new Date().toISOString() })

@@ -1,5 +1,6 @@
 // Diagnostic Systeme.io : vérifie les tags homonymes et les tags réellement
 // posés sur un contact. Aucune donnée sensible n'est renvoyée (noms/ids de tags).
+import { requireAdmin } from "../_shared/authGuard.ts";
 import { getContactTags, findSystemeIoContactId } from "../_shared/systemeio.ts";
 
 const corsHeaders = {
@@ -17,6 +18,8 @@ const json = (body: unknown, status = 200) =>
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  const admin = await requireAdmin(req);
+  if (admin instanceof Response) return admin;
 
   const apiKey = Deno.env.get("SYSTEMEIO_API_KEY");
   if (!apiKey) return json({ ok: false, error: "SYSTEMEIO_API_KEY absente" }, 500);

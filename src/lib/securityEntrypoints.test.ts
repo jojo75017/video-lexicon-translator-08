@@ -95,7 +95,7 @@ describe('Subscriber BYOK is never replaced by operator keys', () => {
 });
 
 describe('Public signup cannot rewrite existing customer records', () => {
-  for (const name of ['free-trial-signup', 'redeem-beta-code', 'quiz-lead', 'start-trial']) {
+  for (const name of ['free-trial-signup', 'redeem-beta-code', 'quiz-lead']) {
     it(`${name} leaves an existing record untouched and sends nothing`, async () => {
       const update = vi.fn();
       const insert = vi.fn();

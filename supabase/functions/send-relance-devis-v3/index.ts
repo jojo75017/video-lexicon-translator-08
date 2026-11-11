@@ -32,6 +32,9 @@ const LINK_DEVIS = "https://ebookstudio.fr/r/devis1";
 const LINK_V3 = "https://ebookstudio.fr/r/v3insc";
 const BATCH_MAX = 200;
 
+function escHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
 function isInternalEmail(email: string): boolean {
   const e = email.trim().toLowerCase();
   if (!e || !e.includes("@")) return true;
@@ -43,7 +46,7 @@ function isInternalEmail(email: string): boolean {
 }
 
 function html(firstName: string | null): string {
-  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  const hello = firstName ? `Bonjour ${escHtml(firstName)},` : "Bonjour,";
   return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
 <tr><td align="center">
@@ -84,7 +87,7 @@ Un manuscrit n'est pas un livre publiable
 
 /** Relance nº2 : uniquement pour ceux qui n'ont cliqué sur aucun des deux liens. */
 function htmlSuivi(firstName: string | null): string {
-  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  const hello = firstName ? `Bonjour ${escHtml(firstName)},` : "Bonjour,";
   return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
 <tr><td align="center">
@@ -114,7 +117,7 @@ Le 1<sup>er</sup> octobre, c'est dans quelques jours
 
 /** Relance nº3 : dernier message, uniquement après la relance nº2 et sans clic. */
 function htmlDerniereChance(firstName: string | null): string {
-  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  const hello = firstName ? `Bonjour ${escHtml(firstName)},` : "Bonjour,";
   return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
 <tr><td align="center">

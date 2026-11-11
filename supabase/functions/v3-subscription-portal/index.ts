@@ -18,7 +18,7 @@ Deno.serve(async (req) => {
     let returnUrl: string | undefined;
     try {
       const body = await req.json();
-      if (typeof body?.returnUrl === "string" && /^https?:\/\//.test(body.returnUrl) && body.returnUrl.length < 500) returnUrl = body.returnUrl;
+      if (typeof body?.returnUrl === "string" && /^https:\/\/((www\.)?ebookstudio\.fr|[a-z0-9-]+\.lovable\.app)(\/|$)/.test(body.returnUrl) && body.returnUrl.length < 500) returnUrl = body.returnUrl;
     } catch { /* corps vide */ }
 
     const { data: order } = await admin.from("v3_installment_orders")

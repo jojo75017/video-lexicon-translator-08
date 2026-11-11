@@ -421,14 +421,15 @@ Deno.serve(async (req) => {
       await supabase
         .from("trial_chapters")
         .update({ email, status: "delivered", delivered_at: new Date().toISOString() })
-        .eq("id", trialId);
+        .eq("id", trialId)
+        .is("email", null);
 
       // Prospect enregistré pour la séquence de lancement
       await supabase
         .from("funnel_leads")
         .upsert(
           { email, lead_magnet: "essai-chapitre-1", landing_url: `${SITE}/essai` },
-          { onConflict: "email" },
+          { onConflict: "email", ignoreDuplicates: true },
         );
 
       let emailSent = false;

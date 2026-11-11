@@ -118,15 +118,8 @@ Deno.serve(async (req) => {
         .eq('email', email)
         .maybeSingle();
 
-      if (existing?.id) {
-        await supabase
-          .from('ambassador_outreach')
-          .update({
-            status: 'inscrit',
-            last_contact_at: new Date().toISOString(),
-          })
-          .eq('id', existing.id);
-      } else {
+      // Un contact existant n'est jamais modifié depuis ce formulaire public.
+      if (!existing?.id) {
         await supabase.from('ambassador_outreach').insert({
           owner_id: ownerId,
           handle: handle || name,

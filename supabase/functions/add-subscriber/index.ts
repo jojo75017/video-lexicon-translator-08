@@ -76,7 +76,7 @@ async function sendAdminNotification(subscriberEmail: string, planType: string, 
       subject: `${action} — ${subscriberEmail} (${planType})`,
       html,
     });
-    console.log('Admin notification sent for:', subscriberEmail);
+    console.log('Admin notification sent');
   } catch (error) {
     console.error('Failed to send admin notification:', error);
   }

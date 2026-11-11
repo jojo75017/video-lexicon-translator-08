@@ -66,12 +66,7 @@ Deno.serve(async (req) => {
       return json({
         ok: false,
         alreadyUsed: true,
-        status: existing.status,
-        endsAt: existing.ends_at,
-        error:
-          existing.status === "converti"
-            ? "Vous avez déjà un accès actif à EbookStudio."
-            : "Vous avez déjà utilisé votre essai gratuit de 7 jours.",
+        error: "Cette adresse a déjà bénéficié de l'essai ou d'un accès EbookStudio.",
       });
     }
 

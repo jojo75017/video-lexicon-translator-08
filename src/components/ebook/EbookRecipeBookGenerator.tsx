@@ -22,17 +22,10 @@ import { exportEbookToDocx, type DocxSection, type DocxBlock } from '@/lib/ebook
 const RECIPE_HISTORY_STORAGE_KEY = 'recipe_generator:last_dish_names:v1';
 
 // Fallback images (historique). NOTE: le projet privilégie la génération IA; pas de fallback stock côté UI.
-const PEXELS_API_KEY = '563492ad6f91700001000001b3c9c2fb1df54302850f8185e752c274';
 const fetchPexelsFoodImage = async (query: string): Promise<string | null> => {
   try {
-    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(
-      `${query} food dish`
-    )}&per_page=1`;
-    const res = await fetch(url, { headers: { Authorization: PEXELS_API_KEY } });
-    if (!res.ok) return null;
-    const json = await res.json();
-    const photo = json?.photos?.[0];
-    return photo?.src?.large2x || photo?.src?.large || photo?.src?.original || null;
+    const { data } = await supabase.functions.invoke('stock-photos', { body: { query: `${query} food dish`, orientation: 'landscape' } });
+    return data?.photos?.[0]?.full || null;
   } catch {
     return null;
   }

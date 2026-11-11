@@ -84,7 +84,7 @@ serve(async (req) => {
       });
     }
 
-    console.log(`[WEBINAIRE] Confirmation envoyée à ${cleanEmail}`);
+    console.log("[WEBINAIRE] Confirmation envoyée");
     return new Response(JSON.stringify({ success: true }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

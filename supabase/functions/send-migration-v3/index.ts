@@ -38,7 +38,7 @@ async function sendOne(resendKey: string, to: string, subject: string, html: str
   });
   const text = await res.text();
   if (!res.ok) {
-    console.error(`Resend refuse ${to} [${res.status}]: ${text}`);
+    console.error(`Resend refuse [${res.status}]: ${text}`);
     return { ok: false, error: `${res.status}: ${text}` };
   }
   return { ok: true, error: null as string | null };

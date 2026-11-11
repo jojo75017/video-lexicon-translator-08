@@ -30,6 +30,9 @@ const DO_NOT_CONTACT = new Set<string>([
 ]);
 
 /** Adresses internes / de test : jamais relancées. */
+function escHtml(s: string): string {
+  return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!));
+}
 function isInternalEmail(email: string): boolean {
   const e = email.trim().toLowerCase();
   if (!e || !e.includes("@")) return true;
@@ -45,7 +48,7 @@ function isInternalEmail(email: string): boolean {
 
 
 function html(firstName: string | null, link: string): string {
-  const hello = firstName ? `Bonjour ${firstName},` : "Bonjour,";
+  const hello = firstName ? `Bonjour ${escHtml(firstName)},` : "Bonjour,";
   return `<!DOCTYPE html><html lang="fr"><body style="margin:0;background:#FAFAFA">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#FAFAFA;padding:24px 12px">
 <tr><td align="center">
