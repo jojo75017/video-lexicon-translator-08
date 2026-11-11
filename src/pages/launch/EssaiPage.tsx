@@ -500,13 +500,18 @@ export default function EssaiPage() {
                       }
                     >
                       {i > 0 && <Lock className="mt-0.5 h-3.5 w-3.5 flex-none text-[#B8AFA0]" />}
-                      <span>
+                      <span className={!claimed && i >= 3 ? 'select-none blur-[4px]' : undefined} aria-hidden={!claimed && i >= 3 ? true : undefined}>
                         {c.title}
                         {i === 0 && (chapter ? ' — écrit ✓' : ' — en cours…')}
                       </span>
                     </li>
                   ))}
                 </ol>
+                {!claimed && outlineResult.outline.length > 3 && (
+                  <p className="mt-3 rounded-lg bg-[#FF9E2D]/15 p-3 text-sm font-semibold text-[#7A4A00]">
+                    🔒 Chapitres 4 à {outlineResult.outline.length} : entrez votre email sous l'extrait pour les débloquer et recevoir votre PDF offert.
+                  </p>
+                )}
               </div>
 
               {claimed && (
