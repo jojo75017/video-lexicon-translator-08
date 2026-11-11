@@ -63,6 +63,31 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
     setMobileOpen(false);
   }, [pathname, search]);
 
+  // Espace membre : aucune catégorie déroulante ne doit rester ouverte.
+  useEffect(() => {
+    if (hideCategories) setOpenKey(null);
+  }, [hideCategories]);
+
+  // Fermeture au clic extérieur, au défilement et à la touche Échap.
+  useEffect(() => {
+    if (!openKey) return;
+    const close = () => setOpenKey(null);
+    const onDown = (e: MouseEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && t.closest('[data-v3-nav]')) return;
+      close();
+    };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    document.addEventListener('mousedown', onDown);
+    window.addEventListener('scroll', close, { passive: true });
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      window.removeEventListener('scroll', close);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [openKey]);
+
   const isCatActive = (cat: MenuCategory) =>
     cat.links.some((l) => {
       const [p] = l.to.split('?');
@@ -76,7 +101,7 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
   };
 
   // Panneau ouvert : positionné hors de la rangée scrollable, jamais coupé à droite
-  const openCatData = openKey ? V3_HEADER_MENU.find((c) => c.key === openKey) ?? null : null;
+  const openCatData = openKey && !hideCategories ? V3_HEADER_MENU.find((c) => c.key === openKey) ?? null : null;
   const openCols = openCatData ? (openCatData.links.length > 8 ? 3 : openCatData.links.length > 4 ? 2 : 1) : 1;
   const openPanelWidth = openCols === 1 ? 320 : openCols === 2 ? 560 : 780;
   const viewportW = typeof window !== 'undefined' ? window.innerWidth : 1600;
