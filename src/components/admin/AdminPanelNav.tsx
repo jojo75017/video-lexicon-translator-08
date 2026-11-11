@@ -17,7 +17,7 @@ type AdminNavItem = {
 // accessibles par leur adresse, mais n'encombrent plus la navigation.
 const adminNavItems: AdminNavItem[] = [
   { label: 'Tableau de bord admin', path: ADMIN_HOME_PATH, icon: BarChart3, exact: true },
-  { label: 'Essai gratuit & Leads', path: '/admin/lancement', icon: Mail, exact: true },
+  { label: 'Essai gratuit & Leads', path: '/admin/essai-gratuit', icon: Mail, exact: true },
   { label: 'Ventes & Abonnements', path: '/admin/funnel', icon: CreditCard, exact: true },
   { label: 'Membres & Formules', path: '/admin/plans-v3', icon: Users, exact: true },
 ];
@@ -62,7 +62,7 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
       </div>
 
       <div className="mt-3 overflow-x-auto">
-        <div className="flex min-w-max flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2">
           {adminNavItems.map((item) => {
             const Icon = item.icon;
 
@@ -74,6 +74,7 @@ export function AdminPanelNav({ className }: AdminPanelNavProps) {
                 onClick={() => navigate(item.path)}
                 className={cn(
                   'rounded-xl',
+                  item.path === '/admin/essai-gratuit' && 'admin-trial-access',
                   item.isNew && 'border-2 border-emerald-700 bg-emerald-600 text-white font-semibold hover:bg-emerald-700 hover:text-white',
                   item.isNew && isActive(item) && 'ring-2 ring-emerald-500 ring-offset-2',
                 )}

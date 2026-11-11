@@ -437,10 +437,10 @@ export const AdminPage = () => {
               👉 Voir les emails
             </Button>
             <Button
-              onClick={() => navigate('/admin/lancement')}
+              onClick={() => navigate('/admin/essai-gratuit')}
               size="lg"
               variant="outline"
-              className="w-full text-lg font-bold md:w-auto"
+              className="admin-trial-access w-full whitespace-normal text-lg font-bold md:w-auto"
             >
               📩 Emails de l'essai gratuit
             </Button>

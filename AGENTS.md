@@ -62,3 +62,5 @@
 - Paid, email-sending and admin edge functions start with a guard from _shared/authGuard.ts (requireUser / requireAdmin / requireAdminOrService), so no metered or privileged action runs for anonymous callers.
 - Access-code sign-in (subscriber-auth, validate-subscription) is rate-limited via access_code_attempts; codes are only ever emailed, never returned by trial or checkout responses; unsubscribe links carry an HMAC token and user-supplied URLs go through _shared/safeFetch.ts, so accounts, prospects and internal hosts cannot be reached by guessing or forging requests.
 - Stripe return_url always comes from src/lib/paymentReturnUrl.ts and points at the public /merci thank-you page, never at a /v3/* address, because legacy /v3 aliases redirect (the old /v3/offres/merci sent buyers back to the pricing page instead of a thank-you screen).
+
+- The dedicated admin trial overview reuses AdminLancementPage in trials-only mode, keeping existing data and exports separate from launch controls without duplicating capture logic.

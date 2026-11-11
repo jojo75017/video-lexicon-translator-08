@@ -14,3 +14,5 @@
 - [ ] Sécurité restante : anciens codes abonnés/bêta à préserver jusqu’à décision, démo publique à sécuriser, 4 avertissements de données/stockage et dépendances encore signalées ; le prochain scan doit requalifier les alertes après corrections.
 - [ ] Clé de signature Resend (RESEND_WEBHOOK_SECRET) à fournir par Georges pour réactiver le suivi des emails
 - [x] Liens mensuels déjà publiés précédemment ; aucune nouvelle publication du site pour cet audit.
+
+- [x] Rendre le suivi des essais immédiatement visible et accessible en orange, sans les réglages du lancement ; accès connecté, copie des emails et export CSV vérifiés.

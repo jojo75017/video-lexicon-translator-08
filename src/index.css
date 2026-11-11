@@ -808,3 +808,8 @@ a:hover {
   color: #E5E7EB !important;
 }
 .admin-readable .bg-orange-500 .text-orange-600 { color: #C2410C !important; }
+
+/* Accès prioritaire aux contacts de l’essai. */
+:root { --admin-trial-accent: 32 100% 59%; --admin-trial-foreground: 210 29% 16%; }
+.admin-trial-access { background: hsl(var(--admin-trial-accent)) !important; color: hsl(var(--admin-trial-foreground)) !important; border-color: hsl(var(--admin-trial-accent)); }
+.admin-trial-access:hover { background: hsl(var(--admin-trial-accent) / .9) !important; }

@@ -77,7 +77,7 @@ function fmtDate(value: string | null) {
 }
 
 /** Pilotage du lancement du 1er septembre → ouverture du 1er octobre 2026. */
-function AdminLancementContent() {
+function AdminLancementContent({ trialsOnly = false }: { trialsOnly?: boolean }) {
   const { settings, loading: settingsLoading, update, reload } = useLaunchSettings();
   const [trials, setTrials] = useState<TrialRow[]>([]);
   const [waitlist, setWaitlist] = useState<WaitlistRow[]>([]);
@@ -109,9 +109,9 @@ function AdminLancementContent() {
   }, []);
 
   useEffect(() => {
-    document.title = 'Lancement V3 — Administration';
+    document.title = trialsOnly ? 'Essai gratuit & Leads — Administration' : 'Lancement V3 — Administration';
     void load();
-  }, [load]);
+  }, [load, trialsOnly]);
 
   useEffect(() => {
     setVideoUrl(String(settings.launch_video?.url || ''));
@@ -181,6 +181,110 @@ function AdminLancementContent() {
       <div className="mx-auto max-w-7xl space-y-6 px-4 py-8">
         <AdminPanelNav />
 
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h1 className="text-2xl font-bold text-foreground">Essai gratuit & Leads</h1>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => void load()} disabled={loading}>
+              <RefreshCw className="h-4 w-4" /> Actualiser les essais
+            </Button>
+            <Button asChild variant="outline"><Link to="/v3">Accueil V3</Link></Button>
+          </div>
+        </div>
+        {/* Essais gratuits */}
+        <Card className="rounded-2xl">
+          <CardHeader>
+            <CardTitle className="text-base">Chapitres d’essai ({trials.length})</CardTitle>
+          </CardHeader>
+          <CardContent className="overflow-x-auto">
+            {(() => {
+              const withEmail = trials.filter((t) => t.email);
+              const uniq = Array.from(new Set(withEmail.map((t) => (t.email ?? '').trim().toLowerCase())));
+              const rate = trials.length ? Math.round((withEmail.length / trials.length) * 100) : 0;
+              const copyAll = async () => {
+                try {
+                  await navigator.clipboard.writeText(uniq.join('\n'));
+                  toast.success(`${uniq.length} emails copiés.`);
+                } catch {
+                  toast.error('Impossible de copier.');
+                }
+              };
+              const exportCsv = () => {
+                const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
+                const rows = withEmail.map((t) =>
+                  [t.email ?? '', t.proposed_title ?? t.book_idea ?? '', t.created_at ?? '', t.delivered_at ? 'pdf' : ''].map(esc).join(','),
+                );
+                const csv = ['email,titre,date,statut', ...rows].join('\n');
+                const url = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'prospects-essai.csv';
+                a.click();
+                URL.revokeObjectURL(url);
+              };
+              return (
+                <div className="mb-4 space-y-3">
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Essais démarrés</p><p className="text-2xl font-bold">{trials.length}</p></div>
+                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Emails capturés</p><p className="text-2xl font-bold">{uniq.length}</p></div>
+                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Taux avec email</p><p className="text-2xl font-bold">{rate} %</p></div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button size="sm" className="rounded-lg" onClick={() => void copyAll()} disabled={!uniq.length}>
+                      <Copy className="mr-2 h-4 w-4" /> Copier tous les emails
+                    </Button>
+                    <Button size="sm" variant="outline" className="rounded-lg" onClick={exportCsv} disabled={!uniq.length}>
+                      Exporter en CSV
+                    </Button>
+                  </div>
+                </div>
+              );
+            })()}
+            {loading ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : trials.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Aucun essai généré pour l’instant.</p>
+            ) : (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
+                    <th className="py-2 pr-3">Titre proposé</th>
+                    <th className="py-2 pr-3">Email</th>
+                    <th className="py-2 pr-3">Mots</th>
+                    <th className="py-2 pr-3">Langue</th>
+                    <th className="py-2 pr-3">Envoyé</th>
+                    <th className="py-2 pr-3">Converti</th>
+                    <th className="py-2">Créé le</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trials.map((t) => (
+                    <tr key={t.id} className="border-b last:border-0">
+                      <td className="max-w-[260px] truncate py-2 pr-3 font-medium" title={t.book_idea}>
+                        {t.proposed_title ?? t.book_idea}
+                      </td>
+                      <td className="py-2 pr-3">{t.email ?? <span className="text-muted-foreground">anonyme</span>}</td>
+                      <td className="py-2 pr-3">{t.word_count ?? '—'}</td>
+                      <td className="py-2 pr-3 uppercase">{t.language ?? 'fr'}</td>
+                      <td className="py-2 pr-3">
+                        {t.delivered_at ? <Badge>envoyé</Badge> : <Badge variant="secondary">non</Badge>}
+                      </td>
+                      <td className="py-2 pr-3">
+                        {t.converted_at ? (
+                          <Badge className="bg-emerald-600">abonné</Badge>
+                        ) : (
+                          <Badge variant="secondary">en attente</Badge>
+                        )}
+                      </td>
+                      <td className="py-2 text-muted-foreground">{fmtDate(t.created_at)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </CardContent>
+        </Card>
+
+        {!trialsOnly && <>
         <MigrationV3SendPanel
           emailId="micro-series-precommande"
           customEmail={MICRO_SERIES_EMAIL}
@@ -380,108 +484,17 @@ function AdminLancementContent() {
           </CardContent>
         </Card>
 
-        {/* Essais gratuits */}
-        <Card className="rounded-2xl">
-          <CardHeader>
-            <CardTitle className="text-base">Chapitres d’essai ({trials.length})</CardTitle>
-          </CardHeader>
-          <CardContent className="overflow-x-auto">
-            {(() => {
-              const withEmail = trials.filter((t) => t.email);
-              const uniq = Array.from(new Set(withEmail.map((t) => t.email!.trim().toLowerCase())));
-              const rate = trials.length ? Math.round((withEmail.length / trials.length) * 100) : 0;
-              const copyAll = async () => {
-                try {
-                  await navigator.clipboard.writeText(uniq.join('\n'));
-                  toast.success(`${uniq.length} emails copiés.`);
-                } catch {
-                  toast.error('Impossible de copier.');
-                }
-              };
-              const exportCsv = () => {
-                const esc = (v: string) => `"${v.replace(/"/g, '""')}"`;
-                const rows = withEmail.map((t) =>
-                  [t.email ?? '', t.proposed_title ?? t.book_idea ?? '', t.created_at ?? '', t.delivered_at ? 'pdf' : ''].map(esc).join(','),
-                );
-                const csv = ['email,titre,date,statut', ...rows].join('\n');
-                const url = URL.createObjectURL(new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' }));
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'prospects-essai.csv';
-                a.click();
-                URL.revokeObjectURL(url);
-              };
-              return (
-                <div className="mb-4 space-y-3">
-                  <div className="grid gap-3 sm:grid-cols-3">
-                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Essais démarrés</p><p className="text-2xl font-bold">{trials.length}</p></div>
-                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Emails capturés</p><p className="text-2xl font-bold">{uniq.length}</p></div>
-                    <div className="rounded-xl border border-border p-3"><p className="text-xs text-muted-foreground">Taux avec email</p><p className="text-2xl font-bold">{rate} %</p></div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" className="rounded-lg" onClick={() => void copyAll()} disabled={!uniq.length}>
-                      <Copy className="mr-2 h-4 w-4" /> Copier tous les emails
-                    </Button>
-                    <Button size="sm" variant="outline" className="rounded-lg" onClick={exportCsv} disabled={!uniq.length}>
-                      Exporter en CSV
-                    </Button>
-                  </div>
-                </div>
-              );
-            })()}
-            {loading ? (
-              <Loader2 className="h-5 w-5 animate-spin" />
-            ) : trials.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Aucun essai généré pour l’instant.</p>
-            ) : (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b text-left text-xs uppercase tracking-wider text-muted-foreground">
-                    <th className="py-2 pr-3">Titre proposé</th>
-                    <th className="py-2 pr-3">Email</th>
-                    <th className="py-2 pr-3">Mots</th>
-                    <th className="py-2 pr-3">Langue</th>
-                    <th className="py-2 pr-3">Envoyé</th>
-                    <th className="py-2 pr-3">Converti</th>
-                    <th className="py-2">Créé le</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {trials.map((t) => (
-                    <tr key={t.id} className="border-b last:border-0">
-                      <td className="max-w-[260px] truncate py-2 pr-3 font-medium" title={t.book_idea}>
-                        {t.proposed_title ?? t.book_idea}
-                      </td>
-                      <td className="py-2 pr-3">{t.email ?? <span className="text-muted-foreground">anonyme</span>}</td>
-                      <td className="py-2 pr-3">{t.word_count ?? '—'}</td>
-                      <td className="py-2 pr-3 uppercase">{t.language ?? 'fr'}</td>
-                      <td className="py-2 pr-3">
-                        {t.delivered_at ? <Badge>envoyé</Badge> : <Badge variant="secondary">non</Badge>}
-                      </td>
-                      <td className="py-2 pr-3">
-                        {t.converted_at ? (
-                          <Badge className="bg-emerald-600">abonné</Badge>
-                        ) : (
-                          <Badge variant="secondary">en attente</Badge>
-                        )}
-                      </td>
-                      <td className="py-2 text-muted-foreground">{fmtDate(t.created_at)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            )}
-          </CardContent>
-        </Card>
+
+        </>}
       </div>
     </div>
   );
 }
 
-export default function AdminLancementPage() {
+export default function AdminLancementPage({ trialsOnly = false }: { trialsOnly?: boolean }) {
   return (
     <AdminGate>
-      <AdminLancementContent />
+      <AdminLancementContent trialsOnly={trialsOnly} />
     </AdminGate>
   );
 }
