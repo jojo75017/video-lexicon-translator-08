@@ -1,5 +1,6 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.78.0';
 import { Resend } from 'npm:resend@2.0.0';
+import { clientIp, isLockedOut, recordFailure } from '../_shared/codeAttempts.ts';
 import { EMAIL_SENDING_ENABLED } from '../_shared/emailSendingGuard.ts';
 
 const resend = new Resend(Deno.env.get('RESEND_API_KEY'));
@@ -132,6 +133,13 @@ Deno.serve(async (req) => {
       });
     }
 
+    const ip = clientIp(req);
+    if (await isLockedOut(admin, email, ip)) {
+      return new Response(JSON.stringify({ success: false, reason: 'invalid', error: 'Trop de tentatives. Réessayez plus tard.' }), {
+        status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     // Look up the code
     const { data: codeRow, error: codeErr } = await admin
       .from('beta_promo_codes')
@@ -148,6 +156,7 @@ Deno.serve(async (req) => {
     }
 
     if (!codeRow) {
+      await recordFailure(admin, email, ip);
       return new Response(
         JSON.stringify({ success: false, reason: 'invalid', error: INVALID_MSG }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }

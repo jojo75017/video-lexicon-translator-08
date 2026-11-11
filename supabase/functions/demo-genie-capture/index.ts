@@ -14,7 +14,7 @@ const json = (status: number, body: unknown) =>
 
 const isValidEmail = (e: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
 
-const OFFER_URL = "https://ebookstudio.fr/commander";
+const OFFER_URL = "https://ebookstudio.fr/formules";
 
 function escapeHtml(s: string) {
   return s
@@ -53,10 +53,10 @@ async function sendSummaryEmail(
     <ol style="padding-left:20px">${list}</ol>
     <p style="text-align:center;margin:28px 0">
       <a href="${OFFER_URL}" style="background:#E8951E;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block">
-        Faire écrire mon livre en entier — 47 € à vie
+        Écrire mon livre en entier — dès 19 €/mois
       </a>
     </p>
-    <p style="font-size:13px;color:#6B6257">L'accès à vie à 47 € est disponible jusqu'au 30 septembre 2026. Ensuite, l'accès se fera uniquement par abonnement.</p>
+    <p style="font-size:13px;color:#6B6257">Trois formules sans engagement : 19 €, 29 € ou 59 € par mois.</p>
     <hr style="border:none;border-top:1px solid #e5ded0;margin:20px 0"/>
     <p style="font-size:12px;color:#8a8178">Vous recevez cet email car vous avez testé la démo sur ebookstudio.fr.</p>
   </div>`;
