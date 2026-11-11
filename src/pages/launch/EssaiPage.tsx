@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 import ChapterFlipbook from '@/components/essai/ChapterFlipbook';
+import { buildTrialPdf, downloadBlob, slugify } from '@/lib/essai/trialPdf';
 
 interface OutlineItem {
   title: string;
@@ -100,6 +101,9 @@ export default function EssaiPage() {
   const [claimed, setClaimed] = useState(false);
   const [fullChapter, setFullChapter] = useState<string | null>(null);
 
+  const [pdfBlob, setPdfBlob] = useState<Blob | null>(null);
+  const pdfName = `${slugify(outlineResult?.title ?? '')}.pdf`;
+
   const wallSeen = useRef(false);
 
   useEffect(() => {
@@ -192,6 +196,20 @@ export default function EssaiPage() {
       }
       setFullChapter(data.chapter ?? '');
       setClaimed(true);
+      try {
+        const blob = buildTrialPdf({
+          title: outlineResult.title,
+          subtitle: outlineResult.subtitle,
+          outline: outlineResult.outline,
+          chapterTitle: data.chapterTitle || chapter?.chapterTitle || 'Chapitre 1',
+          chapterText: data.chapter ?? '',
+        });
+        setPdfBlob(blob);
+        downloadBlob(blob, `${slugify(outlineResult.title)}.pdf`);
+        void track('pdf_downloaded', params);
+      } catch (err) {
+        console.error('PDF', err);
+      }
       void track('email_captured', params);
       toast.success('Chapitre débloqué — il part aussi dans votre boîte de réception.');
     } catch (e) {
@@ -412,11 +430,15 @@ export default function EssaiPage() {
 
                     <div className="mt-2 rounded-xl border border-[#0F2E1F]/15 bg-[#FBF8F3] p-5">
                       <p className="text-base font-bold text-[#2A2118]">
-                        Lire mon chapitre 1 en entier
+                        Votre livre en PDF : plan complet + chapitre 1
                       </p>
-                      <p className="mt-1 text-sm text-[#5B5245]">
-                        Votre email, et le chapitre complet s'affiche tout de suite. Vous le recevez
-                        aussi par mail pour le garder.
+                      <ul className="mt-2 space-y-1 text-sm text-[#5B5245]">
+                        <li>• Votre titre et sous-titre</li>
+                        <li>• Le sommaire détaillé de tous les chapitres</li>
+                        <li>• Le texte intégral de votre chapitre 1</li>
+                      </ul>
+                      <p className="mt-2 text-sm text-[#5B5245]">
+                        Entrez votre email : le PDF se télécharge tout de suite et le chapitre s'affiche en entier.
                       </p>
                       <div className="mt-3 flex flex-col gap-2 sm:flex-row">
                         <input
@@ -437,7 +459,7 @@ export default function EssaiPage() {
                           ) : (
                             <Mail className="h-4 w-4" />
                           )}
-                          Débloquer mon chapitre
+                          Télécharger mon PDF gratuit
                         </button>
                       </div>
                     </div>
@@ -447,7 +469,16 @@ export default function EssaiPage() {
 
               {claimed && (
                 <p className="mt-6 flex items-center gap-2 text-sm font-semibold text-[#0F2E1F]">
-                  <CheckCircle2 className="h-5 w-5" /> Chapitre envoyé à {email}.
+                  <CheckCircle2 className="h-5 w-5" /> Votre PDF est prêt ({pdfName}).
+                  {pdfBlob && (
+                    <button
+                      type="button"
+                      onClick={() => downloadBlob(pdfBlob, pdfName)}
+                      className="ml-2 rounded-lg border border-[#0F2E1F]/30 px-3 py-1 text-xs font-bold hover:bg-[#0F2E1F]/5"
+                    >
+                      Télécharger à nouveau
+                    </button>
+                  )}
                 </p>
               )}
             </section>
