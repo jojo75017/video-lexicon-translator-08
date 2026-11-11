@@ -557,7 +557,7 @@ export default function EssaiPage() {
   );
 }
 
-/** Preuve sociale basée sur le nombre réel de contacts inscrits (2 018 au 11/11/2026). */
+/** Preuve sociale basée sur le nombre réel de contacts inscrits (2 018 au 11/11/2026, affiché « plus de 1 500 » à la demande de Georges). */
 function EssaiTestimonials() {
   const points = [
     { icon: '⚡', text: 'Sans engagement ni carte bancaire pour tester immédiatement' },
@@ -567,7 +567,7 @@ function EssaiTestimonials() {
   return (
     <section className="mx-auto mt-12 max-w-2xl rounded-xl border border-black/5 bg-white p-6 text-center shadow-sm">
       <h2 className="v3-serif text-xl font-bold" style={{ color: 'var(--v3-ink, #2A2118)' }}>
-        Rejoignez plus de 2 000 auteurs et créateurs indépendants
+        Rejoignez plus de 1 500 auteurs et créateurs indépendants
       </h2>
       <p className="mt-2 text-sm leading-relaxed" style={{ color: '#5B5245' }}>
         Du premier livre au catalogue complet, ils utilisent EbookStudio pour concevoir, structurer et publier sur Amazon KDP.
