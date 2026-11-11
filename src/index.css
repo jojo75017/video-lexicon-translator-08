@@ -794,3 +794,17 @@ a:hover {
 .dark-sales .ds-glow {
   box-shadow: 0 0 60px rgba(212, 175, 55, 0.12);
 }
+
+/* Tableau de bord admin : lisibilité sur fond sombre (couleurs claires codées en dur neutralisées). */
+.admin-readable { color: #F3F4F6; }
+.admin-readable td, .admin-readable th, .admin-readable .font-medium, .admin-readable h2, .admin-readable h3 { color: #F3F4F6; }
+.admin-readable .text-muted-foreground { color: #CBD5E1 !important; }
+.admin-readable [class~="bg-blue-50"], .admin-readable [class~="bg-blue-50/50"], .admin-readable [class~="bg-gray-50"], .admin-readable [class~="bg-gray-50/50"], .admin-readable [class~="bg-green-50"], .admin-readable [class~="bg-orange-50"], .admin-readable [class~="bg-red-50"], .admin-readable [class~="bg-gray-100"], .admin-readable [class~="bg-blue-100"], .admin-readable [class~="bg-green-100"], .admin-readable [class~="bg-orange-100"], .admin-readable [class~="bg-emerald-100"] {
+  background-color: rgba(255,255,255,0.06) !important;
+}
+.admin-readable [class*="text-gray-"], .admin-readable [class*="text-blue-"], .admin-readable [class*="text-green-7"],
+.admin-readable [class*="text-green-8"], .admin-readable [class*="text-green-9"], .admin-readable [class*="text-orange-7"],
+.admin-readable [class*="text-orange-8"], .admin-readable [class*="text-emerald-7"], .admin-readable [class*="text-purple-"] {
+  color: #E5E7EB !important;
+}
+.admin-readable .bg-orange-500 .text-orange-600 { color: #C2410C !important; }

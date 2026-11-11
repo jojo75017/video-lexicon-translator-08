@@ -326,7 +326,7 @@ export const AdminPage = () => {
   const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
+    <div className="admin-readable min-h-screen bg-gradient-to-br from-primary/10 via-background to-secondary/10 p-4">
       <div className="container mx-auto max-w-6xl py-8 space-y-6">
 
         <AdminPanelNav />
