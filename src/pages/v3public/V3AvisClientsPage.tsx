@@ -135,17 +135,17 @@ export default function V3AvisClientsPage() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
-      <header className="rounded-2xl border p-6" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
+      <header className="rounded-2xl border p-6" style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#151d2c' }}>
         <div className="flex items-center gap-2">
           <Star className="w-5 h-5" style={{ color: 'var(--v3-gold, #c9a227)' }} />
-          <p className="text-[12px] uppercase tracking-[0.14em]" style={{ color: 'var(--v3-emerald)' }}>
+          <p className="text-[12px] uppercase tracking-[0.14em]" style={{ color: '#2DD4BF' }}>
             Avis clients Amazon
           </p>
         </div>
-        <h1 className="mt-2 text-2xl md:text-[28px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+        <h1 className="mt-2 text-2xl md:text-[28px] font-semibold" style={{ color: '#F5F5F5' }}>
           Obtenir des avis clients : la marche à suivre
         </h1>
-        <p className="mt-2 text-[14px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>
+        <p className="mt-2 text-[14px] leading-relaxed" style={{ color: '#C4CAD6' }}>
           Les avis décident de la visibilité d’un livre sur Amazon. Voici la seule méthode conforme aux règles : préparer
           le livre, inviter vos lecteurs, relancer une fois, puis laisser la série travailler pour vous.
         </p>
@@ -153,11 +153,11 @@ export default function V3AvisClientsPage() {
 
       {/* La méthode en vidéo : chargée seulement au clic, sans lecture automatique */}
       <section className="mt-6 grid gap-5 rounded-2xl border p-5 md:p-6 lg:grid-cols-[1.3fr_1fr]"
-        style={{ borderColor: 'rgba(201,162,39,0.55)', background: '#fff' }}>
+        style={{ borderColor: 'rgba(201,162,39,0.55)', background: '#111827' }}>
         <div>
           <div className="flex items-center gap-2">
             <PlayCircle className="w-4 h-4" style={{ color: 'var(--v3-gold, #c9a227)' }} />
-            <h2 className="text-[15px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+            <h2 className="text-[15px] font-semibold" style={{ color: '#F5F5F5' }}>
               Regarder la méthode en vidéo
             </h2>
           </div>
@@ -184,18 +184,18 @@ export default function V3AvisClientsPage() {
             </div>
           </div>
           <a href={`https://www.youtube.com/watch?v=${VIDEO_ID}`} target="_blank" rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] underline" style={{ color: 'var(--v3-muted)' }}>
+            className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] underline" style={{ color: '#C4CAD6' }}>
             <ExternalLink className="w-3.5 h-3.5" /> Ouvrir sur YouTube
           </a>
         </div>
 
-        <div className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
-          <h3 className="text-[13.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+        <div className="rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#151d2c' }}>
+          <h3 className="text-[13.5px] font-semibold" style={{ color: '#F5F5F5' }}>
             L’essentiel, si vous préférez lire
           </h3>
           <ul className="mt-3 space-y-2">
             {VIDEO_POINTS.map((p) => (
-              <li key={p} className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>• {p}</li>
+              <li key={p} className="text-[13px] leading-relaxed" style={{ color: '#C4CAD6' }}>• {p}</li>
             ))}
           </ul>
         </div>
@@ -203,55 +203,55 @@ export default function V3AvisClientsPage() {
 
 
 
-      <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: '#f0c98a', background: '#fdf7ec' }}>
-        <h2 className="text-[15px] font-semibold" style={{ color: '#92400e' }}>
+      <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: '#f0c98a', background: '#2a1d0a' }}>
+        <h2 className="text-[15px] font-semibold" style={{ color: '#FFD08A' }}>
           Les règles Amazon, à lire avant tout
         </h2>
         <ul className="mt-3 space-y-2">
           {RULES.map((r) => (
-            <li key={r} className="text-[13px] leading-relaxed" style={{ color: '#92400e' }}>• {r}</li>
+            <li key={r} className="text-[13px] leading-relaxed" style={{ color: '#FFD08A' }}>• {r}</li>
           ))}
         </ul>
       </section>
 
       <section className="mt-6 grid gap-4 md:grid-cols-2">
         {STEPS.map((s) => (
-          <article key={s.title} className="rounded-2xl border p-5" style={{ borderColor: 'var(--v3-line)', background: '#fff' }}>
+          <article key={s.title} className="rounded-2xl border p-5" style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#111827' }}>
             <div className="flex items-center gap-2">
-              <s.icon className="w-4 h-4" style={{ color: 'var(--v3-emerald)' }} />
-              <h2 className="text-[15px] font-semibold" style={{ color: 'var(--v3-ink)' }}>{s.title}</h2>
+              <s.icon className="w-4 h-4" style={{ color: '#2DD4BF' }} />
+              <h2 className="text-[15px] font-semibold" style={{ color: '#F5F5F5' }}>{s.title}</h2>
             </div>
             <ul className="mt-3 space-y-2">
               {s.body.map((b) => (
-                <li key={b} className="text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>• {b}</li>
+                <li key={b} className="text-[13px] leading-relaxed" style={{ color: '#C4CAD6' }}>• {b}</li>
               ))}
             </ul>
           </article>
         ))}
       </section>
 
-      <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: 'var(--v3-line)', background: '#fff' }}>
-        <h2 className="text-[15px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+      <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#111827' }}>
+        <h2 className="text-[15px] font-semibold" style={{ color: '#F5F5F5' }}>
           Vos textes prêts à copier
         </h2>
-        <p className="mt-1 text-[13px]" style={{ color: 'var(--v3-muted)' }}>
+        <p className="mt-1 text-[13px]" style={{ color: '#C4CAD6' }}>
           Renseignez les trois champs : la page de fin et la séquence de 3 emails se personnalisent automatiquement.
         </p>
 
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           <input value={bookTitle} onChange={(e) => setBookTitle(e.target.value)} placeholder="Titre du livre"
-            className="rounded-xl border px-3 py-2 text-[13px]" style={{ borderColor: 'var(--v3-line)' }} />
+            className="rounded-xl border px-3 py-2 text-[13px]" style={{ borderColor: 'rgba(255,255,255,0.14)' }} />
           <input value={authorName} onChange={(e) => setAuthorName(e.target.value)} placeholder="Votre nom d’auteur"
-            className="rounded-xl border px-3 py-2 text-[13px]" style={{ borderColor: 'var(--v3-line)' }} />
+            className="rounded-xl border px-3 py-2 text-[13px]" style={{ borderColor: 'rgba(255,255,255,0.14)' }} />
           <input value={link} onChange={(e) => setLink(e.target.value)} placeholder="Lien Amazon du livre"
-            className="rounded-xl border px-3 py-2 text-[13px]" style={{ borderColor: 'var(--v3-line)' }} />
+            className="rounded-xl border px-3 py-2 text-[13px]" style={{ borderColor: 'rgba(255,255,255,0.14)' }} />
         </div>
 
-        <div className="mt-5 rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
+        <div className="mt-5 rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#151d2c' }}>
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <QrCode className="w-4 h-4" style={{ color: 'var(--v3-emerald)' }} />
-              <h3 className="text-[13.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>
+              <QrCode className="w-4 h-4" style={{ color: '#2DD4BF' }} />
+              <h3 className="text-[13.5px] font-semibold" style={{ color: '#F5F5F5' }}>
                 Page de fin du livre
               </h3>
             </div>
@@ -259,16 +259,16 @@ export default function V3AvisClientsPage() {
               {copied === 'back' ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Copier
             </button>
           </div>
-          <pre className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{backPage}</pre>
+          <pre className="mt-3 whitespace-pre-wrap text-[13px] leading-relaxed" style={{ color: '#C4CAD6' }}>{backPage}</pre>
         </div>
 
         <div className="mt-4 space-y-4">
           {emails.map((e) => (
-            <div key={e.label} className="rounded-xl border p-4" style={{ borderColor: 'var(--v3-line)', background: '#fbfbfa' }}>
+            <div key={e.label} className="rounded-xl border p-4" style={{ borderColor: 'rgba(255,255,255,0.14)', background: '#151d2c' }}>
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4" style={{ color: 'var(--v3-emerald)' }} />
-                  <h3 className="text-[13.5px] font-semibold" style={{ color: 'var(--v3-ink)' }}>{e.label}</h3>
+                  <Mail className="w-4 h-4" style={{ color: '#2DD4BF' }} />
+                  <h3 className="text-[13.5px] font-semibold" style={{ color: '#F5F5F5' }}>{e.label}</h3>
                 </div>
                 <button
                   onClick={() => void copy(e.label, `Objet : ${e.subject}\n\n${e.body}`)}
@@ -277,8 +277,8 @@ export default function V3AvisClientsPage() {
                   {copied === e.label ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />} Copier
                 </button>
               </div>
-              <p className="mt-2 text-[13px] font-medium" style={{ color: 'var(--v3-ink)' }}>Objet : {e.subject}</p>
-              <pre className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed" style={{ color: 'var(--v3-muted)' }}>{e.body}</pre>
+              <p className="mt-2 text-[13px] font-medium" style={{ color: '#F5F5F5' }}>Objet : {e.subject}</p>
+              <pre className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed" style={{ color: '#C4CAD6' }}>{e.body}</pre>
             </div>
           ))}
         </div>
