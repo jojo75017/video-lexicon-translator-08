@@ -9,9 +9,9 @@ export interface EbookExportTypography {
   /** Police principale (titres + corps) */
   fontFamily: ExportFontFamily;
   /** Taille des titres de chapitre (en pt) — 14 ou 16 */
-  headingSize: 14 | 16;
+  headingSize: 14 | 16 | 18 | 20;
   /** Taille du corps de texte (en pt) — 11, 12 ou 14 */
-  bodySize: 11 | 12 | 14;
+  bodySize: 11 | 12 | 14 | 16;
   /** Justifie le corps de texte (sinon aligné à gauche) */
   justify: boolean;
   /** Couleur des titres (hex avec #) */

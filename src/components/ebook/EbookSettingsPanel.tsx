@@ -313,12 +313,14 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
               <Label>Taille des titres</Label>
               <Select
                 value={String(typo.headingSize)}
-                onValueChange={(v) => updateTypo({ headingSize: Number(v) as 14 | 16 })}
+                onValueChange={(v) => updateTypo({ headingSize: Number(v) as 14 | 16 | 18 | 20 })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="14">14 pt</SelectItem>
                   <SelectItem value="16">16 pt</SelectItem>
+                  <SelectItem value="18">18 pt (jeunesse)</SelectItem>
+                  <SelectItem value="20">20 pt (tout-petits)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -326,13 +328,14 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
               <Label>Taille du corps</Label>
               <Select
                 value={String(typo.bodySize)}
-                onValueChange={(v) => updateTypo({ bodySize: Number(v) as 11 | 12 | 14 })}
+                onValueChange={(v) => updateTypo({ bodySize: Number(v) as 11 | 12 | 14 | 16 })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="11">11 pt</SelectItem>
                   <SelectItem value="12">12 pt</SelectItem>
                   <SelectItem value="14">14 pt</SelectItem>
+                  <SelectItem value="16">16 pt (jeunesse)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
