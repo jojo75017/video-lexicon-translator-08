@@ -21,7 +21,7 @@ import {
 import {
   buildStudioComposition,
   COVER_IMAGE_STYLES,
-  getImageStyle,
+  getImageStyle, ILLUSTRATED_STYLE_IDS,
   TEXT_PLACEMENTS,
   type TextPlacement,
 } from '@/lib/cover-editor/studioProCover';
@@ -288,6 +288,7 @@ const CoverStudioPro: React.FC = () => {
           openrouterModel: useOpenRouter ? orModel : undefined,
           ideogramKey: ideoKey.trim() || undefined,
           noText,
+          illustrated: ILLUSTRATED_STYLE_IDS.includes(imageStyle),
         },
       });
       if (error) throw error;

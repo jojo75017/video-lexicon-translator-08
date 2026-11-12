@@ -34,6 +34,18 @@ export const COVER_IMAGE_STYLES: { id: string; label: string; prompt: string }[]
       'Richly painted digital illustration, oil-painting texture, warm rim light, deep painterly depth, best-seller book cover craftsmanship.',
   },
   {
+    id: 'cartoon2d',
+    label: '✏️ Dessin animé 2D éducatif',
+    prompt:
+      'Bright 2D children cartoon illustration in the style of French educational publishers (Hatier, Nathan, Milan): clean soft outlines, cheerful vivid colours (sunny yellow, sky blue, mint green), smiling expressive kid characters, light luminous background, playful learning details (stars, light bulb, pencils), very readable as a small thumbnail.',
+  },
+  {
+    id: 'cartoon3d',
+    label: '🎬 Dessin animé 3D (film d\'animation)',
+    prompt:
+      'Warm 3D animated feature-film style (Pixar-like), adorable expressive characters with big friendly eyes, soft bright lighting, cheerful saturated colours, luminous clean background, family-friendly joyful mood.',
+  },
+  {
     id: 'aquarelle',
     label: '🎨 Aquarelle jeunesse',
     prompt:
@@ -64,6 +76,9 @@ export const COVER_IMAGE_STYLES: { id: string; label: string; prompt: string }[]
       'Vintage retro poster style, screen-print texture, limited muted palette, mid-century shapes, aged paper grain, nostalgic editorial feel.',
   },
 ];
+
+/** Styles illustrés : le moteur ne doit pas forcer la photo réaliste. */
+export const ILLUSTRATED_STYLE_IDS = ['cartoon2d', 'cartoon3d', 'aquarelle', 'peinte', 'minimal', '3d', 'bd', 'vintage'];
 
 export const getImageStyle = (id: string) =>
   COVER_IMAGE_STYLES.find((s) => s.id === id) ?? COVER_IMAGE_STYLES[0];

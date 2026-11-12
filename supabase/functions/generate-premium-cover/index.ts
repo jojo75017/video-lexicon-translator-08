@@ -21,7 +21,8 @@ interface CoverRequest {
   openrouterKey?: string;    // BYOK OpenRouter (sk-or-...) — prioritaire si fourni
   openrouterModel?: string;  // modèle d'image OpenRouter choisi
   ideogramKey?: string;      // BYOK Ideogram — meilleur rendu typographique
-  noText?: boolean;          // illustration seule (typographie ajoutée ensuite au 300 DPI)
+  noText?: boolean;
+  illustrated?: boolean;     // style dessiné choisi : ne pas forcer la photo          // illustration seule (typographie ajoutée ensuite au 300 DPI)
 }
 
 /** Ideogram v3 — le meilleur modèle pour un titre net et bien composé. */
@@ -58,7 +59,11 @@ async function buildArtDirection(
   req: CoverRequest,
 ): Promise<string> {
   // Étape 1 — Direction artistique IA (texte) pour enrichir le prompt image.
-  const sys = `Tu es directeur artistique senior pour une grande maison d'édition (Penguin, HarperCollins).
+  const sys = req.illustrated
+    ? `Tu es directeur artistique senior pour une grande maison d'édition jeunesse et pédagogique (Hatier, Nathan, Milan).
+Tu écris un brief visuel COURT et PRÉCIS (en anglais, 4 à 6 phrases) pour une couverture ILLUSTRÉE lumineuse, en respectant strictement le style dessiné demandé dans la direction de référence.
+Inclure: concept visuel central, palette claire et gaie, composition avec espace dégagé pour le titre, ambiance joyeuse et rassurante. Interdits: photo réaliste, ambiance sombre, watermark.`
+    : `Tu es directeur artistique senior pour une grande maison d'édition (Penguin, HarperCollins).
 Tu écris un brief visuel COURT et PRÉCIS (en anglais, 4 à 6 phrases) pour générer une couverture de livre PHOTORÉALISTE haut de gamme.
 Inclure: concept visuel central, palette de couleurs, éclairage, composition, ambiance, et style typographique suggéré.
 Interdits absolus: cartoon, illustration enfantine, rendu 3D plastique, watermark. Cible: bestseller Amazon, qualité magazine.`;
@@ -94,6 +99,20 @@ Donne uniquement le brief visuel, sans préambule.`;
 
 function buildImagePrompt(req: CoverRequest, artDirection: string): string {
   const showAuthor = req.showAuthor !== false;
+  if (req.illustrated) {
+    return `Create a premium ILLUSTRATED front book cover for Amazon KDP, bright, cheerful and luminous, in exactly the drawing style described below (NOT a photograph, no dark or dramatic mood).
+
+STYLE AND ART DIRECTION:
+${req.registrePrompt || ''}
+${artDirection}
+
+BOOK: "${req.title}"${req.subtitle ? ` — ${req.subtitle}` : ''}. Genre: ${req.genre || 'general'}.
+
+${req.noText ? 'NO TEXT AT ALL: no letters, words or logo anywhere. Keep clean bright empty space in the upper third and lower fifth for typography added later.' : `TYPOGRAPHY: title "${req.title}" large, sharp and readable as a thumbnail${req.subtitle ? `; subtitle "${req.subtitle}" smaller below` : ''}${showAuthor && req.author ? `; author "${req.author}" at the bottom` : ''}.`}
+
+TECHNICAL: portrait 2:3, full bleed, no borders, no barcode, no watermark, clean professional finish.
+${req.customPrompt ? `CREATIVE DIRECTION: ${req.customPrompt}` : ''}`;
+  }
   return `Create an ULTRA-REALISTIC, PHOTOREALISTIC, premium front book cover for Amazon KDP — the quality of a flagship Penguin Random House / HarperCollins release.
 
 ABSOLUTE REQUIREMENT — REAL PHOTOGRAPH LOOK:
