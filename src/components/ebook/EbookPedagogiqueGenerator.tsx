@@ -194,8 +194,10 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
         .map((c) => ({ type: 'chapter', chapterTitle: c.title, url: c.imageUrl }));
       const payload = {
         user_id: auth.user.id,
-        title: bookTitle.trim(),
-        subtitle: bookSubtitle.trim() || null,
+        title: bookSubtitle.trim()
+          ? `${bookTitle.trim()} — ${bookSubtitle.trim()}`
+          : bookTitle.trim(),
+        project_type: 'pedagogique',
         target_audience: audience,
         tone,
         number_of_chapters: chapters.length,
