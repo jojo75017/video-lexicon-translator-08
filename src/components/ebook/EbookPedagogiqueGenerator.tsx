@@ -576,14 +576,14 @@ Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), ave
 
       {showOutline && (outlineView.length > 0 || chapters.length > 0) && (
         <div ref={outlineRef}>
-        <Card className="border-2 border-primary/40">
-          <CardHeader className="pb-2"><CardTitle className="text-lg">📑 Sommaire du livre</CardTitle></CardHeader>
+        <Card className="border-2" style={{ background: '#0F172A', borderColor: '#008296', color: '#F3F4F6' }}>
+          <CardHeader className="pb-2"><CardTitle className="text-lg" style={{ color: '#FF9E2D' }}>📑 Sommaire du livre</CardTitle></CardHeader>
           <CardContent>
             <ol className="space-y-2">
               {(outlineView.length ? outlineView : chapters.map(c => ({ title: c.title, focus: '' }))).map((o, i) => (
                 <li key={i} className="text-sm">
-                  <span className="font-semibold">{o.title}</span>
-                  {o.focus && <span className="block text-muted-foreground">{o.focus}</span>}
+                  <span className="font-semibold" style={{ color: '#FFFFFF' }}>{o.title}</span>
+                  {o.focus && <span className="block" style={{ color: '#CBD5E1' }}>{o.focus}</span>}
                   {i < chapters.length ? <span className="ml-1">✅</span> : progress?.current === i + 1 ? <span className="ml-1">⏳</span> : null}
                 </li>
               ))}
