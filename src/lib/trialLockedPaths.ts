@@ -21,6 +21,7 @@ export const TRIAL_LOCKED_PATHS = [
   '/v3/posts',
   '/v3/acquisition',
   '/v3/avis',
+  '/v3/kdp/avis',
   '/v3/gallery',
   '/v3/auteur',
 ];

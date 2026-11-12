@@ -62,6 +62,13 @@ export const KDP_TAB_PAGES: KdpTabPage[] = [
     maison: true,
   },
   {
+    label: 'Avis clients Amazon — vos 10 premiers avis',
+    to: '/v3/kdp/avis',
+    desc: 'La marche à suivre autorisée par Amazon : règles, étapes et modèles de messages prêts à copier pour obtenir des avis honnêtes',
+    badge: 'Nouveau',
+    maison: true,
+  },
+  {
     label: 'Audit avant publication',
     to: '/audit-pilot',
     desc: 'Vérification complète de votre fiche avant la mise en vente Kindle ou poche',
