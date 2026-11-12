@@ -107,7 +107,7 @@ const EbookScolaireGenerator: React.FC<ScolaireGeneratorProps> = ({ ebookTitle }
       if (saved.imageStyle) setImageStyle(saved.imageStyle);
       if (Array.isArray(saved.chapters)) setChapters(saved.chapters);
     }
-    hydrated.current = true;
+    setTimeout(() => { hydrated.current = true; }, 0);
   }, []);
 
   // Auto-save on changes

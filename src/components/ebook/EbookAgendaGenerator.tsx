@@ -83,7 +83,7 @@ const EbookAgendaGenerator: React.FC<AgendaGeneratorProps> = ({ ebookTitle }) =>
       if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
       if (Array.isArray(saved.pages)) setPages(saved.pages);
     }
-    hydrated.current = true;
+    setTimeout(() => { hydrated.current = true; }, 0);
   }, []);
 
   useEffect(() => {

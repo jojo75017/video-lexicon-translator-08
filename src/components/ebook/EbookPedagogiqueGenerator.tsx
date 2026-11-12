@@ -13,7 +13,7 @@ import { buildImageCacheKey, getCachedImage, setCachedImage } from '@/lib/educat
 import { exportEbookToDocx } from '@/lib/ebookDocxExporter';
 import { exportEbookToPdf } from '@/lib/ebookPdfExporter';
 import { getFriendlyError } from '@/lib/errorMessages';
-import { writeAutosave, readAutosave } from '@/lib/ebookProjectStorage';
+import { writeAutosave, readAutosaveAsync } from '@/lib/ebookProjectStorage';
 import { EbookProjectsPanel } from './EbookProjectsPanel';
 import { EbookSettingsPanel, loadTypography, getOpenRouterKey } from './EbookSettingsPanel';
 import { callAIWriting, getProvider, getProviderKey, validateKeyFormat, PROVIDER_LABELS } from '@/services/aiWritingService';
@@ -160,7 +160,9 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const hydrated = useRef(false);
 
   useEffect(() => {
-    const saved = readAutosave<any>('pedagogique');
+    let cancelled = false;
+    readAutosaveAsync<any>('pedagogique').then((saved) => {
+    if (cancelled) return;
     if (saved) {
       if (saved.bookTitle) setBookTitle(saved.bookTitle);
       if (saved.bookSubtitle) setBookSubtitle(saved.bookSubtitle);
@@ -173,8 +175,13 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
       if (saved.customPrompt) setCustomPrompt(saved.customPrompt);
       if (saved.imageStyle) setImageStyle(saved.imageStyle);
       if (Array.isArray(saved.chapters)) setChapters(saved.chapters);
+      if (Array.isArray(saved.outline)) setOutlineView(saved.outline);
     }
-    hydrated.current = true;
+    // Laisse React appliquer l'état restauré avant d'autoriser l'écriture,
+    // sinon la sauvegarde vide écrase le livre au chargement.
+    setTimeout(() => { hydrated.current = true; }, 0);
+    });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
