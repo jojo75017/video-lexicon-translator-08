@@ -89,7 +89,10 @@ const toText = (v: unknown): string => {
 
 const safeJsonExtract = (raw: string): any => {
   let cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-  const start = cleaned.indexOf('[');
+  const firstObj = cleaned.indexOf('{');
+  const firstArr = cleaned.indexOf('[');
+  const cands = [firstObj, firstArr].filter(n => n >= 0);
+  const start = cands.length ? Math.min(...cands) : 0;
   if (start > 0) cleaned = cleaned.slice(start);
   try { return JSON.parse(cleaned); } catch { }
   const objects: any[] = [];
@@ -147,6 +150,7 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const [customPrompt, setCustomPrompt] = useState('');
   const [chapters, setChapters] = useState<PedagogiqueChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [outlineView, setOutlineView] = useState<{ title: string; focus: string }[]>([]);
   const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
   const [imageStyle, setImageStyle] = useState<'hatier-school' | 'flat-clean' | 'soft-planner'>('soft-planner');
   const [imageStats, setImageStats] = useState<{ success: number; failed: number; lastError: 'credits' | 'rate' | 'other' | null }>(
@@ -193,6 +197,7 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
     setTablesPerChapter(data.tablesPerChapter ?? 1);
     setCustomPrompt(data.customPrompt || '');
     setChapters(Array.isArray(data.chapters) ? data.chapters : []);
+    setOutlineView(Array.isArray(data.outline) ? data.outline : []);
   };
 
   const mapChapters = (list: any[]): PedagogiqueChapter[] => list.map((c: any, i: number) => ({
@@ -292,25 +297,28 @@ Réponds en JSON : {"chapters": [{"title": "Chapitre N — Titre", "focus": "th�
       if (!outline.length) throw new Error('Sommaire introuvable dans la réponse IA');
       outline = outline.slice(0, numberOfChapters);
       const allTitles = outline.map((o: any, i: number) => toText(o?.title) || `Chapitre ${i + 1}`);
+      setOutlineView(outline.map((o: any, i: number) => ({ title: allTitles[i], focus: toText(o?.focus) })));
 
       // 2) Rédaction chapitre par chapitre
       const list: any[] = [];
       setChapters([]);
       for (let i = 0; i < outline.length; i++) {
         setProgress({ current: i + 1, total: outline.length });
-        const chapPrompt = `${prompt}
+        const chapPrompt = `${prompt.replace(/^Écris \d+ chapitres/, `Écris le chapitre ${i + 1} (sur ${outline.length})`).replace('Pour CHAQUE chapitre, retourne un objet JSON', 'Pour ce chapitre, retourne un objet JSON')}
 
 SOMMAIRE COMPLET : ${allTitles.join(' | ')}
 Écris UNIQUEMENT le chapitre ${i + 1} : "${allTitles[i]}" (thème : ${toText(outline[i]?.focus)}).
-Réponds en JSON : {"chapters": [ UN SEUL objet chapitre ]}.`;
+Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), avec title, intro, subSections, callouts, tables, imagePrompt, imageCaption.`;
         try {
           const raw = await callAIWriting(chapPrompt, { systemPrompt: sysPrompt, temperature: 0.7, maxTokens: 8000 });
           let c: any = typeof raw === 'string' ? safeJsonExtract(raw) : raw;
-          c = Array.isArray(c) ? c[0] : Array.isArray(c?.chapters) ? c.chapters[0] : c;
-          if (c && typeof c === 'object') {
+          c = Array.isArray(c) ? c[0] : Array.isArray(c?.chapters) ? c.chapters[0] : (c?.chapter ?? c);
+          if (c && typeof c === 'object' && (c.intro || c.subSections)) {
             if (!c.title) c.title = allTitles[i];
             list.push(c);
             setChapters(mapChapters([...list]));
+          } else {
+            toast.error(`Chapitre ${i + 1} : réponse IA illisible, relancez.`);
           }
         } catch (err: any) {
           console.error('[Pedagogique] chapitre', i + 1, err);
@@ -401,7 +409,12 @@ Réponds en JSON : {"chapters": [ UN SEUL objet chapitre ]}.`;
     }
   };
 
-  const buildExportSections = () => chapters.map(c => {
+  const buildExportSections = () => {
+    const toc = (outlineView.length ? outlineView.map(o => o.title) : chapters.map(c => c.title));
+    const tocSection = toc.length ? [{ title: 'Sommaire', blocks: [{ kind: 'paragraph', text: toc.join('\n') }] }] : [];
+    return [...tocSection, ...buildChapterSections()];
+  };
+  const buildChapterSections = () => chapters.map(c => {
     const blocks: any[] = [];
     if (c.intro) blocks.push({ kind: 'paragraph', text: c.intro });
     c.subSections.forEach(s => blocks.push({ kind: 'paragraph', heading: s.heading, text: s.paragraphs.join('\n\n') }));
@@ -551,6 +564,23 @@ Réponds en JSON : {"chapters": [ UN SEUL objet chapitre ]}.`;
         isEmpty={chapters.length === 0}
         onLoad={loadProject}
       />
+
+      {outlineView.length > 0 && (
+        <Card className="border-2 border-primary/40">
+          <CardHeader className="pb-2"><CardTitle className="text-lg">📑 Sommaire du livre</CardTitle></CardHeader>
+          <CardContent>
+            <ol className="space-y-2">
+              {outlineView.map((o, i) => (
+                <li key={i} className="text-sm">
+                  <span className="font-semibold">{o.title}</span>
+                  {o.focus && <span className="block text-muted-foreground">{o.focus}</span>}
+                  {i < chapters.length ? <span className="ml-1">✅</span> : progress?.current === i + 1 ? <span className="ml-1">⏳</span> : null}
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      )}
 
       {chapters.length > 0 && (
         <>
