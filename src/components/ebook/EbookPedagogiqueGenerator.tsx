@@ -160,6 +160,74 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const hydrated = useRef(false);
   const [showOutline, setShowOutline] = useState(true);
   const outlineRef = useRef<HTMLDivElement>(null);
+  const [isSavingToLibrary, setIsSavingToLibrary] = useState(false);
+
+  // Enregistre le livre dans la bibliothèque (ebook_projects) pour qu'il
+  // apparaisse dans les studios de couverture et « Mes livres ».
+  const saveToLibrary = async () => {
+    if (!bookTitle.trim()) {
+      toast.error('Donnez un titre à votre livre avant de le sauvegarder.');
+      return;
+    }
+    if (!chapters.length) {
+      toast.error('Générez au moins un chapitre avant de sauvegarder.');
+      return;
+    }
+    setIsSavingToLibrary(true);
+    try {
+      const { data: auth } = await supabase.auth.getUser();
+      if (!auth.user) {
+        toast.error('Connectez-vous pour sauvegarder votre livre.');
+        return;
+      }
+      const chaptersPayload = chapters.map((c, i) => ({
+        number: i + 1,
+        title: c.title,
+        content: [
+          c.intro,
+          ...c.subSections.map((s) => `${s.heading}\n\n${s.paragraphs.join('\n\n')}`),
+        ].filter(Boolean).join('\n\n'),
+        imageUrl: c.imageUrl || null,
+      }));
+      const ebookImages = chapters
+        .filter((c) => c.imageUrl)
+        .map((c) => ({ type: 'chapter', chapterTitle: c.title, url: c.imageUrl }));
+      const payload = {
+        user_id: auth.user.id,
+        title: bookTitle.trim(),
+        subtitle: bookSubtitle.trim() || null,
+        target_audience: audience,
+        tone,
+        number_of_chapters: chapters.length,
+        chapters: chaptersPayload,
+        ebook_images: ebookImages,
+        book_summary: outlineView.length
+          ? outlineView.map((o, i) => `Chapitre ${i + 1} : ${o.title} — ${o.focus}`).join('\n')
+          : null,
+        updated_at: new Date().toISOString(),
+      };
+      // Met à jour le projet existant du même titre plutôt que de créer un doublon.
+      const { data: existing } = await supabase
+        .from('ebook_projects')
+        .select('id')
+        .eq('user_id', auth.user.id)
+        .eq('title', bookTitle.trim())
+        .maybeSingle();
+      if (existing?.id) {
+        const { error } = await supabase.from('ebook_projects').update(payload).eq('id', existing.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('ebook_projects').insert(payload);
+        if (error) throw error;
+      }
+      toast.success('Livre sauvegardé dans votre bibliothèque — il est maintenant disponible pour les couvertures.');
+    } catch (err) {
+      console.error('❌ Sauvegarde bibliothèque:', err);
+      toast.error(getFriendlyError(err));
+    } finally {
+      setIsSavingToLibrary(false);
+    }
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -613,6 +681,14 @@ Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), ave
             <Button variant="outline" onClick={generate} disabled={isGenerating}>
               {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
               Régénérer
+            </Button>
+            <Button
+              onClick={saveToLibrary}
+              disabled={isSavingToLibrary}
+              style={{ backgroundColor: '#008296', color: '#FFFFFF' }}
+            >
+              {isSavingToLibrary ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <BookOpen className="w-4 h-4 mr-2" />}
+              Sauvegarder dans ma bibliothèque
             </Button>
             <Button variant="outline" onClick={generateAllImages}>
               <ImageIcon className="w-4 h-4 mr-2" />Toutes les illustrations
