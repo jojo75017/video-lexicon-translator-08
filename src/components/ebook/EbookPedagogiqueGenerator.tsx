@@ -181,9 +181,9 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
     if (!hydrated.current) return;
     writeAutosave('pedagogique', {
       bookTitle, bookSubtitle, topic, audience, tone, numberOfChapters,
-      calloutsPerChapter, tablesPerChapter, customPrompt, imageStyle, chapters,
+      calloutsPerChapter, tablesPerChapter, customPrompt, imageStyle, chapters, outline: outlineView,
     });
-  }, [bookTitle, bookSubtitle, topic, audience, tone, numberOfChapters, calloutsPerChapter, tablesPerChapter, customPrompt, imageStyle, chapters]);
+  }, [bookTitle, bookSubtitle, topic, audience, tone, numberOfChapters, calloutsPerChapter, tablesPerChapter, customPrompt, imageStyle, chapters, outlineView]);
 
   const loadProject = (data: any) => {
     if (!data) return;
@@ -411,7 +411,7 @@ Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), ave
 
   const buildExportSections = () => {
     const toc = (outlineView.length ? outlineView.map(o => o.title) : chapters.map(c => c.title));
-    const tocSection = toc.length ? [{ title: 'Sommaire', blocks: [{ kind: 'paragraph', text: toc.join('\n') }] }] : [];
+    const tocSection = toc.length ? [{ title: 'Sommaire', blocks: [{ kind: 'paragraph', text: toc.join('\n') }] as any[] }] : [];
     return [...tocSection, ...buildChapterSections()];
   };
   const buildChapterSections = () => chapters.map(c => {
