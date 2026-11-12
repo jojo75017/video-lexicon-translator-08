@@ -443,10 +443,20 @@ Retourne UNIQUEMENT un tableau JSON valide (sans markdown) avec ${numberOfChapte
                   {c.imageUrl && (
                     <img src={c.imageUrl} alt={c.title} className="w-full max-h-80 object-contain rounded-lg border bg-muted/30" />
                   )}
-                  <div><Badge variant="secondary">Objectifs</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.objectives}</pre></div>
-                  <div><Badge variant="secondary">Cours</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.lesson}</pre></div>
-                  <div><Badge variant="secondary">Exercices</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.exercises}</pre></div>
-                  <div><Badge variant="secondary">Corrigés</Badge><pre className="mt-1 whitespace-pre-wrap font-sans text-muted-foreground">{c.corrections}</pre></div>
+                  {([
+                    ['🎯 Objectifs', c.objectives, 'border-l-accent bg-accent/10'],
+                    ['📘 Règle d\'or & cours', c.lesson, 'border-l-primary bg-primary/10'],
+                    ['✍️ Exercices', c.exercises, 'border-l-secondary bg-secondary/40'],
+                  ] as const).map(([label, body, cls]) => (
+                    <div key={label} className={`rounded-xl border border-l-4 p-4 ${cls}`}>
+                      <p className="font-semibold mb-2 text-foreground">{label}</p>
+                      <pre className="whitespace-pre-wrap font-sans text-foreground/90 leading-relaxed">{body}</pre>
+                    </div>
+                  ))}
+                  <details className="rounded-xl border border-l-4 border-l-primary bg-muted/40 p-4">
+                    <summary className="cursor-pointer font-semibold text-foreground">✅ Corrigés détaillés (cliquer pour afficher)</summary>
+                    <pre className="mt-2 whitespace-pre-wrap font-sans text-foreground/90 leading-relaxed">{c.corrections}</pre>
+                  </details>
                 </CardContent>
               </Card>
             ))}

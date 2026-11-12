@@ -11,6 +11,7 @@ export const SPECIAL_BOOK_TABS: { slug: string; label: string }[] = [
   { slug: 'agenda', label: 'Agenda' },
   { slug: 'journal', label: 'Journal' },
   { slug: 'scolaire', label: 'Scolaire' },
+  { slug: 'pedagogique', label: 'Livre pédagogique (encadrés, tableaux, schémas)' },
   { slug: 'aquariophilie', label: 'Aquariophilie' },
   { slug: 'oiseaux', label: 'Fiches oiseaux' },
   { slug: 'saga', label: 'Saga multi-tomes' },
