@@ -147,6 +147,7 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   const [customPrompt, setCustomPrompt] = useState('');
   const [chapters, setChapters] = useState<PedagogiqueChapter[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [progress, setProgress] = useState<{ current: number; total: number } | null>(null);
   const [imageStyle, setImageStyle] = useState<'hatier-school' | 'flat-clean' | 'soft-planner'>('soft-planner');
   const [imageStats, setImageStats] = useState<{ success: number; failed: number; lastError: 'credits' | 'rate' | 'other' | null }>(
     { success: 0, failed: 0, lastError: null }
@@ -194,6 +195,38 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
     setChapters(Array.isArray(data.chapters) ? data.chapters : []);
   };
 
+  const mapChapters = (list: any[]): PedagogiqueChapter[] => list.map((c: any, i: number) => ({
+        id: `pedago-${Date.now()}-${i}`,
+        title: toText(c.title) || `Chapitre ${i + 1}`,
+        intro: toText(c.intro),
+        subSections: Array.isArray(c.subSections)
+          ? c.subSections.map((s: any) => ({
+              heading: toText(s.heading),
+              paragraphs: Array.isArray(s.paragraphs) ? s.paragraphs.map(toText) : [toText(s.paragraphs)],
+            }))
+          : [],
+        callouts: Array.isArray(c.callouts)
+          ? c.callouts
+              .map((b: any) => ({
+                type: (['saviez-vous', 'conseil', 'exercice', 'point-cle'].includes(b?.type) ? b.type : 'point-cle') as CalloutBox['type'],
+                title: toText(b?.title),
+                body: toText(b?.body),
+              }))
+              .filter((b: CalloutBox) => b.body)
+          : [],
+        tables: Array.isArray(c.tables)
+          ? c.tables
+              .map((t: any) => ({
+                caption: toText(t?.caption),
+                headers: Array.isArray(t?.headers) ? t.headers.map(toText) : [],
+                rows: Array.isArray(t?.rows) ? t.rows.map((r: any) => Array.isArray(r) ? r.map(toText) : []) : [],
+              }))
+              .filter((t: ComparisonTable) => t.headers.length && t.rows.length)
+          : [],
+        imagePrompt: toText(c.imagePrompt),
+        imageCaption: toText(c.imageCaption),
+      }));
+
   const generate = async () => {
     const prov = getProvider();
     const provKey = getProviderKey(prov);
@@ -211,7 +244,7 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
       const sysPrompt = `Tu es un auteur professionnel de livres pédagogiques (style Éditions Eyrolles / Larousse / Hatier).
 Tu maîtrises la pédagogie : structure progressive, vulgarisation rigoureuse, exemples concrets, encadrés didactiques, tableaux comparatifs.
 RÈGLES CRITIQUES :
-- Réponds UNIQUEMENT avec un tableau JSON valide (commence par [ et termine par ]).
+- Réponds UNIQUEMENT avec du JSON valide.
 - AUCUN texte avant/après, AUCUN markdown, AUCUN backtick.
 - Échappe correctement guillemets et sauts de ligne (\n) dans les chaînes.
 - Contenu RICHE : intro 100-180 mots, chaque sous-section 200-350 mots minimum.
@@ -244,57 +277,53 @@ Pour CHAQUE chapitre, retourne un objet JSON avec :
 
 QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie : progression claire, exemples concrets, vocabulaire précis, jamais creux.`;
 
-      const text = await callAIWriting(prompt, {
-        systemPrompt: sysPrompt,
-        temperature: 0.7,
-        maxTokens: 24000,
-        jsonMode: true,
+      // 1) Sommaire
+      const outlineRaw = await callAIWriting(`Établis le sommaire d'un livre pédagogique de ${numberOfChapters} chapitres.
+LIVRE : "${bookTitle || topic}"${bookSubtitle ? ` — ${bookSubtitle}` : ''}
+SUJET : ${topic}
+PUBLIC : ${audience}
+${customPrompt ? `INSTRUCTIONS : ${customPrompt}` : ''}
+Réponds en JSON : {"chapters": [{"title": "Chapitre N — Titre", "focus": "thème précis en une phrase"}]} avec exactement ${numberOfChapters} chapitres progressifs.`, {
+        systemPrompt: 'Tu es un auteur de livres pédagogiques. Réponds uniquement en JSON valide.',
+        temperature: 0.6, maxTokens: 3000,
       });
+      let outline: any = typeof outlineRaw === 'string' ? safeJsonExtract(outlineRaw) : outlineRaw;
+      outline = Array.isArray(outline) ? outline : Array.isArray(outline?.chapters) ? outline.chapters : [];
+      if (!outline.length) throw new Error('Sommaire introuvable dans la réponse IA');
+      outline = outline.slice(0, numberOfChapters);
+      const allTitles = outline.map((o: any, i: number) => toText(o?.title) || `Chapitre ${i + 1}`);
 
-      let content: any = text;
-      if (typeof content === 'string') {
-        content = safeJsonExtract(content);
+      // 2) Rédaction chapitre par chapitre
+      const list: any[] = [];
+      setChapters([]);
+      for (let i = 0; i < outline.length; i++) {
+        setProgress({ current: i + 1, total: outline.length });
+        const chapPrompt = `${prompt}
+
+SOMMAIRE COMPLET : ${allTitles.join(' | ')}
+Écris UNIQUEMENT le chapitre ${i + 1} : "${allTitles[i]}" (thème : ${toText(outline[i]?.focus)}).
+Réponds en JSON : {"chapters": [ UN SEUL objet chapitre ]}.`;
+        try {
+          const raw = await callAIWriting(chapPrompt, { systemPrompt: sysPrompt, temperature: 0.7, maxTokens: 8000 });
+          let c: any = typeof raw === 'string' ? safeJsonExtract(raw) : raw;
+          c = Array.isArray(c) ? c[0] : Array.isArray(c?.chapters) ? c.chapters[0] : c;
+          if (c && typeof c === 'object') {
+            if (!c.title) c.title = allTitles[i];
+            list.push(c);
+            setChapters(mapChapters([...list]));
+          }
+        } catch (err: any) {
+          console.error('[Pedagogique] chapitre', i + 1, err);
+          toast.error(`Chapitre ${i + 1} non rédigé : ${err?.message || 'erreur'}`);
+        }
       }
-      const list: any[] = Array.isArray(content)
-        ? content
-        : Array.isArray((content as any)?.chapters) ? (content as any).chapters : [];
 
       if (!list.length) throw new Error('Aucun chapitre valide reçu');
-      if (list.length < numberOfChapters) {
-        toast.warning(`Réponse partielle : ${list.length}/${numberOfChapters} chapitres récupérés.`);
+      if (list.length < outline.length) {
+        toast.warning(`${list.length}/${outline.length} chapitres rédigés. Relancez pour compléter.`);
       }
 
-      const generated: PedagogiqueChapter[] = list.map((c: any, i: number) => ({
-        id: `pedago-${Date.now()}-${i}`,
-        title: toText(c.title) || `Chapitre ${i + 1}`,
-        intro: toText(c.intro),
-        subSections: Array.isArray(c.subSections)
-          ? c.subSections.map((s: any) => ({
-              heading: toText(s.heading),
-              paragraphs: Array.isArray(s.paragraphs) ? s.paragraphs.map(toText) : [toText(s.paragraphs)],
-            }))
-          : [],
-        callouts: Array.isArray(c.callouts)
-          ? c.callouts
-              .map((b: any) => ({
-                type: (['saviez-vous', 'conseil', 'exercice', 'point-cle'].includes(b?.type) ? b.type : 'point-cle') as CalloutBox['type'],
-                title: toText(b?.title),
-                body: toText(b?.body),
-              }))
-              .filter((b: CalloutBox) => b.body)
-          : [],
-        tables: Array.isArray(c.tables)
-          ? c.tables
-              .map((t: any) => ({
-                caption: toText(t?.caption),
-                headers: Array.isArray(t?.headers) ? t.headers.map(toText) : [],
-                rows: Array.isArray(t?.rows) ? t.rows.map((r: any) => Array.isArray(r) ? r.map(toText) : []) : [],
-              }))
-              .filter((t: ComparisonTable) => t.headers.length && t.rows.length)
-          : [],
-        imagePrompt: toText(c.imagePrompt),
-        imageCaption: toText(c.imageCaption),
-      }));
+      const generated: PedagogiqueChapter[] = mapChapters(list);
       setChapters(generated);
       toast.success(`${generated.length} chapitres pédagogiques générés !`);
     } catch (e: any) {
@@ -302,6 +331,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
       toast.error(e?.message || getFriendlyError(e, 'Erreur lors de la génération'));
     } finally {
       setIsGenerating(false);
+      setProgress(null);
     }
   };
 
@@ -507,7 +537,7 @@ QUALITÉ : surpasse-toi. Le rendu doit être digne d'un livre vendu en librairie
             <Textarea value={customPrompt} onChange={e => setCustomPrompt(e.target.value)} rows={3} placeholder="Ex: inclure des références scientifiques, éviter le jargon, ajouter des anecdotes..." />
           </div>
           <Button onClick={generate} disabled={isGenerating} className="w-full">
-            {isGenerating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Génération en cours…</> : <><Sparkles className="w-4 h-4 mr-2" />Générer les chapitres pédagogiques</>}
+            {isGenerating ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" />{progress ? `Chapitre ${progress.current}/${progress.total} en cours…` : "Génération en cours…"}</> : <><Sparkles className="w-4 h-4 mr-2" />Générer les chapitres pédagogiques</>}
           </Button>
         </CardContent>
       </Card>
