@@ -203,9 +203,15 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
         number_of_chapters: chapters.length,
         chapters: chaptersPayload,
         ebook_images: ebookImages,
-        book_summary: outlineView.length
-          ? outlineView.map((o, i) => `Chapitre ${i + 1} : ${o.title} — ${o.focus}`).join('\n')
-          : null,
+        // Synopsis lisible, repris par les studios de couverture.
+        book_summary: [
+          `${bookTitle.trim()}${bookSubtitle.trim() ? ` : ${bookSubtitle.trim()}` : ''}.`,
+          audience ? `Un guide pratique pour ${audience}.` : '',
+          chapters.length
+            ? `En ${chapters.length} chapitres, le livre aborde : ${chapters.map((c) => c.title).join(', ')}.`
+            : '',
+          (chapters[0]?.intro || '').split(/(?<=[.!?])\s+/).slice(0, 2).join(' '),
+        ].filter(Boolean).join(' '),
         updated_at: new Date().toISOString(),
       };
       // Met à jour le projet existant du même titre plutôt que de créer un doublon.
