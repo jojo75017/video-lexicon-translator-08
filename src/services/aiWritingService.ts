@@ -327,7 +327,8 @@ async function callClaude(apiKey: string, prompt: string, opts: AIWritingOptions
       },
       body: JSON.stringify({
         model: DEFAULT_MODELS.claude,
-        max_tokens: opts.maxTokens ?? 8192,
+        // Claude 3.5 Sonnet : 8 192 jetons de sortie maximum.
+        max_tokens: Math.min(opts.maxTokens ?? 8192, 8192),
         temperature: opts.temperature ?? 0.7,
         system: opts.systemPrompt || undefined,
         messages: [{ role: 'user', content: prompt }],
@@ -359,9 +360,14 @@ async function callOpenAI(apiKey: string, prompt: string, opts: AIWritingOptions
       model: DEFAULT_MODELS.openai,
       messages,
       temperature: opts.temperature ?? 0.7,
-      max_tokens: opts.maxTokens ?? 8192,
+      // gpt-4o-mini accepte 16 384 jetons de sortie maximum : au-delà, OpenAI renvoie 400.
+      max_tokens: Math.min(opts.maxTokens ?? 8192, 16000),
     };
-    if (opts.jsonMode) body.response_format = { type: 'json_object' };
+    if (opts.jsonMode) {
+      // Le mode JSON d'OpenAI exige un objet racine et le mot « JSON » dans les messages.
+      messages.push({ role: 'system', content: 'Réponds en JSON valide. Si le résultat attendu est une liste, renvoie un objet {"chapters": [...]} ou {"items": [...]}.' });
+      body.response_format = { type: 'json_object' };
+    }
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
