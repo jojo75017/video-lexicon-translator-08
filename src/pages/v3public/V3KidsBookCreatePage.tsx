@@ -87,6 +87,8 @@ export default function V3KidsBookCreatePage() {
   const [generatingBack, setGeneratingBack] = useState(false);
   const [generatingKdp, setGeneratingKdp] = useState(false);
   const [pageCount, setPageCount] = useState<number>(32);
+  const [textSize, setTextSize] = useState<number>(() => Number(localStorage.getItem('v3_kids_text_size')) || 16);
+  useEffect(() => { localStorage.setItem('v3_kids_text_size', String(textSize)); }, [textSize]);
 
   const applyPreset = (id: KidsPresetId) => {
     setPreset(id);
@@ -495,7 +497,7 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
   };
 
   const exportHtml = () => {
-    const html = buildAlbumHtml(draft);
+    const html = buildAlbumHtml(draft, textSize);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -509,7 +511,7 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
   const exportPdf = () => {
     setExporting('pdf');
     try {
-      const html = buildAlbumHtml(draft);
+      const html = buildAlbumHtml(draft, textSize);
       const w = window.open('', '_blank');
       if (!w) { toast.error('Autorise les pop-ups pour imprimer.'); return; }
       w.document.write(html);
@@ -658,7 +660,7 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
         }));
         children.push(new Paragraph({
           alignment: AlignmentType.JUSTIFIED, spacing: { after: 200, line: 360 },
-          children: [new TextRun({ text: s.content || s.synopsis || '', size: 28 })],
+          children: [new TextRun({ text: s.content || s.synopsis || '', size: textSize * 2 })],
         }));
         children.push(new Paragraph({ children: [new PageBreak()] }));
       }
@@ -1344,6 +1346,15 @@ Pays dépôt légal : ${draft.legalDepositCountry || ''}
           <p className="text-xs text-[var(--v3-muted)] mb-3">
             Format album carré 21,59 × 21,59 cm — prêt pour KDP.
           </p>
+          <label className="mb-3 flex items-center gap-2 text-sm">
+            Taille du texte :
+            <select value={textSize} onChange={(e) => setTextSize(Number(e.target.value))} className="rounded-md border border-input bg-background px-2 py-1 text-foreground">
+              <option value={14}>14 pt (CE1 et plus)</option>
+              <option value={16}>16 pt (CP)</option>
+              <option value={18}>18 pt (jeunesse)</option>
+              <option value={20}>20 pt (tout-petits)</option>
+            </select>
+          </label>
           <div className="flex flex-wrap gap-2">
             <Button
               onClick={exportPdf}
@@ -1415,7 +1426,7 @@ function esc(s: string): string {
     ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 }
 
-function buildAlbumHtml(d: KidsBookDraft): string {
+function buildAlbumHtml(d: KidsBookDraft, textSize = 16): string {
   const stories = d.stories.map((s, i) => `
     <section class="page image-page">
       ${s.illustrationUrl ? `<img src="${esc(s.illustrationUrl)}" alt="${esc(s.title)}" />` : `<div class="placeholder">Illustration à générer</div>`}
@@ -1444,8 +1455,8 @@ function buildAlbumHtml(d: KidsBookDraft): string {
   .image-page img { width: 100%; height: 100%; object-fit: cover; }
   .image-page .placeholder { flex: 1; display: flex; align-items: center; justify-content: center; background: #f5f5f4; color: #999; font-size: 14pt; }
   .text-page { padding: 3cm 2.5cm; justify-content: center; }
-  .text-page h2 { font-size: 26pt; margin: 0 0 1cm; }
-  .text-page p { font-size: 16pt; line-height: 1.6; margin: 0; white-space: pre-wrap; }
+  .text-page h2 { font-size: ${textSize + 10}pt; margin: 0 0 1cm; }
+  .text-page p { font-size: ${textSize}pt; line-height: 1.6; margin: 0; white-space: pre-wrap; }
   .end-page { padding: 3cm 2.5cm; justify-content: center; text-align: center; background: #fffdf7; }
   .end-page h2 { font-size: 30pt; margin: 0 0 1cm; color: #C97A14; }
   .end-page p { font-size: 15pt; line-height: 1.6; margin: 0 0 0.6cm; }
