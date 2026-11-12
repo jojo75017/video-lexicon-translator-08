@@ -158,6 +158,8 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
   );
   const [typography, setTypography] = useState<EbookExportTypography>(loadTypography());
   const hydrated = useRef(false);
+  const [showOutline, setShowOutline] = useState(true);
+  const outlineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -572,12 +574,13 @@ Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), ave
         onLoad={loadProject}
       />
 
-      {outlineView.length > 0 && (
+      {showOutline && (outlineView.length > 0 || chapters.length > 0) && (
+        <div ref={outlineRef}>
         <Card className="border-2 border-primary/40">
           <CardHeader className="pb-2"><CardTitle className="text-lg">📑 Sommaire du livre</CardTitle></CardHeader>
           <CardContent>
             <ol className="space-y-2">
-              {outlineView.map((o, i) => (
+              {(outlineView.length ? outlineView : chapters.map(c => ({ title: c.title, focus: '' }))).map((o, i) => (
                 <li key={i} className="text-sm">
                   <span className="font-semibold">{o.title}</span>
                   {o.focus && <span className="block text-muted-foreground">{o.focus}</span>}
@@ -587,6 +590,7 @@ Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), ave
             </ol>
           </CardContent>
         </Card>
+        </div>
       )}
 
       {chapters.length > 0 && (
@@ -603,6 +607,9 @@ Réponds avec UN SEUL objet JSON chapitre (commence par { et termine par }), ave
                 </SelectContent>
               </Select>
             </div>
+            <Button variant="outline" onClick={() => { const next = !showOutline; setShowOutline(next); if (next) setTimeout(() => outlineRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }}>
+              📑 {showOutline ? 'Masquer le sommaire' : 'Sommaire'}
+            </Button>
             <Button variant="outline" onClick={generate} disabled={isGenerating}>
               {isGenerating ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
               Régénérer
