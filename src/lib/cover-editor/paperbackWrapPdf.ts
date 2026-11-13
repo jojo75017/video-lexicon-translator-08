@@ -48,7 +48,10 @@ export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
   if (g.spineText && sw > 0) {
     ctx.save(); ctx.translate(sx + sw / 2, oy + H / 2); ctx.rotate(Math.PI / 2);
     const fs = Math.min(sw * 0.55, 90); ctx.font = `800 ${fs}px Montserrat, Arial, sans-serif`; ctx.fillStyle = readableOn(i.accent); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(`${i.title.toUpperCase()}   ·   ${i.author.toUpperCase()}`.slice(0, 90), 0, 0); ctx.restore();
+    // Titre au milieu du dos, nom d'auteur séparé en bas du dos.
+    ctx.fillText(i.title.toUpperCase().slice(0, 70), -H * 0.06, 0);
+    ctx.font = `600 ${fs * 0.8}px Montserrat, Arial, sans-serif`; ctx.textAlign = 'right';
+    ctx.fillText(i.author.toUpperCase().slice(0, 40), H / 2 - px(BLEED + 0.4), 0); ctx.restore();
   }
   // Quatrième (gauche) : texte + emplacement code-barres KDP (2" × 1.2", bas droite).
   const bx = ox + px(BLEED + 0.5), by = oy + px(BLEED + 0.7), bw = px(g.tw - 1);
