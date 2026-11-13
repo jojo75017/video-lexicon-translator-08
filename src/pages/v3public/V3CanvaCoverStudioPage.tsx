@@ -15,6 +15,15 @@ const SCENE_IDEAS: Record<string, string[]> = {
   thriller: ["Une silhouette sous la pluie dans une ruelle sombre éclairée par un seul réverbère, ambiance froide et tendue", "Une maison isolée la nuit au bord d'un lac brumeux, une seule fenêtre allumée", "Un couloir d'hôpital désert aux néons vacillants, une porte entrouverte au fond"],
   romance: ["Un couple de dos face à un coucher de soleil sur la mer, lumière dorée et douce", "Deux mains qui se frôlent sur une table de café parisien, pluie fine derrière la vitre", "Une jeune femme lisant une lettre dans un champ de lavande au crépuscule"],
   jeunesse: ["Un petit renard curieux dans une forêt enchantée, lucioles et champignons lumineux", "Une fillette et son chien explorent un jardin rempli de fleurs géantes", "Un ourson qui regarde les étoiles depuis sa cabane dans un arbre"],
+  business: ["Un homme et une femme d'affaires confiants devant les tours vitrées d'un quartier d'affaires au lever du soleil", "Un bureau moderne avec un graphique en forte hausse sur un écran, lumière dorée", "Un escalier de verre montant vers le ciel, symbole de réussite"],
+  cuisine: ["Une table en bois garnie de plats maison fumants, herbes fraîches et pain croustillant, lumière naturelle", "Des mains qui pétrissent une pâte sur un plan de travail fariné", "Un panier de légumes colorés du marché sur une nappe en lin"],
+  sante: ["Une femme sereine qui fait du yoga au bord d'un lac au lever du jour", "Une tasse de tisane, des feuilles de menthe et une bougie sur une table claire", "Un sentier en forêt baigné de lumière douce"],
+  biographie: ["Le portrait d'une personne âgée au regard profond, lumière de fenêtre, tons sépia", "Une valise ancienne, des photos jaunies et des lettres sur une table", "Une silhouette sur un quai de gare des années 1950"],
+  historique: ["Un cavalier sur une colline face à un château médiéval au crépuscule", "Une femme en robe d'époque dans une rue pavée de Paris au XIXe siècle", "Un voilier ancien affrontant une mer déchaînée"],
+  humour: ["Un chat stupéfait assis sur un clavier d'ordinateur, expression comique", "Un homme en costume qui glisse sur une peau de banane, pose exagérée", "Un chien avec des lunettes de soleil dans une voiture décapotable"],
+  spiritualite: ["Une silhouette en méditation sur une montagne sous un ciel étoilé, halo de lumière", "Un lotus flottant sur une eau calme, reflets dorés", "Un rayon de lumière traversant une forêt brumeuse"],
+  carnet: ["Des fleurs séchées et une plume posées sur un papier crème, style minimaliste", "Motif géométrique doux aux tons pastel", "Une branche d'eucalyptus sur fond uni clair"],
+  policier: ["Une scène de crime de nuit, ruban de police, gyrophares bleus et rouges sous la pluie", "Un inspecteur en imperméable devant un mur couvert de photos et de fils rouges", "Une ruelle sombre, une arme abandonnée près d'une flaque éclairée par un néon"],
 };
 const DEFAULT_IDEAS = ["Un bureau lumineux avec un carnet ouvert, une tasse de café et des plantes, ambiance inspirante", "Un chemin de montagne au lever du soleil, symbole de progression", "Une personne souriante devant un ordinateur portable dans un salon clair"];
 const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: string }> = {
@@ -24,10 +33,22 @@ const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: stri
   romance: { style: 'photorealistic cinematic photograph, golden hour natural light, shallow depth of field, real people, elegant, NOT cartoon', mood: 'tender, emotional' },
   devperso: { style: 'uplifting luminous illustration, sunrise, open landscape, airy composition', mood: 'hopeful, inspiring' },
   sf: { style: 'epic science-fiction / fantasy digital painting, cosmic scale, glowing details', mood: 'epic, wondrous', lighting: 'dark' },
+  business: { style: 'photorealistic corporate editorial photograph, clean premium look, NOT cartoon', mood: 'confident, ambitious' },
+  cuisine: { style: 'photorealistic food photography, natural window light, appetizing detail, NOT illustration', mood: 'warm, gourmand' },
+  sante: { style: 'soft photorealistic wellness photograph, natural light, airy composition', mood: 'calm, healthy, serene' },
+  biographie: { style: 'photorealistic portrait or still life, timeless editorial photography, sepia warmth', mood: 'intimate, nostalgic' },
+  historique: { style: 'epic cinematic historical painting with realistic period details', mood: 'adventurous, grand', lighting: 'dark' },
+  humour: { style: 'vivid comic photograph or bold playful illustration, exaggerated expressions', mood: 'funny, cheerful' },
+  spiritualite: { style: 'luminous mystical digital painting, glowing light, cosmic and natural elements', mood: 'peaceful, transcendent', lighting: 'dark' },
+  carnet: { style: 'minimalist flat pattern or delicate botanical still life, pastel palette', mood: 'calm, elegant' },
+  policier: { style: 'photorealistic noir crime film still, 35mm grain, neon and police lights, rain, real photography, NOT cartoon', mood: 'tense, investigative', lighting: 'dark' },
 };
 const TITLE_COLORS: Record<string, string[]> = {
   guide: ['#232F3E', '#FF9E2D', '#008296'], jeunesse: ['#1E3A8A', '#F97316', '#0E7490'], thriller: ['#FFFFFF', '#FACC15', '#FFFFFF'],
   romance: ['#FDE68A', '#FBCFE8', '#FDE68A'], devperso: ['#004D57', '#FF9E2D', '#004D57'], sf: ['#67E8F9', '#E9D5FF', '#67E8F9'],
+  business: ['#FFFFFF', '#D4A017', '#FFFFFF'], cuisine: ['#5B3A1E', '#C2410C', '#5B3A1E'], sante: ['#2F4F3A', '#8A9A5B', '#2F4F3A'],
+  biographie: ['#F3E5C0', '#C9A45C', '#F3E5C0'], historique: ['#E8C872', '#F3E5C0', '#E8C872'], humour: ['#1A1A1A', '#D93025', '#1A1A1A'],
+  spiritualite: ['#F5D77A', '#C4B5FD', '#F5D77A'], carnet: ['#4A4A4A', '#B07D8C', '#4A4A4A'], policier: ['#F2F2F2', '#D93025', '#F2F2F2'],
 };
 type Extra = { id: number; text: string; x: number; y: number; size: number; color: string; box: 'aucun' | 'panneau' | 'bulle' };
 const COLORS = ['#FFFFFF', '#232F3E', '#FF9E2D', '#008296', '#F5C542', '#D93025'];
@@ -225,7 +246,7 @@ const STEPS = [
             <span className="text-3xl">{st.icon}</span><span className="flex-1 border-l border-border pl-4"><span className="block text-lg font-bold text-foreground">{st.t}</span><span className="text-sm text-muted-foreground">{st.d}</span></span><span className="text-muted-foreground">›</span></button>)}
           <div className="rounded-xl bg-card p-4">
           {tab === 'modele' && <div><p className="mb-3 font-semibold">Modèles de couverture</p><div className="grid grid-cols-3 gap-3">{COVER_GENRES.map((g) => (
-            <button key={g.id} onClick={() => { if (g.id !== genreId) { setImg(null); setSceneText(bookScene(books.find((x) => x.id === bookId))); } setGenreId(g.id); if (g.id === 'jeunesse') { changeFormat('album'); setBadgeOn(false); } setBadgeText(g.badges[0]); const fic = g.id === 'thriller' || g.id === 'romance'; if (g.id !== 'jeunesse') setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
+            <button key={g.id} onClick={() => { if (g.id !== genreId) { setImg(null); setSceneText(bookScene(books.find((x) => x.id === bookId))); } setGenreId(g.id); if (g.id === 'jeunesse') { changeFormat('album'); setBadgeOn(false); } setBadgeText(g.badges[0]); const fic = ['thriller', 'romance', 'policier', 'historique', 'biographie'].includes(g.id); if (g.id !== 'jeunesse') setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
               <span className={`flex aspect-[5/8] flex-col items-center ${g.titlePos === 'top' ? 'justify-start pt-3' : 'justify-end pb-3'} rounded-lg px-1 shadow-lg ring-2 ${g.id === genreId ? 'ring-primary' : 'ring-transparent'}`} style={{ background: g.bg }}>
                 {(TITLE_COLORS[g.id] ?? [g.titleColor]).slice(0, 2).map((c, i) => <span key={i} className="text-[11px] font-black leading-tight" style={{ color: c, font: g.titleFont.replace('{s}', '12') }}>{i ? 'TITRE' : 'MON'}</span>)}
               </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
