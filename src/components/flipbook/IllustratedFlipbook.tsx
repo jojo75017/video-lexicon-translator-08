@@ -12,10 +12,13 @@ interface Props {
   bookTitle: string;
   pages: FlipPage[];
   onClose?: () => void;
+  /** Liseuse plein écran pour albums jeunesse : gros titres, texte centré. */
+  kids?: boolean;
+  textPx?: number;
 }
 
 /** Feuilletoir illustré : image à gauche, texte à droite, une double page à la fois. */
-export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props) {
+export default function IllustratedFlipbook({ bookTitle, pages, onClose, kids = false, textPx = 24 }: Props) {
   const [index, setIndex] = useState(0);
   const [turning, setTurning] = useState<'next' | 'prev' | null>(null);
   const touchX = useRef<number | null>(null);
@@ -31,10 +34,10 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
 
   if (!page) return null;
 
-  return (
-    <section className="rounded-xl border border-border bg-card p-4 md:p-6" aria-label="Feuilleter le livre">
+  const book = (
+    <section className={kids ? 'mx-auto flex min-h-full w-full max-w-6xl flex-col justify-center p-4 md:p-8' : 'rounded-xl border border-border bg-card p-4 md:p-6'} aria-label="Feuilleter le livre">
       <div className="mb-4 flex items-center justify-between gap-3">
-        <p className="v3-serif text-lg font-semibold text-foreground">📖 {bookTitle}</p>
+        <p className={`v3-serif font-semibold text-foreground ${kids ? 'text-2xl md:text-4xl' : 'text-lg'}`}>📖 {bookTitle}</p>
         {onClose && (
           <button type="button" onClick={onClose} className="inline-flex items-center gap-1 rounded-md border border-border px-3 py-1.5 text-sm text-foreground">
             <X className="h-4 w-4" /> Fermer
@@ -43,7 +46,7 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
       </div>
 
       <div
-        className="mx-auto grid h-[380px] max-w-4xl overflow-hidden rounded-md bg-[#FBF8F1] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/10 md:h-[440px] md:grid-cols-[1fr_24px_1fr]"
+        className={`mx-auto grid w-full ${kids ? 'h-[75vh] max-w-6xl' : 'h-[380px] max-w-4xl md:h-[440px]'} overflow-hidden rounded-md bg-[#FBF8F1] shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)] ring-1 ring-black/10 md:grid-cols-[1fr_24px_1fr]`}
         onTouchStart={(e) => (touchX.current = e.touches[0].clientX)}
         onTouchEnd={(e) => {
           if (touchX.current === null) return;
@@ -65,9 +68,9 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
           )}
         </div>
         <div aria-hidden className="hidden bg-gradient-to-r from-black/0 via-black/15 to-black/0 md:block" />
-        <div className="flex flex-col px-6 py-7 text-[#2A2118]">
-          {page.title && <h3 className="v3-serif mb-3 text-xl font-bold !text-inherit">{page.title}</h3>}
-          <div className="flex-1 overflow-y-auto whitespace-pre-line text-[15px] leading-[1.7]">{page.text}</div>
+        <div className={`flex flex-col px-6 py-7 text-[#2A2118] ${kids ? 'items-center justify-center text-center md:px-12' : ''}`}>
+          {page.title && <h3 className={`v3-serif mb-3 font-bold !text-inherit ${kids ? 'text-3xl md:text-4xl' : 'text-xl'}`}>{page.title}</h3>}
+          <div className={kids ? 'flex flex-1 items-center justify-center overflow-y-auto whitespace-pre-line font-medium leading-[1.55]' : 'flex-1 overflow-y-auto whitespace-pre-line text-[15px] leading-[1.7]'} style={kids ? { fontSize: `${textPx}px` } : undefined}>{page.text}</div>
           {page.caption && <p className="mt-3 text-xs italic text-[#8A8072]">{page.caption}</p>}
           <p className="mt-4 text-center text-xs text-[#8A8072]">{index + 1}</p>
         </div>
@@ -84,4 +87,7 @@ export default function IllustratedFlipbook({ bookTitle, pages, onClose }: Props
       </div>
     </section>
   );
+
+  if (!kids) return book;
+  return <div className="fixed inset-0 z-50 overflow-y-auto bg-background/95 backdrop-blur-sm" role="dialog" aria-modal="true">{book}</div>;
 }
