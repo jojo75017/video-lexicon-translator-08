@@ -174,6 +174,10 @@ const STEPS = [
           <button disabled title="Bientôt disponible" className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold text-foreground opacity-70">📘 Télécharger le broché KDP <span className="ml-auto text-xs">bientôt</span></button>
         </aside>
         <main className="flex flex-col items-center gap-6 p-6">
+          <div className="flex w-full max-w-[440px] flex-col gap-2">
+            <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
+            {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
+          </div>
           <canvas ref={canvasRef} width={W} height={H} className="w-full max-w-[440px] rounded shadow-2xl" />
           <div className="flex w-full max-w-3xl flex-wrap items-center gap-6 rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center gap-4">
