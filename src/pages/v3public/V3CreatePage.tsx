@@ -408,7 +408,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
   if (importMode) {
     return (
-      <section className="min-h-[calc(100vh-4rem)] py-14 px-5 bg-[var(--v3-paper,#fbfaf6)]">
+      <section className="v3-lancer-dark min-h-[calc(100vh-4rem)] py-14 px-5">
         <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
         <Suspense fallback={<div className="py-24 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-emerald,#064e3b)]" /></div>}>
           <V3ImportStudio />
@@ -418,7 +418,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
   }
 
   return (
-    <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
+    <section className="v3-lancer-dark v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <BackButton to="/v3/create#choix-parcours" label="Retour aux choix" />

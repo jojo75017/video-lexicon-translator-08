@@ -200,7 +200,7 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
 
 
   return (
-    <section className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+    <section className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#0F172A' }}>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="v3-chip v3-chip-orange text-[11px]"><BookOpen className="h-3 w-3" /> Aperçu du livre</span>
         <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
 
       {chapters.length > 0 && (rawCount > 0 || correcting) && (
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-xl border px-3 py-2 text-[11.5px]"
-          style={{ borderColor: 'rgba(180,83,9,0.35)', background: 'rgba(251,191,36,0.10)', color: '#92400e' }}>
+          style={{ borderColor: 'rgba(180,83,9,0.35)', background: 'rgba(251,191,36,0.10)', color: '#FDBA74' }}>
           <span>
             {correcting
               ? 'Correction éditoriale en cours : le texte affiché va se mettre à jour.'
@@ -262,7 +262,7 @@ export default function V3BookLivePreview({ brief }: { brief: BookBrief }) {
       {open && chapters.length > 0 && (
         <div
           className="mt-3 max-h-[70vh] overflow-y-auto rounded-2xl border px-5 py-6 md:px-8"
-          style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#fffdf7' }}
+          style={{ borderColor: 'rgba(0,0,0,0.08)', background: '#111827' }}
         >
           {/* Page de titre */}
           <header className="border-b pb-6 text-center" style={{ borderColor: 'rgba(201,168,76,0.4)' }}>

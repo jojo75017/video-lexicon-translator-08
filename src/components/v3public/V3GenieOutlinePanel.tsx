@@ -178,7 +178,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
 
   return (
     <div className="space-y-4">
-      <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+      <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#0F172A' }}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="v3-chip v3-chip-orange text-[11px]"><ListOrdered className="h-3 w-3" /> Votre livre en direct</span>
           <span className="text-[11px]" style={{ color: 'var(--v3-muted)' }}>
@@ -218,7 +218,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
 
         {/* Tout le détail du livre est replié : un seul clic pour l'ouvrir */}
         <details className="mt-3">
-          <summary className="cursor-pointer text-[12px] font-semibold underline" style={{ color: '#8a6d1f' }}>
+          <summary className="cursor-pointer text-[12px] font-semibold underline" style={{ color: '#FF9E2D', background: 'transparent' }}>
             Voir mon sommaire, mes chapitres et mes réglages
           </summary>
 
@@ -288,7 +288,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
                     className="rounded-full border px-2.5 py-1 text-[10.5px] transition"
                     style={{
                       borderColor: storyView === id ? 'var(--v3-gold, #c9a84c)' : 'rgba(0,0,0,0.12)',
-                      background: storyView === id ? 'rgba(201,168,76,0.12)' : '#fff',
+                      background: storyView === id ? 'rgba(201,168,76,0.12)' : '#0F172A',
                       color: 'var(--v3-ink)',
                     }}>{label}</button>
                 ))}
@@ -388,7 +388,7 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
 
       {/* Réglage avancé : générer ou coller un sommaire complet d'un coup */}
 
-      <details className="rounded-[22px] border p-3" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
+      <details className="rounded-[22px] border p-3" style={{ borderColor: 'var(--v3-border)', background: '#0F172A' }}>
         <summary className="cursor-pointer text-[11.5px] font-semibold" style={{ color: 'var(--v3-muted)' }}>
           Sommaire complet d’un coup (avancé)
         </summary>
