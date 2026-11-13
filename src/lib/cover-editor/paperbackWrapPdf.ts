@@ -28,7 +28,7 @@ export interface WrapInput {
   title: string; author: string; backText: string; bg: string; textColor: string; accent: string;
 }
 
-export function buildPaperbackPdf(i: WrapInput): Blob {
+export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
   const g = wrapGeometry(i.trim, i.pages, i.paper);
   const m = i.marks ? SLUG : 0;
   const px = (v: number) => Math.round(v * DPI);
@@ -70,6 +70,13 @@ export function buildPaperbackPdf(i: WrapInput): Blob {
     for (const x of [sx, sx + sw]) { ctx.beginPath(); ctx.moveTo(x, oy - gap); ctx.lineTo(x, oy - gap - L); ctx.moveTo(x, oy + H + gap); ctx.lineTo(x, oy + H + gap + L); ctx.stroke(); }
     ctx.setLineDash([]);
   }
+  return c;
+}
+
+export function buildPaperbackPdf(i: WrapInput): Blob {
+  const g = wrapGeometry(i.trim, i.pages, i.paper);
+  const m = i.marks ? SLUG : 0;
+  const c = renderWrapCanvas(i);
   const wIn = g.width + 2 * m, hIn = g.height + 2 * m;
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'in', format: [wIn, hIn], compress: true });
   pdf.addImage(c.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, wIn, hIn);
