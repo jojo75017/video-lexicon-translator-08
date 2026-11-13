@@ -260,7 +260,23 @@ export default function EssaiPage() {
               feuilleter comme un vrai livre. Gratuit et sans carte bancaire.
             </p>
 
-            <div className="mt-8 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+            {/* La démo vidéo passe avant le formulaire : le visiteur voit le
+                résultat avant de taper son idée. Elle reste compacte pour que
+                la case de saisive demeure atteignable sans long défilement. */}
+            <div className="mt-6 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
+                Voyez l'essai en 30 secondes
+              </p>
+              <video
+                src={essaiVideo.url}
+                controls
+                playsInline
+                preload="metadata"
+                className="mt-3 w-full rounded-xl bg-black"
+              />
+            </div>
+
+            <div className="mt-5 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
               <label className="block text-sm font-semibold text-[#2A2118]">
                 Votre idée de livre
                 <textarea
@@ -552,10 +568,6 @@ export default function EssaiPage() {
             </aside>
           </div>
         )}
-        <section className="mx-auto mt-12 max-w-3xl text-center">
-          <h2 className="font-serif text-2xl font-bold text-[#1F1A14]">Voyez l'essai en 30 secondes</h2>
-          <video src={essaiVideo.url} controls playsInline preload="metadata" className="mt-4 w-full rounded-xl shadow-md" />
-        </section>
         <EssaiTestimonials />
       </main>
     </div>
