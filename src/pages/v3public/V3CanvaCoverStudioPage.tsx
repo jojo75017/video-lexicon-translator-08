@@ -85,6 +85,9 @@ export default function V3CanvaCoverStudioPage() {
       <p className="mb-6 text-muted-foreground">Choisissez un modèle, ajoutez votre image et vos textes : la couverture se met à jour en direct.</p>
       <div className="grid gap-6 md:grid-cols-[340px_1fr]">
         <div className="rounded-xl border border-border bg-card p-4">
+            <label className="mb-4 block rounded-lg border-2 border-accent p-3 text-sm font-bold">📚 Choisir mon livre<select className={input} value={bookId} onChange={(e) => pickBook(e.target.value)}>
+              <option value="">{books.length ? '— Sélectionnez un livre —' : 'Aucun livre enregistré'}</option>
+              {books.map((b) => <option key={b.id} value={b.id}>{b.title || 'Sans titre'}</option>)}</select></label>
           <div className="mb-4 grid grid-cols-2 gap-2">
             {tabs.map(([id, l]) => <button key={id} onClick={() => setTab(id)} className={`v3-chip-toggle rounded-lg px-3 py-2 text-sm font-semibold ${tab === id ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>{l}</button>)}
           </div>
@@ -96,9 +99,7 @@ export default function V3CanvaCoverStudioPage() {
             <input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0])} className="text-sm" />
             {img && <button onClick={() => setImg(null)} className="v3-chip-toggle rounded-lg bg-muted px-3 py-2 text-sm text-foreground">Retirer l'image</button>}</div>}
           {tab === 'texte' && <div className="space-y-3">
-            <label className="block text-sm font-semibold">📚 Choisir mon livre<select className={input} value={bookId} onChange={(e) => pickBook(e.target.value)}>
-              <option value="">{books.length ? '— Sélectionnez un livre —' : 'Aucun livre enregistré'}</option>
-              {books.map((b) => <option key={b.id} value={b.id}>{b.title || 'Sans titre'}</option>)}</select></label>
+
             <label className="block text-sm">Titre<input className={input} value={title} onChange={(e) => setTitle(e.target.value)} /></label>
             <label className="block text-sm">Sous-titre<input className={input} value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
             <label className="block text-sm">Auteur<input className={input} value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
