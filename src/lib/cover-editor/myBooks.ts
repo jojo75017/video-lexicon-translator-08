@@ -24,6 +24,26 @@ export interface MyBookOption {
 const clean = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
 
 /**
+ * Retire du résumé tout ce qui ressemble à une table des matières
+ * (« TABLE DES MATIÈRES », « Chapitre 1 », listes numérotées ou à puces),
+ * pour ne garder que le récit utilisable comme sujet d'image.
+ */
+export const stripTableOfContents = (raw: string): string => {
+  const text = clean(raw);
+  if (!text) return '';
+  const cut = text.search(/(table des mati[eè]res|sommaire\b|plan du livre|^\s*chapitre\s*1\b)/im);
+  const head = cut >= 0 ? text.slice(0, cut) : text;
+  const lines = head.split(/\n+/).filter((l) => {
+    const t = l.trim();
+    if (!t) return false;
+    if (/^(chapitre|chapter|partie|part)\s*[\dIVX]+/i.test(t)) return false;
+    if (/^(\d+[.)-]|[-•*–])\s+/.test(t)) return false;
+    return true;
+  });
+  return lines.join(' ').replace(/En \d+ chapitres, le livre aborde\s*:[^.]*\./i, '').replace(/\s+/g, ' ').trim();
+};
+
+/**
  * Beaucoup de livres sont enregistrés avec la formule « Titre : Sous-titre » dans un seul champ.
  * On sépare alors les deux parties, sans rien inventer : seul le texte existant est découpé.
  */
@@ -80,13 +100,13 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
         firstOf(brief, ['subtitle', 'sousTitre', 'sous_titre', 'tagline', 'accroche']) || split.subtitle,
       author: clean(row.author_name) || firstOf(brief, ['author', 'authorName']),
       synopsis:
-        clean(row.book_summary) ||
-        clean(row.kdp_description) ||
+        stripTableOfContents(clean(row.kdp_description)) ||
+        stripTableOfContents(clean(row.book_summary)) ||
         firstOf(brief, ['synopsis', 'hook', 'description', 'pitch', 'resume', 'summary']),
       genre: clean(row.kdp_categories) || firstOf(brief, ['genre', 'category', 'categorie']),
       backCover: (() => {
         const bc = ((row as Record<string, unknown>).back_cover_data ?? {}) as Record<string, unknown>;
-        return clean(bc.selectedText) || clean(bc.shortVersion) || clean(row.kdp_description) || clean(row.book_summary);
+        return clean(bc.selectedText) || clean(bc.shortVersion) || clean(row.kdp_description) || stripTableOfContents(clean(row.book_summary));
       })(),
       authorBio: clean((((row as Record<string, unknown>).back_cover_data ?? {}) as Record<string, unknown>).authorBio),
       updatedAt: clean(row.updated_at) || null,
@@ -101,7 +121,7 @@ export async function listMyBooks(limit = 60): Promise<MyBookOption[]> {
       title: split.title || 'Sans titre',
       subtitle: clean(row.subtitle) || split.subtitle,
       author: '',
-      synopsis: clean(row.source_notes) || clean(row.target_audience),
+      synopsis: stripTableOfContents(clean(row.source_notes)),
       genre: clean(row.genre),
       updatedAt: clean(row.updated_at) || null,
     };
