@@ -39,7 +39,7 @@ export default function V3AmbiancePicker({ compact = false }: { compact?: boolea
               type="button"
               onClick={() => setAmbiance(amb.id)}
               aria-pressed={active}
-              className="relative overflow-hidden rounded-2xl border text-left transition hover:-translate-y-0.5"
+              className="v3-flat-btn relative overflow-hidden rounded-2xl border text-left transition hover:-translate-y-0.5"
               style={{
                 borderColor: active ? amb.palette.accent : 'rgba(0,0,0,0.10)',
                 boxShadow: active ? `0 0 0 2px ${amb.palette.accent}33` : 'none',

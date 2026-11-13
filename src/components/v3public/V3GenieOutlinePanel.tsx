@@ -176,9 +176,9 @@ export default function V3GenieOutlinePanel({ outlineMode }: { outlineMode?: 'fu
   };
 
 
+  // Fond sombre forcé : on force aussi des couleurs de texte claires en local,
+  // sinon en mode clair --v3-ink est foncé et le sommaire devient illisible.
   return (
-    {/* Fond sombre forcé : on force aussi des couleurs de texte claires en local,
-        sinon en mode clair --v3-ink est foncé et le sommaire devient illisible. */}
     <div className="space-y-4" style={{ '--v3-ink': '#F8FAFC', '--v3-ink-2': '#E2E8F0', '--v3-muted': '#CBD5E1', '--v3-accent': '#FF9E2D' } as CSSProperties}>
       <div className="rounded-[22px] border p-4 md:p-5" style={{ borderColor: 'var(--v3-border)', background: '#0F172A' }}>
         <div className="flex flex-wrap items-center justify-between gap-2">
