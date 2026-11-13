@@ -1,3 +1,4 @@
+import EssaiVisitsPanel from '@/components/admin/EssaiVisitsPanel';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -195,6 +196,7 @@ function AdminLancementContent({ trialsOnly = false }: { trialsOnly?: boolean })
             <Button asChild variant="outline"><Link to="/v3">Accueil V3</Link></Button>
           </div>
         </div>
+        <EssaiVisitsPanel />
         {/* Essais gratuits */}
         <Card className="rounded-2xl">
           <CardHeader>
