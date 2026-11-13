@@ -24,9 +24,17 @@ export async function comicTextProvider(body: Record<string, unknown>, systemPro
   const payload = provider === 'gemini'
     ? { system_instruction: { parts: [{ text: systemPrompt }] }, contents: [{ role: 'user', parts: [{ text: body.prompt }] }], generationConfig: { maxOutputTokens: maxTokens, temperature: 0.7, responseMimeType: 'application/json' } }
     : provider === 'claude' ? { model, system: systemPrompt, messages: messages.slice(1), max_tokens: maxTokens }
-    : { model, messages, max_tokens: maxTokens };
+    : provider === 'openrouter'
+      ? { model, models: [...new Set([model, 'google/gemini-2.5-flash', 'openai/gpt-4o-mini', 'anthropic/claude-3.5-haiku'])].slice(0, 3), messages, max_tokens: maxTokens }
+      : { model, messages, max_tokens: maxTokens };
   try {
-    const response = await fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(maxTokens > 6000 ? 145000 : 120000) });
+    const send = () => fetch(url, { method: 'POST', headers, body: JSON.stringify(payload), signal: AbortSignal.timeout(maxTokens > 6000 ? 145000 : 120000) });
+    let response = await send();
+    // Saturation passagère du fournisseur : une seule nouvelle tentative après une courte pause.
+    for (let attempt = 0; attempt < 2 && (response.status === 429 || response.status === 503) && provider !== 'gemini'; attempt++) {
+      await new Promise((r) => setTimeout(r, 4000 * (attempt + 1)));
+      response = await send();
+    }
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       const raw = typeof data?.error?.metadata?.raw === 'string' ? ` (${data.error.metadata.raw.slice(0, 200)})` : '';
