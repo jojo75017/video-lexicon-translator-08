@@ -20,6 +20,12 @@ import useModuleAccess from '@/hooks/useModuleAccess';
 import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
 import IllustratedFlipbook from '@/components/flipbook/IllustratedFlipbook';
 
+const KIDS_FONTS = [
+  { id: 'andika', label: 'Andika (conçue pour apprendre à lire)', family: "'Andika',sans-serif", css: 'https://fonts.googleapis.com/css2?family=Andika:wght@400;700&display=swap' },
+  { id: 'nunito', label: 'Nunito (arrondie, douce)', family: "'Nunito',sans-serif", css: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap' },
+  { id: 'lexend', label: 'Lexend (très lisible, aérée)', family: "'Lexend',sans-serif", css: 'https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap' },
+  { id: 'atkinson', label: 'Atkinson Hyperlegible (malvoyants, dys)', family: "'Atkinson Hyperlegible',sans-serif", css: 'https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap' },
+];
 const STORAGE_KEY = 'v3_illustrated_album_draft_v1';
 const PROJECT_KEY = 'v3_illustrated_album_project_id';
 const STEPS = ['Le livre', 'Personnages', 'Pages', 'Illustrations', 'Export'];
@@ -47,6 +53,9 @@ export default function V3IllustratedAlbumPage() {
   const [flip, setFlip] = useState(false);
   const [textSize, setTextSize] = useState<number>(() => Number(localStorage.getItem('v3_album_text_size')) || 18);
   useEffect(() => { localStorage.setItem('v3_album_text_size', String(textSize)); }, [textSize]);
+  const [fontId, setFontId] = useState<string>(() => localStorage.getItem('v3_album_font') || 'andika');
+  useEffect(() => { localStorage.setItem('v3_album_font', fontId); }, [fontId]);
+  const font = KIDS_FONTS.find((f) => f.id === fontId) || KIDS_FONTS[0];
   const { saveSpecializedProject, updateSpecializedProject } = useProjectSave();
   const { loading: accessLoading, hasAccess } = useModuleAccess('studio-jeunesse');
 
@@ -67,6 +76,28 @@ export default function V3IllustratedAlbumPage() {
       return false;
     }
     return true;
+  };
+
+  const prefillFromTitle = async () => {
+    if (draft.title.trim().length < 2) return toast.error('Tapez d’abord le titre du livre.');
+    setBusy('prefill');
+    try {
+      const { data, error } = await supabase.functions.invoke('album-illustrated-story', { body: { mode: 'prefill', title: draft.title, targetAge: draft.targetAge } });
+      if (error || !data?.pitch) throw new Error(data?.error || error?.message || 'Remplissage non reçu');
+      const first = draft.characters[0];
+      setDraft((current) => ({
+        ...current,
+        pitch: data.pitch,
+        moral: data.moral || current.moral,
+        backCoverText: data.backCoverText || current.backCoverText,
+        characters: [{ ...first, ...data.character, referenceUrl: undefined, locked: false }, ...current.characters.slice(1)],
+      }));
+      toast.success('Tous les champs sont remplis. Relisez et ajustez si besoin.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Impossible de remplir les champs.');
+    } finally {
+      setBusy(null);
+    }
   };
 
   const generateReference = async (character: AlbumCharacter) => {
@@ -220,7 +251,7 @@ export default function V3IllustratedAlbumPage() {
   const exportAlbum = () => {
     if (!draft.pages.length) return toast.error('Le livre ne contient encore aucune page.');
     const sections = draft.pages.map((page) => `<section class="page">${page.illustrationUrl ? `<img src="${escapeHtml(page.illustrationUrl)}" alt="Illustration page ${page.pageNumber}">` : '<div class="placeholder">Illustration à terminer</div>'}<div class="copy"><span>${page.pageNumber}</span><p>${escapeHtml(page.text)}</p></div></section>`).join('');
-    const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(draft.title)}</title><style>@page{size:21.59cm 21.59cm;margin:0}*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;color:#232f3e}.page{width:21.59cm;height:21.59cm;page-break-after:always;position:relative;overflow:hidden;background:#fafafa}.page img{width:100%;height:100%;object-fit:cover}.placeholder{height:100%;display:grid;place-items:center;color:#777}.copy{position:absolute;left:1.4cm;right:1.4cm;bottom:1.2cm;background:rgba(255,255,255,.92);padding:.45cm .65cm;border-radius:.3cm}.copy span{font-size:9pt;color:#777}.copy p{font-size:${textSize}pt;line-height:1.35;margin:.08cm 0 0}</style></head><body>${sections}</body></html>`;
+    const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>${escapeHtml(draft.title)}</title><link rel="stylesheet" href="${font.css}"><style>@page{size:21.59cm 21.59cm;margin:0}*{box-sizing:border-box}body{margin:0;font-family:${font.family};color:#232f3e}.page{width:21.59cm;height:21.59cm;page-break-after:always;position:relative;overflow:hidden;background:#fafafa}.page img{width:100%;height:100%;object-fit:cover}.placeholder{height:100%;display:grid;place-items:center;color:#777}.copy{position:absolute;left:1.4cm;right:1.4cm;bottom:1.2cm;background:rgba(255,255,255,.92);padding:.45cm .65cm;border-radius:.3cm}.copy span{font-size:9pt;color:#777}.copy p{font-size:${textSize}pt;line-height:1.35;margin:.08cm 0 0}</style></head><body>${sections}</body></html>`;
     const win = window.open('', '_blank');
     if (!win) return toast.error('Autorisez les fenêtres pour ouvrir l’export.');
     win.document.write(html);
@@ -266,7 +297,7 @@ export default function V3IllustratedAlbumPage() {
         </div>
 
         {step === 0 && <Card><CardHeader><CardTitle>1. Préparer l’histoire</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-2">
-          <Field label="Titre du livre"><input value={draft.title} onChange={(event) => update({ title: event.target.value })} maxLength={160} placeholder="Le grand voyage de Léo" className={FIELD_CLASS} /></Field>
+          <Field label="Titre du livre"><input value={draft.title} onChange={(event) => update({ title: event.target.value })} maxLength={160} placeholder="Le grand voyage de Léo" className={FIELD_CLASS} /><Button type="button" size="sm" className="mt-2 w-full" onClick={prefillFromTitle} disabled={busy === 'prefill'}>{busy === 'prefill' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />} Remplir tous les champs d’après le titre</Button></Field>
           <Field label="Nom d’auteur"><input value={draft.authorName} onChange={(event) => update({ authorName: event.target.value })} maxLength={100} placeholder="Votre nom sur la couverture" className={FIELD_CLASS} /></Field>
           <Field label="Âge visé"><input value={draft.targetAge} onChange={(event) => update({ targetAge: event.target.value })} maxLength={30} className={FIELD_CLASS} /></Field>
           <Field label="Nombre de pages"><select value={draft.pageCount} onChange={(event) => update({ pageCount: Number(event.target.value) as IllustratedAlbumDraft['pageCount'], pages: [] })} className={FIELD_CLASS}>{ALBUM_PAGE_COUNTS.map((count) => <option key={count} value={count}>{count} pages</option>)}</select></Field>
@@ -296,7 +327,7 @@ export default function V3IllustratedAlbumPage() {
 
         {step === 3 && <Card><CardHeader><CardTitle>4. Contrôler les illustrations</CardTitle>{busy === 'images' && <p className="text-sm text-muted-foreground">Création en cours : {imageProgress.done}/{imageProgress.total}</p>}</CardHeader><CardContent><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{draft.pages.length ? draft.pages.map((page) => <article key={page.id} className="overflow-hidden rounded-md border border-border bg-card"><div className="aspect-square bg-muted">{page.illustrationUrl ? <img src={page.illustrationUrl} alt={`Page ${page.pageNumber}`} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center text-sm text-muted-foreground">Page {page.pageNumber} en attente</div>}</div><div className="space-y-2 p-3"><p className="text-sm font-bold">Page {page.pageNumber}</p><p className="line-clamp-3 text-xs text-muted-foreground">{page.text}</p><Button variant="outline" size="sm" className="w-full" onClick={() => regeneratePage(page)} disabled={busy !== null}>{busy === `page-${page.id}` ? <Loader2 className="mr-2 h-3.5 w-3.5 animate-spin" /> : <Sparkles className="mr-2 h-3.5 w-3.5" />}{page.illustrationUrl ? 'Refaire cette image' : 'Créer cette image'}</Button></div></article>) : <Empty message="Créez d’abord le chemin de fer." />}</div>{draft.pages.length > 0 && illustratedCount < draft.pages.length && <div className="mt-5 flex justify-center"><Button onClick={generateAllImages} disabled={busy === 'images'}>{busy === 'images' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />} Continuer les illustrations ({illustratedCount}/{draft.pages.length})</Button></div>}</CardContent></Card>}
 
-        {step === 4 && <Card><CardHeader><CardTitle>5. Exporter l’album</CardTitle></CardHeader><CardContent className="space-y-5"><div className="rounded-md border border-border bg-muted/40 p-4"><BookOpen className="mb-2 h-6 w-6 text-primary" /><p className="font-semibold">Album carré 21,59 × 21,59 cm</p><p className="text-sm text-muted-foreground">{draft.pages.length} pages intérieures préparées, dont {illustratedCount} illustrées.</p></div><Field label="Taille du texte dans l’album"><select value={textSize} onChange={(event) => setTextSize(Number(event.target.value))} className={FIELD_CLASS}><option value={16}>16 pt</option><option value={18}>18 pt (jeunesse)</option><option value={20}>20 pt (tout-petits)</option><option value={24}>24 pt (très gros)</option></select></Field><Field label="Texte de quatrième de couverture"><textarea value={draft.backCoverText} onChange={(event) => update({ backCoverText: event.target.value })} maxLength={1500} rows={4} className={FIELD_CLASS} /></Field><div className="flex flex-wrap gap-2"><Button onClick={exportAlbum} disabled={!draft.pages.length}><Printer className="mr-2 h-4 w-4" /> Exporter en PDF</Button><Button variant="outline" onClick={() => { const blob = new Blob([JSON.stringify(draft, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${safeSlug(draft.title)}-sauvegarde.json`; link.click(); URL.revokeObjectURL(url); }}><Download className="mr-2 h-4 w-4" /> Sauvegarde complète</Button><Button variant="outline" onClick={saveProject}><Save className="mr-2 h-4 w-4" /> Enregistrer dans mes livres</Button><Button variant="secondary" onClick={() => setFlip((v) => !v)} disabled={!draft.pages.length}><BookOpen className="mr-2 h-4 w-4" /> Feuilleter mon album</Button></div>{flip && draft.pages.length > 0 && <IllustratedFlipbook bookTitle={draft.title || 'Mon album'} onClose={() => setFlip(false)} pages={draft.pages.map((p) => ({ imageUrl: p.illustrationUrl, text: p.text }))} />}</CardContent></Card>}
+        {step === 4 && <Card><CardHeader><CardTitle>5. Exporter l’album</CardTitle></CardHeader><CardContent className="space-y-5"><div className="rounded-md border border-border bg-muted/40 p-4"><BookOpen className="mb-2 h-6 w-6 text-primary" /><p className="font-semibold">Album carré 21,59 × 21,59 cm</p><p className="text-sm text-muted-foreground">{draft.pages.length} pages intérieures préparées, dont {illustratedCount} illustrées.</p></div><Field label="Taille du texte dans l’album"><select value={textSize} onChange={(event) => setTextSize(Number(event.target.value))} className={FIELD_CLASS}><option value={16}>16 pt</option><option value={18}>18 pt (jeunesse)</option><option value={20}>20 pt (tout-petits)</option><option value={24}>24 pt (très gros)</option></select></Field><Field label="Police du texte (lisible pour les enfants)"><select value={fontId} onChange={(event) => setFontId(event.target.value)} className={FIELD_CLASS}>{KIDS_FONTS.map((f) => <option key={f.id} value={f.id}>{f.label}</option>)}</select><p className="mt-1 text-xs text-muted-foreground">Évitez les polices fantaisie : les enfants reconnaissent mieux les lettres simples (a et g ronds).</p></Field><Field label="Texte de quatrième de couverture"><textarea value={draft.backCoverText} onChange={(event) => update({ backCoverText: event.target.value })} maxLength={1500} rows={4} className={FIELD_CLASS} /></Field><div className="flex flex-wrap gap-2"><Button onClick={exportAlbum} disabled={!draft.pages.length}><Printer className="mr-2 h-4 w-4" /> Exporter en PDF</Button><Button variant="outline" onClick={() => { const blob = new Blob([JSON.stringify(draft, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `${safeSlug(draft.title)}-sauvegarde.json`; link.click(); URL.revokeObjectURL(url); }}><Download className="mr-2 h-4 w-4" /> Sauvegarde complète</Button><Button variant="outline" onClick={saveProject}><Save className="mr-2 h-4 w-4" /> Enregistrer dans mes livres</Button><Button variant="secondary" onClick={() => setFlip((v) => !v)} disabled={!draft.pages.length}><BookOpen className="mr-2 h-4 w-4" /> Feuilleter mon album</Button></div>{flip && draft.pages.length > 0 && <IllustratedFlipbook bookTitle={draft.title || 'Mon album'} onClose={() => setFlip(false)} pages={draft.pages.map((p) => ({ imageUrl: p.illustrationUrl, text: p.text }))} />}</CardContent></Card>}
       </div>
     </main>
   );

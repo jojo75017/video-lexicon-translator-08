@@ -72,6 +72,7 @@ const NAV: NavSection[] = [
       { to: '/v3/contentstudio', label: '🎬 ContentStudio Engine (livre → vidéo)', icon: Film },
       { to: '/v3/livres/jeux-enigmes', label: '🧩 Livres de Jeux & Énigmes', icon: Puzzle, badge: 'Pro' },
       { to: '/v3/livres/cherche-trouve', label: '🔍 Coloriages Cherche & Trouve', icon: Search, badge: 'Pro' },
+      { to: '/v3/livres/bd', label: '💥 BD & Albums (Astérix, Lucky Luke, manga)', icon: BookOpen, badge: 'Pro' },
       { to: '/v3/create/album-illustre', label: '🧸 Album illustré 3-6 ans (histoire continue)', icon: BookOpen, badge: 'VIP' },
       { to: '/v3/livres/histoires-illustrees', label: '📖 Histoires Courtes & Contes', icon: BookOpen, badge: 'Pro' },
       { to: '/v3/create/illustre?preset=maternelle-3-6', label: 'Album maternelle 3-6 ans', icon: Sparkles },

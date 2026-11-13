@@ -69,7 +69,32 @@ Deno.serve(async (req) => {
     const apiKey = Deno.env.get('LOVABLE_API_KEY');
     if (!apiKey) return json({ error: 'Le moteur d’écriture n’est pas configuré.' }, 500);
 
-    const parsedBody = BodySchema.safeParse(await req.json());
+    const rawBody = await req.json();
+    if (rawBody?.mode === 'prefill') {
+      const pre = z.object({ title: z.string().trim().min(2).max(160), targetAge: z.string().trim().max(30).optional() }).safeParse(rawBody);
+      if (!pre.success) return json({ error: 'Indiquez d’abord un titre.' }, 400);
+      const age = pre.data.targetAge || '3-6 ans';
+      const prePrompt = `Tu es auteur français d'albums illustrés pour enfants de ${age}. À partir du seul titre « ${pre.data.title} », propose la fiche complète de l'album.
+Règles: français naturel uniquement, aucun mot inventé, aucun tiret cadratin. Histoire douce, rassurante, avec début, problème, péripéties et fin heureuse. Personnage principal cohérent avec le titre (s'il est nommé dans le titre, garder ce nom).
+Retourne uniquement un JSON valide, sans markdown, au format exact:
+{"pitch":"4 à 6 phrases","moral":"une phrase courte","backCoverText":"3 phrases pour la quatrième de couverture","character":{"name":"...","age":"...","physical":"apparence précise: visage, cheveux ou pelage, yeux, taille, couleurs","outfit":"tenue précise avec couleurs","distinctiveFeatures":"un signe distinctif","personality":"trois traits"}}`;
+      const r = await fetch('https://ai.gateway.lovable.dev/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Lovable-API-Key': apiKey, 'X-Lovable-AIG-SDK': 'fetch' },
+        body: JSON.stringify({ model: 'openai/gpt-6-astra', input: prePrompt, stream: true, store: false, reasoning: { effort: 'low', summary: 'auto' }, include: ['reasoning.encrypted_content'] }),
+      });
+      if (!r.ok) return json({ error: (await r.text()).slice(0, 300) || 'Le remplissage a échoué.' }, r.status);
+      const out = await readResponseText(r);
+      const m = out.match(/\{[\s\S]*\}/);
+      if (!m) return json({ error: 'Réponse illisible. Relancez.' }, 502);
+      const fill = z.object({
+        pitch: z.string().min(1).max(4000), moral: z.string().max(300), backCoverText: z.string().max(1500).optional(),
+        character: z.object({ name: z.string().min(1).max(80), age: z.string().max(30), physical: z.string().max(1000), outfit: z.string().max(600), distinctiveFeatures: z.string().max(300), personality: z.string().max(300) }),
+      }).safeParse(JSON.parse(m[0]));
+      if (!fill.success) return json({ error: 'Réponse incomplète. Relancez.' }, 502);
+      return json(fill.data);
+    }
+    const parsedBody = BodySchema.safeParse(rawBody);
     if (!parsedBody.success) return json({ error: 'Certains champs sont incomplets ou trop longs.', fields: parsedBody.error.flatten().fieldErrors }, 400);
     const body = parsedBody.data;
     const pageCount = body.pageCount;
