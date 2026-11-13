@@ -111,9 +111,15 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       const cx = badgeXY?.x ?? dcx, cy = badgeXY?.y ?? dcy; lastBadge.current = { x: cx, y: cy, r };
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = st.fill; ctx.fill();
       ctx.lineWidth = 12; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.stroke();
-      ctx.fillStyle = st.text; ctx.font = '800 64px Montserrat, Arial, sans-serif'; ctx.textBaseline = 'middle';
-      const bl = wrap(ctx, badgeText.toUpperCase(), r * 1.6).slice(0, 3);
-      bl.forEach((l, i) => ctx.fillText(l, cx, cy + (i - (bl.length - 1) / 2) * 72));
+      ctx.fillStyle = st.text; ctx.textBaseline = 'middle';
+      let fs = Math.round(r * 0.28), bl: string[] = [];
+      for (; fs > 14; fs -= 2) {
+        ctx.font = `800 ${fs}px Montserrat, Arial, sans-serif`;
+        bl = wrap(ctx, badgeText.toUpperCase(), r * 1.5);
+        if (bl.length <= 3 && bl.length * fs * 1.12 <= r * 1.4 && bl.every((l) => ctx.measureText(l).width <= r * 1.55)) break;
+      }
+      bl = bl.slice(0, 3);
+      bl.forEach((l, i) => ctx.fillText(l, cx, cy + (i - (bl.length - 1) / 2) * fs * 1.12));
     }
     ctx.textBaseline = 'top'; ctx.textAlign = 'center';
     for (const ex of extras) {
