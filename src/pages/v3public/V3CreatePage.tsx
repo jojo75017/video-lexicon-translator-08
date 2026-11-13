@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { BackButton } from '@/components/v3/BackButton';
 import V3BriefRecap from '@/components/v3public/V3BriefRecap';
-import V3AmbiancePicker from '@/components/v3public/V3AmbiancePicker';
 import V3KeyHint from '@/components/v3public/V3KeyHint';
 import AgentPortrait from '@/components/v3public/AgentPortrait';
 import V3PipelinePanel from '@/components/v3public/V3PipelinePanel';
@@ -867,11 +866,10 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
                 <details className="rounded-[22px] border p-4" style={{ borderColor: 'var(--v3-border)', background: '#fff' }}>
                   <summary className="cursor-pointer text-xs font-semibold" style={{ color: 'var(--v3-muted)' }}>
-                    Réglages du livre (titre, auteur, catégorie, ambiance, clés IA, agents)
+                    Réglages du livre (titre, auteur, catégorie, clés IA, agents)
                   </summary>
                   <div className="mt-4 space-y-4">
                     <V3BriefRecap key={briefKey} variant="full" formOnly hideBookForm={false} />
-                    <V3AmbiancePicker />
                     <V3KeyHint />
                     <V3PipelinePanel />
                   </div>
@@ -901,7 +899,6 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
               <V3BookActionsBar onLaunch={launchWorkflow} />
               {desk === 1 && <V3GenieOutlinePanel key={briefKey} />}
               <V3BriefRecap key={`recap-${briefKey}`} variant="full" formOnly hideBookForm={false} />
-              <V3AmbiancePicker />
               <V3KeyHint />
               <V3PipelinePanel />
               <div className="flex flex-wrap justify-center gap-2">
