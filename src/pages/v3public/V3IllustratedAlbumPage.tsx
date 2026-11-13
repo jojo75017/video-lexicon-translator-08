@@ -393,7 +393,6 @@ function KdpAlbumSheet({ draft }: { draft: IllustratedAlbumDraft }) {
     ['Nombre de pages intérieures', `${draft.pages.length * 2 + 4} pages environ`],
     ['Catégories conseillées', 'Livres pour enfants > Albums illustrés ; Livres pour enfants > Premières lectures'],
   ];
-  const rows = rowsBuilder();
   const [kdp, setKdp] = useState<{ description: string; keywords: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const generate = async () => {
@@ -409,6 +408,7 @@ function KdpAlbumSheet({ draft }: { draft: IllustratedAlbumDraft }) {
     } finally { setLoading(false); }
   };
   const copy = (text: string) => { void navigator.clipboard.writeText(text); toast.success('Copié'); };
+  const rows = rowsBuilder();
   return <section className="space-y-4 rounded-md border border-border bg-card p-4" aria-label="Fiche KDP">
     <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-lg font-bold">Fiche Amazon KDP de votre album</h3><div className="flex flex-wrap gap-2"><Button onClick={generate} disabled={loading}>{loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}{loading ? 'Rédaction (environ 20 secondes)…' : kdp ? 'Refaire description et mots-clés' : 'Écrire la description et les 7 mots-clés'}</Button><Button asChild variant="outline"><Link to="/v3/studio-v4"><ImageIcon className="mr-2 h-4 w-4" /> Créer la couverture KDP</Link></Button></div></div>
     <p className="text-sm text-muted-foreground">Copiez chaque case dans KDP. Le titre et le résumé viennent de votre album ; complétez-les à l’étape 1 ou ci-dessus si besoin.</p>
