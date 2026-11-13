@@ -43,6 +43,9 @@ export default function V3CanvaCoverStudioPage() {
   const [showSub, setShowSub] = useState(true);
   const [showAuthor, setShowAuthor] = useState(true);
   const [shade, setShade] = useState(0);
+  const [tPos, setTPos] = useState<'auto' | 'haut' | 'milieu' | 'bas'>('auto');
+  const [tScale, setTScale] = useState(100);
+  const [tColor, setTColor] = useState('');
   const [stockQ, setStockQ] = useState('');
   const [stock, setStock] = useState<{ id: string; thumb: string; full: string; author: string; source: string; download?: string }[]>([]);
   const [stockMsg, setStockMsg] = useState('');
@@ -120,13 +123,14 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     ctx.fillStyle = genre.overlay; ctx.fillRect(0, 0, W, H);
     if (shade > 0) { const g = genre.titlePos === 'top' ? ctx.createLinearGradient(0, 0, 0, H * 0.6) : ctx.createLinearGradient(0, H, 0, H * 0.4); g.addColorStop(0, `rgba(0,0,0,${shade / 100})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
     const t = !showTitle ? '' : genre.titleUpper ? title.toUpperCase() : title;
-    let size = 210; const maxW = W - 200; let lines: string[] = [];
-    do { ctx.font = genre.titleFont.replace('{s}', String(size)); lines = t ? wrap(ctx, t, maxW) : []; size -= 10; } while ((lines.length > 3 || lines.some((l) => ctx.measureText(l).width > maxW)) && size > 80);
+    let size = Math.round(210 * tScale / 100); const maxW = W - 200; let lines: string[] = [];
+    do { ctx.font = genre.titleFont.replace('{s}', String(size)); lines = t ? wrap(ctx, t, maxW) : []; size -= 10; } while ((lines.length > 3 || lines.some((l) => ctx.measureText(l).width > maxW)) && size > 50);
     const lh = (size + 10) * 1.1; const blockH = lines.length * lh;
-    let y = genre.titlePos === 'top' ? 280 : H - 420 - blockH;
+    const pos = tPos === 'auto' ? (genre.titlePos === 'top' ? 'haut' : 'bas') : tPos;
+    let y = pos === 'haut' ? 280 : pos === 'milieu' ? (H - blockH) / 2 - 80 : H - 420 - blockH;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     if (img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3; }
-    const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
+    const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tColor || tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
     ctx.font = '600 72px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.subColor;
     wrap(ctx, showSub ? subtitle : '', maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
     ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.titleColor;
@@ -159,7 +163,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       ls.forEach((l, i) => ctx.fillText(l, cx, cy + i * lh)); ctx.shadowBlur = 0;
     }
     ctx.shadowOffsetY = 0; setThumb(c.toDataURL('image/jpeg', 0.6));
-  }, [genre, title, subtitle, author, img, shade, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
+  }, [genre, title, subtitle, author, img, shade, tPos, tScale, tColor, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
 
   const searchStock = async () => {
     setStockMsg('Recherche…'); setStock([]);
@@ -227,6 +231,10 @@ const STEPS = [
           {tab === 'texte' && <div className="space-y-3">
 
             <div className="flex flex-wrap gap-3 text-sm">{([['Titre', showTitle, setShowTitle], ['Sous-titre', showSub, setShowSub], ['Auteur', showAuthor, setShowAuthor]] as const).map(([l, v, f]) => <label key={l} className="flex items-center gap-1"><input type="checkbox" checked={v} onChange={(e) => f(e.target.checked)} /> Afficher {l.toLowerCase()}</label>)}</div>
+            <div className="space-y-2 rounded-lg border border-border p-2 text-sm"><p className="font-semibold">Position du titre</p>
+              <div className="grid grid-cols-4 gap-1">{([['auto', 'Modèle'], ['haut', 'Haut'], ['milieu', 'Milieu'], ['bas', 'Bas']] as const).map(([k, l]) => <button key={k} onClick={() => setTPos(k)} className={`v3-chip-toggle rounded px-2 py-1 text-xs ${tPos === k ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>{l}</button>)}</div>
+              <label className="block text-xs">Taille du titre : {tScale} %<input type="range" min={40} max={120} value={tScale} onChange={(e) => setTScale(+e.target.value)} className="w-full" /></label>
+              <div className="flex items-center gap-1"><span className="text-xs">Couleur :</span><button onClick={() => setTColor('')} className={`v3-chip-toggle rounded px-2 text-xs ${!tColor ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>Modèle</button>{COLORS.map((c) => <button key={c} aria-label={`Couleur ${c}`} onClick={() => setTColor(c)} className={`v3-chip-toggle h-6 w-6 rounded-full border-2 ${tColor === c ? 'border-primary' : 'border-border'}`} style={{ background: c }} />)}<input type="color" aria-label="Autre couleur" value={tColor || '#ffffff'} onChange={(e) => setTColor(e.target.value)} className="h-6 w-8" /></div></div>
             <label className="block text-sm">Titre<input className={input} value={title} onChange={(e) => setTitle(e.target.value)} /></label>
             <label className="block text-sm">Sous-titre<input className={input} value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
             <label className="block text-sm">Auteur<input className={input} value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
