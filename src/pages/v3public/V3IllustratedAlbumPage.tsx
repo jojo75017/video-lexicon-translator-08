@@ -90,7 +90,7 @@ export default function V3IllustratedAlbumPage() {
         pitch: data.pitch,
         moral: data.moral || current.moral,
         backCoverText: data.backCoverText || current.backCoverText,
-        characters: incoming.length ? incoming.map((c: Partial<AlbumCharacter>) => ({ ...createAlbumCharacter(), ...c, referenceUrl: undefined, locked: false })) : current.characters,
+        characters: incoming.length ? incoming.map((c: Partial<AlbumCharacter>) => { const kept = current.characters.find((k) => k.referenceUrl && k.name.trim().toLowerCase() === (c.name || '').trim().toLowerCase()); return kept ? kept : { ...createAlbumCharacter(), ...c, referenceUrl: undefined, locked: false }; }) : current.characters,
       }));
       toast.success(`Tous les champs sont remplis, avec ${incoming.length} personnage(s) : ${incoming.map((c: { name: string }) => c.name).join(', ')}. Voir l’étape 2.`); setStep(1);
     } catch (e) {
