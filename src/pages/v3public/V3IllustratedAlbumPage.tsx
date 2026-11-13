@@ -383,18 +383,34 @@ function KdpAlbumSheet({ draft }: { draft: IllustratedAlbumDraft }) {
   const ages = (draft.targetAge.match(/\d+/g) || []).map(Number);
   const minAge = ages.length ? Math.min(...ages) : 3;
   const maxAge = ages.length ? Math.max(...ages) : 6;
-  const rows: Array<[string, string]> = [
+  const rowsBuilder = (): Array<[string, string]> => [
     ['Titre', draft.title],
     ['Auteur', draft.authorName],
-    ['Description (résumé)', draft.backCoverText || draft.pitch],
+    ['Description Amazon', kdp?.description || ''],
+    ...((kdp?.keywords || Array(7).fill('')) as string[]).map((kw, i) => [`Mot-clé ${i + 1}`, kw] as [string, string]),
     ['Tranche d’âge de lecture', `${minAge} à ${maxAge} ans`],
     ['Format', 'Livre broché, 21,59 × 21,59 cm (8,5 × 8,5 po), intérieur couleur, couverture brillante'],
     ['Nombre de pages intérieures', `${draft.pages.length * 2 + 4} pages environ`],
     ['Catégories conseillées', 'Livres pour enfants > Albums illustrés ; Livres pour enfants > Premières lectures'],
   ];
+  const rows = rowsBuilder();
+  const [kdp, setKdp] = useState<{ description: string; keywords: string[] } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const generate = async () => {
+    if (!draft.title.trim()) return toast.error('Indiquez d’abord un titre à l’étape 1.');
+    setLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('album-illustrated-story', { body: { mode: 'kdp', title: draft.title, authorName: draft.authorName, pitch: draft.pitch, moral: draft.moral, targetAge: draft.targetAge, story: draft.pages.map((p) => p.text).join('\n').slice(0, 12000) } });
+      if (error || !data?.description) throw new Error(data?.error || error?.message || 'Fiche non reçue');
+      setKdp(data);
+      toast.success('Description et 7 mots-clés prêts.');
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Impossible de créer la fiche KDP.');
+    } finally { setLoading(false); }
+  };
   const copy = (text: string) => { void navigator.clipboard.writeText(text); toast.success('Copié'); };
   return <section className="space-y-4 rounded-md border border-border bg-card p-4" aria-label="Fiche KDP">
-    <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-lg font-bold">Fiche Amazon KDP de votre album</h3><Button asChild><Link to="/v3/studio-v4"><ImageIcon className="mr-2 h-4 w-4" /> Créer la couverture KDP</Link></Button></div>
+    <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-lg font-bold">Fiche Amazon KDP de votre album</h3><div className="flex flex-wrap gap-2"><Button onClick={generate} disabled={loading}>{loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}{loading ? 'Rédaction (environ 20 secondes)…' : kdp ? 'Refaire description et mots-clés' : 'Écrire la description et les 7 mots-clés'}</Button><Button asChild variant="outline"><Link to="/v3/studio-v4"><ImageIcon className="mr-2 h-4 w-4" /> Créer la couverture KDP</Link></Button></div></div>
     <p className="text-sm text-muted-foreground">Copiez chaque case dans KDP. Le titre et le résumé viennent de votre album ; complétez-les à l’étape 1 ou ci-dessus si besoin.</p>
     <div className="space-y-2">{rows.map(([label, value]) => <div key={label} className="grid gap-2 rounded-md border border-border p-3 md:grid-cols-[200px_1fr_auto] md:items-start"><span className="text-sm font-semibold">{label}</span><span className="whitespace-pre-line text-sm text-muted-foreground">{value || 'À compléter'}</span><Button variant="outline" size="sm" onClick={() => copy(value)} disabled={!value}>Copier</Button></div>)}</div>
   </section>;

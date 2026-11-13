@@ -70,6 +70,29 @@ Deno.serve(async (req) => {
     if (!apiKey) return json({ error: 'Le moteur d’écriture n’est pas configuré.' }, 500);
 
     const rawBody = await req.json();
+    if (rawBody?.mode === 'kdp') {
+      const k = z.object({ title: z.string().trim().min(2).max(160), authorName: z.string().max(100).optional(), pitch: z.string().max(4000).optional(), moral: z.string().max(300).optional(), targetAge: z.string().max(30).optional(), story: z.string().max(12000).optional() }).safeParse(rawBody);
+      if (!k.success) return json({ error: 'Indiquez d’abord un titre.' }, 400);
+      const kPrompt = `Tu es expert Amazon KDP pour albums jeunesse français (${k.data.targetAge || '3-6 ans'}). Album « ${k.data.title} »${k.data.authorName ? ` de ${k.data.authorName}` : ''}.
+Résumé de l'auteur: ${k.data.pitch || 'non précisé'}. Message: ${k.data.moral || 'non précisé'}.
+Texte de l'album: ${k.data.story || ''}
+Rédige:
+1. "description": une description de vente Amazon de 150 à 250 mots, chaleureuse, adressée aux parents, en plusieurs paragraphes séparés par \n\n, avec 3 à 4 puces commençant par "• " sur les bienfaits pour l'enfant. Uniquement ce qui est vrai dans l'histoire, aucune promesse inventée, aucun avis client, aucun tiret cadratin ni demi-cadratin.
+2. "keywords": exactement 7 expressions de recherche KDP en français, chacune de 2 à 5 mots, moins de 50 caractères, sans répéter le titre ni le nom de l'auteur, sans marque.
+Français naturel uniquement. Retourne uniquement un JSON valide sans markdown: {"description":"...","keywords":["...",...]}`;
+      const r = await fetch('https://ai.gateway.lovable.dev/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Lovable-API-Key': apiKey, 'X-Lovable-AIG-SDK': 'fetch' },
+        body: JSON.stringify({ model: 'openai/gpt-6-astra', input: kPrompt, stream: true, store: false, reasoning: { effort: 'low', summary: 'auto' }, include: ['reasoning.encrypted_content'] }),
+      });
+      if (!r.ok) return json({ error: (await r.text()).slice(0, 300) || 'La fiche KDP a échoué.' }, r.status);
+      const out = await readResponseText(r);
+      const m = out.match(/\{[\s\S]*\}/);
+      if (!m) return json({ error: 'Réponse illisible. Relancez.' }, 502);
+      const kd = z.object({ description: z.string().min(50).max(4000), keywords: z.array(z.string().min(2).max(50)).min(7) }).safeParse(JSON.parse(m[0]));
+      if (!kd.success) return json({ error: 'Réponse incomplète. Relancez.' }, 502);
+      return json({ description: kd.data.description.replace(/[—–]/g, ','), keywords: kd.data.keywords.slice(0, 7) });
+    }
     if (rawBody?.mode === 'prefill-character') {
       const pc = z.object({ title: z.string().trim().min(2).max(160), pitch: z.string().max(4000).optional(), targetAge: z.string().max(30).optional(), existing: z.array(z.string().max(80)).max(3).optional(), hint: z.string().max(200).optional() }).safeParse(rawBody);
       if (!pc.success) return json({ error: 'Indiquez d’abord un titre.' }, 400);
