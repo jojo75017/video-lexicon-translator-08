@@ -131,6 +131,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     links: [
       { label: 'VC Books — livres humoristiques', to: '/v3/vc-books/apercu', desc: 'Aperçu de la page et du modèle ; rédaction dédiée bientôt disponible' },
       { label: 'VC Books — studio de couverture', to: '/v3/vc-books/images', badge: 'Nouveau', desc: 'Couvertures couleur et illustrations intérieures en noir et blanc' },
+      { label: 'Album illustré 3–6 ans (histoire continue)', to: '/v3/create/album-illustre', badge: 'Édition VIP', desc: 'Une seule histoire suivie jusqu’à 30 pages, mêmes personnages sur chaque page' },
       ...SPECIAL_BOOK_TABS.map((t) => ({
       label: t.label,
       to: `/v3/livres/${t.slug}`,
