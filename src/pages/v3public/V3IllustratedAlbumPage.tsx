@@ -82,17 +82,17 @@ export default function V3IllustratedAlbumPage() {
     if (draft.title.trim().length < 2) return toast.error('Tapez d’abord le titre du livre.');
     setBusy('prefill');
     try {
-      const { data, error } = await supabase.functions.invoke('album-illustrated-story', { body: { mode: 'prefill', title: draft.title, targetAge: draft.targetAge, pitch: draft.pitch.trim() || undefined } });
+      const { data, error } = await supabase.functions.invoke('album-illustrated-story', { body: { mode: 'prefill', title: draft.title, targetAge: draft.targetAge } });
       if (error || !data?.pitch) throw new Error(data?.error || error?.message || 'Remplissage non reçu');
       const incoming = (Array.isArray(data.characters) ? data.characters : data.character ? [data.character] : []).slice(0, 3);
       setDraft((current) => ({
         ...current,
-        pitch: current.pitch.trim() ? current.pitch : data.pitch,
+        pitch: data.pitch,
         moral: data.moral || current.moral,
         backCoverText: data.backCoverText || current.backCoverText,
         characters: incoming.length ? incoming.map((c: Partial<AlbumCharacter>) => ({ ...createAlbumCharacter(), ...c, referenceUrl: undefined, locked: false })) : current.characters,
       }));
-      toast.success('Tous les champs sont remplis. Relisez et ajustez si besoin.');
+      toast.success(`Tous les champs sont remplis, avec ${incoming.length} personnage(s) : ${incoming.map((c: { name: string }) => c.name).join(', ')}. Voir l’étape 2.`); setStep(1);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Impossible de remplir les champs.');
     } finally {
@@ -316,7 +316,7 @@ export default function V3IllustratedAlbumPage() {
         </div>
 
         {step === 0 && <Card><CardHeader><CardTitle>1. Préparer l’histoire</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-2">
-          <Field label="Titre du livre"><input value={draft.title} onChange={(event) => update({ title: event.target.value })} maxLength={160} placeholder="Le grand voyage de Léo" className={FIELD_CLASS} /><Button type="button" size="sm" className="mt-2 w-full" onClick={prefillFromTitle} disabled={busy === 'prefill'}>{busy === 'prefill' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />} Remplir tous les champs d’après le titre</Button></Field>
+          <Field label="Titre du livre"><input value={draft.title} onChange={(event) => update({ title: event.target.value })} maxLength={160} placeholder="Le grand voyage de Léo" className={FIELD_CLASS} /><Button type="button" size="sm" className="mt-2 w-full" onClick={prefillFromTitle} disabled={busy === 'prefill'}>{busy === 'prefill' ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />} {busy === 'prefill' ? 'Écriture en cours (environ 20 secondes)…' : 'Remplir tous les champs d’après le titre'}</Button></Field>
           <Field label="Nom d’auteur"><input value={draft.authorName} onChange={(event) => update({ authorName: event.target.value })} maxLength={100} placeholder="Votre nom sur la couverture" className={FIELD_CLASS} /></Field>
           <Field label="Âge visé"><input value={draft.targetAge} onChange={(event) => update({ targetAge: event.target.value })} maxLength={30} className={FIELD_CLASS} /></Field>
           <Field label="Nombre de pages"><select value={draft.pageCount} onChange={(event) => update({ pageCount: Number(event.target.value) as IllustratedAlbumDraft['pageCount'], pages: [] })} className={FIELD_CLASS}>{ALBUM_PAGE_COUNTS.map((count) => <option key={count} value={count}>{count} pages</option>)}</select></Field>
