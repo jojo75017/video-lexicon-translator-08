@@ -209,14 +209,14 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
-      <Card className="border-amber-200 dark:border-amber-800 bg-gradient-to-br from-amber-50/50 to-orange-50/50 dark:from-amber-950/20 dark:to-orange-950/20">
+      <Card className="border-amber-200 dark:border-amber-800 bg-card text-card-foreground">
         <CollapsibleTrigger asChild>
-          <CardHeader className="cursor-pointer hover:bg-amber-100/50 dark:hover:bg-amber-900/20 transition-colors">
+          <CardHeader className="cursor-pointer hover:bg-amber-500/10 transition-colors">
             <CardTitle className="flex items-center justify-between text-lg">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-5 w-5 text-amber-600" />
                 <span>Outils KDP Amazon</span>
-                <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
+                <Badge variant="outline" className="bg-amber-500/20 text-amber-300 border-amber-500/40">
                   Publication
                 </Badge>
               </div>
@@ -247,23 +247,23 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
             </Button>
 
             {/* Prix suggéré */}
-            <div className="p-4 bg-white dark:bg-gray-900 rounded-lg border">
+            <div className="p-4 bg-card text-card-foreground rounded-lg border">
               <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="h-5 w-5 text-green-600" />
+                <DollarSign className="h-5 w-5 text-green-400" />
                 <h4 className="font-semibold">Prix suggéré</h4>
               </div>
               <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <div className="p-3 bg-muted rounded-lg">
                   <div className="text-sm text-muted-foreground">Minimum</div>
-                  <div className="text-lg font-bold text-gray-600">{priceRange.min}€</div>
+                  <div className="text-lg font-bold text-foreground">{priceRange.min}€</div>
                 </div>
-                <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-lg border-2 border-green-500">
-                  <div className="text-sm text-green-600">Optimal</div>
-                  <div className="text-xl font-bold text-green-600">{priceRange.optimal}€</div>
+                <div className="p-3 bg-green-500/15 rounded-lg border-2 border-green-500">
+                  <div className="text-sm text-green-400">Optimal</div>
+                  <div className="text-xl font-bold text-green-400">{priceRange.optimal}€</div>
                 </div>
-                <div className="p-3 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                <div className="p-3 bg-muted rounded-lg">
                   <div className="text-sm text-muted-foreground">Maximum</div>
-                  <div className="text-lg font-bold text-gray-600">{priceRange.max}€</div>
+                  <div className="text-lg font-bold text-foreground">{priceRange.max}€</div>
                 </div>
               </div>
               <p className="text-xs text-muted-foreground mt-2 text-center">
@@ -291,7 +291,7 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
               </div>
               <div className="flex flex-wrap gap-2">
                 {(customKeywords.length > 0 ? customKeywords : generateDefaultKeywords()).map((kw, i) => (
-                  <Badge key={i} variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                  <Badge key={i} variant="secondary" className="bg-blue-500/20 text-blue-200">
                     {kw}
                   </Badge>
                 ))}
@@ -315,8 +315,8 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
               </div>
               <div className="space-y-2">
                 {(kdpData?.categories || KDP_CATEGORY_SUGGESTIONS[productType]).map((cat, i) => (
-                  <div key={i} className="flex items-center justify-between p-2 bg-purple-50 dark:bg-purple-900/20 rounded border border-purple-200 dark:border-purple-800">
-                    <span className="text-sm">{cat}</span>
+                  <div key={i} className="flex items-center justify-between p-2 bg-purple-500/10 rounded border border-purple-200 dark:border-purple-800">
+                    <span className="text-sm text-foreground">{cat}</span>
                     <Button variant="ghost" size="sm" onClick={() => copyToClipboard(cat, 'Catégorie')}>
                       <Copy className="h-3 w-3" />
                     </Button>
@@ -354,29 +354,29 @@ export const KdpQuickTools: React.FC<KdpQuickToolsProps> = ({
             </div>
 
             {/* Checklist */}
-            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
-              <h4 className="font-semibold text-green-700 dark:text-green-300 mb-3 flex items-center gap-2">
+            <div className="p-4 bg-green-500/10 rounded-lg border border-green-200 dark:border-green-800">
+              <h4 className="font-semibold text-green-400 mb-3 flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5" />
                 Checklist publication
               </h4>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className={`h-4 w-4 ${pageCount >= 24 ? 'text-green-600' : 'text-red-500'}`} />
-                  <span className={pageCount >= 24 ? 'text-green-700' : 'text-red-600'}>
+                  <CheckCircle2 className={`h-4 w-4 ${pageCount >= 24 ? 'text-green-400' : 'text-red-500'}`} />
+                  <span className={pageCount >= 24 ? 'text-green-400' : 'text-red-400'}>
                     Minimum 24 pages ({pageCount} pages)
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className={`h-4 w-4 ${title ? 'text-green-600' : 'text-gray-400'}`} />
-                  <span>Titre défini</span>
+                  <CheckCircle2 className={`h-4 w-4 ${title ? 'text-green-400' : 'text-gray-400'}`} />
+                  <span className="text-foreground">Titre défini</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className={`h-4 w-4 ${customKeywords.length >= 5 ? 'text-green-600' : 'text-yellow-500'}`} />
-                  <span>5-7 mots-clés ({customKeywords.length}/7)</span>
+                  <CheckCircle2 className={`h-4 w-4 ${customKeywords.length >= 5 ? 'text-green-400' : 'text-yellow-500'}`} />
+                  <span className="text-foreground">5-7 mots-clés ({customKeywords.length}/7)</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className={`h-4 w-4 ${(customDescription || '').length > 100 ? 'text-green-600' : 'text-yellow-500'}`} />
-                  <span>Description complète</span>
+                  <CheckCircle2 className={`h-4 w-4 ${(customDescription || '').length > 100 ? 'text-green-400' : 'text-yellow-500'}`} />
+                  <span className="text-foreground">Description complète</span>
                 </div>
               </div>
             </div>

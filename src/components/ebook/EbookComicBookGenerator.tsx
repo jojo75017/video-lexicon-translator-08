@@ -106,7 +106,12 @@ const PANEL_LAYOUTS = [
   { value: '6-panels', label: '6 cases', description: 'Détaillé (2x3)', grid: [2, 2, 2], panelsPerPage: 6 },
   { value: '8-panels', label: '8 cases', description: 'Riche (2x4)', grid: [2, 2, 2, 2], panelsPerPage: 8 },
   { value: '2-panels', label: '2 cases', description: 'Panoramique', grid: [1, 1], panelsPerPage: 2 },
+  { value: '10-panels', label: '10 cases', description: 'Album classique (2x5)', grid: [2, 2, 2, 2, 2], panelsPerPage: 10 },
+  { value: '12-panels', label: '12 cases', description: 'Album franco-belge (3x4)', grid: [3, 3, 3, 3], panelsPerPage: 12 },
 ];
+
+// Nombre de colonnes d'une planche : 3 colonnes pour 12 cases, sinon 2.
+const colsFor = (panelsPerPage: number) => (panelsPerPage >= 12 ? 3 : panelsPerPage <= 2 ? 1 : 2);
 
 const ART_STYLES = [
   { value: 'cartoon', label: '🎨 Cartoon', description: 'Style simple et coloré' },
@@ -310,6 +315,15 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
     loadSavedComics();
   }, []);
 
+  // Sauvegarde automatique dès que toutes les planches sont créées,
+  // pour ne plus perdre une BD en rechargeant la page.
+  const [pendingAutoSave, setPendingAutoSave] = useState(false);
+  useEffect(() => {
+    if (!pendingAutoSave || generatedPages.length === 0) return;
+    setPendingAutoSave(false);
+    if (title.trim()) void saveComicBook();
+  }, [pendingAutoSave, generatedPages]);
+
   const loadSavedComics = async () => {
     setIsLoadingComics(true);
     try {
@@ -487,6 +501,8 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const getLayoutDescription = (layout: string): string => {
     const layouts: Record<string, string> = {
       '2-panels': '2 grandes cases horizontales',
+      '10-panels': '10 cases (2 colonnes x 5 rangées), album classique',
+      '12-panels': '12 cases (3 colonnes x 4 rangées), album franco-belge',
       '3-panels': '3 cases verticales (style manga)',
       '4-panels': '4 cases en grille 2x2',
       '6-panels': '6 cases en grille 2x3',
@@ -744,10 +760,10 @@ ${visualRef}
 === SCENE ===
 ${panelData.description}
 
-${hasSpeechBubble ? `=== SPEECH BUBBLE ===
-Draw a WHITE speech bubble with BLACK outline.
-Inside write: "${dialogueText}"
-Bubble points to ${panelData.character}.` : ''}
+=== NO TEXT ===
+Absolutely NO text, NO letters, NO words, NO speech bubbles, NO captions, NO signs with writing in the image.
+Leave a calm area at the top of the panel. The dialogue is added later by the layout.
+${hasSpeechBubble ? `The speaking character (${panelData.character}) shows a clear expression and gesture.` : ''}
 
 === RULES ===
 - Professional comic art, child-friendly
@@ -851,6 +867,7 @@ Bubble points to ${panelData.character}.` : ''}
       }
 
       toast.success(`${allPages.length} pages de BD générées avec succès !`);
+      setPendingAutoSave(true);
       reportImageFailures(allPages);
 
 
@@ -934,6 +951,7 @@ Bubble points to ${panelData.character}.` : ''}
       }
 
       toast.success(`🎉 BD complète générée : ${allPages.length} pages !`);
+      setPendingAutoSave(true);
       reportImageFailures(allPages);
 
 
@@ -1033,8 +1051,8 @@ Bubble points to ${panelData.character}.` : ''}
         const panelsPerPage = selectedLayout?.panelsPerPage || 4;
 
         // Calcul des dimensions selon le nombre de panels
-        const cols = 2;
-        const rows = Math.ceil(panelsPerPage / 2);
+        const cols = colsFor(panelsPerPage);
+        const rows = Math.ceil(panelsPerPage / cols);
 
         const gap = 4;
         const panelWidth = (pageWidth - (margin * 2) - gap) / cols;
@@ -1095,23 +1113,18 @@ Bubble points to ${panelData.character}.` : ''}
           // Bulle de dialogue sous la case (plus compacte pour les layouts denses)
           if (panel?.dialogue) {
             const bubbleY = pos.y + panelHeight + 1;
-            const bubbleHeight = panelsPerPage > 4 ? 12 : 14;
+            const bubbleHeight = dialogueSpace - 2;
             pdf.setFillColor(255, 255, 255);
+            pdf.setDrawColor(30, 30, 30);
             pdf.roundedRect(pos.x, bubbleY, panelWidth, bubbleHeight, 2, 2, 'FD');
-            
-            pdf.setFontSize(panelsPerPage > 6 ? 6 : 7);
-            pdf.setFont('helvetica', 'bold');
-            pdf.setTextColor(50, 50, 150);
-            pdf.text(`${cleanTextForPDF(panel.character)}:`, pos.x + 2, bubbleY + (panelsPerPage > 6 ? 4 : 5));
-            
+            // Taille unique pour toute la planche : aucun texte géant ou minuscule.
+            const fontSize = panelsPerPage >= 10 ? 6.5 : 7.5;
+            pdf.setFontSize(fontSize);
             pdf.setFont('helvetica', 'normal');
             pdf.setTextColor(30, 30, 30);
-            const maxDialogueWidth = panelWidth - 20;
-            const dialogueLines = pdf.splitTextToSize(cleanTextForPDF(panel.dialogue), maxDialogueWidth);
-            pdf.text(dialogueLines[0] || '', pos.x + 18, bubbleY + (panelsPerPage > 6 ? 4 : 5));
-            if (dialogueLines[1] && panelsPerPage <= 6) {
-              pdf.text(dialogueLines[1].substring(0, 30) + (dialogueLines[1].length > 30 ? '...' : ''), pos.x + 2, bubbleY + 10);
-            }
+            const line = `${cleanTextForPDF(panel.character)} : ${cleanTextForPDF(panel.dialogue)}`;
+            const lines = pdf.splitTextToSize(line, panelWidth - 4).slice(0, 2);
+            pdf.text(lines, pos.x + 2, bubbleY + fontSize * 0.5);
           }
         }
 
@@ -1194,10 +1207,9 @@ ${visualRef}
 === SCENE ===
 ${panel.action}
 
-${dialogueText ? `=== SPEECH BUBBLE ===
-Draw a WHITE speech bubble with BLACK outline.
-Inside write: "${dialogueText}"
-Bubble points to ${panel.character}.` : ''}
+=== NO TEXT ===
+Absolutely NO text, NO letters, NO words, NO speech bubbles, NO captions in the image.
+${dialogueText ? `The speaking character (${panel.character}) shows a clear expression and gesture.` : ''}
 
 === RULES ===
 - Professional comic art, child-friendly
@@ -1897,8 +1909,8 @@ Bubble points to ${panel.character}.` : ''}
               {generatedPages.map((page, index) => {
                 const layoutForPage = page.layout || panelLayout;
                 const panelsPerPage = PANEL_LAYOUTS.find(l => l.value === layoutForPage)?.panelsPerPage || 4;
-                const cols = 2;
-                const rows = Math.ceil(panelsPerPage / 2);
+                const cols = colsFor(panelsPerPage);
+                const rows = Math.ceil(panelsPerPage / cols);
                 return (
                   <div key={page.id} className="border border-border/50 rounded-lg p-4 bg-muted/20">
                     <div className="flex items-center justify-between mb-3">
@@ -1957,10 +1969,10 @@ Bubble points to ${panel.character}.` : ''}
                           </div>
                           {/* Dialogue sous la case */}
                           {panel.dialogue && (
-                            <div className="bg-background border-2 border-t-0 border-foreground/80 rounded-b-md px-2 py-1.5">
-                              <p className="text-[11px] leading-tight">
-                                <span className="font-bold text-amber-600">{panel.character}:</span>{' '}
-                                <span className="italic">"{panel.dialogue}"</span>
+                            <div className="bg-card text-card-foreground border-2 border-t-0 border-foreground/80 rounded-b-md px-2 py-1.5 h-12 overflow-hidden flex items-center">
+                              <p className="text-xs leading-snug line-clamp-2">
+                                <span className="font-bold text-primary">{panel.character} :</span>{' '}
+                                <span>« {panel.dialogue} »</span>
                               </p>
                             </div>
                           )}
