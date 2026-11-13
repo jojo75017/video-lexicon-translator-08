@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
-import { generateIncludedIllustration } from '@/lib/cover-editor/includedCoverEngine';
+import { supabase } from '@/integrations/supabase/client';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
 
 const W = 1600, H = 2560;
@@ -36,15 +36,25 @@ export default function V3CanvaCoverStudioPage() {
   const [books, setBooks] = useState<MyBookOption[]>([]);
   const [bookId, setBookId] = useState('');
   useEffect(() => { listMyBooks().then(setBooks).catch(() => setBooks([])); }, []);
-  const pickBook = (id: string) => { setBookId(id); const b = books.find((x) => x.id === id); if (!b) return; setTitle(b.title || ''); setSubtitle(b.subtitle || ''); if (b.author) setAuthor(b.author); };
+  const pickBook = (id: string) => { setBookId(id); const b = books.find((x) => x.id === id); if (!b) return; setTitle(b.title || ''); setSubtitle(b.subtitle || ''); if (b.author) setAuthor(b.author); setSceneText(b.synopsis || ''); };
   const [genLoading, setGenLoading] = useState(false);
   const [genError, setGenError] = useState('');
+  const [sceneText, setSceneText] = useState('');
   const createImage = async () => {
     setGenLoading(true); setGenError('');
     try {
-      const b = books.find((x) => x.id === bookId); const gs = GENRE_STYLE[genreId] ?? GENRE_STYLE.guide;
-      const url = await generateIncludedIllustration({ projectId: bookId || 'studio-couvertures', title, subtitle, author, genre: genre.label, mood: gs.mood, lighting: gs.lighting, summary: b?.synopsis || subtitle, visualPrompt: `Art style: ${gs.style}.` });
-      const blob = await (await fetch(url)).blob(); const i = new Image(); i.onload = () => setImg(i); i.src = URL.createObjectURL(blob);
+      const gs = GENRE_STYLE[genreId] ?? GENRE_STYLE.guide;
+      const scene = sceneText.trim() || `${title}. ${subtitle}`;
+      const prompt = `Professional bestseller book cover ILLUSTRATION ONLY (artwork, no typography) for the book "${title}"${subtitle ? ` (${subtitle})` : ''}.
+Scene to depict faithfully: ${scene}.
+Art style: ${gs.style}. Mood: ${gs.mood}. ${gs.lighting === 'dark' ? 'Dramatic but readable lighting.' : 'Bright, luminous, well-exposed lighting, never dark or muddy.'}
+Vertical portrait composition 1600x2560, ${genre.titlePos === 'top' ? 'keep the TOP third calm and uncluttered for the title, main subject in the lower two thirds' : 'keep the BOTTOM third calm for the title, main subject in the upper two thirds'}. Expressive characters, rich detail, art-directed publishing-house quality.
+ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-bleed, no border, no 3D book mockup.`;
+      const { data, error } = await supabase.functions.invoke('generate-ai-cover', { body: { title, subtitle, author, genre: genre.label, format: 'kindle', customPrompt: prompt } });
+      if (error) throw new Error((await (error as { context?: Response }).context?.json?.().catch(() => null))?.error || error.message);
+      if (data?.error) throw new Error(data.error);
+      if (!data?.imageUrl) throw new Error('Aucune image reçue, réessayez.');
+      const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => { setImg(i); }; i.onerror = () => setGenError("L'image reçue est illisible, réessayez."); i.src = data.imageUrl;
     } catch (e) { setGenError(e instanceof Error ? e.message : "La création de l'image a échoué."); }
     finally { setGenLoading(false); }
   };
@@ -115,7 +125,9 @@ export default function V3CanvaCoverStudioPage() {
             <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); }} className={`v3-chip-toggle flex w-full items-center gap-3 rounded-lg border p-2 text-left ${g.id === genreId ? 'border-primary' : 'border-border'}`}>
               <span className="h-10 w-7 rounded" style={{ background: g.bg, border: `3px solid ${g.titleColor}` }} /><span className="font-medium text-foreground">{g.label}</span>
             </button>))}</div>}
-          {tab === 'visuel' && <div className="space-y-3"><button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-accent px-3 py-3 font-bold text-accent-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
+          {tab === 'visuel' && <div className="space-y-3"><label className="block text-sm font-semibold">Que doit montrer l'image ?<textarea className={input} rows={4} value={sceneText} onChange={(e) => setSceneText(e.target.value)} placeholder="Ex. : une maman et son garçon de 7 ans font les devoirs en souriant, une ampoule s'allume au-dessus du cahier, salon lumineux avec des plantes" /></label>
+            <p className="text-xs text-muted-foreground">Plus votre description est précise (personnages, âge, lieu, objets, ambiance), plus l'image sera réussie. Le résumé de votre livre s'y place tout seul s'il existe.</p>
+            <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-accent px-3 py-3 font-bold text-accent-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
             <p className="text-xs text-muted-foreground">L'image est créée à partir du résumé de votre livre, dans le style du modèle « {genre.label} ».</p>
             {genError && <p className="text-sm text-destructive">{genError}</p>}
             <p className="text-sm text-muted-foreground">Ou ajoutez l'illustration créée dans le studio d'images ou votre propre image.</p>
