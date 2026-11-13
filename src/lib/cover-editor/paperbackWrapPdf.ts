@@ -47,12 +47,12 @@ export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
   ctx.fillStyle = i.accent; ctx.fillRect(sx, oy, sw, H);
   if (g.spineText && sw > 0) {
     ctx.save(); ctx.translate(sx + sw / 2, oy + H / 2); ctx.rotate(Math.PI / 2);
-    const fs = Math.min(sw * 0.55, 90); ctx.font = `800 ${fs}px Montserrat, Arial, sans-serif`; ctx.fillStyle = '#FFFFFF'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const fs = Math.min(sw * 0.55, 90); ctx.font = `800 ${fs}px Montserrat, Arial, sans-serif`; ctx.fillStyle = readableOn(i.accent); ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(`${i.title.toUpperCase()}   ·   ${i.author.toUpperCase()}`.slice(0, 90), 0, 0); ctx.restore();
   }
   // Quatrième (gauche) : texte + emplacement code-barres KDP (2" × 1.2", bas droite).
   const bx = ox + px(BLEED + 0.5), by = oy + px(BLEED + 0.7), bw = px(g.tw - 1);
-  ctx.fillStyle = i.textColor; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+  ctx.fillStyle = readableOn(i.bg); ctx.textAlign = 'left'; ctx.textBaseline = 'top';
   ctx.font = `800 ${px(0.28)}px Montserrat, Arial, sans-serif`;
   wrapLines(ctx, i.title, bw).filter(Boolean).slice(0, 3).forEach((l, k) => ctx.fillText(l, bx, by + k * px(0.36)));
   ctx.font = `400 ${px(0.15)}px Georgia, serif`; let y = by + px(1.4);
@@ -81,4 +81,11 @@ export function buildPaperbackPdf(i: WrapInput): Blob {
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'in', format: [wIn, hIn], compress: true });
   pdf.addImage(c.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, wIn, hIn);
   return pdf.output('blob');
+}
+
+/** Texte noir ou blanc selon la clarté du fond, pour qu'il reste toujours lisible. */
+export function readableOn(hex: string): string {
+  const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim()); if (!m) return '#FFFFFF';
+  const n = parseInt(m[1], 16); const l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)) / 255;
+  return l > 0.6 ? '#111111' : '#FFFFFF';
 }
