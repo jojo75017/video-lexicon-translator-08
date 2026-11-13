@@ -20,7 +20,7 @@ const V3CreateWizard = lazy(() => import('@/components/v3public/V3CreateWizard')
  */
 export default function V3LaunchBookPage() {
   return (
-    <section className="v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
+    <section className="v3-lancer-dark v3-halo-soft min-h-[calc(100vh-4rem)] py-10 px-5">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <BackButton to="/v3/create#choix-parcours" label="Retour aux choix" />
