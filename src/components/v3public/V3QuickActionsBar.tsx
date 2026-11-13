@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Rocket, Palette, Sparkles, Save, Plus, FileText, Wand2 } from 'lucide-react';
+import { Rocket, Palette, Save, Plus, FileText, Wand2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { clearBookBrief, readBookBrief, writeBookBrief } from '@/lib/v3/bookBrief';
 
@@ -55,14 +55,6 @@ export default function V3QuickActionsBar() {
         style={{ borderColor: '#FF9E2D', color: '#FF9E2D', background: '#0F172A' }}
       >
         <Palette className="h-3.5 w-3.5" /> 🎨 Couverture
-      </button>
-      <button
-        type="button"
-        onClick={() => navigate('/ambiances')}
-        className={outline}
-        style={{ borderColor: '#008296', color: '#5EEAD4', background: '#0F172A' }}
-      >
-        <Sparkles className="h-3.5 w-3.5" /> Ambiances
       </button>
       <button
         type="button"
