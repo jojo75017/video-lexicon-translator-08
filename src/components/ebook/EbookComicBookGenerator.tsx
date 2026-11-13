@@ -102,12 +102,15 @@ const AGE_GROUPS = [
 ];
 
 const PANEL_LAYOUTS = [
-  { value: '4-panels', label: '4 cases', description: 'Standard BD (2x2)', grid: [2, 2], panelsPerPage: 4 },
-  { value: '6-panels', label: '6 cases', description: 'Détaillé (2x3)', grid: [2, 2, 2], panelsPerPage: 6 },
+  { value: '4-panels', label: '4 cases', description: 'Très aéré (2x2)', grid: [2, 2], panelsPerPage: 4 },
+  { value: '6-panels', label: '6 cases', description: 'Album classique (2x3)', grid: [2, 2, 2], panelsPerPage: 6 },
   { value: '8-panels', label: '8 cases', description: 'Riche (2x4)', grid: [2, 2, 2, 2], panelsPerPage: 8 },
-  { value: '2-panels', label: '2 cases', description: 'Panoramique', grid: [1, 1], panelsPerPage: 2 },
-  { value: '10-panels', label: '10 cases', description: 'Album classique (2x5)', grid: [2, 2, 2, 2, 2], panelsPerPage: 10 },
-  { value: '12-panels', label: '12 cases', description: 'Album franco-belge (3x4)', grid: [3, 3, 3, 3], panelsPerPage: 12 },
+];
+// Anciennes BD à 10/12 cases : toujours lisibles à l'ouverture, mais plus proposées.
+const LEGACY_PANEL_LAYOUTS = [
+  { value: '2-panels', panelsPerPage: 2 },
+  { value: '10-panels', panelsPerPage: 10 },
+  { value: '12-panels', panelsPerPage: 12 },
 ];
 
 // Nombre de colonnes d'une planche : 3 colonnes pour 12 cases, sinon 2.
@@ -173,7 +176,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
   const [ageGroup, setAgeGroup] = useState('7-10');
   const [artStyle, setArtStyle] = useState('cartoon');
   const [colorMode, setColorMode] = useState('color');
-  const [panelLayout, setPanelLayout] = useState('4-panels');
+  const [panelLayout, setPanelLayout] = useState('6-panels');
   const [storyTemplate, setStoryTemplate] = useState('hero-journey');
   const [numberOfPages, setNumberOfPages] = useState(12);
   const [title, setTitle] = useState(ebookTitle || '');
@@ -427,7 +430,7 @@ export const EbookComicBookGenerator: React.FC<ComicBookGeneratorProps> = ({ ebo
       setAgeGroup(data.age_group || '7-10');
       setArtStyle(data.art_style || 'cartoon');
       setColorMode(data.color_mode || 'color');
-      setPanelLayout(data.panel_layout || '4-panels');
+      setPanelLayout(PANEL_LAYOUTS.some(l => l.value === data.panel_layout) ? data.panel_layout : '6-panels');
       setNumberOfPages(data.number_of_pages || 12);
       setScenario(data.scenario ? (data.scenario as unknown as typeof scenario) : null);
       setGeneratedPages(data.pages ? (data.pages as unknown as ComicPage[]) : []);
@@ -1048,7 +1051,7 @@ ${hasSpeechBubble ? `The speaking character (${panelData.character}) shows a cle
 
         const layoutForPage = page.layout || panelLayout;
         const selectedLayout = PANEL_LAYOUTS.find(l => l.value === layoutForPage);
-        const panelsPerPage = selectedLayout?.panelsPerPage || 4;
+        const panelsPerPage = selectedLayout?.panelsPerPage || LEGACY_PANEL_LAYOUTS.find(l => l.value === layoutForPage)?.panelsPerPage || 4;
 
         // Calcul des dimensions selon le nombre de panels
         const cols = colsFor(panelsPerPage);
@@ -1914,7 +1917,7 @@ ${dialogueText ? `The speaking character (${panel.character}) shows a clear expr
             <div className="space-y-6">
               {generatedPages.map((page, index) => {
                 const layoutForPage = page.layout || panelLayout;
-                const panelsPerPage = PANEL_LAYOUTS.find(l => l.value === layoutForPage)?.panelsPerPage || 4;
+                const panelsPerPage = [...PANEL_LAYOUTS, ...LEGACY_PANEL_LAYOUTS].find(l => l.value === layoutForPage)?.panelsPerPage || 4;
                 const cols = colsFor(panelsPerPage);
                 const rows = Math.ceil(panelsPerPage / cols);
                 return (
@@ -1975,9 +1978,9 @@ ${dialogueText ? `The speaking character (${panel.character}) shows a clear expr
                           </div>
                           {/* Vraie bulle de BD incrustée dans la case */}
                           {panel.imageUrl && panel.dialogue && (
-                            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[86%] pointer-events-none">
-                              <div className="comic-bubble relative rounded-[50%] border-2 px-3 py-2 text-center shadow-md">
-                                <p className="text-[11px] sm:text-xs leading-tight font-semibold line-clamp-3">{panel.dialogue}</p>
+                            <div className="absolute top-1.5 right-1.5 max-w-[62%] pointer-events-none">
+                              <div className="comic-bubble relative rounded-2xl border px-2 py-1 text-center shadow-sm">
+                                <p className="text-[10px] sm:text-[11px] leading-tight font-medium line-clamp-2">{panel.dialogue}</p>
                                 <span className="comic-bubble-tail absolute -bottom-[9px] left-1/3 h-0 w-0" />
                               </div>
                             </div>
