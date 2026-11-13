@@ -1,4 +1,4 @@
-import { test, expect } from "bun:test";
+import { test, expect } from "vitest";
 import { stripTableOfContents } from "./myBooks";
 test("retire la table des matières", () => {
   const r = stripTableOfContents("Un mariage sicilien tourne au règlement de comptes.\n\nTABLE DES MATIÈRES VALIDÉE\nChapitre 1 : Le départ\nChapitre 2 : La fête");
