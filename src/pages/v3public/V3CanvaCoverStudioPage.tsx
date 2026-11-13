@@ -11,6 +11,12 @@ import { fitArtwork, studioCompositionPrompt, studioCoverSize, type StudioCoverF
 
 /** Rendu interne en 2× pour des titres nets à l'impression 300 DPI. */
 const S = 2;
+const SCENE_IDEAS: Record<string, string[]> = {
+  thriller: ["Une silhouette sous la pluie dans une ruelle sombre éclairée par un seul réverbère, ambiance froide et tendue", "Une maison isolée la nuit au bord d'un lac brumeux, une seule fenêtre allumée", "Un couloir d'hôpital désert aux néons vacillants, une porte entrouverte au fond"],
+  romance: ["Un couple de dos face à un coucher de soleil sur la mer, lumière dorée et douce", "Deux mains qui se frôlent sur une table de café parisien, pluie fine derrière la vitre", "Une jeune femme lisant une lettre dans un champ de lavande au crépuscule"],
+  jeunesse: ["Un petit renard curieux dans une forêt enchantée, lucioles et champignons lumineux", "Une fillette et son chien explorent un jardin rempli de fleurs géantes", "Un ourson qui regarde les étoiles depuis sa cabane dans un arbre"],
+};
+const DEFAULT_IDEAS = ["Un bureau lumineux avec un carnet ouvert, une tasse de café et des plantes, ambiance inspirante", "Un chemin de montagne au lever du soleil, symbole de progression", "Une personne souriante devant un ordinateur portable dans un salon clair"];
 const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: string }> = {
   guide: { style: 'clean modern editorial illustration, soft natural colours', mood: 'clear, reassuring, practical' },
   jeunesse: { style: 'bright 3D animated film style (Pixar-like), friendly cartoon characters, warm cheerful colours, NOT photographic', mood: 'joyful, warm, encouraging' },
@@ -218,12 +224,13 @@ const STEPS = [
             <span className="text-3xl">{st.icon}</span><span className="flex-1 border-l border-border pl-4"><span className="block text-lg font-bold text-foreground">{st.t}</span><span className="text-sm text-muted-foreground">{st.d}</span></span><span className="text-muted-foreground">›</span></button>)}
           <div className="rounded-xl bg-card p-4">
           {tab === 'modele' && <div><p className="mb-3 font-semibold">Modèles de couverture</p><div className="grid grid-cols-3 gap-3">{COVER_GENRES.map((g) => (
-            <button key={g.id} onClick={() => { setGenreId(g.id); if (g.id === 'jeunesse') { changeFormat('album'); setBadgeOn(false); } setBadgeText(g.badges[0]); const fic = g.id === 'thriller' || g.id === 'romance'; if (g.id !== 'jeunesse') setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
+            <button key={g.id} onClick={() => { if (g.id !== genreId) { setImg(null); setSceneText(''); } setGenreId(g.id); if (g.id === 'jeunesse') { changeFormat('album'); setBadgeOn(false); } setBadgeText(g.badges[0]); const fic = g.id === 'thriller' || g.id === 'romance'; if (g.id !== 'jeunesse') setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
               <span className={`flex aspect-[5/8] flex-col items-center ${g.titlePos === 'top' ? 'justify-start pt-3' : 'justify-end pb-3'} rounded-lg px-1 shadow-lg ring-2 ${g.id === genreId ? 'ring-primary' : 'ring-transparent'}`} style={{ background: g.bg }}>
                 {(TITLE_COLORS[g.id] ?? [g.titleColor]).slice(0, 2).map((c, i) => <span key={i} className="text-[11px] font-black leading-tight" style={{ color: c, font: g.titleFont.replace('{s}', '12') }}>{i ? 'TITRE' : 'MON'}</span>)}
               </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
             </button>))}</div></div>}
           {tab === 'visuel' && <div className="space-y-3"><label className="block text-sm font-semibold">Que doit montrer l'image ? <span className="text-primary">(obligatoire)</span><textarea className={`${input} ${sceneText.trim().length < 20 ? 'border-primary' : ''}`} rows={4} value={sceneText} onChange={(e) => setSceneText(e.target.value)} placeholder="Ex. : une maman et son garçon de 7 ans font les devoirs en souriant, une ampoule s'allume au-dessus du cahier, salon lumineux avec des plantes" /></label>
+            <div><p className="mb-1 text-xs font-semibold">💡 Idées de scènes en 1 clic</p><div className="flex flex-wrap gap-1">{(SCENE_IDEAS[genreId] ?? DEFAULT_IDEAS).map((t, i) => <button key={i} type="button" onClick={() => setSceneText(t)} className="v3-chip-toggle rounded-full bg-muted px-3 py-1 text-left text-xs text-foreground">Idée {i + 1} : {t.slice(0, 40)}…</button>)}</div></div>
             <p className="text-xs font-semibold text-primary">{getOpenRouterImageKey().startsWith('sk-or-') ? '✅ Votre clé OpenRouter est utilisée pour créer les images.' : 'ℹ️ Ajoutez votre clé OpenRouter (sk-or-) dans vos réglages pour ne jamais être bloqué.'}</p>
             <p className="text-xs text-muted-foreground">Plus votre description est précise (personnages, âge, lieu, objets, ambiance), plus l'image sera réussie. Le résumé de votre livre s'y place tout seul s'il existe.</p>
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
@@ -275,6 +282,7 @@ const STEPS = [
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
             {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
           </div>
+          {img && <button type="button" onClick={() => setImg(null)} className="v3-chip-toggle mb-2 rounded-lg bg-destructive px-3 py-2 text-sm font-bold text-destructive-foreground">🗑️ Effacer l'image</button>}
           <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] touch-none cursor-move rounded shadow-2xl"
             onPointerDown={(e) => { const p = toCover(e); const b = lastBadge.current;
               if (badgeOn && Math.hypot(p.x - b.x, p.y - b.y) <= b.r) drag.current = { kind: 'badge' };
