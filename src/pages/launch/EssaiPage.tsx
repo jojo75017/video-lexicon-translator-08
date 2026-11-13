@@ -4,6 +4,7 @@ import { Loader2, Sparkles, Lock, BookOpen, Mail, CheckCircle2, PenLine, Rocket,
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
+import essaiVideo from '@/assets/videos/essai-gratuit-paysage.mp4.asset.json';
 import ChapterFlipbook from '@/components/essai/ChapterFlipbook';
 import { buildTrialPdf, downloadBlob, slugify } from '@/lib/essai/trialPdf';
 
@@ -551,6 +552,10 @@ export default function EssaiPage() {
             </aside>
           </div>
         )}
+        <section className="mx-auto mt-12 max-w-3xl text-center">
+          <h2 className="font-serif text-2xl font-bold text-[#1F1A14]">Voyez l'essai en 30 secondes</h2>
+          <video src={essaiVideo.url} controls playsInline preload="metadata" className="mt-4 w-full rounded-xl shadow-md" />
+        </section>
         <EssaiTestimonials />
       </main>
     </div>
