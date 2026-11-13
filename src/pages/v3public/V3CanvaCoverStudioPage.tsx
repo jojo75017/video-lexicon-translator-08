@@ -12,8 +12,8 @@ const S = 2;
 const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: string }> = {
   guide: { style: 'clean modern editorial illustration, soft natural colours', mood: 'clear, reassuring, practical' },
   jeunesse: { style: 'bright 3D animated film style (Pixar-like), friendly cartoon characters, warm cheerful colours, NOT photographic', mood: 'joyful, warm, encouraging' },
-  thriller: { style: 'cinematic dark thriller artwork, high contrast, mysterious silhouettes', mood: 'tense, suspenseful', lighting: 'dark' },
-  romance: { style: 'romantic painterly illustration, golden hour glow, elegant', mood: 'tender, emotional' },
+  thriller: { style: 'photorealistic cinematic film still, 35mm film grain, chiaroscuro, rain-soaked night streets or misty forest, lone mysterious silhouette, real photography, NOT illustration, NOT cartoon', mood: 'tense, suspenseful', lighting: 'dark' },
+  romance: { style: 'photorealistic cinematic photograph, golden hour natural light, shallow depth of field, real people, elegant, NOT cartoon', mood: 'tender, emotional' },
   devperso: { style: 'uplifting luminous illustration, sunrise, open landscape, airy composition', mood: 'hopeful, inspiring' },
   sf: { style: 'epic science-fiction / fantasy digital painting, cosmic scale, glowing details', mood: 'epic, wondrous', lighting: 'dark' },
 };
@@ -39,6 +39,13 @@ export default function V3CanvaCoverStudioPage() {
   const [author, setAuthor] = useState('Prénom Nom');
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [badgeOn, setBadgeOn] = useState(true);
+  const [showTitle, setShowTitle] = useState(true);
+  const [showSub, setShowSub] = useState(true);
+  const [showAuthor, setShowAuthor] = useState(true);
+  const [shade, setShade] = useState(0);
+  const [stockQ, setStockQ] = useState('');
+  const [stock, setStock] = useState<{ id: string; thumb: string; full: string; author: string; source: string; download?: string }[]>([]);
+  const [stockMsg, setStockMsg] = useState('');
   const [badgeText, setBadgeText] = useState('Méthode prouvée');
   const [badgeStyle, setBadgeStyle] = useState('or');
   const [badgePos, setBadgePos] = useState<'haut' | 'bas'>('haut');
@@ -111,18 +118,19 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     ctx.fillStyle = genre.bg; ctx.fillRect(0, 0, W, H);
     if (img) { const s = Math.max(W / img.width, H / img.height); ctx.drawImage(img, (W - img.width * s) / 2, (H - img.height * s) / 2, img.width * s, img.height * s); }
     ctx.fillStyle = genre.overlay; ctx.fillRect(0, 0, W, H);
-    const t = genre.titleUpper ? title.toUpperCase() : title;
+    if (shade > 0) { const g = genre.titlePos === 'top' ? ctx.createLinearGradient(0, 0, 0, H * 0.6) : ctx.createLinearGradient(0, H, 0, H * 0.4); g.addColorStop(0, `rgba(0,0,0,${shade / 100})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+    const t = !showTitle ? '' : genre.titleUpper ? title.toUpperCase() : title;
     let size = 210; const maxW = W - 200; let lines: string[] = [];
-    do { ctx.font = genre.titleFont.replace('{s}', String(size)); lines = wrap(ctx, t, maxW); size -= 10; } while ((lines.length > 3 || lines.some((l) => ctx.measureText(l).width > maxW)) && size > 80);
+    do { ctx.font = genre.titleFont.replace('{s}', String(size)); lines = t ? wrap(ctx, t, maxW) : []; size -= 10; } while ((lines.length > 3 || lines.some((l) => ctx.measureText(l).width > maxW)) && size > 80);
     const lh = (size + 10) * 1.1; const blockH = lines.length * lh;
     let y = genre.titlePos === 'top' ? 280 : H - 420 - blockH;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     if (img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3; }
     const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
     ctx.font = '600 72px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.subColor;
-    wrap(ctx, subtitle, maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
+    wrap(ctx, showSub ? subtitle : '', maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
     ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.titleColor;
-    if (genre.titlePos === 'top') { ctx.font = '600 76px Montserrat, Arial, sans-serif'; ctx.fillText(author.toUpperCase().split('').join(String.fromCharCode(8202)), W / 2, 120); } else ctx.fillText(author.toUpperCase(), W / 2, H - 200); ctx.shadowBlur = 0;
+    if (!showAuthor || !author.trim()) { /* auteur masqué */ } else if (genre.titlePos === 'top') { ctx.font = '600 76px Montserrat, Arial, sans-serif'; ctx.fillText(author.toUpperCase().split('').join(String.fromCharCode(8202)), W / 2, 120); } else ctx.fillText(author.toUpperCase(), W / 2, H - 200); ctx.shadowBlur = 0;
     if (badgeOn && badgeText.trim()) {
       const st = BADGE_STYLES.find((b) => b.id === badgeStyle)!; const r = badgeSize;
       const dcx = W - r - 90, dcy = badgePos === 'haut' ? (genre.titlePos === 'top' ? y + r + 80 : r + 120) : H - r - 380;
@@ -151,8 +159,20 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       ls.forEach((l, i) => ctx.fillText(l, cx, cy + i * lh)); ctx.shadowBlur = 0;
     }
     ctx.shadowOffsetY = 0; setThumb(c.toDataURL('image/jpeg', 0.6));
-  }, [genre, title, subtitle, author, img, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
+  }, [genre, title, subtitle, author, img, shade, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
 
+  const searchStock = async () => {
+    setStockMsg('Recherche…'); setStock([]);
+    const { data, error } = await supabase.functions.invoke('stock-photos', { body: { query: stockQ } });
+    if (error || data?.error) { setStockMsg(data?.error || 'Recherche impossible, réessayez.'); return; }
+    setStock(data?.photos ?? []); setStockMsg(data?.photos?.length ? '' : 'Aucune photo trouvée, essayez d’autres mots (en anglais souvent mieux).');
+  };
+  const pickStock = (p: { full: string; source: string; download?: string }) => {
+    const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => setImg(i); i.onerror = () => setStockMsg('Photo illisible, choisissez-en une autre.'); i.src = p.full;
+    if (p.source === 'unsplash' && p.download) void supabase.functions.invoke('stock-photos', { body: { track: p.download } });
+  };
+  const downloadArt = () => { if (!img) return; const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d')!; const sc = Math.max(W / img.width, H / img.height); kc.drawImage(img, (W - img.width * sc) / 2, (H - img.height * sc) / 2, img.width * sc, img.height * sc); const a = document.createElement('a'); a.href = k.toDataURL('image/jpeg', 0.95); a.download = (title || 'illustration').replace(/\W+/g, '-') + '-image-seule.jpg'; a.click(); };
+  const fromStory = () => { const b = books.find((x) => x.id === bookId); if (!b) { setGenError('Choisissez d’abord votre livre en haut à droite (📚 Mon livre).'); return; } const story = b.backCover || b.synopsis; if (!story) { setGenError('Ce livre n’a pas encore de résumé enregistré : ajoutez-le dans la case.'); return; } setBackText(story); setSceneText(b.synopsis || story); setGenError(''); };
   const onFile = (f?: File) => { if (!f) return; const i = new Image(); i.onload = () => setImg(i); i.src = URL.createObjectURL(f); };
   const download = () => { const a = document.createElement('a'); const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d')!; kc.imageSmoothingQuality = 'high'; kc.drawImage(canvasRef.current!, 0, 0, W, H); a.href = k.toDataURL('image/jpeg', 0.97); a.download = (title || 'couverture').replace(/\W+/g, '-') + '-kindle.jpg'; a.click(); };
   const tabs = [['modele', '1. Modèle'], ['visuel', '2. Visuel'], ['texte', '3. Textes'], ['macaron', '4. Macaron']] as const;
@@ -186,7 +206,7 @@ const STEPS = [
             <span className="text-3xl">{st.icon}</span><span className="flex-1 border-l border-border pl-4"><span className="block text-lg font-bold text-foreground">{st.t}</span><span className="text-sm text-muted-foreground">{st.d}</span></span><span className="text-muted-foreground">›</span></button>)}
           <div className="rounded-xl bg-card p-4">
           {tab === 'modele' && <div><p className="mb-3 font-semibold">Modèles de couverture</p><div className="grid grid-cols-3 gap-3">{COVER_GENRES.map((g) => (
-            <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); }} className="v3-chip-toggle text-center">
+            <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); const fic = g.id === 'thriller' || g.id === 'romance'; setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
               <span className={`flex aspect-[5/8] flex-col items-center ${g.titlePos === 'top' ? 'justify-start pt-3' : 'justify-end pb-3'} rounded-lg px-1 shadow-lg ring-2 ${g.id === genreId ? 'ring-primary' : 'ring-transparent'}`} style={{ background: g.bg }}>
                 {(TITLE_COLORS[g.id] ?? [g.titleColor]).slice(0, 2).map((c, i) => <span key={i} className="text-[11px] font-black leading-tight" style={{ color: c, font: g.titleFont.replace('{s}', '12') }}>{i ? 'TITRE' : 'MON'}</span>)}
               </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
@@ -198,9 +218,15 @@ const STEPS = [
             {genError && <p className="text-sm text-destructive">{genError}</p>}
             <p className="text-sm text-muted-foreground">Ou ajoutez l'illustration créée dans le studio d'images ou votre propre image.</p>
             <input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0])} className="text-sm" />
+            <div className="border-t border-border pt-3"><p className="mb-2 text-sm font-semibold">📸 Photos réelles libres de droits</p>
+              <div className="flex gap-2"><input className={input} value={stockQ} onChange={(e) => setStockQ(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && stockQ.trim() && searchStock()} placeholder="Ex. : rue sombre pluie nuit" /><button onClick={searchStock} disabled={!stockQ.trim()} className="rounded-lg bg-primary px-3 font-bold text-primary-foreground disabled:opacity-60">Chercher</button></div>
+              {stockMsg && <p className="mt-2 text-xs text-muted-foreground">{stockMsg}</p>}
+              <div className="mt-2 grid grid-cols-3 gap-2">{stock.map((p) => <button key={p.id} onClick={() => pickStock(p)} className="v3-chip-toggle text-left"><img src={p.thumb} alt={`Photo de ${p.author}`} className="aspect-[2/3] w-full rounded object-cover" /><span className="block truncate text-[10px] text-muted-foreground">{p.author} · {p.source}</span></button>)}</div></div>
+            <label className="block text-xs">Assombrir derrière le titre (lisibilité) : {shade} %<input type="range" min={0} max={85} value={shade} onChange={(e) => setShade(+e.target.value)} className="w-full" /></label>
             {img && <button onClick={() => setImg(null)} className="v3-chip-toggle rounded-lg bg-muted px-3 py-2 text-sm text-foreground">Retirer l'image</button>}</div>}
           {tab === 'texte' && <div className="space-y-3">
 
+            <div className="flex flex-wrap gap-3 text-sm">{([['Titre', showTitle, setShowTitle], ['Sous-titre', showSub, setShowSub], ['Auteur', showAuthor, setShowAuthor]] as const).map(([l, v, f]) => <label key={l} className="flex items-center gap-1"><input type="checkbox" checked={v} onChange={(e) => f(e.target.checked)} /> Afficher {l.toLowerCase()}</label>)}</div>
             <label className="block text-sm">Titre<input className={input} value={title} onChange={(e) => setTitle(e.target.value)} /></label>
             <label className="block text-sm">Sous-titre<input className={input} value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
             <label className="block text-sm">Auteur<input className={input} value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
@@ -241,11 +267,13 @@ const STEPS = [
             onPointerUp={() => { drag.current = null; }} />
           <div className="flex w-full max-w-3xl flex-col gap-2">
           <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-base font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
+          {img && <button onClick={downloadArt} className="flex w-full items-center gap-3 rounded-xl bg-card px-4 py-3 text-base font-bold text-foreground">🖼️ Télécharger l'image seule (sans texte ni macaron) <span className="ml-auto">›</span></button>}
           <button onClick={openWrap} className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-4 py-3 text-base font-bold text-foreground">📘 Télécharger le broché KDP <span className="ml-auto">{showWrap ? '▾' : '›'}</span></button>
           {showWrap && <div className="space-y-3 rounded-xl bg-card p-4 text-sm">
             <label className="block">Format du livre<select className={input} value={trim} onChange={(e) => setTrim(e.target.value as Trim)}>{Object.keys(TRIMS).map((t) => <option key={t} value={t}>{t.replace('x', ' × ')} pouces</option>)}</select></label>
             <label className="block">Nombre de pages intérieures<input type="number" min={24} max={828} className={input} value={pages} onChange={(e) => setPages(Math.max(24, +e.target.value || 24))} /></label>
             <label className="block">Papier<select className={input} value={paper} onChange={(e) => setPaper(e.target.value as Paper)}><option value="blanc">Blanc (noir et blanc)</option><option value="creme">Crème (noir et blanc)</option><option value="couleur">Blanc (couleur)</option></select></label>
+            <button onClick={fromStory} className="w-full rounded-lg bg-accent px-3 py-2 font-bold text-accent-foreground">✨ Reprendre le résumé de mon livre</button>
             <label className="block">Texte de quatrième de couverture<textarea rows={5} className={input} value={backText} onChange={(e) => setBackText(e.target.value)} placeholder="Présentez votre livre en quelques phrases…" /></label>
             <label className="flex items-start gap-2"><input type="checkbox" checked={marks} onChange={(e) => setMarks(e.target.checked)} className="mt-1" /><span>Ajouter les repères d'impression (coupe et pli). <b>À décocher pour Amazon KDP</b>, qui refuse les repères ; utile pour un imprimeur ou pour vérifier.</span></label>
             <p className="text-xs text-muted-foreground">Dos : {(geo.spine * 2.54).toFixed(2)} cm · Couverture complète : {(geo.width * 2.54).toFixed(1)} × {(geo.height * 2.54).toFixed(1)} cm, fond perdu inclus, 300 DPI. {geo.spineText ? 'Titre et auteur écrits sur le dos.' : 'Moins de 79 pages : KDP n\'autorise pas de texte sur le dos.'} Un cadre blanc est réservé en bas de la quatrième pour le code-barres Amazon.</p>
