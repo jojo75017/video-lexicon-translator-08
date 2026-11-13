@@ -247,6 +247,7 @@ const V3VersionAudioPage = lazy(() => import('./pages/v3public/V3VersionAudioPag
 const V3EditorPage = lazy(() => import('./pages/v3public/V3EditorPage'));
 const V3OffrePage = lazy(() => import('./pages/v3public/V3OffrePage'));
 const V3CoverOfferPage = lazy(() => import('./pages/v3public/V3CoverOfferPage'));
+const V3CanvaCoverStudioPage = lazy(() => import('./pages/v3public/V3CanvaCoverStudioPage'));
 const V3StudioV4Page = lazy(() => import('./pages/v3public/V3StudioV4Page'));
 const PrestationKdpPage = lazy(() => import('./pages/PrestationKdpPage'));
 const V3CommanderPage = lazy(() => import('./pages/v3public/V3CommanderPage'));
@@ -767,6 +768,7 @@ const App = () => {
             <Route path="/v3/cover-studio-pro" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/cover-studio-pro/edit" element={<div className="v3-dark-page"><Navigate to="/v3/mes-couvertures" replace /></div>} />
             <Route path="/v3/couverture-express" element={<div className="v3-dark-page">{gated(<TrialGate label="Ma couverture en 3 étapes"><CouvertureExpressPage /></TrialGate>)}</div>} />
+            <Route path="/v3/studio-couvertures" element={<div className="v3-dark-page">{gated(<PlanGuard><V3CanvaCoverStudioPage /></PlanGuard>)}</div>} />
             <Route path="/v3/studio-v4" element={<div className="v3-dark-page">{gated(<PlanGuard><TrialGate label="Studio V4"><PageHeroImage src={studioCouvHero} alt="Studio de couverture" /><V3StudioV4Page /></TrialGate></PlanGuard>)}</div>} />
             <Route path="/v3/mes-couvertures" element={<div className="v3-dark-page">{gated(<TrialGate label="Mes couvertures"><MesCouverturesPage /></TrialGate>)}</div>} />
             <Route path="/v3/mes-couvertures/:id" element={<div className="v3-dark-page">{gated(<TrialGate label="Mes couvertures"><CouvertureProjetPage /></TrialGate>)}</div>} />
