@@ -677,7 +677,7 @@ COHÉRENCE STRICTE ABSOLUE:
         ? ['gemini', 'openrouter']
         : engine === 'openrouter'
           ? ['openrouter', 'gemini']
-          : ['gemini', 'openrouter'];
+          : ['openrouter', 'gemini']; // auto : OpenRouter d'abord (pas de quota gratuit bloquant), Gemini ensuite
       for (const p of order) {
         if (p === skip) continue;
         const key = resolvedKeys[p];
@@ -730,7 +730,18 @@ COHÉRENCE STRICTE ABSOLUE:
     } else if (wantsUserKeyFirst) {
       // L'abonné a une clé Gemini et/ou OpenRouter : on l'utilise directement
       const prompt = customPrompt || buildFallbackPrompt();
-      const img = await tryUserKeys(prompt);
+      let img = await tryUserKeys(prompt);
+      if (!img && resolvedKeys.openai && engine !== 'gemini' && engine !== 'openrouter') {
+        try {
+          img = await generateWithOpenAI(chapterTitle, chapterContent, ebookTitle, style, characters, resolvedKeys.openai, ratio, quality, colorScheme, visualCoherence, coherenceIntensity, referenceImageUrl, isColoringBook, coloringBookAgeGroup, customPrompt);
+          if (img) usedProvider = 'openai';
+        } catch (err) {
+          console.error('Secours OpenAI échoué:', err);
+        }
+      }
+      if (!img && resolvedKeys.gemini && !resolvedKeys.openrouter) {
+        providerError = "Votre clé Gemini n'a plus de quota d'images. Ajoutez une clé OpenRouter (sk-or-) dans vos réglages de clés.";
+      }
       if (img) {
         generatedImageUrl = img;
       } else {
