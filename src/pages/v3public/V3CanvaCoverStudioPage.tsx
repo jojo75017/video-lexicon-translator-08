@@ -31,7 +31,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, max: number) {
 }
 
 export default function V3CanvaCoverStudioPage() {
-  const { status: pro, loading: proLoading } = useCoverProAccess();
+  const pro = useCoverProAccess(); const proLoading = pro.loading;
   const [tab, setTab] = useState<'modele' | 'visuel' | 'texte' | 'macaron'>('modele');
   const [genreId, setGenreId] = useState('guide');
   const [title, setTitle] = useState('Mon titre de livre');
