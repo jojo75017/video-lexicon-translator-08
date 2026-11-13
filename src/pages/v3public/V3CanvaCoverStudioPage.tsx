@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 
 import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
 import { buildPaperbackPdf, renderWrapCanvas, wrapGeometry, TRIMS, type Trim, type Paper } from '@/lib/cover-editor/paperbackWrapPdf';
 import { supabase } from '@/integrations/supabase/client';
+import { Link } from 'react-router-dom';
+import useCoverProAccess from '@/hooks/useCoverProAccess';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
 
 const W = 1600, H = 2560;
@@ -29,6 +31,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, max: number) {
 }
 
 export default function V3CanvaCoverStudioPage() {
+  const { status: pro, loading: proLoading } = useCoverProAccess();
   const [tab, setTab] = useState<'modele' | 'visuel' | 'texte' | 'macaron'>('modele');
   const [genreId, setGenreId] = useState('guide');
   const [title, setTitle] = useState('Mon titre de livre');
@@ -163,6 +166,12 @@ const STEPS = [
   ] as const;
   return (
     <div className="min-h-screen text-foreground">
+      {!proLoading && !pro.hasAccess && (
+        <div className="flex flex-wrap items-center justify-center gap-3 border-b border-border bg-accent/15 px-6 py-2 text-sm">
+          <span>👑 Envie d’aller plus loin ? Le Studio Pro est inclus dans Édition VIP (59 €/mois) ou disponible à 67 € à vie.</span>
+          <Link to="/v3/cover-pro" className="rounded-full bg-accent px-3 py-1 font-bold text-accent-foreground">Voir l’offre Studio Pro</Link>
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-4 border-b border-border px-6 py-4">
         <span className="text-3xl">📖</span><h1 className="text-2xl font-bold">Studio de couverture</h1>
         <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">👑 Inclus Édition VIP</span>

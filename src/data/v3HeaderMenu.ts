@@ -64,6 +64,7 @@ export const V3_HEADER_MENU: MenuCategory[] = [
     color: '#c9a84c',
     tagline: 'Le livre-objet',
     links: [
+      { label: 'Studio Couvertures KDP', to: '/v3/studio-couvertures', badge: 'Nouveau', desc: 'Créez votre couverture Kindle et brochée en quelques clics, avec modèles prêts à l’emploi' },
       { label: 'Studio de couverture', to: '/v3/studio-v4', badge: 'V4', desc: 'Le studio professionnel visible dans votre maison d’édition : titres, styles, images et variantes' },
       { label: 'BD Studio', to: '/bd-studio', desc: 'Bandes dessinées et albums illustrés' },
       { label: 'Illustrations intérieures', to: '/v3/create/illustre', desc: 'Images cohérentes pour chapitres et sections' },
