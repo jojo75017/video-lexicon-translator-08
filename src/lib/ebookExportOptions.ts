@@ -94,6 +94,7 @@ export const saveTypography = (t: EbookExportTypography) => {
 const OPENROUTER_LS = 'openrouter_image_api_key';
 export const getOpenRouterImageKey = (): string => {
   if (typeof window === 'undefined') return '';
+  for (const k of [OPENROUTER_LS, 'cover_openrouter_key']) { const v = (localStorage.getItem(k) || '').trim(); if (v.startsWith('sk-or-')) return v; }
   return (localStorage.getItem(OPENROUTER_LS) || '').trim();
 };
 export const setOpenRouterImageKey = (k: string) => {

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 
 import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
 import { buildPaperbackPdf, renderWrapCanvas, wrapGeometry, TRIMS, type Trim, type Paper } from '@/lib/cover-editor/paperbackWrapPdf';
 import { supabase } from '@/integrations/supabase/client';
+import { getOpenRouterImageKey } from '@/lib/ebookExportOptions';
 import { Link } from 'react-router-dom';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
@@ -106,7 +107,7 @@ Scene to depict faithfully and literally (this is the ONLY subject, do not inven
 Art style: ${gs.style}. Mood: ${gs.mood}. ${gs.lighting === 'dark' ? 'Dramatic but readable lighting.' : 'Bright, luminous, well-exposed lighting, never dark or muddy.'}
 ${studioCompositionPrompt(coverFormat, genre.titlePos === 'top')} Expressive characters, rich detail, art-directed publishing-house quality.
 ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-bleed, no border, no 3D book mockup.`;
-      const { data, error } = await supabase.functions.invoke('generate-ai-cover', { body: { title, subtitle, author, genre: genre.label, format: coverFormat, customPrompt: prompt } });
+      const { data, error } = await supabase.functions.invoke('generate-ai-cover', { body: { title, subtitle, author, genre: genre.label, format: coverFormat, customPrompt: prompt, openrouterKey: getOpenRouterImageKey() || undefined } });
       if (error) throw new Error((await (error as { context?: Response }).context?.json?.().catch(() => null))?.error || error.message);
       if (data?.error) throw new Error(data.error);
       if (!data?.imageUrl) throw new Error('Aucune image reçue, réessayez.');
@@ -222,6 +223,7 @@ const STEPS = [
               </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
             </button>))}</div></div>}
           {tab === 'visuel' && <div className="space-y-3"><label className="block text-sm font-semibold">Que doit montrer l'image ? <span className="text-primary">(obligatoire)</span><textarea className={`${input} ${sceneText.trim().length < 20 ? 'border-primary' : ''}`} rows={4} value={sceneText} onChange={(e) => setSceneText(e.target.value)} placeholder="Ex. : une maman et son garçon de 7 ans font les devoirs en souriant, une ampoule s'allume au-dessus du cahier, salon lumineux avec des plantes" /></label>
+            <p className="text-xs font-semibold text-primary">{getOpenRouterImageKey().startsWith('sk-or-') ? '✅ Votre clé OpenRouter est utilisée pour créer les images.' : 'ℹ️ Ajoutez votre clé OpenRouter (sk-or-) dans vos réglages pour ne jamais être bloqué.'}</p>
             <p className="text-xs text-muted-foreground">Plus votre description est précise (personnages, âge, lieu, objets, ambiance), plus l'image sera réussie. Le résumé de votre livre s'y place tout seul s'il existe.</p>
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
             <p className="text-xs text-muted-foreground">L'image est créée à partir du résumé de votre livre, dans le style du modèle « {genre.label} ».</p>

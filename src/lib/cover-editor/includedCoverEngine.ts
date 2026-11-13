@@ -1,3 +1,4 @@
+import { getOpenRouterImageKey } from '@/lib/ebookExportOptions';
 /**
  * Moteur d'illustration INCLUS dans toutes les formules (qualité V2).
  *
@@ -86,6 +87,7 @@ ABSOLUTELY NO TEXT: no letters, no title, no words, no logo, no watermark, no ba
       genre: input.genre ?? '',
       format: input.wrap ? 'paperback' : 'kindle',
       customPrompt: prompt,
+      openrouterKey: getOpenRouterImageKey() || undefined,
     },
   });
   if (error) throw error;
