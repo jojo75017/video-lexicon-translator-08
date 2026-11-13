@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as RPointerEvent } from 'react';
 import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
 import { buildPaperbackPdf, wrapGeometry, TRIMS, type Trim, type Paper } from '@/lib/cover-editor/paperbackWrapPdf';
 import { supabase } from '@/integrations/supabase/client';
@@ -39,6 +39,10 @@ export default function V3CanvaCoverStudioPage() {
   const [badgeText, setBadgeText] = useState('Méthode prouvée');
   const [badgeStyle, setBadgeStyle] = useState('or');
   const [badgePos, setBadgePos] = useState<'haut' | 'bas'>('haut');
+  const [badgeXY, setBadgeXY] = useState<{ x: number; y: number } | null>(null);
+  const [badgeSize, setBadgeSize] = useState(230);
+  const lastBadge = useRef({ x: 0, y: 0, r: 230 });
+  const drag = useRef<null | { kind: 'badge' } | { kind: 'extra'; id: number }>(null);
   const [extras, setExtras] = useState<Extra[]>([]);
   const [books, setBooks] = useState<MyBookOption[]>([]);
   const [bookId, setBookId] = useState('');
@@ -77,6 +81,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     } catch (e) { setGenError(e instanceof Error ? e.message : "La création de l'image a échoué."); }
     finally { setGenLoading(false); }
   };
+  const toCover = (e: RPointerEvent<HTMLCanvasElement>) => { const r = e.currentTarget.getBoundingClientRect(); return { x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H }; };
   const addExtra = () => setExtras((e) => [...e, { id: Date.now(), text: 'Nouveau texte', x: 30, y: 55, size: 64, color: '#FFFFFF', box: 'aucun' }]);
   const upd = (id: number, p: Partial<Extra>) => setExtras((e) => e.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -101,8 +106,9 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.titleColor;
     if (genre.titlePos === 'top') { ctx.font = '600 76px Montserrat, Arial, sans-serif'; ctx.fillText(author.toUpperCase().split('').join(String.fromCharCode(8202)), W / 2, 120); } else ctx.fillText(author.toUpperCase(), W / 2, H - 200); ctx.shadowBlur = 0;
     if (badgeOn && badgeText.trim()) {
-      const st = BADGE_STYLES.find((b) => b.id === badgeStyle)!; const r = 230;
-      const cx = W - r - 90, cy = badgePos === 'haut' ? (genre.titlePos === 'top' ? y + r + 80 : r + 120) : H - r - 380;
+      const st = BADGE_STYLES.find((b) => b.id === badgeStyle)!; const r = badgeSize;
+      const dcx = W - r - 90, dcy = badgePos === 'haut' ? (genre.titlePos === 'top' ? y + r + 80 : r + 120) : H - r - 380;
+      const cx = badgeXY?.x ?? dcx, cy = badgeXY?.y ?? dcy; lastBadge.current = { x: cx, y: cy, r };
       ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = st.fill; ctx.fill();
       ctx.lineWidth = 12; ctx.strokeStyle = 'rgba(255,255,255,0.8)'; ctx.stroke();
       ctx.fillStyle = st.text; ctx.font = '800 64px Montserrat, Arial, sans-serif'; ctx.textBaseline = 'middle';
@@ -121,7 +127,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       ls.forEach((l, i) => ctx.fillText(l, cx, cy + i * lh)); ctx.shadowBlur = 0;
     }
     ctx.shadowOffsetY = 0; setThumb(c.toDataURL('image/jpeg', 0.6));
-  }, [genre, title, subtitle, author, img, badgeOn, badgeText, badgeStyle, badgePos, extras]);
+  }, [genre, title, subtitle, author, img, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
 
   const onFile = (f?: File) => { if (!f) return; const i = new Image(); i.onload = () => setImg(i); i.src = URL.createObjectURL(f); };
   const download = () => { const a = document.createElement('a'); const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d')!; kc.imageSmoothingQuality = 'high'; kc.drawImage(canvasRef.current!, 0, 0, W, H); a.href = k.toDataURL('image/jpeg', 0.97); a.download = (title || 'couverture').replace(/\W+/g, '-') + '-kindle.jpg'; a.click(); };
@@ -179,11 +185,14 @@ const STEPS = [
                 <button onClick={() => setExtras((e) => e.filter((x) => x.id !== ex.id))} className="v3-chip-toggle text-xs text-destructive">Supprimer ce texte</button></div>)}
               <button onClick={addExtra} className="v3-chip-toggle w-full rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-foreground">+ Ajouter un texte</button></div></div>}
           {tab === 'macaron' && <div className="space-y-3">
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={badgeOn} onChange={(e) => setBadgeOn(e.target.checked)} /> Afficher le macaron</label>
+            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={badgeOn} onChange={(e) => setBadgeOn(e.target.checked)} /> Afficher le macaron (décochez pour l'enlever)</label>
             <div className="flex flex-wrap gap-2">{genre.badges.map((b) => <button key={b} onClick={() => setBadgeText(b)} className="v3-chip-toggle rounded-full bg-muted px-3 py-1 text-xs text-foreground">{b}</button>)}</div>
             <input className={input} value={badgeText} onChange={(e) => setBadgeText(e.target.value)} maxLength={40} />
             <div className="grid grid-cols-2 gap-2">{BADGE_STYLES.map((s) => <button key={s.id} onClick={() => setBadgeStyle(s.id)} className={`v3-chip-toggle rounded-lg border p-2 text-xs ${badgeStyle === s.id ? 'border-primary' : 'border-border'}`} style={{ background: s.fill, color: s.text }}>{s.label}</button>)}</div>
-            <div className="flex gap-2">{(['haut', 'bas'] as const).map((p) => <button key={p} onClick={() => setBadgePos(p)} className={`v3-chip-toggle flex-1 rounded-lg px-3 py-2 text-sm ${badgePos === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>En {p}</button>)}</div></div>}
+            <div className="grid grid-cols-3 gap-2">{([['Gauche', 290], ['Centre', 800], ['Droite', 1310]] as const).map(([l, x]) => <button key={l} onClick={() => setBadgeXY({ x, y: lastBadge.current.y })} className="v3-chip-toggle rounded-lg bg-muted px-2 py-2 text-sm text-foreground">{l}</button>)}</div>
+            <label className="block text-xs">Taille du macaron<input type="range" min={120} max={340} value={badgeSize} onChange={(e) => setBadgeSize(+e.target.value)} className="w-full" /></label>
+            <p className="text-xs text-muted-foreground">Astuce : faites glisser le macaron (ou vos textes) directement sur la couverture avec la souris ou le doigt.</p>
+            <div className="flex gap-2">{(['haut', 'bas'] as const).map((p) => <button key={p} onClick={() => { setBadgePos(p); setBadgeXY(null); }} className={`v3-chip-toggle flex-1 rounded-lg px-3 py-2 text-sm ${badgePos === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>En {p}</button>)}</div></div>}
           </div>
           <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
           <button onClick={() => setShowWrap((v) => !v)} className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold text-foreground">📘 Télécharger le broché KDP <span className="ml-auto">{showWrap ? '▾' : '›'}</span></button>
@@ -202,7 +211,15 @@ const STEPS = [
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
             {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
           </div>
-          <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] rounded shadow-2xl" />
+          <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] touch-none cursor-move rounded shadow-2xl"
+            onPointerDown={(e) => { const p = toCover(e); const b = lastBadge.current;
+              if (badgeOn && Math.hypot(p.x - b.x, p.y - b.y) <= b.r) drag.current = { kind: 'badge' };
+              else { const hit = [...extras].reverse().find((x) => Math.abs(p.x - (x.x / 100) * W) < 400 && p.y - (x.y / 100) * H > -60 && p.y - (x.y / 100) * H < x.size * 3); if (hit) drag.current = { kind: 'extra', id: hit.id }; }
+              if (drag.current) (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId); }}
+            onPointerMove={(e) => { const d = drag.current; if (!d) return; const p = toCover(e);
+              if (d.kind === 'badge') setBadgeXY({ x: Math.min(W, Math.max(0, p.x)), y: Math.min(H, Math.max(0, p.y)) });
+              else upd(d.id, { x: Math.min(95, Math.max(5, (p.x / W) * 100)), y: Math.min(95, Math.max(2, (p.y / H) * 100)) }); }}
+            onPointerUp={() => { drag.current = null; }} />
           <div className="flex w-full max-w-3xl flex-wrap items-center gap-6 rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center gap-4">
               {thumb && <img src={thumb} alt="Miniature Amazon" className="w-[64px] rounded shadow" />}
