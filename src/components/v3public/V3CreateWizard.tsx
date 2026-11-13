@@ -2017,7 +2017,7 @@ ${outlineRulesFor(bookType)}`;
                     }
                   }}
                   className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold disabled:opacity-50"
-                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                  style={{ borderColor: '#008296', color: '#F8FAFC', background: '#0F172A' }}
                 >
                   <FileDown className="h-4 w-4" /> Télécharger l’image
                 </button>
@@ -2030,21 +2030,21 @@ ${outlineRulesFor(bookType)}`;
                     toast.success('URL de la couverture copiée.');
                   }}
                   className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold disabled:opacity-50"
-                  style={{ borderColor: 'var(--v3-border)', color: 'var(--v3-ink)', background: 'var(--v3-paper)' }}
+                  style={{ borderColor: '#008296', color: '#F8FAFC', background: '#0F172A' }}
                 >
                   <Copy className="h-4 w-4" /> Copier l’URL
                 </button>
                 <Link
                   to={`/v3/couverture-express?title=${encodeURIComponent(finalTitle)}&subtitle=${encodeURIComponent(subtitle || '')}&author=${encodeURIComponent(authorName)}${coverUrl ? `&image=${encodeURIComponent(coverUrl)}` : ''}`}
                   className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-bold"
-                  style={{ background: 'var(--v3-ink)', color: '#fff' }}
+                  style={{ background: '#FF9E2D', color: '#0F172A' }}
                 >
                   <Palette className="h-4 w-4" /> Créer ma couverture
                 </Link>
                 <Link
                   to="/couverture-kdp"
                   className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold"
-                  style={{ borderColor: 'var(--v3-orange-600)', color: 'var(--v3-orange-600)', background: 'var(--v3-paper)' }}
+                  style={{ borderColor: '#FF9E2D', color: '#FF9E2D', background: '#0F172A' }}
                 >
                   <ExternalLink className="h-4 w-4" /> Couverture PDF exacte KDP
                 </Link>
