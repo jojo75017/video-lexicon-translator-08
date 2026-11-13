@@ -27,10 +27,10 @@ const STATUS_LABEL: Record<ChapterStatus, string> = {
 };
 
 const STATUS_COLOR: Record<ChapterStatus, string> = {
-  raw: '#92400e',
-  correcting: '#b45309',
-  corrected: '#0f766e',
-  failed: '#b91c1c',
+  raw: '#FBBF24',
+  correcting: '#FDBA74',
+  corrected: '#34D399',
+  failed: '#F87171',
 };
 
 function StatusBadge({ status }: { status: ChapterStatus }) {
@@ -147,7 +147,7 @@ export default function V3WrittenBookTab({
                 <strong style={{ color: 'var(--v3-ink)' }}>{c.index + 1}. {c.title}</strong>
                 <span className="mt-0.5 flex flex-wrap items-center gap-2 text-[10.5px]" style={{ color: 'var(--v3-muted)' }}>
                   <StatusBadge status={c.editedContent ? 'corrected' : c.status} />
-                  {c.editedContent ? <span style={{ color: '#0f766e' }}>votre version</span> : null}
+                  {c.editedContent ? <span style={{ color: '#34D399' }}>votre version</span> : null}
                   <span>{c.words.toLocaleString('fr-FR')} mots</span>
                   {typeof c.corrections === 'number' && c.corrections > 0 ? <span>{c.corrections} corrections</span> : null}
                   <span>· {open ? 'replier' : 'lire le texte entier'}</span>
