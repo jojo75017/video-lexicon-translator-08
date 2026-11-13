@@ -76,7 +76,7 @@ Deno.serve(async (req) => {
       const cPrompt = `Tu es auteur français d'albums illustrés pour enfants de ${pc.data.targetAge || '3-6 ans'}. Album « ${pc.data.title} ». Histoire: ${pc.data.pitch || 'non précisée'}.
 Personnages déjà présents: ${(pc.data.existing || []).join(', ') || 'aucun'}.
 ${pc.data.hint ? `Indication de l'auteur pour ce personnage: ${pc.data.hint}.` : ''}
-Crée UN personnage secondaire nouveau, utile à l'histoire (parent, ami, animal compagnon...), avec un nom différent des autres. Français naturel uniquement, aucun tiret cadratin.
+Si l'histoire mentionne un personnage pas encore présent dans la liste, crée sa fiche en respectant exactement son nom, son espèce et son rôle dans l'histoire. Sinon crée UN personnage secondaire nouveau, cohérent avec l'histoire (parent, ami, animal compagnon...), avec un nom différent des autres. Français naturel uniquement, aucun tiret cadratin.
 Retourne uniquement un JSON valide sans markdown: {"name":"...","age":"...","physical":"apparence précise avec couleurs","outfit":"tenue précise avec couleurs","distinctiveFeatures":"...","personality":"trois traits"}`;
       const r = await fetch('https://ai.gateway.lovable.dev/v1/responses', {
         method: 'POST',
@@ -92,13 +92,15 @@ Retourne uniquement un JSON valide sans markdown: {"name":"...","age":"...","phy
       return json({ character: ch.data });
     }
     if (rawBody?.mode === 'prefill') {
-      const pre = z.object({ title: z.string().trim().min(2).max(160), targetAge: z.string().trim().max(30).optional() }).safeParse(rawBody);
+      const pre = z.object({ title: z.string().trim().min(2).max(160), targetAge: z.string().trim().max(30).optional(), pitch: z.string().max(4000).optional() }).safeParse(rawBody);
       if (!pre.success) return json({ error: 'Indiquez d’abord un titre.' }, 400);
       const age = pre.data.targetAge || '3-6 ans';
       const prePrompt = `Tu es auteur français d'albums illustrés pour enfants de ${age}. À partir du seul titre « ${pre.data.title} », propose la fiche complète de l'album.
 Règles: français naturel uniquement, aucun mot inventé, aucun tiret cadratin. Histoire douce, rassurante, avec début, problème, péripéties et fin heureuse. Personnage principal cohérent avec le titre (s'il est nommé dans le titre, garder ce nom).
+${pre.data.pitch ? `Synopsis déjà écrit par l'auteur, à respecter strictement (ne pas le réécrire): ${pre.data.pitch}` : ''}
+Liste dans "characters" de 1 à 3 personnages, UNIQUEMENT ceux qui apparaissent réellement dans ton synopsis "pitch" (mêmes noms exacts, même espèce, même rôle), le héros en premier. N'invente aucun personnage absent du synopsis. Chaque fiche doit être cohérente avec le synopsis.
 Retourne uniquement un JSON valide, sans markdown, au format exact:
-{"pitch":"4 à 6 phrases","moral":"une phrase courte","backCoverText":"3 phrases pour la quatrième de couverture","character":{"name":"...","age":"...","physical":"apparence précise: visage, cheveux ou pelage, yeux, taille, couleurs","outfit":"tenue précise avec couleurs","distinctiveFeatures":"un signe distinctif","personality":"trois traits"}}`;
+{"pitch":"4 à 6 phrases","moral":"une phrase courte","backCoverText":"3 phrases pour la quatrième de couverture","characters":[{"name":"...","age":"...","physical":"apparence précise: visage, cheveux ou pelage, yeux, taille, couleurs","outfit":"tenue précise avec couleurs","distinctiveFeatures":"un signe distinctif","personality":"trois traits"}]}`;
       const r = await fetch('https://ai.gateway.lovable.dev/v1/responses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Lovable-API-Key': apiKey, 'X-Lovable-AIG-SDK': 'fetch' },
@@ -110,7 +112,7 @@ Retourne uniquement un JSON valide, sans markdown, au format exact:
       if (!m) return json({ error: 'Réponse illisible. Relancez.' }, 502);
       const fill = z.object({
         pitch: z.string().min(1).max(4000), moral: z.string().max(300), backCoverText: z.string().max(1500).optional(),
-        character: z.object({ name: z.string().min(1).max(80), age: z.string().max(30), physical: z.string().max(1000), outfit: z.string().max(600), distinctiveFeatures: z.string().max(300), personality: z.string().max(300) }),
+        characters: z.array(z.object({ name: z.string().min(1).max(80), age: z.string().max(30), physical: z.string().max(1000), outfit: z.string().max(600), distinctiveFeatures: z.string().max(300), personality: z.string().max(300) })).min(1).max(3),
       }).safeParse(JSON.parse(m[0]));
       if (!fill.success) return json({ error: 'Réponse incomplète. Relancez.' }, 502);
       return json(fill.data);
