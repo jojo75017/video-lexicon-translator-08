@@ -1014,3 +1014,9 @@ details.v3-genie-more > summary { color: #E6F4F1 !important; }
 .v3-lancer-dark [class*="text-slate-6"], .v3-lancer-dark [class*="text-gray-6"], .v3-lancer-dark [class*="text-slate-5"],
 .v3-lancer-dark [class*="text-gray-5"], .v3-lancer-dark .text-muted-foreground { color: #CBD5E1 !important; }
 .v3-lancer-dark article h4, .v3-lancer-dark h3.v3-serif { color: #FF9E2D !important; }
+.v3-lancer-dark, .v3-lancer-dark .v3-ambiance { --v3-orange-50: rgba(255,158,45,0.12); --v3-gold-soft: rgba(255,158,45,0.12); }
+.v3-lancer-dark .v3-chip { background: rgba(255,158,45,0.15) !important; color: #FF9E2D !important; border-color: rgba(255,158,45,0.5) !important; }
+.v3-lancer-dark [style*="background: var(--v3-orange-50)"], .v3-lancer-dark [style*="rgba(201, 168, 76"], .v3-lancer-dark [style*="rgba(251, 191, 36"] { background: rgba(255,158,45,0.10) !important; }
+.v3-lancer-dark [style*="rgba(201, 168, 76"] *, .v3-lancer-dark [style*="background: var(--v3-orange-50)"] p { color: #F8FAFC; }
+.v3-lancer-dark select option { background: #0F172A; color: #F8FAFC; }
+.v3-lancer-dark select option:checked { background: #008296; color: #fff; }
