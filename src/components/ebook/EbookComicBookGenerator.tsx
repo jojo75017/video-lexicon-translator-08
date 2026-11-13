@@ -1531,11 +1531,11 @@ Bubble points to ${panel.character}.` : ''}
                       variant={colorMode === mode.value ? "default" : "outline"}
                       size="sm"
                       onClick={() => setColorMode(mode.value)}
-                      className={colorMode === mode.value 
-                        ? "bg-gradient-to-r from-amber-500 to-orange-500 text-white" 
-                        : "hover:bg-amber-50"}
+                      className={`v3-chip-toggle ${colorMode === mode.value
+                        ? "bg-primary text-primary-foreground ring-2 ring-accent font-bold"
+                        : "bg-muted text-foreground opacity-80"}`}
                     >
-                      {mode.label.split(' ')[0]}
+                      {colorMode === mode.value ? '✓ ' : ''}{mode.label}
                     </Button>
                   ))}
                 </div>
@@ -1554,11 +1554,11 @@ Bubble points to ${panel.character}.` : ''}
                       variant={panelLayout === layout.value ? "default" : "outline"}
                       size="sm"
                       onClick={() => setPanelLayout(layout.value)}
-                      className={panelLayout === layout.value 
-                        ? "bg-gradient-to-r from-blue-500 to-indigo-500 text-white" 
-                        : "hover:bg-blue-50"}
+                      className={`v3-chip-toggle ${panelLayout === layout.value
+                        ? "bg-primary text-primary-foreground ring-2 ring-accent font-bold"
+                        : "bg-muted text-foreground opacity-80"}`}
                     >
-                      {layout.label}
+                      {panelLayout === layout.value ? '✓ ' : ''}{layout.label}
                     </Button>
                   ))}
                 </div>
