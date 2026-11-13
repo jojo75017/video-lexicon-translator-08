@@ -173,7 +173,7 @@ const STEPS = [
         </div>
       )}
       <div className="flex flex-wrap items-center gap-4 border-b border-border px-6 py-4">
-        <span className="text-3xl">📖</span><h1 className="text-2xl font-bold">Studio de couverture</h1>
+        <Link to="/v3" className="rounded-lg bg-primary px-3 py-2 text-sm font-bold text-primary-foreground">← Retour à l’accueil</Link><Link to="/v3/mes-couvertures" className="text-sm font-semibold text-muted-foreground underline">Mes couvertures</Link><span className="text-3xl">📖</span><h1 className="text-2xl font-bold">Studio de couverture</h1>
         <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">👑 Inclus Édition VIP</span>
         <label className="ml-auto flex items-center gap-2 text-sm font-semibold">📚 Mon livre
           <select className="rounded-lg border border-border bg-background px-3 py-2 text-foreground" value={bookId} onChange={(e) => pickBook(e.target.value)}>
