@@ -62,9 +62,10 @@ export default function V3CanvaCoverStudioPage() {
     setGenLoading(true); setGenError('');
     try {
       const gs = GENRE_STYLE[genreId] ?? GENRE_STYLE.guide;
-      const scene = sceneText.trim() || `${title}. ${subtitle}`;
+      const scene = sceneText.trim();
+      if (scene.length < 20) { setTab('visuel'); setGenError("Décrivez d'abord ce que doit montrer l'image (étape 3. Illustration), par exemple : deux voitures de course au coude-à-coude sur un circuit la nuit."); return; }
       const prompt = `Professional bestseller book cover ILLUSTRATION ONLY (artwork, no typography) for the book "${title}"${subtitle ? ` (${subtitle})` : ''}.
-Scene to depict faithfully: ${scene}.
+Scene to depict faithfully and literally (this is the ONLY subject, do not invent another theme from the title): ${scene}.
 Art style: ${gs.style}. Mood: ${gs.mood}. ${gs.lighting === 'dark' ? 'Dramatic but readable lighting.' : 'Bright, luminous, well-exposed lighting, never dark or muddy.'}
 Vertical portrait composition 1600x2560, ${genre.titlePos === 'top' ? 'keep the TOP third calm and uncluttered for the title, main subject in the lower two thirds' : 'keep the BOTTOM third calm for the title, main subject in the upper two thirds'}. Expressive characters, rich detail, art-directed publishing-house quality.
 ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-bleed, no border, no 3D book mockup.`;
@@ -154,7 +155,7 @@ const STEPS = [
                 {(TITLE_COLORS[g.id] ?? [g.titleColor]).slice(0, 2).map((c, i) => <span key={i} className="text-[11px] font-black leading-tight" style={{ color: c, font: g.titleFont.replace('{s}', '12') }}>{i ? 'TITRE' : 'MON'}</span>)}
               </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
             </button>))}</div></div>}
-          {tab === 'visuel' && <div className="space-y-3"><label className="block text-sm font-semibold">Que doit montrer l'image ?<textarea className={input} rows={4} value={sceneText} onChange={(e) => setSceneText(e.target.value)} placeholder="Ex. : une maman et son garçon de 7 ans font les devoirs en souriant, une ampoule s'allume au-dessus du cahier, salon lumineux avec des plantes" /></label>
+          {tab === 'visuel' && <div className="space-y-3"><label className="block text-sm font-semibold">Que doit montrer l'image ? <span className="text-primary">(obligatoire)</span><textarea className={`${input} ${sceneText.trim().length < 20 ? 'border-primary' : ''}`} rows={4} value={sceneText} onChange={(e) => setSceneText(e.target.value)} placeholder="Ex. : une maman et son garçon de 7 ans font les devoirs en souriant, une ampoule s'allume au-dessus du cahier, salon lumineux avec des plantes" /></label>
             <p className="text-xs text-muted-foreground">Plus votre description est précise (personnages, âge, lieu, objets, ambiance), plus l'image sera réussie. Le résumé de votre livre s'y place tout seul s'il existe.</p>
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
             <p className="text-xs text-muted-foreground">L'image est créée à partir du résumé de votre livre, dans le style du modèle « {genre.label} ».</p>
