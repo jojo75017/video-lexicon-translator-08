@@ -1,8 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
+import { generateIncludedIllustration } from '@/lib/cover-editor/includedCoverEngine';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
 
 const W = 1600, H = 2560;
+const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: string }> = {
+  guide: { style: 'clean modern editorial illustration, soft natural colours', mood: 'clear, reassuring, practical' },
+  jeunesse: { style: 'bright 3D animated film style (Pixar-like), friendly cartoon characters, warm cheerful colours, NOT photographic', mood: 'joyful, warm, encouraging' },
+  thriller: { style: 'cinematic dark thriller artwork, high contrast, mysterious silhouettes', mood: 'tense, suspenseful', lighting: 'dark' },
+  romance: { style: 'romantic painterly illustration, golden hour glow, elegant', mood: 'tender, emotional' },
+  devperso: { style: 'uplifting luminous illustration, sunrise, open landscape, airy composition', mood: 'hopeful, inspiring' },
+  sf: { style: 'epic science-fiction / fantasy digital painting, cosmic scale, glowing details', mood: 'epic, wondrous', lighting: 'dark' },
+};
 type Extra = { id: number; text: string; x: number; y: number; size: number; color: string; box: 'aucun' | 'panneau' | 'bulle' };
 const COLORS = ['#FFFFFF', '#232F3E', '#FF9E2D', '#008296', '#F5C542', '#D93025'];
 
@@ -28,6 +37,17 @@ export default function V3CanvaCoverStudioPage() {
   const [bookId, setBookId] = useState('');
   useEffect(() => { listMyBooks().then(setBooks).catch(() => setBooks([])); }, []);
   const pickBook = (id: string) => { setBookId(id); const b = books.find((x) => x.id === id); if (!b) return; setTitle(b.title || ''); setSubtitle(b.subtitle || ''); if (b.author) setAuthor(b.author); };
+  const [genLoading, setGenLoading] = useState(false);
+  const [genError, setGenError] = useState('');
+  const createImage = async () => {
+    setGenLoading(true); setGenError('');
+    try {
+      const b = books.find((x) => x.id === bookId); const gs = GENRE_STYLE[genreId] ?? GENRE_STYLE.guide;
+      const url = await generateIncludedIllustration({ projectId: bookId || 'studio-couvertures', title, subtitle, author, genre: genre.label, mood: gs.mood, lighting: gs.lighting, summary: b?.synopsis || subtitle, visualPrompt: `Art style: ${gs.style}.` });
+      const blob = await (await fetch(url)).blob(); const i = new Image(); i.onload = () => setImg(i); i.src = URL.createObjectURL(blob);
+    } catch (e) { setGenError(e instanceof Error ? e.message : "La création de l'image a échoué."); }
+    finally { setGenLoading(false); }
+  };
   const addExtra = () => setExtras((e) => [...e, { id: Date.now(), text: 'Nouveau texte', x: 30, y: 55, size: 64, color: '#FFFFFF', box: 'aucun' }]);
   const upd = (id: number, p: Partial<Extra>) => setExtras((e) => e.map((x) => (x.id === id ? { ...x, ...p } : x)));
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -95,7 +115,10 @@ export default function V3CanvaCoverStudioPage() {
             <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); }} className={`v3-chip-toggle flex w-full items-center gap-3 rounded-lg border p-2 text-left ${g.id === genreId ? 'border-primary' : 'border-border'}`}>
               <span className="h-10 w-7 rounded" style={{ background: g.bg, border: `3px solid ${g.titleColor}` }} /><span className="font-medium text-foreground">{g.label}</span>
             </button>))}</div>}
-          {tab === 'visuel' && <div className="space-y-3"><p className="text-sm text-muted-foreground">Ajoutez l'illustration créée dans le studio d'images ou votre propre image.</p>
+          {tab === 'visuel' && <div className="space-y-3"><button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-accent px-3 py-3 font-bold text-accent-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
+            <p className="text-xs text-muted-foreground">L'image est créée à partir du résumé de votre livre, dans le style du modèle « {genre.label} ».</p>
+            {genError && <p className="text-sm text-destructive">{genError}</p>}
+            <p className="text-sm text-muted-foreground">Ou ajoutez l'illustration créée dans le studio d'images ou votre propre image.</p>
             <input type="file" accept="image/*" onChange={(e) => onFile(e.target.files?.[0])} className="text-sm" />
             {img && <button onClick={() => setImg(null)} className="v3-chip-toggle rounded-lg bg-muted px-3 py-2 text-sm text-foreground">Retirer l'image</button>}</div>}
           {tab === 'texte' && <div className="space-y-3">
