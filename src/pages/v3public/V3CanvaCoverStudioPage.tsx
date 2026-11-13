@@ -51,6 +51,7 @@ export default function V3CanvaCoverStudioPage() {
   const [tPos, setTPos] = useState<'auto' | 'haut' | 'milieu' | 'bas'>('auto');
   const [tScale, setTScale] = useState(100);
   const [tColor, setTColor] = useState('');
+  const [aColor, setAColor] = useState('');
   const [stockQ, setStockQ] = useState('');
   const [stock, setStock] = useState<{ id: string; thumb: string; full: string; author: string; source: string; download?: string }[]>([]);
   const [stockMsg, setStockMsg] = useState('');
@@ -103,7 +104,7 @@ export default function V3CanvaCoverStudioPage() {
       const scene = sceneText.trim();
       if (scene.length < 20) { setTab('visuel'); setGenError("Décrivez d'abord ce que doit montrer l'image (étape 3. Illustration), par exemple : deux voitures de course au coude-à-coude sur un circuit la nuit."); return; }
       const prompt = `Professional bestseller book cover ILLUSTRATION ONLY (artwork, no typography) for the book "${title}"${subtitle ? ` (${subtitle})` : ''}.
-Scene to depict faithfully and literally (this is the ONLY subject, do not invent another theme from the title): ${scene}.
+${(() => { const b = books.find((x) => x.id === bookId); const topic = (b?.synopsis || subtitle || '').trim(); return topic ? `What the book is about (the image MUST illustrate this subject): ${topic.slice(0, 600)}.\n` : ''; })()}Scene to depict faithfully and literally (this is the ONLY subject, do not invent another theme from the title): ${scene}.
 Art style: ${gs.style}. Mood: ${gs.mood}. ${gs.lighting === 'dark' ? 'Dramatic but readable lighting.' : 'Bright, luminous, well-exposed lighting, never dark or muddy.'}
 ${studioCompositionPrompt(coverFormat, genre.titlePos === 'top')} Expressive characters, rich detail, art-directed publishing-house quality.
 ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-bleed, no border, no 3D book mockup.`;
@@ -125,7 +126,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
   useEffect(() => {
     const c = canvasRef.current; if (!c) return; const ctx = c.getContext('2d')!; ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingQuality = 'high';
     ctx.fillStyle = genre.bg; ctx.fillRect(0, 0, W, H);
-    if (img) { const fit = fitArtwork(img.width, img.height, W, H); ctx.drawImage(img, fit.x, fit.y, fit.width, fit.height); }
+    if (img) { const cs = Math.max(W / img.width, H / img.height); const cw = img.width * cs, ch = img.height * cs; ctx.save(); ctx.filter = 'blur(40px) brightness(0.85)'; ctx.drawImage(img, (W - cw) / 2, (H - ch) / 2, cw, ch); ctx.restore(); const fit = fitArtwork(img.width, img.height, W, H); ctx.drawImage(img, fit.x, fit.y, fit.width, fit.height); }
     ctx.fillStyle = genre.overlay; ctx.fillRect(0, 0, W, H);
     if (shade > 0) { const g = genre.titlePos === 'top' ? ctx.createLinearGradient(0, 0, 0, H * 0.6) : ctx.createLinearGradient(0, H, 0, H * 0.4); g.addColorStop(0, `rgba(0,0,0,${shade / 100})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
     const t = !showTitle ? '' : genre.titleUpper ? title.toUpperCase() : title;
@@ -139,7 +140,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tColor || tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
     ctx.font = '600 72px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.subColor;
     wrap(ctx, showSub ? subtitle : '', maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
-    ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.titleColor;
+    ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = aColor || genre.titleColor;
     if (!showAuthor || !author.trim()) { /* auteur masqué */ } else { const ay = authorY ?? H - 200; ctx.textBaseline = 'middle'; ctx.fillText(author.toUpperCase(), W / 2, ay); ctx.textBaseline = 'top'; } ctx.shadowBlur = 0;
     if (badgeOn && badgeText.trim()) {
       const st = BADGE_STYLES.find((b) => b.id === badgeStyle)!; const r = badgeSize;
@@ -169,7 +170,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       ls.forEach((l, i) => ctx.fillText(l, cx, cy + i * lh)); ctx.shadowBlur = 0;
     }
     ctx.shadowOffsetY = 0; setThumb(c.toDataURL('image/jpeg', 0.6));
-  }, [W, H, authorY, genre, title, subtitle, author, img, shade, tPos, tScale, tColor, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
+  }, [W, H, authorY, genre, title, subtitle, author, img, shade, tPos, tScale, tColor, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize, aColor]);
 
   const searchStock = async () => {
     setStockMsg('Recherche…'); setStock([]);
@@ -246,6 +247,7 @@ const STEPS = [
             <label className="block text-sm">Titre<input className={input} value={title} onChange={(e) => setTitle(e.target.value)} /></label>
             <label className="block text-sm">Sous-titre<input className={input} value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
             <label className="block text-sm">Auteur<input className={input} value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
+            <div className="flex flex-wrap items-center gap-1"><span className="text-xs">Couleur du nom :</span><button onClick={() => setAColor('')} className={`v3-chip-toggle rounded px-2 text-xs ${!aColor ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>Modèle</button>{COLORS.map((c) => <button key={c} aria-label={`Couleur auteur ${c}`} onClick={() => setAColor(c)} className={`v3-chip-toggle h-6 w-6 rounded-full border-2 ${aColor === c ? 'border-primary' : 'border-border'}`} style={{ background: c }} />)}<input type="color" aria-label="Autre couleur auteur" value={aColor || '#ffffff'} onChange={(e) => setAColor(e.target.value)} className="h-6 w-8" /></div>
             <div className="flex flex-wrap items-center gap-1"><span className="text-xs">Place du nom :</span>{([['Haut', 140], ['Milieu', H / 2], ['Bas', H - 200]] as const).map(([l, v]) => <button key={l} onClick={() => setAuthorY(v)} className={`v3-chip-toggle rounded px-2 text-xs ${(authorY ?? H - 200) === v ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>{l}</button>)}<span className="text-xs text-muted-foreground">ou glissez-le avec la souris</span></div>
             <div className="border-t border-border pt-3"><p className="mb-2 text-sm font-semibold">Textes en plus sur l'image</p>
               {extras.map((ex) => <div key={ex.id} className="mb-3 space-y-2 rounded-lg border border-border p-2">
