@@ -3,7 +3,7 @@ import { jsPDF } from 'jspdf';
 /** Épaisseur KDP par page (pouces) selon le papier. */
 export const PAPER_INCH_PER_PAGE = { blanc: 0.002252, creme: 0.0025, couleur: 0.002347 } as const;
 export type Paper = keyof typeof PAPER_INCH_PER_PAGE;
-export const TRIMS = { '5x8': [5, 8], '5.5x8.5': [5.5, 8.5], '6x9': [6, 9], '8.5x11': [8.5, 11] } as const;
+export const TRIMS = { '5x8': [5, 8], '5.5x8.5': [5.5, 8.5], '6x9': [6, 9], '8.5x8.5': [8.5, 8.5], '8.5x11': [8.5, 11] } as const;
 export type Trim = keyof typeof TRIMS;
 const BLEED = 0.125, SLUG = 0.375, DPI = 300;
 

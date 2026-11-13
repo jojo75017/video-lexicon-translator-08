@@ -1,4 +1,5 @@
 # Roadmap
+- [ ] Corriger la couverture de Léo et le studio : scène continue, format carré jeunesse, aperçu et téléchargements vérifiés sans publication.
 - [x] Ajouter « Voir votre Flipbook » aux deux bibliothèques : lecture depuis le compte de Georges vérifiée, affichage mobile contrôlé et trois tests réussis ; /essai et spécimen /v3/ebook-illustre ouverts à l’écran.
 - [ ] Publication demandée le 10 novembre : confirmer la lecture vidéo sur le site public ; le fichier CDN est valide (52,33 secondes), mais localhost ne sert pas le CDN. Les anciennes alertes approfondies du 7 novembre restent à requalifier.
 

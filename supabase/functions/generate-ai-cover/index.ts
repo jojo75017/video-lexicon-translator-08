@@ -169,7 +169,7 @@ serve(async (req) => {
     const paperbackSpec = format === 'paperback' ? buildPaperbackSpec(parsed) : null;
     const formatGuidance = format === 'paperback'
       ? paperbackSpecPrompt(paperbackSpec!)
-      : KINDLE_SPEC;
+      : format === 'album' ? 'Square flat 2D artwork, aspect ratio 1:1. One continuous scene, no panels, no border, no cropped characters.' : KINDLE_SPEC;
 
 
     // === STEP 1: generate a unique cinematic scene concept ===
@@ -182,7 +182,9 @@ serve(async (req) => {
 
     // Si l'utilisateur fournit son propre prompt, on s'en sert COMME SCÈNE et on saute la génération d'idée.
     let sceneConcept = '';
-    if (userPrompt && userPrompt.trim().length > 10) {
+    if (customPrompt && customPrompt.trim().length > 30) {
+      sceneConcept = customPrompt.trim();
+    } else if (userPrompt && userPrompt.trim().length > 10) {
       sceneConcept = userPrompt.trim();
     } else {
       sceneConcept = await generateSceneConcept({
@@ -249,7 +251,7 @@ Render variation #${variationSeed}. The output MUST be a finished, print-ready, 
           modalities: ["image", "text"],
           // Kindle = portrait (2:3 est le ratio portrait le plus proche de 1.6:1),
           // Broché wrap = paysage. Le recadrage exact est fait côté client.
-          image_config: { aspect_ratio: format === 'paperback' ? '3:2' : '2:3', image_size: '2K' },
+          image_config: { aspect_ratio: format === 'album' ? '1:1' : format === 'paperback' ? '3:2' : '2:3', image_size: '2K' },
         }),
       });
       if (!resp.ok) {

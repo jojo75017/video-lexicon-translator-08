@@ -5,8 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import useCoverProAccess from '@/hooks/useCoverProAccess';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
+import { Button } from '@/components/ui/button';
+import { fitArtwork, studioCompositionPrompt, studioCoverSize, type StudioCoverFormat } from '@/lib/cover-editor/studioCoverLayout';
 
-const W = 1600, H = 2560;
 /** Rendu interne en 2× pour des titres nets à l'impression 300 DPI. */
 const S = 2;
 const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: string }> = {
@@ -34,6 +35,9 @@ export default function V3CanvaCoverStudioPage() {
   const pro = useCoverProAccess(); const proLoading = pro.loading;
   const [tab, setTab] = useState<'modele' | 'visuel' | 'texte' | 'macaron'>('modele');
   const [genreId, setGenreId] = useState('guide');
+  const [coverFormat, setCoverFormat] = useState<StudioCoverFormat>('kindle');
+  const { width: W, height: H } = studioCoverSize(coverFormat);
+  const changeFormat = (format: StudioCoverFormat) => { setCoverFormat(format); setAuthorY(null); setBadgeXY(null); if (format === 'album') { setTrim('8.5x8.5'); setPaper('couleur'); } };
   const [title, setTitle] = useState('Mon titre de livre');
   const [subtitle, setSubtitle] = useState('Un sous-titre court et clair');
   const [author, setAuthor] = useState('Prénom Nom');
@@ -100,9 +104,9 @@ export default function V3CanvaCoverStudioPage() {
       const prompt = `Professional bestseller book cover ILLUSTRATION ONLY (artwork, no typography) for the book "${title}"${subtitle ? ` (${subtitle})` : ''}.
 Scene to depict faithfully and literally (this is the ONLY subject, do not invent another theme from the title): ${scene}.
 Art style: ${gs.style}. Mood: ${gs.mood}. ${gs.lighting === 'dark' ? 'Dramatic but readable lighting.' : 'Bright, luminous, well-exposed lighting, never dark or muddy.'}
-Vertical portrait composition 1600x2560, ${genre.titlePos === 'top' ? 'keep the TOP third calm and uncluttered for the title, main subject in the lower two thirds' : 'keep the BOTTOM third calm for the title, main subject in the upper two thirds'}. Expressive characters, rich detail, art-directed publishing-house quality.
+${studioCompositionPrompt(coverFormat, genre.titlePos === 'top')} Expressive characters, rich detail, art-directed publishing-house quality.
 ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-bleed, no border, no 3D book mockup.`;
-      const { data, error } = await supabase.functions.invoke('generate-ai-cover', { body: { title, subtitle, author, genre: genre.label, format: 'kindle', customPrompt: prompt } });
+      const { data, error } = await supabase.functions.invoke('generate-ai-cover', { body: { title, subtitle, author, genre: genre.label, format: coverFormat, customPrompt: prompt } });
       if (error) throw new Error((await (error as { context?: Response }).context?.json?.().catch(() => null))?.error || error.message);
       if (data?.error) throw new Error(data.error);
       if (!data?.imageUrl) throw new Error('Aucune image reçue, réessayez.');
@@ -120,7 +124,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
   useEffect(() => {
     const c = canvasRef.current; if (!c) return; const ctx = c.getContext('2d')!; ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingQuality = 'high';
     ctx.fillStyle = genre.bg; ctx.fillRect(0, 0, W, H);
-    if (img) { const s = Math.max(W / img.width, H / img.height); ctx.drawImage(img, (W - img.width * s) / 2, (H - img.height * s) / 2, img.width * s, img.height * s); }
+    if (img) { const fit = fitArtwork(img.width, img.height, W, H); ctx.drawImage(img, fit.x, fit.y, fit.width, fit.height); }
     ctx.fillStyle = genre.overlay; ctx.fillRect(0, 0, W, H);
     if (shade > 0) { const g = genre.titlePos === 'top' ? ctx.createLinearGradient(0, 0, 0, H * 0.6) : ctx.createLinearGradient(0, H, 0, H * 0.4); g.addColorStop(0, `rgba(0,0,0,${shade / 100})`); g.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
     const t = !showTitle ? '' : genre.titleUpper ? title.toUpperCase() : title;
@@ -164,7 +168,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       ls.forEach((l, i) => ctx.fillText(l, cx, cy + i * lh)); ctx.shadowBlur = 0;
     }
     ctx.shadowOffsetY = 0; setThumb(c.toDataURL('image/jpeg', 0.6));
-  }, [authorY, genre, title, subtitle, author, img, shade, tPos, tScale, tColor, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
+  }, [W, H, authorY, genre, title, subtitle, author, img, shade, tPos, tScale, tColor, showTitle, showSub, showAuthor, badgeOn, badgeText, badgeStyle, badgePos, extras, badgeXY, badgeSize]);
 
   const searchStock = async () => {
     setStockMsg('Recherche…'); setStock([]);
@@ -176,7 +180,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     const i = new Image(); i.crossOrigin = 'anonymous'; i.onload = () => setImg(i); i.onerror = () => setStockMsg('Photo illisible, choisissez-en une autre.'); i.src = p.full;
     if (p.source === 'unsplash' && p.download) void supabase.functions.invoke('stock-photos', { body: { track: p.download } });
   };
-  const downloadArt = () => { if (!img) return; const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d')!; const sc = Math.max(W / img.width, H / img.height); kc.drawImage(img, (W - img.width * sc) / 2, (H - img.height * sc) / 2, img.width * sc, img.height * sc); const a = document.createElement('a'); a.href = k.toDataURL('image/jpeg', 0.95); a.download = (title || 'illustration').replace(/\W+/g, '-') + '-image-seule.jpg'; a.click(); };
+  const downloadArt = () => { if (!img) return; const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d'); if (!kc) return; kc.fillStyle = genre.bg; kc.fillRect(0, 0, W, H); const fit = fitArtwork(img.width, img.height, W, H); kc.drawImage(img, fit.x, fit.y, fit.width, fit.height); const a = document.createElement('a'); a.href = k.toDataURL('image/jpeg', 0.95); a.download = (title || 'illustration').replace(/\W+/g, '-') + '-image-seule.jpg'; a.click(); };
   const fromStory = () => { const b = books.find((x) => x.id === bookId); if (!b) { setGenError('Choisissez d’abord votre livre en haut à droite (📚 Mon livre).'); return; } const story = b.backCover || b.synopsis; if (!story) { setGenError('Ce livre n’a pas encore de résumé enregistré : ajoutez-le dans la case.'); return; } setBackText(story); setSceneText(b.synopsis || story); setGenError(''); };
   const onFile = (f?: File) => { if (!f) return; const i = new Image(); i.onload = () => setImg(i); i.src = URL.createObjectURL(f); };
   const download = () => { const a = document.createElement('a'); const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d')!; kc.imageSmoothingQuality = 'high'; kc.drawImage(canvasRef.current!, 0, 0, W, H); a.href = k.toDataURL('image/jpeg', 0.97); a.download = (title || 'couverture').replace(/\W+/g, '-') + '-kindle.jpg'; a.click(); };
@@ -207,11 +211,12 @@ const STEPS = [
       </div>
       <div className="grid gap-0 lg:grid-cols-[420px_1fr]">
         <aside className="space-y-3 border-r border-border p-4">
+          <label className="block text-sm font-semibold">Format de couverture<select aria-label="Format de couverture" className={input} value={coverFormat} disabled={genLoading} onChange={(e) => changeFormat(e.target.value as StudioCoverFormat)}><option value="kindle">Portrait Kindle</option><option value="album">Album jeunesse carré · 21,59 × 21,59 cm</option></select></label>
           {STEPS.map((st) => <button key={st.id} onClick={() => setTab(st.id)} className={`v3-chip-toggle flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left ${tab === st.id ? 'border-primary bg-primary/20' : 'border-transparent bg-card'}`}>
             <span className="text-3xl">{st.icon}</span><span className="flex-1 border-l border-border pl-4"><span className="block text-lg font-bold text-foreground">{st.t}</span><span className="text-sm text-muted-foreground">{st.d}</span></span><span className="text-muted-foreground">›</span></button>)}
           <div className="rounded-xl bg-card p-4">
           {tab === 'modele' && <div><p className="mb-3 font-semibold">Modèles de couverture</p><div className="grid grid-cols-3 gap-3">{COVER_GENRES.map((g) => (
-            <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); const fic = g.id === 'thriller' || g.id === 'romance'; setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
+            <button key={g.id} onClick={() => { setGenreId(g.id); if (g.id === 'jeunesse') { changeFormat('album'); setBadgeOn(false); } setBadgeText(g.badges[0]); const fic = g.id === 'thriller' || g.id === 'romance'; if (g.id !== 'jeunesse') setBadgeOn(!fic); if (fic) setShowSub(false); setShade(fic ? 45 : 0); }} className="v3-chip-toggle text-center">
               <span className={`flex aspect-[5/8] flex-col items-center ${g.titlePos === 'top' ? 'justify-start pt-3' : 'justify-end pb-3'} rounded-lg px-1 shadow-lg ring-2 ${g.id === genreId ? 'ring-primary' : 'ring-transparent'}`} style={{ background: g.bg }}>
                 {(TITLE_COLORS[g.id] ?? [g.titleColor]).slice(0, 2).map((c, i) => <span key={i} className="text-[11px] font-black leading-tight" style={{ color: c, font: g.titleFont.replace('{s}', '12') }}>{i ? 'TITRE' : 'MON'}</span>)}
               </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
@@ -278,7 +283,7 @@ const STEPS = [
               else upd(d.id, { x: Math.min(95, Math.max(5, (p.x / W) * 100)), y: Math.min(95, Math.max(2, (p.y / H) * 100)) }); }}
             onPointerUp={() => { drag.current = null; }} />
           <div className="flex w-full max-w-3xl flex-col gap-2">
-          <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-base font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
+          <Button onClick={download} className="flex h-auto w-full items-center gap-3 px-4 py-3 text-base font-bold">📥 {coverFormat === 'album' ? 'Télécharger la couverture carrée' : 'Télécharger pour Kindle'} <span className="ml-auto">›</span></Button>
           {img && <button onClick={downloadArt} className="flex w-full items-center gap-3 rounded-xl bg-card px-4 py-3 text-base font-bold text-foreground">🖼️ Télécharger l'image seule (sans texte ni macaron) <span className="ml-auto">›</span></button>}
           <button onClick={openWrap} className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-4 py-3 text-base font-bold text-foreground">📘 Télécharger le broché KDP <span className="ml-auto">{showWrap ? '▾' : '›'}</span></button>
           {showWrap && <div className="space-y-3 rounded-xl bg-card p-4 text-sm">
