@@ -118,7 +118,7 @@ function detectKeyProvider(key?: string | null): KeyProvider {
 // Génération d'image via OpenRouter (BYOK abonné) — modèles Gemini image.
 async function tryOpenRouterImage(prompt: string, apiKey?: string): Promise<string | null> {
   if (!apiKey || !apiKey.startsWith('sk-or-')) return null;
-  const models = ['google/gemini-2.5-flash-image-preview', 'google/gemini-2.0-flash-exp:free'];
+  const models = ['google/gemini-2.5-flash-image', 'google/gemini-3-pro-image-preview'];
   for (const model of models) {
     try {
       const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
@@ -160,7 +160,7 @@ async function tryGeminiDirect(prompt: string, apiKey?: string): Promise<string 
   // Nano Banana (2.5 flash image) d'abord : rapide et économique.
   const models = [
     'gemini-2.5-flash-image',
-    'gemini-2.5-flash-image-preview',
+    
     'gemini-3-pro-image-preview',
   ];
   for (const model of models) {
