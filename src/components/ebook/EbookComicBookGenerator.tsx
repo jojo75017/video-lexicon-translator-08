@@ -1056,7 +1056,7 @@ ${hasSpeechBubble ? `The speaking character (${panelData.character}) shows a cle
 
         const gap = 4;
         const panelWidth = (pageWidth - (margin * 2) - gap) / cols;
-        const dialogueSpace = 15; // Espace pour les dialogues
+        const dialogueSpace = 3; // Bulles incrustées dans les cases
         const panelHeight = (pageHeight - (margin * 2) - (rows * dialogueSpace) - ((rows - 1) * gap)) / rows;
 
         // Générer les positions pour chaque panel
@@ -1110,21 +1110,27 @@ ${hasSpeechBubble ? `The speaking character (${panelData.character}) shows a cle
             pdf.rect(pos.x + 1, pos.y + 1, panelWidth - 2, panelHeight - 2, 'F');
           }
 
-          // Bulle de dialogue sous la case (plus compacte pour les layouts denses)
-          if (panel?.dialogue) {
-            const bubbleY = pos.y + panelHeight + 1;
-            const bubbleHeight = dialogueSpace - 2;
-            pdf.setFillColor(255, 255, 255);
-            pdf.setDrawColor(30, 30, 30);
-            pdf.roundedRect(pos.x, bubbleY, panelWidth, bubbleHeight, 2, 2, 'FD');
-            // Taille unique pour toute la planche : aucun texte géant ou minuscule.
+          // Vraie bulle de BD incrustée en haut de la case
+          if (panel?.dialogue && panel?.imageUrl) {
             const fontSize = panelsPerPage >= 10 ? 6.5 : 7.5;
             pdf.setFontSize(fontSize);
-            pdf.setFont('helvetica', 'normal');
-            pdf.setTextColor(30, 30, 30);
-            const line = `${cleanTextForPDF(panel.character)} : ${cleanTextForPDF(panel.dialogue)}`;
-            const lines = pdf.splitTextToSize(line, panelWidth - 4).slice(0, 2);
-            pdf.text(lines, pos.x + 2, bubbleY + fontSize * 0.5);
+            pdf.setFont('helvetica', 'bold');
+            const bw = panelWidth * 0.86;
+            const lines = pdf.splitTextToSize(cleanTextForPDF(panel.dialogue), bw - 8).slice(0, 3);
+            const lh = fontSize * 0.42;
+            const bh = lines.length * lh + 5;
+            const bx = pos.x + (panelWidth - bw) / 2;
+            const by = pos.y + 2;
+            pdf.setFillColor(255, 255, 255);
+            pdf.setDrawColor(20, 20, 20);
+            pdf.setLineWidth(0.4);
+            pdf.ellipse(bx + bw / 2, by + bh / 2, bw / 2, bh / 2, 'FD');
+            const tx = bx + bw / 3;
+            pdf.triangle(tx - 2, by + bh - 0.8, tx + 2, by + bh - 0.8, tx - 1, by + bh + 4, 'F');
+            pdf.line(tx - 2, by + bh - 0.6, tx - 1, by + bh + 4);
+            pdf.line(tx + 2, by + bh - 0.6, tx - 1, by + bh + 4);
+            pdf.setTextColor(20, 20, 20);
+            pdf.text(lines, bx + bw / 2, by + 3 + lh * 0.8, { align: 'center' });
           }
         }
 
@@ -1939,7 +1945,7 @@ ${dialogueText ? `The speaking character (${panel.character}) shows a clear expr
                             <img
                               src={panel.imageUrl}
                               alt={`Panel ${panelIdx + 1}`}
-                              className="w-full aspect-square object-cover rounded-t-md border-2 border-foreground/80 shadow-md"
+                              className="w-full aspect-square object-cover rounded-md border-2 border-foreground/80 shadow-md"
                             />
                           ) : (
                             <div className="w-full aspect-square bg-muted flex flex-col items-center justify-center gap-2 rounded-t-md border-2 border-dashed border-destructive/50 p-2 text-center">
@@ -1967,13 +1973,13 @@ ${dialogueText ? `The speaking character (${panel.character}) shows a clear expr
                           <div className="absolute top-1 left-1 bg-foreground/70 text-background text-xs px-1.5 py-0.5 rounded">
                             {panelIdx + 1}
                           </div>
-                          {/* Dialogue sous la case */}
-                          {panel.dialogue && (
-                            <div className="bg-card text-card-foreground border-2 border-t-0 border-foreground/80 rounded-b-md px-2 py-1.5 h-12 overflow-hidden flex items-center">
-                              <p className="text-xs leading-snug line-clamp-2">
-                                <span className="font-bold text-primary">{panel.character} :</span>{' '}
-                                <span>« {panel.dialogue} »</span>
-                              </p>
+                          {/* Vraie bulle de BD incrustée dans la case */}
+                          {panel.imageUrl && panel.dialogue && (
+                            <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[86%] pointer-events-none">
+                              <div className="comic-bubble relative rounded-[50%] border-2 px-3 py-2 text-center shadow-md">
+                                <p className="text-[11px] sm:text-xs leading-tight font-semibold line-clamp-3">{panel.dialogue}</p>
+                                <span className="comic-bubble-tail absolute -bottom-[9px] left-1/3 h-0 w-0" />
+                              </div>
                             </div>
                           )}
                         </div>

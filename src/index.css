@@ -813,3 +813,7 @@ a:hover {
 :root { --admin-trial-accent: 32 100% 59%; --admin-trial-foreground: 210 29% 16%; }
 .admin-trial-access { background: hsl(var(--admin-trial-accent)) !important; color: hsl(var(--admin-trial-foreground)) !important; border-color: hsl(var(--admin-trial-accent)); }
 .admin-trial-access:hover { background: hsl(var(--admin-trial-accent) / .9) !important; }
+
+/* Bulles de BD : toujours blanches à texte noir, comme un album imprimé */
+.comic-bubble { background: #ffffff; color: #111111; border-color: #111111; }
+.comic-bubble-tail { border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 10px solid #111111; }
