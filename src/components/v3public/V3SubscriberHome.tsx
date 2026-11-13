@@ -79,6 +79,24 @@ export default function V3SubscriberHome({ user }: { user: any }) {
           </h1>
         </div>
 
+        <Link
+          to="/v3/fonctionnalites/cles"
+          className="flex flex-col items-start gap-3 rounded-2xl p-4 md:flex-row md:items-center md:justify-between md:p-5"
+          style={{ background: 'rgba(255,158,45,0.12)', border: '2px solid #FF9E2D' }}
+        >
+          <div>
+            <p className="text-base font-bold md:text-lg" style={{ color: '#FF9E2D' }}>
+              🔑 Première étape : branchez votre clé Gemini gratuite
+            </p>
+            <p className="mt-1 text-sm" style={{ color: '#F3EDE6' }}>
+              2 minutes, sans carte bancaire. Sans clé, la rédaction et les images ne démarrent pas.
+            </p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-bold" style={{ background: '#FF9E2D', color: '#0F172A' }}>
+            Configurer ma clé <ArrowRight className="h-4 w-4" />
+          </span>
+        </Link>
+
         <V3HomeTopBlock userId={user.id} />
 
       </div>
