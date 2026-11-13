@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { listMyBooks, type MyBookOption } from '@/lib/cover-editor/myBooks';
+import { buildPaperbackPdf, wrapGeometry, TRIMS, type Trim, type Paper } from '@/lib/cover-editor/paperbackWrapPdf';
 import { supabase } from '@/integrations/supabase/client';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
 
@@ -40,10 +41,21 @@ export default function V3CanvaCoverStudioPage() {
   const [books, setBooks] = useState<MyBookOption[]>([]);
   const [bookId, setBookId] = useState('');
   useEffect(() => { listMyBooks().then(setBooks).catch(() => setBooks([])); }, []);
-  const pickBook = (id: string) => { setBookId(id); const b = books.find((x) => x.id === id); if (!b) return; setTitle(b.title || ''); setSubtitle(b.subtitle || ''); if (b.author) setAuthor(b.author); setSceneText(b.synopsis || ''); };
+  const pickBook = (id: string) => { setBookId(id); const b = books.find((x) => x.id === id); if (!b) return; setTitle(b.title || ''); setSubtitle(b.subtitle || ''); if (b.author) setAuthor(b.author); setSceneText(b.synopsis || ''); setBackText(b.backCover || b.synopsis || ''); };
   const [genLoading, setGenLoading] = useState(false);
   const [genError, setGenError] = useState('');
   const [sceneText, setSceneText] = useState('');
+  const [showWrap, setShowWrap] = useState(false);
+  const [trim, setTrim] = useState<Trim>('6x9');
+  const [pages, setPages] = useState(120);
+  const [paper, setPaper] = useState<Paper>('blanc');
+  const [marks, setMarks] = useState(false);
+  const [backText, setBackText] = useState('');
+  const geo = wrapGeometry(trim, pages, paper);
+  const downloadWrap = () => {
+    const blob = buildPaperbackPdf({ front: canvasRef.current!, trim, pages, paper, marks, title, author, backText, bg: genre.bg, textColor: genre.titlePos === 'top' && !/^#0|^#1|^#3/.test(genre.bg) ? '#232F3E' : '#FFFFFF', accent: (TITLE_COLORS[genreId] ?? [genre.titleColor])[0] });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${(title || 'couverture').replace(/\W+/g, '-')}-broche-kdp${marks ? '-reperes' : ''}.pdf`; a.click();
+  };
   const createImage = async () => {
     setGenLoading(true); setGenError('');
     try {
@@ -171,7 +183,16 @@ const STEPS = [
             <div className="flex gap-2">{(['haut', 'bas'] as const).map((p) => <button key={p} onClick={() => setBadgePos(p)} className={`v3-chip-toggle flex-1 rounded-lg px-3 py-2 text-sm ${badgePos === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>En {p}</button>)}</div></div>}
           </div>
           <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
-          <button disabled title="Bientôt disponible" className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold text-foreground opacity-70">📘 Télécharger le broché KDP <span className="ml-auto text-xs">bientôt</span></button>
+          <button onClick={() => setShowWrap((v) => !v)} className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold text-foreground">📘 Télécharger le broché KDP <span className="ml-auto">{showWrap ? '▾' : '›'}</span></button>
+          {showWrap && <div className="space-y-3 rounded-xl bg-card p-4 text-sm">
+            <label className="block">Format du livre<select className={input} value={trim} onChange={(e) => setTrim(e.target.value as Trim)}>{Object.keys(TRIMS).map((t) => <option key={t} value={t}>{t.replace('x', ' × ')} pouces</option>)}</select></label>
+            <label className="block">Nombre de pages intérieures<input type="number" min={24} max={828} className={input} value={pages} onChange={(e) => setPages(Math.max(24, +e.target.value || 24))} /></label>
+            <label className="block">Papier<select className={input} value={paper} onChange={(e) => setPaper(e.target.value as Paper)}><option value="blanc">Blanc (noir et blanc)</option><option value="creme">Crème (noir et blanc)</option><option value="couleur">Blanc (couleur)</option></select></label>
+            <label className="block">Texte de quatrième de couverture<textarea rows={5} className={input} value={backText} onChange={(e) => setBackText(e.target.value)} placeholder="Présentez votre livre en quelques phrases…" /></label>
+            <label className="flex items-start gap-2"><input type="checkbox" checked={marks} onChange={(e) => setMarks(e.target.checked)} className="mt-1" /><span>Ajouter les repères d'impression (coupe et pli). <b>À décocher pour Amazon KDP</b>, qui refuse les repères ; utile pour un imprimeur ou pour vérifier.</span></label>
+            <p className="text-xs text-muted-foreground">Dos : {(geo.spine * 2.54).toFixed(2)} cm · Couverture complète : {(geo.width * 2.54).toFixed(1)} × {(geo.height * 2.54).toFixed(1)} cm, fond perdu inclus, 300 DPI. {geo.spineText ? 'Titre et auteur écrits sur le dos.' : 'Moins de 79 pages : KDP n\'autorise pas de texte sur le dos.'} Un cadre blanc est réservé en bas de la quatrième pour le code-barres Amazon.</p>
+            <button onClick={downloadWrap} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground">📥 Télécharger le PDF broché</button>
+          </div>}
         </aside>
         <main className="flex flex-col items-center gap-6 p-6">
           <div className="flex w-full max-w-[440px] flex-col gap-2">
