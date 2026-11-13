@@ -12,6 +12,10 @@ const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: stri
   devperso: { style: 'uplifting luminous illustration, sunrise, open landscape, airy composition', mood: 'hopeful, inspiring' },
   sf: { style: 'epic science-fiction / fantasy digital painting, cosmic scale, glowing details', mood: 'epic, wondrous', lighting: 'dark' },
 };
+const TITLE_COLORS: Record<string, string[]> = {
+  guide: ['#232F3E', '#FF9E2D', '#008296'], jeunesse: ['#1E3A8A', '#F97316', '#0E7490'], thriller: ['#FFFFFF', '#FACC15', '#FFFFFF'],
+  romance: ['#FDE68A', '#FBCFE8', '#FDE68A'], devperso: ['#004D57', '#FF9E2D', '#004D57'], sf: ['#67E8F9', '#E9D5FF', '#67E8F9'],
+};
 type Extra = { id: number; text: string; x: number; y: number; size: number; color: string; box: 'aucun' | 'panneau' | 'bulle' };
 const COLORS = ['#FFFFFF', '#232F3E', '#FF9E2D', '#008296', '#F5C542', '#D93025'];
 
@@ -73,14 +77,14 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     let size = 210; const maxW = W - 200; let lines: string[] = [];
     do { ctx.font = genre.titleFont.replace('{s}', String(size)); lines = wrap(ctx, t, maxW); size -= 10; } while ((lines.length > 3 || lines.some((l) => ctx.measureText(l).width > maxW)) && size > 80);
     const lh = (size + 10) * 1.1; const blockH = lines.length * lh;
-    let y = genre.titlePos === 'top' ? 260 : H - 420 - blockH;
+    let y = genre.titlePos === 'top' ? 280 : H - 420 - blockH;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     if (img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 24; }
-    ctx.fillStyle = genre.titleColor; lines.forEach((l) => { ctx.fillText(l, W / 2, y); y += lh; });
+    const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
     ctx.font = '600 72px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.subColor;
     wrap(ctx, subtitle, maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
     ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.titleColor;
-    ctx.fillText(author.toUpperCase(), W / 2, H - 200); ctx.shadowBlur = 0;
+    if (genre.titlePos === 'top') { ctx.font = '600 76px Montserrat, Arial, sans-serif'; ctx.fillText(author.toUpperCase().split('').join(String.fromCharCode(8202)), W / 2, 120); } else ctx.fillText(author.toUpperCase(), W / 2, H - 200); ctx.shadowBlur = 0;
     if (badgeOn && badgeText.trim()) {
       const st = BADGE_STYLES.find((b) => b.id === badgeStyle)!; const r = 230;
       const cx = W - r - 90, cy = badgePos === 'haut' ? (genre.titlePos === 'top' ? y + r + 80 : r + 120) : H - r - 380;
@@ -109,25 +113,36 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
   const tabs = [['modele', '1. Modèle'], ['visuel', '2. Visuel'], ['texte', '3. Textes'], ['macaron', '4. Macaron']] as const;
   const input = 'w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground';
 
+const STEPS = [
+    { id: 'modele', icon: '🖼️', t: '1. Modèles', d: 'Choisissez un style de couverture' },
+    { id: 'texte', icon: '✏️', t: '2. Mon livre & titres', d: 'Titre, sous-titre, auteur, textes' },
+    { id: 'visuel', icon: '🎨', t: '3. Illustration', d: 'Images, personnages, ambiance' },
+    { id: 'macaron', icon: '🏅', t: '4. Macaron', d: 'Bulle d\'accroche, couleur, position' },
+  ] as const;
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 text-foreground">
-      <h1 className="text-3xl font-bold">Studio de couverture</h1>
-      <p className="mb-6 text-muted-foreground">Choisissez un modèle, ajoutez votre image et vos textes : la couverture se met à jour en direct.</p>
-      <div className="grid gap-6 md:grid-cols-[340px_1fr]">
-        <div className="rounded-xl border border-border bg-card p-4">
-            <label className="mb-4 block rounded-lg border-2 border-accent p-3 text-sm font-bold">📚 Choisir mon livre<select className={input} value={bookId} onChange={(e) => pickBook(e.target.value)}>
-              <option value="">{books.length ? '— Sélectionnez un livre —' : 'Aucun livre enregistré'}</option>
-              {books.map((b) => <option key={b.id} value={b.id}>{b.title || 'Sans titre'}</option>)}</select></label>
-          <div className="mb-4 grid grid-cols-2 gap-2">
-            {tabs.map(([id, l]) => <button key={id} onClick={() => setTab(id)} className={`v3-chip-toggle rounded-lg px-3 py-2 text-sm font-semibold ${tab === id ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>{l}</button>)}
-          </div>
-          {tab === 'modele' && <div className="space-y-2">{COVER_GENRES.map((g) => (
-            <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); }} className={`v3-chip-toggle flex w-full items-center gap-3 rounded-lg border p-2 text-left ${g.id === genreId ? 'border-primary' : 'border-border'}`}>
-              <span className="h-10 w-7 rounded" style={{ background: g.bg, border: `3px solid ${g.titleColor}` }} /><span className="font-medium text-foreground">{g.label}</span>
-            </button>))}</div>}
+    <div className="min-h-screen text-foreground">
+      <div className="flex flex-wrap items-center gap-4 border-b border-border px-6 py-4">
+        <span className="text-3xl">📖</span><h1 className="text-2xl font-bold">Studio de couverture</h1>
+        <span className="rounded-full bg-accent px-3 py-1 text-xs font-bold text-accent-foreground">👑 Inclus Édition VIP</span>
+        <label className="ml-auto flex items-center gap-2 text-sm font-semibold">📚 Mon livre
+          <select className="rounded-lg border border-border bg-background px-3 py-2 text-foreground" value={bookId} onChange={(e) => pickBook(e.target.value)}>
+            <option value="">{books.length ? '— Choisir mon livre —' : 'Aucun livre enregistré'}</option>
+            {books.map((b) => <option key={b.id} value={b.id}>{b.title || 'Sans titre'}</option>)}</select></label>
+      </div>
+      <div className="grid gap-0 lg:grid-cols-[420px_1fr]">
+        <aside className="space-y-3 border-r border-border p-4">
+          {STEPS.map((st) => <button key={st.id} onClick={() => setTab(st.id)} className={`v3-chip-toggle flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left ${tab === st.id ? 'border-primary bg-primary/20' : 'border-transparent bg-card'}`}>
+            <span className="text-3xl">{st.icon}</span><span className="flex-1 border-l border-border pl-4"><span className="block text-lg font-bold text-foreground">{st.t}</span><span className="text-sm text-muted-foreground">{st.d}</span></span><span className="text-muted-foreground">›</span></button>)}
+          <div className="rounded-xl bg-card p-4">
+          {tab === 'modele' && <div><p className="mb-3 font-semibold">Modèles de couverture</p><div className="grid grid-cols-3 gap-3">{COVER_GENRES.map((g) => (
+            <button key={g.id} onClick={() => { setGenreId(g.id); setBadgeText(g.badges[0]); }} className="v3-chip-toggle text-center">
+              <span className={`flex aspect-[5/8] flex-col items-center ${g.titlePos === 'top' ? 'justify-start pt-3' : 'justify-end pb-3'} rounded-lg px-1 shadow-lg ring-2 ${g.id === genreId ? 'ring-primary' : 'ring-transparent'}`} style={{ background: g.bg }}>
+                {(TITLE_COLORS[g.id] ?? [g.titleColor]).slice(0, 2).map((c, i) => <span key={i} className="text-[11px] font-black leading-tight" style={{ color: c, font: g.titleFont.replace('{s}', '12') }}>{i ? 'TITRE' : 'MON'}</span>)}
+              </span><span className="mt-1 block text-xs text-foreground">{g.label.split(' /')[0]}</span>
+            </button>))}</div></div>}
           {tab === 'visuel' && <div className="space-y-3"><label className="block text-sm font-semibold">Que doit montrer l'image ?<textarea className={input} rows={4} value={sceneText} onChange={(e) => setSceneText(e.target.value)} placeholder="Ex. : une maman et son garçon de 7 ans font les devoirs en souriant, une ampoule s'allume au-dessus du cahier, salon lumineux avec des plantes" /></label>
             <p className="text-xs text-muted-foreground">Plus votre description est précise (personnages, âge, lieu, objets, ambiance), plus l'image sera réussie. Le résumé de votre livre s'y place tout seul s'il existe.</p>
-            <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-accent px-3 py-3 font-bold text-accent-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
+            <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création en cours (environ 30 s)…' : "🎨 Créer l'image"}</button>
             <p className="text-xs text-muted-foreground">L'image est créée à partir du résumé de votre livre, dans le style du modèle « {genre.label} ».</p>
             {genError && <p className="text-sm text-destructive">{genError}</p>}
             <p className="text-sm text-muted-foreground">Ou ajoutez l'illustration créée dans le studio d'images ou votre propre image.</p>
@@ -154,14 +169,20 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
             <input className={input} value={badgeText} onChange={(e) => setBadgeText(e.target.value)} maxLength={40} />
             <div className="grid grid-cols-2 gap-2">{BADGE_STYLES.map((s) => <button key={s.id} onClick={() => setBadgeStyle(s.id)} className={`v3-chip-toggle rounded-lg border p-2 text-xs ${badgeStyle === s.id ? 'border-primary' : 'border-border'}`} style={{ background: s.fill, color: s.text }}>{s.label}</button>)}</div>
             <div className="flex gap-2">{(['haut', 'bas'] as const).map((p) => <button key={p} onClick={() => setBadgePos(p)} className={`v3-chip-toggle flex-1 rounded-lg px-3 py-2 text-sm ${badgePos === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>En {p}</button>)}</div></div>}
-        </div>
-        <div className="flex flex-col items-center gap-4">
-          <canvas ref={canvasRef} width={W} height={H} className="w-full max-w-[360px] rounded shadow-2xl" />
-          <div className="flex items-end gap-3 text-sm text-muted-foreground">
-            {thumb && <img src={thumb} alt="Miniature Amazon" className="w-[60px] rounded shadow" />}<span>Test miniature Amazon : le titre doit rester lisible à cette taille.</span>
           </div>
-          <button onClick={download} className="rounded-xl bg-primary px-6 py-3 font-bold text-primary-foreground">Télécharger pour Kindle (1600 × 2560)</button>
-        </div>
+          <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
+          <button disabled title="Bientôt disponible" className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold text-foreground opacity-70">📘 Télécharger le broché KDP <span className="ml-auto text-xs">bientôt</span></button>
+        </aside>
+        <main className="flex flex-col items-center gap-6 p-6">
+          <canvas ref={canvasRef} width={W} height={H} className="w-full max-w-[440px] rounded shadow-2xl" />
+          <div className="flex w-full max-w-3xl flex-wrap items-center gap-6 rounded-2xl border border-border bg-card p-5">
+            <div className="flex items-center gap-4">
+              {thumb && <img src={thumb} alt="Miniature Amazon" className="w-[64px] rounded shadow" />}
+              <div><p className="font-semibold">Test miniature Amazon</p><p className="max-w-[260px] text-sm font-bold uppercase">{title}</p><p className="text-xs uppercase text-muted-foreground">{author}</p></div>
+            </div>
+            <p className="ml-auto max-w-[260px] text-sm text-muted-foreground">Le titre doit rester lisible à cette petite taille, comme dans les résultats Amazon.</p>
+          </div>
+        </main>
       </div>
     </div>
   );
