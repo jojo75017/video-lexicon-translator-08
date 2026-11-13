@@ -200,8 +200,13 @@ const STEPS = [
             <p className="text-xs text-muted-foreground">Astuce : faites glisser le macaron (ou vos textes) directement sur la couverture avec la souris ou le doigt.</p>
             <div className="flex gap-2">{(['haut', 'bas'] as const).map((p) => <button key={p} onClick={() => { setBadgePos(p); setBadgeXY(null); }} className={`v3-chip-toggle flex-1 rounded-lg px-3 py-2 text-sm ${badgePos === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>En {p}</button>)}</div></div>}
           </div>
-          <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-5 py-4 text-lg font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
-          <button onClick={() => setShowWrap((v) => !v)} className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-5 py-4 text-lg font-bold text-foreground">📘 Télécharger le broché KDP <span className="ml-auto">{showWrap ? '▾' : '›'}</span></button>
+        </aside>
+        <main className="flex flex-col items-center gap-6 p-6">
+          <div className="flex w-full max-w-[440px] flex-col gap-2">
+            <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
+            {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
+          <button onClick={download} className="flex w-full items-center gap-3 rounded-xl bg-primary px-4 py-3 text-base font-bold text-primary-foreground">📥 Télécharger pour Kindle <span className="ml-auto">›</span></button>
+          <button onClick={() => setShowWrap((v) => !v)} className="flex w-full items-center gap-3 rounded-xl border-2 border-primary bg-card px-4 py-3 text-base font-bold text-foreground">📘 Télécharger le broché KDP <span className="ml-auto">{showWrap ? '▾' : '›'}</span></button>
           {showWrap && <div className="space-y-3 rounded-xl bg-card p-4 text-sm">
             <label className="block">Format du livre<select className={input} value={trim} onChange={(e) => setTrim(e.target.value as Trim)}>{Object.keys(TRIMS).map((t) => <option key={t} value={t}>{t.replace('x', ' × ')} pouces</option>)}</select></label>
             <label className="block">Nombre de pages intérieures<input type="number" min={24} max={828} className={input} value={pages} onChange={(e) => setPages(Math.max(24, +e.target.value || 24))} /></label>
@@ -211,11 +216,6 @@ const STEPS = [
             <p className="text-xs text-muted-foreground">Dos : {(geo.spine * 2.54).toFixed(2)} cm · Couverture complète : {(geo.width * 2.54).toFixed(1)} × {(geo.height * 2.54).toFixed(1)} cm, fond perdu inclus, 300 DPI. {geo.spineText ? 'Titre et auteur écrits sur le dos.' : 'Moins de 79 pages : KDP n\'autorise pas de texte sur le dos.'} Un cadre blanc est réservé en bas de la quatrième pour le code-barres Amazon.</p>
             <button onClick={downloadWrap} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground">📥 Télécharger le PDF broché</button>
           </div>}
-        </aside>
-        <main className="flex flex-col items-center gap-6 p-6">
-          <div className="flex w-full max-w-[440px] flex-col gap-2">
-            <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
-            {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
           </div>
           <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] touch-none cursor-move rounded shadow-2xl"
             onPointerDown={(e) => { const p = toCover(e); const b = lastBadge.current;
