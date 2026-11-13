@@ -18,6 +18,7 @@ import {
 import { useProjectSave } from '@/hooks/useProjectSave';
 import useModuleAccess from '@/hooks/useModuleAccess';
 import V3UpsellCheckout from '@/components/admin/V3UpsellCheckout';
+import useIsAdmin from '@/hooks/useIsAdmin';
 import IllustratedFlipbook from '@/components/flipbook/IllustratedFlipbook';
 
 const KIDS_FONTS = [
@@ -393,6 +394,7 @@ function KdpAlbumSheet({ draft }: { draft: IllustratedAlbumDraft }) {
     ['Nombre de pages intérieures', `${draft.pages.length * 2 + 4} pages environ`],
     ['Catégories conseillées', 'Livres pour enfants > Albums illustrés ; Livres pour enfants > Premières lectures'],
   ];
+  const { isAdmin } = useIsAdmin();
   const [kdp, setKdp] = useState<{ description: string; keywords: string[] } | null>(null);
   const [loading, setLoading] = useState(false);
   const generate = async () => {
@@ -410,7 +412,7 @@ function KdpAlbumSheet({ draft }: { draft: IllustratedAlbumDraft }) {
   const copy = (text: string) => { void navigator.clipboard.writeText(text); toast.success('Copié'); };
   const rows = rowsBuilder();
   return <section className="space-y-4 rounded-md border border-border bg-card p-4" aria-label="Fiche KDP">
-    <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-lg font-bold">Fiche Amazon KDP de votre album</h3><div className="flex flex-wrap gap-2"><Button onClick={generate} disabled={loading}>{loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}{loading ? 'Rédaction (environ 20 secondes)…' : kdp ? 'Refaire description et mots-clés' : 'Écrire la description et les 7 mots-clés'}</Button><Button asChild variant="outline"><Link to="/v3/studio-v4"><ImageIcon className="mr-2 h-4 w-4" /> Créer la couverture KDP</Link></Button></div></div>
+    <div className="flex flex-wrap items-center justify-between gap-2"><h3 className="text-lg font-bold">Fiche Amazon KDP de votre album</h3><div className="flex flex-wrap gap-2"><Button onClick={generate} disabled={loading}>{loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}{loading ? 'Rédaction (environ 20 secondes)…' : kdp ? 'Refaire description et mots-clés' : 'Écrire la description et les 7 mots-clés'}</Button><Button asChild variant="outline"><Link to={isAdmin ? '/admin/cover-pro' : '/v3/studio-v4'}><ImageIcon className="mr-2 h-4 w-4" /> {isAdmin ? 'Créer la couverture (studio admin)' : 'Créer la couverture KDP'}</Link></Button></div></div>
     <p className="text-sm text-muted-foreground">Copiez chaque case dans KDP. Le titre et le résumé viennent de votre album ; complétez-les à l’étape 1 ou ci-dessus si besoin.</p>
     <div className="space-y-2">{rows.map(([label, value]) => <div key={label} className="grid gap-2 rounded-md border border-border p-3 md:grid-cols-[200px_1fr_auto] md:items-start"><span className="text-sm font-semibold">{label}</span><span className="whitespace-pre-line text-sm text-muted-foreground">{value || 'À compléter'}</span><Button variant="outline" size="sm" onClick={() => copy(value)} disabled={!value}>Copier</Button></div>)}</div>
   </section>;
