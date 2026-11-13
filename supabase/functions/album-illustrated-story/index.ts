@@ -70,6 +70,27 @@ Deno.serve(async (req) => {
     if (!apiKey) return json({ error: 'Le moteur d’écriture n’est pas configuré.' }, 500);
 
     const rawBody = await req.json();
+    if (rawBody?.mode === 'prefill-character') {
+      const pc = z.object({ title: z.string().trim().min(2).max(160), pitch: z.string().max(4000).optional(), targetAge: z.string().max(30).optional(), existing: z.array(z.string().max(80)).max(3).optional(), hint: z.string().max(200).optional() }).safeParse(rawBody);
+      if (!pc.success) return json({ error: 'Indiquez d’abord un titre.' }, 400);
+      const cPrompt = `Tu es auteur français d'albums illustrés pour enfants de ${pc.data.targetAge || '3-6 ans'}. Album « ${pc.data.title} ». Histoire: ${pc.data.pitch || 'non précisée'}.
+Personnages déjà présents: ${(pc.data.existing || []).join(', ') || 'aucun'}.
+${pc.data.hint ? `Indication de l'auteur pour ce personnage: ${pc.data.hint}.` : ''}
+Crée UN personnage secondaire nouveau, utile à l'histoire (parent, ami, animal compagnon...), avec un nom différent des autres. Français naturel uniquement, aucun tiret cadratin.
+Retourne uniquement un JSON valide sans markdown: {"name":"...","age":"...","physical":"apparence précise avec couleurs","outfit":"tenue précise avec couleurs","distinctiveFeatures":"...","personality":"trois traits"}`;
+      const r = await fetch('https://ai.gateway.lovable.dev/v1/responses', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Lovable-API-Key': apiKey, 'X-Lovable-AIG-SDK': 'fetch' },
+        body: JSON.stringify({ model: 'openai/gpt-6-astra', input: cPrompt, stream: true, store: false, reasoning: { effort: 'low', summary: 'auto' }, include: ['reasoning.encrypted_content'] }),
+      });
+      if (!r.ok) return json({ error: (await r.text()).slice(0, 300) || 'Le remplissage a échoué.' }, r.status);
+      const out = await readResponseText(r);
+      const m = out.match(/\{[\s\S]*\}/);
+      if (!m) return json({ error: 'Réponse illisible. Relancez.' }, 502);
+      const ch = z.object({ name: z.string().min(1).max(80), age: z.string().max(30), physical: z.string().max(1000), outfit: z.string().max(600), distinctiveFeatures: z.string().max(300), personality: z.string().max(300) }).safeParse(JSON.parse(m[0]));
+      if (!ch.success) return json({ error: 'Réponse incomplète. Relancez.' }, 502);
+      return json({ character: ch.data });
+    }
     if (rawBody?.mode === 'prefill') {
       const pre = z.object({ title: z.string().trim().min(2).max(160), targetAge: z.string().trim().max(30).optional() }).safeParse(rawBody);
       if (!pre.success) return json({ error: 'Indiquez d’abord un titre.' }, 400);

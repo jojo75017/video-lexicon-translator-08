@@ -100,6 +100,25 @@ export default function V3IllustratedAlbumPage() {
     }
   };
 
+  const prefillCharacter = async (character: AlbumCharacter) => {
+    if (draft.title.trim().length < 2) return toast.error('Tapez d’abord le titre du livre à l’étape 1.');
+    setBusy(`fill-${character.id}`);
+    try {
+      const { data, error } = await supabase.functions.invoke('album-illustrated-story', { body: {
+        mode: 'prefill-character', title: draft.title, pitch: draft.pitch, targetAge: draft.targetAge,
+        existing: draft.characters.filter((c) => c.id !== character.id && c.name.trim()).map((c) => c.name),
+        hint: character.name.trim() || undefined,
+      } });
+      if (error || !data?.character) throw new Error(data?.error || error?.message || 'Personnage non reçu');
+      setDraft((current) => ({ ...current, characters: current.characters.map((c) => c.id === character.id ? { ...c, ...data.character, referenceUrl: undefined, locked: false } : c) }));
+      toast.success(`Personnage « ${data.character.name} » rempli.`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Impossible de remplir ce personnage.');
+    } finally {
+      setBusy(null);
+    }
+  };
+
   const generateReference = async (character: AlbumCharacter) => {
     if (!hasAccess) { setShowCheckout(true); return; }
     if (!character.name.trim() || !character.physical.trim() || !character.outfit.trim()) {
@@ -316,7 +335,7 @@ export default function V3IllustratedAlbumPage() {
               <Field label="Tenue exacte" wide><textarea value={character.outfit} onChange={(event) => updateCharacter(character.id, { outfit: event.target.value })} maxLength={600} rows={2} placeholder="Vêtements et couleurs conservés sur toutes les pages" className={FIELD_CLASS} /></Field>
               <Field label="Signe distinctif"><input value={character.distinctiveFeatures} onChange={(event) => updateCharacter(character.id, { distinctiveFeatures: event.target.value })} maxLength={300} placeholder="Lunettes rondes, tache blanche…" className={FIELD_CLASS} /></Field>
               <Field label="Personnalité"><input value={character.personality} onChange={(event) => updateCharacter(character.id, { personality: event.target.value })} maxLength={300} className={FIELD_CLASS} /></Field>
-              <div className="flex flex-wrap gap-2 md:col-span-2"><Button variant="outline" onClick={() => generateReference(character)} disabled={busy === `character-${character.id}`}>{busy === `character-${character.id}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{character.referenceUrl ? 'Refaire la référence' : 'Créer la référence'}</Button>{character.referenceUrl && <Button variant={character.locked ? 'default' : 'outline'} onClick={() => updateCharacter(character.id, { locked: !character.locked, referenceUrl: character.referenceUrl })}>{character.locked ? <Check className="mr-2 h-4 w-4" /> : <LockKeyhole className="mr-2 h-4 w-4" />}{character.locked ? 'Personnage verrouillé' : 'Valider et verrouiller'}</Button>}{draft.characters.length > 1 && <Button variant="ghost" size="icon" title="Supprimer ce personnage" onClick={() => update({ characters: draft.characters.filter((item) => item.id !== character.id) })}><Trash2 className="h-4 w-4" /></Button>}</div>
+              <div className="flex flex-wrap gap-2 md:col-span-2"><Button variant="secondary" onClick={() => prefillCharacter(character)} disabled={busy === `fill-${character.id}`}>{busy === `fill-${character.id}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />} Remplir ce personnage automatiquement</Button><Button variant="outline" onClick={() => generateReference(character)} disabled={busy === `character-${character.id}`}>{busy === `character-${character.id}` ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <ImageIcon className="mr-2 h-4 w-4" />}{character.referenceUrl ? 'Refaire la référence' : 'Créer la référence'}</Button>{character.referenceUrl && <Button variant={character.locked ? 'default' : 'outline'} onClick={() => updateCharacter(character.id, { locked: !character.locked, referenceUrl: character.referenceUrl })}>{character.locked ? <Check className="mr-2 h-4 w-4" /> : <LockKeyhole className="mr-2 h-4 w-4" />}{character.locked ? 'Personnage verrouillé' : 'Valider et verrouiller'}</Button>}{draft.characters.length > 1 && <Button variant="ghost" size="icon" title="Supprimer ce personnage" onClick={() => update({ characters: draft.characters.filter((item) => item.id !== character.id) })}><Trash2 className="h-4 w-4" /></Button>}</div>
             </div>
             <div className="aspect-square overflow-hidden rounded-md border border-border bg-muted">{character.referenceUrl ? <img src={character.referenceUrl} alt={`Référence de ${character.name}`} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center px-4 text-center text-xs text-muted-foreground">La référence apparaîtra ici</div>}</div>
           </div>)}
