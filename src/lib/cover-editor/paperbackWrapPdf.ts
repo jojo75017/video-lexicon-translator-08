@@ -72,6 +72,6 @@ export function buildPaperbackPdf(i: WrapInput): Blob {
   }
   const wIn = g.width + 2 * m, hIn = g.height + 2 * m;
   const pdf = new jsPDF({ orientation: 'landscape', unit: 'in', format: [wIn, hIn], compress: true });
-  pdf.addImage(c.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, wIn, hIn);
+  pdf.addImage(c.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, wIn, hIn);
   return pdf.output('blob');
 }

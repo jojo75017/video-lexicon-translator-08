@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { COVER_GENRES, BADGE_STYLES } from '@/data/canvaCoverGenres';
 
 const W = 1600, H = 2560;
+/** Rendu interne en 2× pour des titres nets à l'impression 300 DPI. */
+const S = 2;
 const GENRE_STYLE: Record<string, { style: string; mood: string; lighting?: string }> = {
   guide: { style: 'clean modern editorial illustration, soft natural colours', mood: 'clear, reassuring, practical' },
   jeunesse: { style: 'bright 3D animated film style (Pixar-like), friendly cartoon characters, warm cheerful colours, NOT photographic', mood: 'joyful, warm, encouraging' },
@@ -81,7 +83,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
   const genre = COVER_GENRES.find((g) => g.id === genreId)!;
 
   useEffect(() => {
-    const c = canvasRef.current; if (!c) return; const ctx = c.getContext('2d')!;
+    const c = canvasRef.current; if (!c) return; const ctx = c.getContext('2d')!; ctx.setTransform(S, 0, 0, S, 0, 0); ctx.imageSmoothingQuality = 'high';
     ctx.fillStyle = genre.bg; ctx.fillRect(0, 0, W, H);
     if (img) { const s = Math.max(W / img.width, H / img.height); ctx.drawImage(img, (W - img.width * s) / 2, (H - img.height * s) / 2, img.width * s, img.height * s); }
     ctx.fillStyle = genre.overlay; ctx.fillRect(0, 0, W, H);
@@ -91,7 +93,7 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     const lh = (size + 10) * 1.1; const blockH = lines.length * lh;
     let y = genre.titlePos === 'top' ? 280 : H - 420 - blockH;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-    if (img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 24; }
+    if (img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3; }
     const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
     ctx.font = '600 72px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.subColor;
     wrap(ctx, subtitle, maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
@@ -114,14 +116,14 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
       const bw = Math.max(...ls.map((l) => ctx.measureText(l).width)); const cx = (ex.x / 100) * W, cy = (ex.y / 100) * H; const bh = ls.length * lh;
       if (ex.box === 'panneau') { ctx.fillStyle = 'rgba(255,255,255,0.88)'; ctx.fillRect(cx - bw / 2 - 40, cy - 30, bw + 80, bh + 60); }
       if (ex.box === 'bulle') { ctx.beginPath(); ctx.ellipse(cx, cy + bh / 2, bw / 2 + 80, bh / 2 + 70, 0, 0, Math.PI * 2); ctx.fillStyle = '#F5C542'; ctx.fill(); }
-      ctx.fillStyle = ex.color; if (ex.box === 'aucun' && img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 18; }
+      ctx.fillStyle = ex.color; if (ex.box === 'aucun' && img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 5; ctx.shadowOffsetY = 2; }
       ls.forEach((l, i) => ctx.fillText(l, cx, cy + i * lh)); ctx.shadowBlur = 0;
     }
-    setThumb(c.toDataURL('image/jpeg', 0.6));
+    ctx.shadowOffsetY = 0; setThumb(c.toDataURL('image/jpeg', 0.6));
   }, [genre, title, subtitle, author, img, badgeOn, badgeText, badgeStyle, badgePos, extras]);
 
   const onFile = (f?: File) => { if (!f) return; const i = new Image(); i.onload = () => setImg(i); i.src = URL.createObjectURL(f); };
-  const download = () => { const a = document.createElement('a'); a.href = canvasRef.current!.toDataURL('image/jpeg', 0.95); a.download = (title || 'couverture').replace(/\W+/g, '-') + '-kindle.jpg'; a.click(); };
+  const download = () => { const a = document.createElement('a'); const k = document.createElement('canvas'); k.width = W; k.height = H; const kc = k.getContext('2d')!; kc.imageSmoothingQuality = 'high'; kc.drawImage(canvasRef.current!, 0, 0, W, H); a.href = k.toDataURL('image/jpeg', 0.97); a.download = (title || 'couverture').replace(/\W+/g, '-') + '-kindle.jpg'; a.click(); };
   const tabs = [['modele', '1. Modèle'], ['visuel', '2. Visuel'], ['texte', '3. Textes'], ['macaron', '4. Macaron']] as const;
   const input = 'w-full rounded-lg border border-border bg-background px-3 py-2 text-foreground';
 
@@ -199,7 +201,7 @@ const STEPS = [
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
             {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
           </div>
-          <canvas ref={canvasRef} width={W} height={H} className="w-full max-w-[440px] rounded shadow-2xl" />
+          <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] rounded shadow-2xl" />
           <div className="flex w-full max-w-3xl flex-wrap items-center gap-6 rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center gap-4">
               {thumb && <img src={thumb} alt="Miniature Amazon" className="w-[64px] rounded shadow" />}
