@@ -52,7 +52,7 @@ export default function V3QuickActionsBar() {
         type="button"
         onClick={() => navigate('/cover-studio')}
         className={outline}
-        style={{ borderColor: 'rgba(201,168,76,0.7)', color: '#8a6d1f', background: '#fff' }}
+        style={{ borderColor: '#FF9E2D', color: '#FF9E2D', background: '#0F172A' }}
       >
         <Palette className="h-3.5 w-3.5" /> 🎨 Couverture
       </button>
@@ -60,7 +60,7 @@ export default function V3QuickActionsBar() {
         type="button"
         onClick={() => navigate('/ambiances')}
         className={outline}
-        style={{ borderColor: 'rgba(6,78,59,0.3)', color: 'var(--v3-emerald, #064e3b)', background: '#fff' }}
+        style={{ borderColor: '#008296', color: '#5EEAD4', background: '#0F172A' }}
       >
         <Sparkles className="h-3.5 w-3.5" /> Ambiances
       </button>
@@ -68,7 +68,7 @@ export default function V3QuickActionsBar() {
         type="button"
         onClick={saveNow}
         className={outline}
-        style={{ borderColor: 'rgba(6,78,59,0.3)', color: 'var(--v3-emerald, #064e3b)', background: '#fff' }}
+        style={{ borderColor: '#008296', color: '#5EEAD4', background: '#0F172A' }}
       >
         <Save className="h-3.5 w-3.5" /> Sauvegarder
       </button>
