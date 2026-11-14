@@ -9,6 +9,7 @@ import {
   writeBookBrief,
   type BookBrief,
 } from '@/lib/v3/bookBrief';
+import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 
 type SectionId = 'sheet' | 'identity' | 'author' | 'pitch' | 'characters' | 'ending' | 'review';
@@ -100,12 +101,35 @@ export default function V3BookSheetForm() {
 
   const set = (patch: Partial<BookBrief>) => setBrief((prev) => ({ ...prev, ...patch }));
 
-  const save = () => {
+  // Enregistrement automatique dans « Mes livres » : rien ne se perd, même sans clic.
+  const [dirty, setDirty] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    if (!mounted) { setMounted(true); return; }
+    const hasContent = Boolean((brief.title || '').trim() || (brief.outline || []).length || (brief.characters || []).length || (brief.description || '').trim());
+    if (hasContent) setDirty(true);
+  }, [brief]);
+  useEffect(() => {
+    if (!dirty) return;
+    const timer = window.setTimeout(() => {
+      const current = readBookBrief() || {};
+      const next: BookBrief = { ...current, ...brief };
+      writeBookBrief(next);
+      void saveBookDraftToCloud(next);
+      setDirty(false);
+    }, 2500);
+    return () => window.clearTimeout(timer);
+  }, [brief, dirty]);
+
+  const save = async () => {
     const current = readBookBrief() || {};
     const next: BookBrief = { ...current, ...brief, creationPath: 'existing-outline', outlineFirst: true };
     writeBookBrief(next);
     window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
-    toast.success('Fiche enregistrée : le Génie s’appuiera dessus sans rien réécrire.');
+    const result = await saveBookDraftToCloud(next);
+    if (result.error === 'not-authenticated') toast.warning('Fiche gardée sur cet appareil : connectez-vous pour l’enregistrer dans « Mes livres ».');
+    else if (result.error) toast.error('Enregistrement impossible, réessayez dans un instant.');
+    else toast.success('Fiche enregistrée dans « Mes livres ».');
   };
 
   const importSheet = () => {
@@ -126,6 +150,7 @@ export default function V3BookSheetForm() {
     writeBookBrief(next);
     setBrief(next);
     window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
+    void saveBookDraftToCloud(next);
     setPasted('');
     setOpen((prev) => ({ ...prev, identity: true, characters: true }));
     toast.success(

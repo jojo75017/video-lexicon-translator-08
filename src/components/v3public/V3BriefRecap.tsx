@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ListOrdered, Rocket, UserRound, Save, Check, ArrowRight } from 'lucide-react';
 import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import V3TargetPromisePanel from './V3TargetPromisePanel';
 import V3OutlinePanel from './V3OutlinePanel';
 
@@ -67,6 +68,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
 
   const save = () => {
     writeBookBrief(brief);
+    void saveBookDraftToCloud(brief);
     setSaved(true);
   };
 
