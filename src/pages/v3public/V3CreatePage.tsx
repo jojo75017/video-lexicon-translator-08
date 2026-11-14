@@ -23,6 +23,7 @@ import V3AvatarPickerCard from '@/components/v3public/V3AvatarPickerCard';
 
 import { BOOK_BRIEF_EVENT, clearBookBrief, parseTocText, readBookBrief, writeBookBrief, type BriefOutlineChapter, type BookBrief } from '@/lib/v3/bookBrief';
 import { restoreDraftState, saveBookDraftToCloud, BOOK_DRAFT_STATUS_EVENT, type BookDraftStatus } from '@/lib/v3/bookDraftCloud';
+import { restoreWritingBrief } from '@/lib/v3/bookDraftRestore';
 import { writeLocalThread } from '@/lib/v3/genieThread';
 import geniusHero from '@/assets/genius-hero.jpg';
 
@@ -244,8 +245,10 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
     const validated = { ...current, chapters: chapters.length, outlineValidated: true, outlineFirst: true, creationPath: 'existing-outline' as const };
     clearPreviousWritingSession();
     writeBookBrief(validated);
-    void saveBookDraftToCloud(validated, { activeStep: 3 });
+    const result = await saveBookDraftToCloud(validated, { activeStep: 3 });
+    if (result.error) { toast.error('Le sommaire reste sur cet appareil. Enregistrez-le avant de passer à la rédaction.'); return; }
     setDesk(3);
+    setShowWizard(true);
     toast.success(`Le Génie a vérifié votre sommaire : ${chapters.length} chapitres conservés tels quels.`);
   };
 
@@ -337,12 +340,13 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
         : {};
       writeBookBrief({
         ...prev, ...restoredBrief,
+        ...restoreWritingBrief(data, restoredBrief),
         mode: biography ? 'biography' : 'book',
         projectId: data.id,
         title: data.title || restoredBrief.title || '',
         author: data.author_name || restoredBrief.author || '',
-        description: data.kdp_description || restoredBrief.description || '',
-        category: category || restoredBrief.category || '',
+        description: restoredBrief.synopsis || restoredBrief.description || data.kdp_description || '',
+        category: restoredBrief.category || restoredBrief.genre || category || '',
         tone: data.tone || restoredBrief.tone || '',
         chapters: outline.length || Number(data.number_of_chapters) || restoredBrief.chapters,
         outline: outline.length ? outline : restoredBrief.outline,
@@ -353,7 +357,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
       if (restored?.activeStep && [1, 2, 3].includes(restored.activeStep)) setDesk(restored.activeStep as DeskId);
       else setDesk(dataStep);
 
-      setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length });
+      setOpenedBook({ id: data.id, title: data.title || 'Livre sans titre', chapters: outline.length || restoredBrief.outline?.length || 0 });
       setBriefKey((k) => k + 1);
       const shouldOpenWriting = Boolean(restoredBrief.outlineValidated || rawChapters.some((chapter) => String(chapter?.content || chapter?.contenu || '').trim()));
       setShowWizard(shouldOpenWriting);
@@ -396,10 +400,12 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
 
   const launchWorkflow = () => {
     if (!readBookBrief()?.outlineValidated) {
+      setDesk(2);
       toast.info('Validez d’abord votre sommaire : la rédaction démarre juste après.');
       document.getElementById('sommaire-ia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
+    setDesk(3);
     setShowWizard(true);
     setTimeout(() => wizardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
   };

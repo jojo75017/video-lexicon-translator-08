@@ -99,23 +99,20 @@ export default function V3BookSheetForm() {
     return () => { alive = false; };
   }, [qrUrl]);
 
-  const set = (patch: Partial<BookBrief>) => setBrief((prev) => ({ ...prev, ...patch }));
+  const set = (patch: Partial<BookBrief>) => {
+    const next = { ...(readBookBrief() || brief), ...patch };
+    writeBookBrief(next);
+    setBrief(next);
+    setDirty(true);
+  };
 
   // Enregistrement automatique dans « Mes livres » : rien ne se perd, même sans clic.
   const [dirty, setDirty] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    if (!mounted) { setMounted(true); return; }
-    const hasContent = Boolean((brief.title || '').trim() || (brief.outline || []).length || (brief.characters || []).length || (brief.description || '').trim());
-    if (hasContent) setDirty(true);
-  }, [brief]);
   useEffect(() => {
     if (!dirty) return;
     const timer = window.setTimeout(() => {
       const current = readBookBrief() || {};
-      const next: BookBrief = { ...current, ...brief };
-      writeBookBrief(next);
-      void saveBookDraftToCloud(next);
+      void saveBookDraftToCloud(current);
       setDirty(false);
     }, 2500);
     return () => window.clearTimeout(timer);
@@ -123,7 +120,7 @@ export default function V3BookSheetForm() {
 
   const save = async () => {
     const current = readBookBrief() || {};
-    const next: BookBrief = { ...current, ...brief, creationPath: 'existing-outline', outlineFirst: true };
+    const next: BookBrief = { ...current, creationPath: 'existing-outline', outlineFirst: true };
     writeBookBrief(next);
     window.dispatchEvent(new Event(BOOK_BRIEF_EVENT));
     const result = await saveBookDraftToCloud(next);

@@ -23,6 +23,7 @@ import TocUltimateGenerator, { type UltimateTocChapter } from '@/components/tool
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BOOK_BRIEF_EVENT, clearTocForWorkflow, listSourcePassages, narrativeForBook, parseTocText, passageForBook, readBookBrief, readLatestUltimateToc, writeBookBrief, type BriefOutlineChapter } from '@/lib/v3/bookBrief';
 import { chapterInstructions } from '@/lib/v3/outlineStudio';
+import { mergeWritingCharacters, restoreWritingBrief } from '@/lib/v3/bookDraftRestore';
 
 
 type WizardCharacter = {
@@ -297,6 +298,7 @@ function hasRepeatedFallbackTitles(items: OutlineChapter[], expectedCount: numbe
 export default function V3CreateWizard() {
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedProjectId = searchParams.get('projectId');
+  const [projectLoaded, setProjectLoaded] = useState(!requestedProjectId);
   const isDirectWritingPath = searchParams.get('ecrire') === '1';
   const hub = useMemo(readHubConfig, []);
   const startingBrief = useMemo(() => readBookBrief() || {}, []);
@@ -509,7 +511,7 @@ export default function V3CreateWizard() {
       }
     }
   };
-  const [tone, setTone] = useState('Inspirant');
+  const [tone, setTone] = useState(startingBrief.tone || 'Inspirant');
   const [chapters, setChapters] = useState(clampNumber(Number(startingBrief.chapters || hub.numberOfChapters), 3, 40, 12));
   const [wordsPerChapter, setWordsPerChapter] = useState(
     clampNumber(Number(startingBrief.wordsPerChapter), 500, 5000, 2500),
@@ -520,7 +522,7 @@ export default function V3CreateWizard() {
       id: makeId(),
       name: character.name || '',
       role: character.role || 'Personnage principal',
-      traits: character.traits || character.description || '',
+      traits: [character.age, character.traits, character.description].filter(Boolean).join('\n'),
     })) : [makeCharacter()];
   });
   const [outline, setOutline] = useState<OutlineChapter[]>(() => {
@@ -638,7 +640,8 @@ export default function V3CreateWizard() {
       }));
       const savedImages = Array.isArray(saved.ebook_images) ? saved.ebook_images : [];
       const savedCover = savedImages.find((image: any) => image?.type === 'front_cover')?.url || saved.cover_concepts || null;
-      const savedSubtitle = String(saved.narrative_format || '').replace(/^Sous-titre\s*:\s*/i, '');
+      const editorial = restoreWritingBrief(saved, startingBrief);
+      const savedSubtitle = editorial.subtitle || '';
       const savedChapterCount = clampNumber(Number(saved.number_of_chapters || savedChapters.length), 3, 40, 12);
 
       restoreRef.current = true;
@@ -647,10 +650,17 @@ export default function V3CreateWizard() {
       setFinalTitle(saved.title || '');
       setSubtitle(savedSubtitle === 'Workflow V3 complet' ? '' : savedSubtitle);
       setAuthorName(saved.author_name || 'Auteur Ebookstudio');
-      setDescription(saved.preface || saved.book_summary || 'Livre sauvegardé dans Mes livres.');
+      setDescription(editorial.description || '');
       setTone(saved.tone || saved.writing_style || 'Inspirant');
       setChapters(savedChapterCount);
-      if (saved.kdp_categories) {
+      setWordsPerChapter(clampNumber(Number(editorial.wordsPerChapter), 500, 5000, 2500));
+      if (editorial.genre || editorial.category) {
+        const genre = editorial.genre || editorial.category || '';
+        const match = CATEGORIES.find((item) => item.toLowerCase() === genre.toLowerCase());
+        setCategory(match || 'Autre');
+        setCustomCategory(match ? '' : genre);
+      }
+      if (saved.kdp_categories && !editorial.genre) {
         // Les catégories sont stockées « cat1 | cat2 | genre » : on repart de la première.
         const first = String(saved.kdp_categories).split('|')[0].trim();
         const match = CATEGORIES.find((item) => item.toLowerCase() === first.toLowerCase());
@@ -658,13 +668,14 @@ export default function V3CreateWizard() {
         else { setCategory('Autre'); setCustomCategory(first); }
       }
 
-      if (restoredOutline.length) setOutline(restoredOutline);
-      if (Array.isArray(saved.characters) && saved.characters.length) {
-        setCharacters(saved.characters.map((character: any) => ({
+      if (editorial.outline?.length) setOutline(editorial.outline.map((chapter) => ({ ...chapter, id: makeId(), objectif: chapter.objectif || '' })));
+      else if (restoredOutline.length) setOutline(restoredOutline);
+      if (editorial.characters?.length) {
+        setCharacters(editorial.characters.map((character) => ({
           id: makeId(),
           name: character.name || '',
           role: character.role || 'Personnage',
-          traits: character.description || character.traits || '',
+          traits: [character.age, character.traits, character.description].filter(Boolean).join('\n'),
         })));
       }
       setCoverUrl(savedCover);
@@ -746,7 +757,8 @@ export default function V3CreateWizard() {
         setStep(2);
         setLaunched(false);
       }
-        toast.success(`« ${saved.title} » est ouvert — l’export est affiché en premier.`);
+      setProjectLoaded(true);
+      toast.success(`« ${saved.title} » est ouvert avec sa fiche et son sommaire.`);
     };
 
     void openSavedProject();
@@ -1133,6 +1145,7 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
 
   // Instantané du brief pour le récapitulatif « Livre en préparation » sur /v3
   useEffect(() => {
+    if (!projectLoaded) return;
     if (!title.trim() && !description.trim()) return;
     // Le Génie et le wizard partagent la même fiche. Toujours reprendre ici la
     // matière la plus récente du stockage, sinon un ancien état React pouvait
@@ -1163,12 +1176,12 @@ Règles : 100 % en français courant, aucun mot latin ni langue étrangère, auc
         titre: c.titre,
         objectif: c.objectif,
       })),
-      characters: characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, description: c.traits, traits: c.traits })),
+      characters: mergeWritingCharacters(currentBrief.characters, characters.filter((c) => c.name.trim()).map((c) => ({ name: c.name, role: c.role, traits: c.traits }))),
       cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, readerAvatarId: avatarId, avatarConsigne,
       promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion,
       projectId,
     } as any);
-  }, [title, finalTitle, subtitle, authorName, description, sourceText, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarId, avatarConsigne, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
+  }, [projectLoaded, title, finalTitle, subtitle, authorName, description, sourceText, effectiveCategory, tone, chapters, wordsPerChapter, normalizedOutline, characters, cibleProfil, cibleNiveau, cibleBesoins, cibleFrustrations, avatarId, avatarConsigne, promesseCentrale, promesseBenefices, promesseDifferenciation, promesseEmotion, projectId]);
 
   const [showTocPaste, setShowTocPaste] = useState(false);
   const [tocPasteText, setTocPasteText] = useState('');

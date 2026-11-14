@@ -1,4 +1,5 @@
 # Architecture
+- Writing restores rich drafts before wizard autosave; only form edits trigger saves, preventing stale fields from erasing book data.
 - Studio cover format controls generation ratio, canvas and downloads together; imported artwork uses contain placement so characters are never cropped by the editor.
 - Library Flipbook previews load only the selected ownership-filtered ebook and its saved pages through SavedBookFlipbook, reusing the illustrated reader without AI generation or changing exports.
 - Security handler regression tests execute isolated handler code with mocked identity, storage and provider calls, so denied requests can be verified without real AI spending, emails or customer changes.
