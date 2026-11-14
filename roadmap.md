@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Cases et lecture du brouillon : fiche complète accessible à l’étape rédaction, synopsis et six personnages affichés, 32 titres visibles avec état non rédigé ; vérification connectée et 4 tests réussis, sans publication.
 - [x] Fils d’El Cuervo : fiche restaurée, 6 personnages et 32 parties conservés ; sauvegarde, validation et accès au bouton de rédaction vérifiés connecté, 4 tests réussis, sans génération ni publication.
 - [ ] Corriger la couverture de Léo et le studio : scène continue, format carré jeunesse, aperçu et téléchargements vérifiés sans publication.
 - [x] Ajouter « Voir votre Flipbook » aux deux bibliothèques : lecture depuis le compte de Georges vérifiée, affichage mobile contrôlé et trois tests réussis ; /essai et spécimen /v3/ebook-illustre ouverts à l’écran.

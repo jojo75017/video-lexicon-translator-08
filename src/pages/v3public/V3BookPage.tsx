@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import AudiobookOfferCard from '@/components/v3public/AudiobookOfferCard';
 import V3ResetBookButton from '@/components/v3public/V3ResetBookButton';
 import { readBookBrief } from '@/lib/v3/bookBrief';
+import type { BookBrief } from '@/lib/v3/bookBrief';
+import { restoreWritingBrief } from '@/lib/v3/bookDraftRestore';
+import { Button } from '@/components/ui/button';
 import {
   effectiveChapterText,
   readWrittenChapters,
@@ -19,6 +22,7 @@ type Book = {
   preface?: string | null;
   conclusion?: string | null;
   chapters?: Array<{ title?: string; content?: string; text?: string }> | null;
+  draft_state?: { brief?: BookBrief } | null;
 };
 
 export default function V3BookPage() {
@@ -32,7 +36,7 @@ export default function V3BookPage() {
     if (!id) return;
     (async () => {
       const { data } = await supabase.from('ebook_projects')
-        .select('id,title,author_name,preface,conclusion,chapters')
+        .select('id,title,author_name,preface,conclusion,chapters,draft_state')
         .eq('id', id).maybeSingle();
       setBook((data as Book) || null);
       setLoading(false);
@@ -74,7 +78,8 @@ export default function V3BookPage() {
     );
   }
 
-  const storedChapters = book.chapters || [];
+  const brief = restoreWritingBrief(book, {});
+  const storedChapters = book.chapters?.length ? book.chapters : (brief.outline || []).map((chapter) => ({ title: chapter.titre, content: '', text: undefined }));
   const chapters = liveChapters.length > 0
     ? liveChapters.map((chapter, index) => ({
         title: chapter.title || storedChapters[index]?.title,
@@ -99,11 +104,17 @@ export default function V3BookPage() {
             />
           </div>
           <h1 className="v3-serif text-4xl md:text-5xl font-bold mt-6">{book.title}</h1>
+          {brief.subtitle && <p className="mt-3 text-lg text-muted-foreground">{brief.subtitle}</p>}
           {book.author_name && <div className="mt-2 text-white/60">par {book.author_name}</div>}
+          <Button asChild className="mt-5"><Link to={`/v3/create?projectId=${book.id}`}>Ouvrir ma fiche et reprendre la rédaction</Link></Button>
         </div>
       </section>
 
       <section className="max-w-4xl mx-auto px-5 md:px-8 py-10 grid md:grid-cols-[220px_1fr] gap-10">
+        <div className="md:col-span-2 space-y-4">
+          {brief.description && <details open><summary className="cursor-pointer font-semibold">Synopsis</summary><p className="mt-3 whitespace-pre-wrap">{brief.description}</p></details>}
+          {!!brief.characters?.length && <details><summary className="cursor-pointer font-semibold">Personnages ({brief.characters.length})</summary><div className="mt-3 space-y-4">{brief.characters.map((character, index) => <div key={index}><h2 className="font-semibold">{character.name} {character.age && `(${character.age})`}</h2><p>{character.role}</p><p className="whitespace-pre-wrap">{character.traits}</p><p>{character.description}</p></div>)}</div></details>}
+        </div>
         <aside className="md:sticky md:top-28 self-start space-y-1 max-h-[70vh] overflow-y-auto pr-2">
           <div className="text-xs uppercase tracking-wider text-[var(--v3-muted)] mb-2">Chapitres</div>
           {book.preface && (
@@ -145,7 +156,7 @@ export default function V3BookPage() {
           {current && (
             <>
               <h2 className="v3-serif text-3xl font-bold mb-6">{current.title || `Chapitre ${activeChapter + 1}`}</h2>
-              <div className="whitespace-pre-wrap">{current.content || current.text || 'Ce chapitre est vide.'}</div>
+              <div className="whitespace-pre-wrap">{current.content || current.text || 'Titre du sommaire enregistré. Ce chapitre n’a pas encore été rédigé.'}</div>
             </>
           )}
           {!current && activeChapter >= 0 && (

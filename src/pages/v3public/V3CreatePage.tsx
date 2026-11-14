@@ -846,6 +846,7 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
             {/* ③ Mon livre : rédaction, relecture, export, couverture, KDP, audio */}
             {desk === 3 && (
               <div className="space-y-4">
+                {existingOutlineActive && <V3BookSheetForm key={`sheet-${briefKey}`} />}
                 {showWizard ? (
                   <div ref={wizardRef} className="v3-card">
                     <Suspense fallback={<div className="py-16 flex justify-center"><Loader2 className="w-6 h-6 animate-spin text-[var(--v3-orange)]" /></div>}>

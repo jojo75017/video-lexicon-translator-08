@@ -2,7 +2,7 @@ import { V3_EXTRA_CATEGORIES } from '@/data/v3BookAvatars';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, ListOrdered, Rocket, UserRound, Save, Check, ArrowRight } from 'lucide-react';
-import { readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
+import { BOOK_BRIEF_EVENT, readBookBrief, writeBookBrief, type BookBrief } from '@/lib/v3/bookBrief';
 import { saveBookDraftToCloud } from '@/lib/v3/bookDraftCloud';
 import V3TargetPromisePanel from './V3TargetPromisePanel';
 import V3OutlinePanel from './V3OutlinePanel';
@@ -52,13 +52,16 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
   const [formOpen, setFormOpen] = useState(false);
 
   useEffect(() => {
-    setBrief(readBookBrief() || {});
+    const sync = () => setBrief(readBookBrief() || {});
+    sync();
+    window.addEventListener(BOOK_BRIEF_EVENT, sync);
+    return () => window.removeEventListener(BOOK_BRIEF_EVENT, sync);
   }, []);
 
   const patch = (values: Partial<BookBrief>) => {
     setSaved(false);
     setBrief((prev) => {
-      const next = { ...prev, ...values };
+      const next = { ...(readBookBrief() || prev), ...values };
       writeBookBrief(next);
       return next;
     });
@@ -178,6 +181,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
                 <select value={brief.category || ''} onChange={(e) => set('category', e.target.value)} size={1}
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle}>
                   <option value="">— Choisir une catégorie —</option>
+                  {brief.category && !CATEGORIES.includes(brief.category) && <option value={brief.category}>{brief.category}</option>}
                   {CATEGORIES.map((item) => <option key={item} value={item}>{item}</option>)}
                 </select>
               </label>
@@ -186,6 +190,7 @@ export default function V3BriefRecap({ variant = 'compact', onLaunch, outlineMod
                 <select value={brief.tone || ''} onChange={(e) => set('tone', e.target.value)}
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none" style={fieldStyle}>
                   <option value="">— Choisir un ton —</option>
+                  {brief.tone && !TONES.includes(brief.tone) && <option value={brief.tone}>{brief.tone}</option>}
                   {TONES.map((item) => <option key={item} value={item}>{item}</option>)}
                 </select>
               </label>
