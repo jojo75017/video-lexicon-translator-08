@@ -25,7 +25,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number) {
 
 export interface WrapInput {
   front: HTMLCanvasElement; trim: Trim; pages: number; paper: Paper; marks: boolean;
-  title: string; author: string; backText: string; backSize?: number; bg: string; textColor: string; accent: string;
+  title: string; author: string; backText: string; backSize?: number; backColor?: string; backAlign?: 'left' | 'center' | 'right'; backBold?: boolean; backItalic?: boolean; backPos?: 'haut' | 'milieu' | 'bas'; bg: string; textColor: string; accent: string;
 }
 
 export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
@@ -58,11 +58,18 @@ export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
   ctx.fillStyle = readableOn(i.bg); ctx.textAlign = 'left'; ctx.textBaseline = 'top';
   ctx.font = `800 ${px(0.28)}px Montserrat, Arial, sans-serif`;
   wrapLines(ctx, i.title, bw).filter(Boolean).slice(0, 3).forEach((l, k) => ctx.fillText(l, bx, by + k * px(0.36)));
-  // Résumé : police agrandie (réglable) et texte jusqu'au-dessus du cadre ISBN.
+  // Résumé : police, couleur, alignement et position réglables ; jamais sur le cadre ISBN.
   const k = (i.backSize ?? 100) / 100, fs = px(0.19 * k), lh = px(0.29 * k);
-  ctx.font = `400 ${fs}px Georgia, serif`; let y = by + px(1.25);
-  const limit = oy + H - px(BLEED + 0.25 + 1.2 + 0.2);
-  for (const l of wrapLines(ctx, i.backText || '', bw)) { if (y + fs > limit) break; ctx.fillText(l, bx, y); y += l ? lh : lh * 0.5; }
+  ctx.font = `${i.backItalic ? 'italic ' : ''}${i.backBold ? 700 : 400} ${fs}px Georgia, serif`;
+  if (i.backColor) ctx.fillStyle = i.backColor;
+  const top = by + px(1.25), limit = oy + H - px(BLEED + 0.25 + 1.2 + 0.2);
+  const lines = wrapLines(ctx, i.backText || '', bw); while (lines.length && !lines[lines.length - 1]) lines.pop();
+  const kept: string[] = []; let hgt = 0;
+  for (const l of lines) { const step = l ? lh : lh * 0.5; if (top + hgt + fs > limit) break; kept.push(l); hgt += step; }
+  const room = limit - top - hgt; let y = top + (i.backPos === 'bas' ? Math.max(0, room) : i.backPos === 'milieu' ? Math.max(0, room / 2) : 0);
+  const al = i.backAlign ?? 'left'; ctx.textAlign = al; const tx = al === 'center' ? bx + bw / 2 : al === 'right' ? bx + bw : bx;
+  for (const l of kept) { ctx.fillText(l, tx, y); y += l ? lh : lh * 0.5; }
+  ctx.textAlign = 'left';
   ctx.fillStyle = '#FFFFFF'; ctx.fillRect(ox + px(BLEED + g.tw - 0.25 - 2), oy + H - px(BLEED + 0.25 + 1.2), px(2), px(1.2));
   // Repères de coupe et de pli (dans la marge, hors fond perdu).
   if (i.marks) {
