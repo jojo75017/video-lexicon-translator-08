@@ -35,7 +35,20 @@ export type WrittenProgress = {
   total: number;
   /** Index du chapitre en cours de rédaction (-1 si aucun). */
   activeIndex: number;
+  /** Livre auquel appartiennent ces chapitres (évite d'afficher ceux d'un autre livre). */
+  projectId?: string | null;
 };
+
+function currentProjectId(): string | null {
+  try {
+    const brief = readBookBrief();
+    return brief?.projectId || null;
+  } catch {
+    return null;
+  }
+}
+
+import { readBookBrief } from '@/lib/v3/bookBrief';
 
 export const WRITTEN_CHAPTERS_KEY = 'v3_written_chapters_v1';
 export const WRITTEN_CHAPTERS_EVENT = 'v3:written-chapters-updated';
@@ -86,7 +99,8 @@ function emit() {
 
 function persist(progress: WrittenProgress) {
   try {
-    localStorage.setItem(WRITTEN_CHAPTERS_KEY, JSON.stringify(progress));
+    const stamped = { ...progress, projectId: progress.projectId ?? currentProjectId() };
+    localStorage.setItem(WRITTEN_CHAPTERS_KEY, JSON.stringify(stamped));
     emit();
   } catch {
     /* quota / mode privé */
@@ -97,6 +111,11 @@ export function readWrittenProgress(): WrittenProgress {
   try {
     const raw = localStorage.getItem(WRITTEN_CHAPTERS_KEY);
     const parsed = raw ? JSON.parse(raw) : null;
+    // Chapitres d'un autre livre (ou anciens chapitres sans livre) : jamais affichés
+    // dans le livre ouvert, pour ne pas mélanger deux manuscrits.
+    const activeProject = currentProjectId();
+    const owner = parsed && !Array.isArray(parsed) ? parsed.projectId || null : null;
+    if (activeProject && owner !== activeProject) return { chapters: [], total: 0, activeIndex: -1 };
     // Ancien format : simple tableau.
     if (Array.isArray(parsed)) {
       const chapters = parsed.map(normalizeChapter);
@@ -108,6 +127,7 @@ export function readWrittenProgress(): WrittenProgress {
         chapters,
         total: Math.max(Number(parsed.total) || 0, chapters.length),
         activeIndex: Number.isFinite(parsed.activeIndex) ? Number(parsed.activeIndex) : -1,
+        projectId: owner,
       };
     }
   } catch {
@@ -172,6 +192,7 @@ export function publishWrittenChapters(
   if (!list.length && !meta?.total) return;
 
   persist({
+    projectId: currentProjectId(),
     chapters: list,
     total: Math.max(meta?.total || 0, list.length, previous.total || 0),
     activeIndex:
