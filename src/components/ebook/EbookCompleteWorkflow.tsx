@@ -635,11 +635,18 @@ const EbookCompleteWorkflow: React.FC<EbookCompleteWorkflowProps> = ({
         }
       : undefined,
     P4: {
-      chapitres: generatedChapters.slice(-3).map((chapter: any) => ({
-        numero: chapter?.numero,
-        titre: limitText(chapter?.titre || chapter?.title, 120),
-        contenu: limitText(chapter?.contenu || chapter?.content, 400),
-      })),
+      // Le dernier chapitre transmet sa FIN (1 500 caractères) : la suite doit
+      // démarrer exactement là où la scène précédente s'est arrêtée.
+      chapitres: generatedChapters.slice(-3).map((chapter: any, idx: number, arr: any[]) => {
+        const text = String(chapter?.contenu || chapter?.content || '');
+        const isLast = idx === arr.length - 1;
+        return {
+          numero: chapter?.numero,
+          titre: limitText(chapter?.titre || chapter?.title, 120),
+          contenu: limitText(text, 400),
+          ...(isLast ? { fin: text.length > 1500 ? `…${text.slice(-1500).trim()}` : text } : {}),
+        };
+      }),
     },
   });
 

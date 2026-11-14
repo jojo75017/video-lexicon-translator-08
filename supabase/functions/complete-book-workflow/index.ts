@@ -1870,6 +1870,14 @@ Format JSON :
             if (resumesList.length > 0) {
               resumeChapitresPrecedents = `\n\nCHAPITRES PRÉCÉDENTS (${activeIsNonFiction ? 'progression pédagogique' : 'continuité narrative'}) :\n${resumesList.join('\n\n')}`;
             }
+            const dernier = chapitresDejaGeneres
+              .filter((ch: any) => ch.numero < chapitre.numero)
+              .sort((a: any, b: any) => a.numero - b.numero)
+              .slice(-1)[0];
+            const finDernier = String(dernier?.fin || dernier?.contenu || '').slice(-1500);
+            if (dernier && finDernier && !activeIsNonFiction && partNumber === 1) {
+              resumeChapitresPrecedents += `\n\nFIN EXACTE DU CHAPITRE ${dernier.numero} (la suite commence ICI) :\n« ${finDernier} »\nCONTINUITÉ OBLIGATOIRE :\n- Ouvre ce chapitre sur la conséquence directe de cette fin (même moment ou ellipse courte et explicite).\n- INTERDIT de redémarrer l'histoire : ne réintroduis pas le décor, l'époque ni les personnages déjà présentés.\n- INTERDIT de rejouer une scène, une rencontre, une arrestation ou une révélation déjà racontée.\n- Respecte l'état actuel des personnages (lieu, blessures, secrets connus, captivité).`;
+            }
           }
 
           const previousPartsSection = previousParts.length > 0
