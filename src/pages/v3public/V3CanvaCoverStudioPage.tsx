@@ -61,7 +61,7 @@ function wrap(ctx: CanvasRenderingContext2D, text: string, max: number) {
 
 export default function V3CanvaCoverStudioPage() {
   const pro = useCoverProAccess(); const proLoading = pro.loading;
-  const [tab, setTab] = useState<'modele' | 'visuel' | 'texte' | 'macaron'>('modele');
+  const [tab, setTab] = useState<'modele' | 'visuel' | 'texte' | 'macaron' | 'quatrieme'>('modele');
   const [genreId, setGenreId] = useState('guide');
   const [coverFormat, setCoverFormat] = useState<StudioCoverFormat>('kindle');
   const { width: W, height: H } = studioCoverSize(coverFormat);
@@ -105,8 +105,9 @@ export default function V3CanvaCoverStudioPage() {
   const [paper, setPaper] = useState<Paper>('blanc');
   const [marks, setMarks] = useState(false);
   const [backText, setBackText] = useState('');
+  const [backSize, setBackSize] = useState(100);
   const geo = wrapGeometry(trim, pages, paper);
-  const wrapInput = () => ({ front: canvasRef.current!, trim, pages, paper, marks, title, author, backText, bg: genre.bg, textColor: genre.titlePos === 'top' && !/^#0|^#1|^#3/.test(genre.bg) ? '#232F3E' : '#FFFFFF', accent: (TITLE_COLORS[genreId] ?? [genre.titleColor])[0] });
+  const wrapInput = () => ({ front: canvasRef.current!, trim, pages, paper, marks, title, author, backText, backSize, bg: genre.bg, textColor: genre.titlePos === 'top' && !/^#0|^#1|^#3/.test(genre.bg) ? '#232F3E' : '#FFFFFF', accent: (TITLE_COLORS[genreId] ?? [genre.titleColor])[0] });
   const [wrapPreview, setWrapPreview] = useState('');
   const autoBackText = () => {
     const b = books.find((x) => x.id === bookId) ?? books.find((x) => x.title?.trim().toLowerCase() === title.trim().toLowerCase());
@@ -120,7 +121,7 @@ export default function V3CanvaCoverStudioPage() {
     const t = setTimeout(() => { try { const c = renderWrapCanvas(wrapInput()); const k = document.createElement('canvas'); k.width = 1400; k.height = Math.round(1400 * c.height / c.width); k.getContext('2d')!.drawImage(c, 0, 0, k.width, k.height); setWrapPreview(k.toDataURL('image/jpeg', 0.85)); } catch { /* aperçu indisponible */ } }, 300);
     return () => clearTimeout(t);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showWrap, trim, pages, paper, backText, title, author, subtitle, genreId, img, badgeOn, badgeText, badgeStyle, badgeXY, badgeSize, extras]);
+  }, [showWrap, trim, pages, paper, backText, backSize, title, author, subtitle, genreId, img, badgeOn, badgeText, badgeStyle, badgeXY, badgeSize, extras]);
   const downloadWrap = () => {
     const blob = buildPaperbackPdf(wrapInput());
     const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${(title || 'couverture').replace(/\W+/g, '-')}-broche-kdp${marks ? '-reperes' : ''}.pdf`; a.click();
@@ -222,6 +223,7 @@ const STEPS = [
     { id: 'texte', icon: '✏️', t: '2. Mon livre & titres', d: 'Titre, sous-titre, auteur, textes' },
     { id: 'visuel', icon: '🎨', t: '3. Illustration', d: 'Images, personnages, ambiance' },
     { id: 'macaron', icon: '🏅', t: '4. Macaron', d: 'Bulle d\'accroche, couleur, position' },
+    { id: 'quatrieme', icon: '📘', t: '5. 4ᵉ de couverture', d: 'Résumé au dos, taille du texte' },
   ] as const;
   return (
     <div className="min-h-screen text-foreground">
@@ -297,6 +299,13 @@ const STEPS = [
             <label className="block text-xs">Taille du macaron<input type="range" min={120} max={340} value={badgeSize} onChange={(e) => setBadgeSize(+e.target.value)} className="w-full" /></label>
             <p className="text-xs text-muted-foreground">Astuce : faites glisser le macaron (ou vos textes) directement sur la couverture avec la souris ou le doigt.</p>
             <div className="flex gap-2">{(['haut', 'bas'] as const).map((p) => <button key={p} onClick={() => { setBadgePos(p); setBadgeXY(null); }} className={`v3-chip-toggle flex-1 rounded-lg px-3 py-2 text-sm ${badgePos === p ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>En {p}</button>)}</div></div>}
+          {tab === 'quatrieme' && <div className="space-y-3 text-sm">
+            <button onClick={fromStory} className="w-full rounded-lg bg-accent px-3 py-2 font-bold text-accent-foreground">✨ Reprendre le résumé de mon livre</button>
+            <label className="block font-semibold">Texte de la 4ᵉ de couverture (modifiable)<textarea rows={12} className={input} value={backText} onChange={(e) => setBackText(e.target.value)} placeholder="Présentez votre livre en quelques phrases…" /></label>
+            <label className="block text-xs">Taille du texte : {backSize} %<input type="range" min={70} max={160} value={backSize} onChange={(e) => setBackSize(+e.target.value)} className="w-full" /></label>
+            <p className="text-xs text-muted-foreground">Le texte descend jusqu'au-dessus du cadre blanc de l'ISBN. Aperçu : bouton « Télécharger le broché KDP » à droite.</p>
+            {!showWrap && <button onClick={openWrap} className="w-full rounded-lg bg-primary px-3 py-2 font-bold text-primary-foreground">👁️ Voir l'aperçu de la couverture complète</button>}
+          </div>}
           </div>
         </aside>
         <main className="flex flex-col items-center gap-6 p-6">
@@ -325,7 +334,7 @@ const STEPS = [
             <label className="block">Nombre de pages intérieures<input type="number" min={24} max={828} className={input} value={pages} onChange={(e) => setPages(Math.max(24, +e.target.value || 24))} /></label>
             <label className="block">Papier<select className={input} value={paper} onChange={(e) => setPaper(e.target.value as Paper)}><option value="blanc">Blanc (noir et blanc)</option><option value="creme">Crème (noir et blanc)</option><option value="couleur">Blanc (couleur)</option></select></label>
             <button onClick={fromStory} className="w-full rounded-lg bg-accent px-3 py-2 font-bold text-accent-foreground">✨ Reprendre le résumé de mon livre</button>
-            <label className="block">Texte de quatrième de couverture<textarea rows={5} className={input} value={backText} onChange={(e) => setBackText(e.target.value)} placeholder="Présentez votre livre en quelques phrases…" /></label>
+            <label className="block">Texte de quatrième de couverture<textarea rows={8} className={input} value={backText} onChange={(e) => setBackText(e.target.value)} placeholder="Présentez votre livre en quelques phrases…" /></label>
             <label className="flex items-start gap-2"><input type="checkbox" checked={marks} onChange={(e) => setMarks(e.target.checked)} className="mt-1" /><span>Ajouter les repères d'impression (coupe et pli). <b>À décocher pour Amazon KDP</b>, qui refuse les repères ; utile pour un imprimeur ou pour vérifier.</span></label>
             <p className="text-xs text-muted-foreground">Dos : {(geo.spine * 2.54).toFixed(2)} cm · Couverture complète : {(geo.width * 2.54).toFixed(1)} × {(geo.height * 2.54).toFixed(1)} cm, fond perdu inclus, 300 DPI. {geo.spineText ? 'Titre et auteur écrits sur le dos.' : 'Moins de 79 pages : KDP n\'autorise pas de texte sur le dos.'} Un cadre blanc est réservé en bas de la quatrième pour le code-barres Amazon.</p>
             {wrapPreview && <div><p className="mb-1 text-xs text-muted-foreground">Aperçu : quatrième (gauche) · tranche (centre) · première (droite)</p><img src={wrapPreview} alt="Aperçu couverture brochée complète" className="w-full rounded shadow" /></div>}

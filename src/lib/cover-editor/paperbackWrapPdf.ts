@@ -25,7 +25,7 @@ function wrapLines(ctx: CanvasRenderingContext2D, text: string, max: number) {
 
 export interface WrapInput {
   front: HTMLCanvasElement; trim: Trim; pages: number; paper: Paper; marks: boolean;
-  title: string; author: string; backText: string; bg: string; textColor: string; accent: string;
+  title: string; author: string; backText: string; backSize?: number; bg: string; textColor: string; accent: string;
 }
 
 export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
@@ -58,8 +58,11 @@ export function renderWrapCanvas(i: WrapInput): HTMLCanvasElement {
   ctx.fillStyle = readableOn(i.bg); ctx.textAlign = 'left'; ctx.textBaseline = 'top';
   ctx.font = `800 ${px(0.28)}px Montserrat, Arial, sans-serif`;
   wrapLines(ctx, i.title, bw).filter(Boolean).slice(0, 3).forEach((l, k) => ctx.fillText(l, bx, by + k * px(0.36)));
-  ctx.font = `400 ${px(0.15)}px Georgia, serif`; let y = by + px(1.4);
-  for (const l of wrapLines(ctx, i.backText || '', bw)) { if (y > oy + H - px(BLEED + 2.1)) break; ctx.fillText(l, bx, y); y += px(0.24); }
+  // Résumé : police agrandie (réglable) et texte jusqu'au-dessus du cadre ISBN.
+  const k = (i.backSize ?? 100) / 100, fs = px(0.19 * k), lh = px(0.29 * k);
+  ctx.font = `400 ${fs}px Georgia, serif`; let y = by + px(1.25);
+  const limit = oy + H - px(BLEED + 0.25 + 1.2 + 0.2);
+  for (const l of wrapLines(ctx, i.backText || '', bw)) { if (y + fs > limit) break; ctx.fillText(l, bx, y); y += l ? lh : lh * 0.5; }
   ctx.fillStyle = '#FFFFFF'; ctx.fillRect(ox + px(BLEED + g.tw - 0.25 - 2), oy + H - px(BLEED + 0.25 + 1.2), px(2), px(1.2));
   // Repères de coupe et de pli (dans la marge, hors fond perdu).
   if (i.marks) {
