@@ -2974,7 +2974,7 @@ ${outlineRulesFor(bookType)}`;
               <h3 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>Bible de l'univers</h3>
             </div>
             <p className="mb-3 text-sm" style={{ color: 'var(--v3-muted)' }}>
-              Décris ton univers : lieux, factions, règles, magie, chronologie, ambiance. Ce texte sera injecté dans TOUS les agents pour garantir la cohérence (idéal pour séries, sagas, mondes étendus).
+              Facultatif. Décris ton univers : lieux, époque, groupes, règles, ambiance. Tous les agents le respecteront. Laisse vide si ta fiche suffit.
             </p>
             <textarea
               value={bibleUnivers}
@@ -2992,7 +2992,7 @@ ${outlineRulesFor(bookType)}`;
               <h3 className="v3-serif text-2xl font-bold" style={{ color: 'var(--v3-ink)' }}>Arbre narratif</h3>
             </div>
             <p className="mb-3 text-sm" style={{ color: 'var(--v3-muted)' }}>
-              Arcs, embranchements, choix, points de bascule, chronologie. Colle ton arbre narratif ici — les agents respecteront la structure lors de la génération.
+              Facultatif. Les grands moments de l'histoire : actes, rebondissements, chronologie. Laisse vide si ton sommaire suffit.
             </p>
             <textarea
               value={arbreNarratif}
@@ -3063,9 +3063,16 @@ ${outlineRulesFor(bookType)}`;
           <ArrowLeft className="h-4 w-4" /> Retour
         </button>
         {step < 4 ? (
-          <button type="button" onClick={goNext} className="v3-btn v3-btn-primary">
-            Continuer <ArrowRight className="h-4 w-4" />
-          </button>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {normalizedOutline.length >= 3 && (
+              <button type="button" onClick={() => { void launchWorkflow(); }} className="v3-btn v3-btn-primary">
+                <Rocket className="h-4 w-4" /> Lancer la rédaction maintenant
+              </button>
+            )}
+            <button type="button" onClick={goNext} className="v3-btn v3-btn-ghost">
+              Continuer <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
         ) : (
           <span className="inline-flex items-center gap-2 text-sm font-semibold" style={{ color: 'var(--v3-muted)' }}><Sparkles className="h-4 w-4" /> Prêt pour les agents</span>
         )}
