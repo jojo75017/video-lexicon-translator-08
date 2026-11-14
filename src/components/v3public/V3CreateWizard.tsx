@@ -1864,6 +1864,21 @@ ${outlineRulesFor(bookType)}`;
     await launchWorkflow(merged);
   };
 
+  // Lancement direct demandé depuis le bandeau « Livre ouvert » de la page.
+  const launchRef = useRef(launchWorkflow);
+  launchRef.current = launchWorkflow;
+  useEffect(() => {
+    if (!projectLoaded) return;
+    const run = () => {
+      if (!(window as any).__v3LaunchPending) return;
+      (window as any).__v3LaunchPending = false;
+      setTimeout(() => { void launchRef.current(); }, 300);
+    };
+    run();
+    window.addEventListener('v3-launch-workflow', run);
+    return () => window.removeEventListener('v3-launch-workflow', run);
+  }, [projectLoaded]);
+
   if (launched) {
     return (
       <div className="space-y-6">
@@ -2418,6 +2433,17 @@ ${outlineRulesFor(bookType)}`;
           </div>
         )}
       </div>
+
+      {normalizedOutline.length >= 3 && (
+        <div className="flex flex-col gap-3 rounded-[22px] border p-4 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: 'var(--v3-orange-600)', background: 'var(--v3-orange-50)' }}>
+          <p className="text-sm font-semibold" style={{ color: 'var(--v3-ink)' }}>
+            Votre fiche et votre sommaire ({normalizedOutline.length} parties) sont prêts. Les étapes ci-dessous sont facultatives.
+          </p>
+          <button type="button" onClick={() => { void launchWorkflow(); }} className="v3-btn v3-btn-primary shrink-0">
+            <Rocket className="h-4 w-4" /> Lancer la rédaction maintenant
+          </button>
+        </div>
+      )}
 
       <div className={`grid gap-2 ${isFictionType(bookType) ? 'sm:grid-cols-5' : 'sm:grid-cols-4'}`}>
 

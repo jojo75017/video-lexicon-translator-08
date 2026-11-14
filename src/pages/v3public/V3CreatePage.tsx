@@ -452,6 +452,18 @@ export default function V3CreatePage({ mode = 'book' }: PageProps) {
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!readBookBrief()?.outlineValidated) { launchWorkflow(); return; }
+                    (window as any).__v3LaunchPending = true;
+                    launchWorkflow();
+                    window.dispatchEvent(new Event('v3-launch-workflow'));
+                  }}
+                  className="v3-btn v3-btn-primary text-sm"
+                >
+                  <Sparkles className="w-4 h-4" /> Lancer la rédaction (15 agents)
+                </button>
                 <Link to={`/v3/book/${openedBook.id}`} className="v3-btn v3-btn-outline text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Lire le livre
                 </Link>
