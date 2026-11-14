@@ -76,7 +76,7 @@ export default function V3CanvaCoverStudioPage() {
   const [showAuthor, setShowAuthor] = useState(true);
   const [shade, setShade] = useState(0);
   const [tPos, setTPos] = useState<'auto' | 'haut' | 'milieu' | 'bas'>('auto');
-  const [tScale, setTScale] = useState(100);
+  const [tScale, setTScale] = useState(130);
   const [tColor, setTColor] = useState('');
   const [aColor, setAColor] = useState('');
   const [stockQ, setStockQ] = useState('');
@@ -105,7 +105,7 @@ export default function V3CanvaCoverStudioPage() {
   const [paper, setPaper] = useState<Paper>('blanc');
   const [marks, setMarks] = useState(false);
   const [backText, setBackText] = useState('');
-  const [backSize, setBackSize] = useState(100);
+  const [backSize, setBackSize] = useState(130);
   const geo = wrapGeometry(trim, pages, paper);
   const wrapInput = () => ({ front: canvasRef.current!, trim, pages, paper, marks, title, author, backText, backSize, bg: genre.bg, textColor: genre.titlePos === 'top' && !/^#0|^#1|^#3/.test(genre.bg) ? '#232F3E' : '#FFFFFF', accent: (TITLE_COLORS[genreId] ?? [genre.titleColor])[0] });
   const [wrapPreview, setWrapPreview] = useState('');
@@ -244,7 +244,7 @@ const STEPS = [
       <div className="grid gap-0 lg:grid-cols-[420px_1fr]">
         <aside className="space-y-3 border-r border-border p-4">
           <label className="block text-sm font-semibold">Format de couverture<select aria-label="Format de couverture" className={input} value={coverFormat} disabled={genLoading} onChange={(e) => changeFormat(e.target.value as StudioCoverFormat)}><option value="kindle">Portrait Kindle</option><option value="album">Album jeunesse carré · 21,59 × 21,59 cm</option></select></label>
-          {STEPS.map((st) => <button key={st.id} onClick={() => setTab(st.id)} className={`v3-chip-toggle flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left ${tab === st.id ? 'border-primary bg-primary/20' : 'border-transparent bg-card'}`}>
+          {STEPS.map((st) => <button key={st.id} onClick={() => { setTab(st.id); if (st.id === 'quatrieme') { if (!backText.trim()) setBackText(autoBackText()); setShowWrap(true); } }} className={`v3-chip-toggle flex w-full items-center gap-4 rounded-xl border-2 p-4 text-left ${tab === st.id ? 'border-primary bg-primary/20' : 'border-transparent bg-card'}`}>
             <span className="text-3xl">{st.icon}</span><span className="flex-1 border-l border-border pl-4"><span className="block text-lg font-bold text-foreground">{st.t}</span><span className="text-sm text-muted-foreground">{st.d}</span></span><span className="text-muted-foreground">›</span></button>)}
           <div className="rounded-xl bg-card p-4">
           {tab === 'modele' && <div><p className="mb-3 font-semibold">Modèles de couverture</p><div className="grid grid-cols-3 gap-3">{COVER_GENRES.map((g) => (
@@ -313,6 +313,7 @@ const STEPS = [
             <button onClick={createImage} disabled={genLoading || !title.trim()} className="w-full rounded-xl bg-primary px-4 py-3 text-lg font-bold text-primary-foreground disabled:opacity-60">{genLoading ? '⏳ Création de l\'image en cours (environ 30 s)…' : "🎨 Créer l'image de couverture"}</button>
             {genError && <p className="text-center text-sm text-destructive">{genError}</p>}
           </div>
+          {tab === 'quatrieme' && <div className="w-full max-w-3xl rounded-xl border-2 border-primary bg-card p-3"><p className="mb-2 text-center font-bold">Aperçu en direct : 4ᵉ de couverture (gauche) · dos · 1ʳᵉ (droite)</p>{wrapPreview ? <img src={wrapPreview} alt="Aperçu de la 4e de couverture" className="w-full rounded shadow" /> : <p className="text-center text-sm text-muted-foreground">Aperçu en préparation…</p>}</div>}
           {img && <button type="button" onClick={() => setImg(null)} className="v3-chip-toggle mb-2 rounded-lg bg-destructive px-3 py-2 text-sm font-bold text-destructive-foreground">🗑️ Effacer l'image</button>}
           <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] touch-none cursor-move rounded shadow-2xl"
             onPointerDown={(e) => { const p = toCover(e); const b = lastBadge.current;
