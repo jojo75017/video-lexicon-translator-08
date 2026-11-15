@@ -249,7 +249,7 @@ export default function EssaiPage() {
               <Sparkles className="h-3.5 w-3.5" /> Gratuit · En 60 secondes · Sans carte bancaire
             </span>
             <h1
-              className="v3-serif mt-4 text-4xl font-bold leading-tight md:text-5xl"
+              className="v3-serif mt-3 text-3xl font-bold leading-tight md:text-5xl"
               style={{ color: 'var(--v3-ink, #2A2118)' }}
             >
               Donnez-nous 1 seule phrase.
@@ -262,21 +262,6 @@ export default function EssaiPage() {
               100 % gratuit.
             </p>
 
-            {/* La démo vidéo passe avant le formulaire : le visiteur voit le
-                résultat avant de taper son idée. Elle reste compacte pour que
-                la case de saisive demeure atteignable sans long défilement. */}
-            <div className="mt-6 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-                Voyez l'essai en 30 secondes
-              </p>
-              <video
-                src={essaiVideo.url}
-                controls
-                playsInline
-                preload="metadata"
-                className="mt-3 w-full rounded-xl bg-black"
-              />
-            </div>
 
             <div className="mt-5 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
               <label className="block text-sm font-semibold text-[#2A2118]">
@@ -291,6 +276,23 @@ export default function EssaiPage() {
                   className="mt-2 w-full rounded-xl border border-black/15 px-3 py-3 text-base font-normal focus:border-[#0F2E1F] focus:outline-none"
                 />
               </label>
+
+              <button
+                type="button"
+                onClick={generate}
+                disabled={generating || !trialOpen || settingsLoading}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#14532D] disabled:opacity-60"
+              >
+                {generating ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" /> Votre livre démarre…
+                  </>
+                ) : (
+                  <>
+                    <PenLine className="h-5 w-5" /> ✨ Écrire mon chapitre 1 gratuitement
+                  </>
+                )}
+              </button>
 
               <div className="flex flex-wrap gap-2">
                 <span className="text-xs text-[#8A8072]">Pas d'idée précise ?</span>
@@ -309,22 +311,6 @@ export default function EssaiPage() {
                 … ou écrivez <strong className="text-[#0F2E1F]">le vôtre</strong> dans le champ ci-dessus ✍️
               </p>
 
-              <button
-                type="button"
-                onClick={generate}
-                disabled={generating || !trialOpen || settingsLoading}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#14532D] disabled:opacity-60"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" /> Votre livre démarre…
-                  </>
-                ) : (
-                  <>
-                    <PenLine className="h-5 w-5" /> ✨ Écrire mon chapitre 1 gratuitement
-                  </>
-                )}
-              </button>
 
               <button
                 type="button"
@@ -388,6 +374,19 @@ export default function EssaiPage() {
               {/* Un seul appel à l'action sur ce premier écran : aucun lien
                   concurrent ne détourne le visiteur avant sa génération. */}
 
+            </div>
+            {/* Vidéo sous le formulaire : le bouton reste visible dès l'ouverture sur mobile. */}
+            <div className="mt-5 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
+                Voyez le résultat en direct
+              </p>
+              <video
+                src={essaiVideo.url}
+                controls
+                playsInline
+                preload="metadata"
+                className="mt-3 w-full rounded-xl bg-black"
+              />
             </div>
           </div>
         ) : (
