@@ -106,6 +106,13 @@ export default function EssaiPage() {
   const pdfName = `${slugify(outlineResult?.title ?? '')}.pdf`;
 
   const wallSeen = useRef(false);
+  const [genStep, setGenStep] = useState(0);
+  useEffect(() => {
+    if (!generating) { setGenStep(0); return; }
+    const t = setInterval(() => setGenStep((n) => Math.min(n + 1, 2)), 6000);
+    return () => clearInterval(t);
+  }, [generating]);
+  const GEN_STEPS = ['Analyse de votre sujet…', 'Rédaction des 12 chapitres…', 'Mise en page de votre livre…'];
 
   useEffect(() => {
     document.title = 'Votre chapitre 1 écrit gratuitement — EbookStudio';
@@ -285,7 +292,7 @@ export default function EssaiPage() {
               >
                 {generating ? (
                   <>
-                    <Loader2 className="h-5 w-5 animate-spin" /> Votre livre démarre…
+                    <Loader2 className="h-5 w-5 animate-spin" /> {GEN_STEPS[genStep]}
                   </>
                 ) : (
                   <>
@@ -293,6 +300,11 @@ export default function EssaiPage() {
                   </>
                 )}
               </button>
+              {generating && (
+                <p className="text-center text-sm text-[#8A8072]" aria-live="polite">
+                  Étape {genStep + 1}/3 · environ 20 secondes, restez sur la page.
+                </p>
+              )}
 
               <div className="flex flex-wrap gap-2">
                 <span className="text-xs text-[#8A8072]">Pas d'idée précise ?</span>
