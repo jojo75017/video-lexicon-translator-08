@@ -42,12 +42,12 @@ export default function EssaiVisitsPanel() {
       <h2 className="text-lg font-bold text-[#FF9E2D]">📊 Visites de la page d'essai (14 derniers jours)</h2>
       <div className="mt-3 grid grid-cols-3 gap-3 text-center">
         <div className="rounded-xl bg-muted p-3"><div className="text-2xl font-bold">{tot.v}</div><div className="text-xs text-muted-foreground">visites</div></div>
-        <div className="rounded-xl bg-muted p-3"><div className="text-2xl font-bold">{tot.g}</div><div className="text-xs text-muted-foreground">idées tapées</div></div>
+        <div className="rounded-xl bg-muted p-3"><div className="text-2xl font-bold">{tot.g}</div><div className="text-xs text-muted-foreground">clics sur le bouton</div></div>
         <div className="rounded-xl bg-muted p-3"><div className="text-2xl font-bold text-[#FF9E2D]">{tot.e}</div><div className="text-xs text-muted-foreground">emails laissés</div></div>
       </div>
       {loading ? <p className="mt-3 text-sm text-muted-foreground">Chargement…</p> : (
         <table className="mt-4 w-full text-sm">
-          <thead><tr className="text-left text-muted-foreground"><th>Jour</th><th>Visites</th><th></th><th className="text-right">Idées</th><th className="text-right">Emails</th></tr></thead>
+          <thead><tr className="text-left text-muted-foreground"><th>Jour</th><th>Visites</th><th></th><th className="text-right">Clics bouton</th><th className="text-right">Emails</th></tr></thead>
           <tbody>
             {rows.map((r) => (
               <tr key={r.date} className="border-t border-border">
