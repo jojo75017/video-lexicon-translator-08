@@ -246,18 +246,20 @@ export default function EssaiPage() {
         {!outlineResult ? (
           <div className="mx-auto max-w-2xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-              <Sparkles className="h-3.5 w-3.5" /> Gratuit, aucune inscription pour commencer
+              <Sparkles className="h-3.5 w-3.5" /> Gratuit · En 60 secondes · Sans carte bancaire
             </span>
             <h1
               className="v3-serif mt-4 text-4xl font-bold leading-tight md:text-5xl"
               style={{ color: 'var(--v3-ink, #2A2118)' }}
             >
-              Essayez votre ebook Kindle en 12 chapitres
+              Donnez-nous 1 seule phrase.
+              <br />
+              Nous écrivons le début de votre livre sous vos yeux.
             </h1>
             <p className="mt-4 text-base leading-relaxed text-[#5B5245]">
-              Une phrase suffit. Vous recevez immédiatement le titre, le sous-titre, le{' '}
-              <strong>plan complet en 12 chapitres</strong> et votre <strong>chapitre 1</strong>, à
-              feuilleter comme un vrai livre. Gratuit et sans carte bancaire.
+              Titre, sous-titre, <strong>plan complet en 12 chapitres</strong> et votre{' '}
+              <strong>chapitre 1</strong> rédigé immédiatement, à feuilleter comme un vrai livre.
+              100 % gratuit.
             </p>
 
             {/* La démo vidéo passe avant le formulaire : le visiteur voit le
@@ -278,7 +280,7 @@ export default function EssaiPage() {
 
             <div className="mt-5 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
               <label className="block text-sm font-semibold text-[#2A2118]">
-                Votre idée de livre
+                Votre idée de livre (une phrase suffit) :
                 <textarea
                   value={idea}
                   onChange={(e) => setIdea(e.target.value)}
@@ -319,7 +321,7 @@ export default function EssaiPage() {
                   </>
                 ) : (
                   <>
-                    <PenLine className="h-5 w-5" /> Découvrir mon plan Kindle en 12 chapitres
+                    <PenLine className="h-5 w-5" /> ✨ Écrire mon chapitre 1 gratuitement
                   </>
                 )}
               </button>
@@ -381,7 +383,7 @@ export default function EssaiPage() {
                 </p>
               )}
               <p className="text-center text-xs text-[#8A8072]">
-                Aucune carte bancaire. Aucun engagement. Votre livre reste le vôtre.
+                ⚡ Génération instantanée · Sans engagement · Vos écrits restent 100 % à vous.
               </p>
               {/* Un seul appel à l'action sur ce premier écran : aucun lien
                   concurrent ne détourne le visiteur avant sa génération. */}
