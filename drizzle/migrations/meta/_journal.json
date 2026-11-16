@@ -141,6 +141,20 @@
       "when": 1794824897787,
       "tag": "0019_annual_plan_quotas",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1794825642697,
+      "tag": "0020_allow_annual_v3m_plans",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1794825840297,
+      "tag": "0021_allow_subscription_plan_type",
+      "breakpoints": true
     }
   ]
 }
