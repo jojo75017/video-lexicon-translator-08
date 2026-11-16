@@ -358,6 +358,15 @@ const STEPS = [
             <button onClick={downloadWrap} className="w-full rounded-lg bg-primary px-3 py-3 font-bold text-primary-foreground">📥 Télécharger le PDF broché</button>
           </div>}
           </div>
+          <section aria-label="Mettre en ligne sur Amazon KDP" className="w-full max-w-3xl rounded-2xl border-2 border-primary bg-card p-4">
+            <p className="mb-1 text-base font-bold text-foreground">🚀 Étape suivante : mettre en ligne sur Amazon KDP</p>
+            <p className="mb-3 text-xs text-muted-foreground">{bookId ? 'Les pages s’ouvrent avec le livre choisi ci-dessus.' : 'Choisissez votre livre dans le studio pour ouvrir directement sa fiche.'}</p>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <Link to={bookId ? `/v3/donnees-kdp?projectId=${encodeURIComponent(bookId)}` : '/v3/mes-livres'} className="rounded-lg bg-primary px-3 py-3 text-center text-sm font-bold text-primary-foreground">📋 Mes données KDP (description et 7 mots-clés)</Link>
+              <Link to="/v3/kdp/fiche-audit" className="rounded-lg border-2 border-primary px-3 py-3 text-center text-sm font-bold text-foreground">🔍 Fiche audit et contenu A+</Link>
+              <Link to="/v3/kdp/lancement" className="rounded-lg border-2 border-primary px-3 py-3 text-center text-sm font-bold text-foreground">🚀 Plan de lancement 30 jours</Link>
+            </div>
+          </section>
           <div className="flex w-full max-w-3xl flex-wrap items-center gap-6 rounded-2xl border border-border bg-card p-5">
             <div className="flex items-center gap-4">
               {thumb && <img src={thumb} alt="Miniature Amazon" className="w-[64px] rounded shadow" />}
