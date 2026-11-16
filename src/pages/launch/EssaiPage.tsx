@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 import essaiVideo from '@/assets/videos/essai-gratuit-paysage.mp4.asset.json';
+import essaiPoster from '@/assets/essai-liseuse-vignette.jpg.asset.json';
 import ChapterFlipbook from '@/components/essai/ChapterFlipbook';
 import { buildTrialPdf, downloadBlob, slugify } from '@/lib/essai/trialPdf';
 
@@ -45,10 +46,10 @@ const LANGUAGES: Array<{ code: string; label: string }> = [
 ];
 
 const EXAMPLES: Array<{ label: string; idea: string }> = [
+  { label: '🔎 Roman policier', idea: "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël." },
+  { label: '🌱 Guide pratique', idea: 'Un guide pratique pour cultiver ses légumes sur un balcon de ville, même sans expérience.' },
   { label: '😴 Bébé dort enfin', idea: 'Un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours.' },
-  { label: '🔎 Le boulanger disparu', idea: "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël." },
   { label: '🥗 Cuisine saine en 20 min', idea: 'Un livre de recettes simples pour cuisiner sain en moins de 20 minutes le soir.' },
-  { label: '🌱 Mon potager sur balcon', idea: 'Un guide pratique pour cultiver ses légumes sur un balcon de ville, même sans expérience.' },
   { label: '🧸 Le petit renard courageux', idea: "Une histoire pour enfants de 4 à 7 ans : un petit renard qui apprend à vaincre sa peur du noir." },
   { label: '💶 Retraite sereine', idea: 'Un guide simple pour bien préparer sa retraite, gérer son budget et profiter de son temps libre.' },
   { label: '💔 Amour à Lisbonne', idea: "Un roman d'amour : deux inconnus se rencontrent dans un tramway de Lisbonne et se retrouvent dix ans plus tard." },
@@ -86,12 +87,14 @@ export default function EssaiPage() {
   const [params] = useSearchParams();
   const { settings, loading: settingsLoading } = useLaunchSettings();
 
-  const [ideaText, setIdea] = useState(EXAMPLES[1].idea);
+  const [ideaText, setIdea] = useState(EXAMPLES[0].idea);
   const idea = ideaText;
   const [audience, setAudience] = useState('');
   const [tone, setTone] = useState(TONES[0]);
   const [language, setLanguage] = useState('fr');
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [showMoreExamples, setShowMoreExamples] = useState(false);
+  const [videoStarted, setVideoStarted] = useState(false);
 
   const [generating, setGenerating] = useState(false);
   const [outlineResult, setOutlineResult] = useState<OutlineResult | null>(null);
@@ -254,27 +257,20 @@ export default function EssaiPage() {
       <main className="mx-auto max-w-6xl px-5 py-10">
         {!outlineResult ? (
           <div className="mx-auto max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/50 bg-[#D4AF37]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-              <Sparkles className="h-3.5 w-3.5" /> Gratuit · En 60 secondes · Sans carte bancaire
-            </span>
             <h1
-              className="v3-serif mt-3 text-3xl font-bold leading-tight md:text-5xl"
+              className="v3-serif text-3xl font-bold leading-tight md:text-5xl"
               style={{ color: 'var(--v3-ink, #2A2118)' }}
             >
-              Donnez-nous 1 seule phrase.
-              <br />
-              Nous écrivons le début de votre livre sous vos yeux.
+              Voyez votre idée prendre la forme d’un livre.
             </h1>
             <p className="mt-4 text-base leading-relaxed text-[#5B5245]">
-              Titre, sous-titre, <strong>plan complet en 12 chapitres</strong> et votre{' '}
-              <strong>chapitre 1</strong> rédigé immédiatement, à feuilleter comme un vrai livre.
-              100 % gratuit.
+              Une phrase suffit pour découvrir votre titre, votre sous-titre, votre plan en 12 chapitres
+              et les premières pages du chapitre 1 dans une liseuse interactive.
             </p>
-
 
             <div className="mt-5 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
               <label className="block text-sm font-semibold text-[#2A2118]">
-                Votre idée de livre (déjà remplie avec un exemple, modifiez-la si vous voulez) :
+                Quelle est votre idée de livre ?
                 <textarea
                   value={idea}
                   onChange={(e) => setIdea(e.target.value)}
@@ -284,6 +280,35 @@ export default function EssaiPage() {
                   className="mt-2 w-full rounded-xl border border-black/15 px-3 py-3 text-base font-normal focus:border-[#0F2E1F] focus:outline-none"
                 />
               </label>
+
+              <div>
+                <div className="flex flex-wrap gap-2">
+                  {(showMoreExamples ? EXAMPLES : EXAMPLES.slice(0, 2)).map((ex, i) => {
+                    const active = idea === ex.idea;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-pressed={active}
+                        disabled={generating}
+                        onClick={() => setIdea(ex.idea)}
+                        className={`v3-chip-toggle rounded-full border-2 px-3 py-2 text-sm font-semibold transition disabled:opacity-60 ${active ? 'border-[#0F2E1F] bg-[#0F2E1F]/5 text-[#0F2E1F]' : 'border-black/10 bg-[#FBF8F3] text-[#5B5245] hover:border-[#0F2E1F]/50'}`}
+                      >
+                        {ex.label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowMoreExamples((v) => !v)}
+                  aria-expanded={showMoreExamples}
+                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#8A6D1B]"
+                >
+                  <ChevronDown className={`h-3.5 w-3.5 transition ${showMoreExamples ? 'rotate-180' : ''}`} />
+                  {showMoreExamples ? 'Moins d’exemples' : 'Voir d’autres exemples'}
+                </button>
+              </div>
 
               <button
                 type="button"
@@ -297,41 +322,24 @@ export default function EssaiPage() {
                   </>
                 ) : (
                   <>
-                    <PenLine className="h-5 w-5" /> ✨ Écrire mon chapitre 1 gratuitement
+                    <BookOpen className="h-5 w-5" /> Voir l’aperçu de mon livre
                   </>
                 )}
               </button>
-              {generating && (
+              {generating ? (
                 <p className="text-center text-sm text-[#8A8072]" aria-live="polite">
                   Étape {genStep + 1}/3 · environ 20 secondes, restez sur la page.
                 </p>
-              )}
-
-              <div>
-                <p className="mb-2 text-sm font-semibold text-[#2A2118]">
-                  👉 Ou choisissez un thème en 1 clic (aucune saisie) :
-                </p>
-                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-                  {EXAMPLES.map((ex, i) => {
-                    const active = idea === ex.idea;
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        aria-pressed={active}
-                        disabled={generating}
-                        onClick={() => { setIdea(ex.idea); void generate(ex.idea); }}
-                        className={`rounded-xl border-2 px-3 py-3 text-left text-sm font-semibold transition disabled:opacity-60 ${active ? 'border-[#0F2E1F] bg-[#0F2E1F]/5 text-[#0F2E1F]' : 'border-black/10 bg-[#FBF8F3] text-[#5B5245] hover:border-[#0F2E1F]/50'}`}
-                      >
-                        {ex.label}
-                      </button>
-                    );
-                  })}
+              ) : (
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-[#0F2E1F]">
+                    Gratuit · Sans carte bancaire · Aperçu sans e-mail
+                  </p>
+                  <p className="mt-1 text-xs text-[#8A8072]">
+                    Votre e-mail est demandé ensuite pour lire la suite du chapitre 1 et télécharger le PDF.
+                  </p>
                 </div>
-              </div>
-
-
-
+              )}
 
               <button
                 type="button"
@@ -389,9 +397,6 @@ export default function EssaiPage() {
                   L'essai gratuit est momentanément fermé. Revenez très vite.
                 </p>
               )}
-              <p className="text-center text-xs text-[#8A8072]">
-                ⚡ Génération instantanée · Sans engagement · Vos écrits restent 100 % à vous.
-              </p>
               {/* Un seul appel à l'action sur ce premier écran : aucun lien
                   concurrent ne détourne le visiteur avant sa génération. */}
 
@@ -399,15 +404,32 @@ export default function EssaiPage() {
             {/* Vidéo sous le formulaire : le bouton reste visible dès l'ouverture sur mobile. */}
             <div className="mt-5 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
               <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-                Voyez le résultat en direct
+                Voir un exemple de livre · 30 s
               </p>
-              <video
-                src={essaiVideo.url}
-                controls
-                playsInline
-                preload="metadata"
-                className="mt-3 w-full rounded-xl bg-black"
-              />
+              {videoStarted ? (
+                <video
+                  src={essaiVideo.url}
+                  poster={essaiPoster.url}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="mt-3 w-full rounded-xl bg-black"
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setVideoStarted(true)}
+                  aria-label="Voir un exemple de livre, vidéo de 30 secondes"
+                  className="group relative mt-3 block w-full overflow-hidden rounded-xl"
+                >
+                  <img src={essaiPoster.url} alt="La liseuse interactive EbookStudio" className="w-full" loading="lazy" />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/25">
+                    <span className="rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-[#0F2E1F] shadow-lg">
+                      ▶ Voir un exemple de livre · 30 s
+                    </span>
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         ) : (
