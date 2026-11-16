@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { Bot, X } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import AssistantChat from './AssistantChat';
 
 /** Bouton flottant de l'assistant, disponible sur tout le site. */
 const AssistantFloatingButton = () => {
   const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  // Page d'essai : écran dégagé, aucun bouton flottant devant le formulaire.
+  if (pathname.startsWith('/essai')) return null;
 
   return (
     <>

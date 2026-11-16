@@ -86,7 +86,8 @@ export default function EssaiPage() {
   const [params] = useSearchParams();
   const { settings, loading: settingsLoading } = useLaunchSettings();
 
-  const [idea, setIdea] = useState('');
+  const [ideaText, setIdea] = useState('');
+  const idea = ideaText;
   const [audience, setAudience] = useState('');
   const [tone, setTone] = useState(TONES[0]);
   const [language, setLanguage] = useState('fr');
@@ -141,7 +142,8 @@ export default function EssaiPage() {
     return data;
   };
 
-  const generate = async () => {
+  const generate = async (override?: string) => {
+    const idea = (typeof override === 'string' ? override : ideaText);
     if (idea.trim().length < 10) {
       toast.error('Décrivez votre idée en une phrase au minimum.');
       return;
@@ -312,7 +314,7 @@ export default function EssaiPage() {
                   <button
                     key={i}
                     type="button"
-                    onClick={() => setIdea(ex.idea)}
+                    onClick={() => { setIdea(ex.idea); if (!generating) void generate(ex.idea); }}
                     className="rounded-full border border-black/10 bg-[#FBF8F3] px-3 py-1 text-xs text-[#5B5245] transition hover:border-[#0F2E1F]/40 hover:text-[#0F2E1F]"
                   >
                     {ex.label}

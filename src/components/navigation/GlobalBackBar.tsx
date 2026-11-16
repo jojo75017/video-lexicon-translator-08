@@ -3,7 +3,7 @@ import { ArrowLeft, Home } from 'lucide-react';
 
 // Pages sans barre de retour : accueils et tunnel de vente/paiement (ne pas distraire l'acheteur).
 const HIDDEN_EXACT = ['/', '/v3', '/connexion-abonne', '/admin-login', '/admin-direct'];
-const HIDDEN_PREFIX = ['/formules', '/paiement', '/commander', '/commande', '/oto', '/lancement', '/checkout'];
+const HIDDEN_PREFIX = ['/formules', '/paiement', '/commander', '/commande', '/oto', '/lancement', '/checkout', '/essai'];
 
 export default function GlobalBackBar({ isAuthenticated }: { isAuthenticated: boolean }) {
   const { pathname } = useLocation();
