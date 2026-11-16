@@ -288,7 +288,7 @@ export default function EssaiPage() {
 
               <button
                 type="button"
-                onClick={generate}
+                onClick={() => void generate()}
                 disabled={generating || !trialOpen || settingsLoading}
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#14532D] disabled:opacity-60"
               >
