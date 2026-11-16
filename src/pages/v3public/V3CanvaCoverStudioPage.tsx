@@ -173,9 +173,9 @@ ABSOLUTELY NO TEXT: no letters, no words, no title, no logo, no watermark. Full-
     if (img) { ctx.shadowColor = 'rgba(0,0,0,0.55)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 3; }
     const tc = TITLE_COLORS[genreId] ?? [genre.titleColor]; lines.forEach((l, i) => { ctx.fillStyle = tColor || tc[i % tc.length]; ctx.fillText(l, W / 2, y); y += lh; });
     ctx.font = '600 72px Montserrat, Arial, sans-serif'; ctx.fillStyle = genre.subColor;
-    wrap(ctx, showSub ? subtitle : '', maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 30); y += 90; });
+    wrap(ctx, showSub ? subtitle : '', maxW).slice(0, 2).forEach((l) => { ctx.fillText(l, W / 2, y + 80); y += 90; });
     ctx.font = '700 90px Montserrat, Arial, sans-serif'; ctx.fillStyle = aColor || genre.titleColor;
-    if (!showAuthor || !author.trim()) { /* auteur masqué */ } else { const ay = authorY ?? H - 200; ctx.textBaseline = 'middle'; ctx.fillText(author.toUpperCase(), W / 2, ay); ctx.textBaseline = 'top'; } ctx.shadowBlur = 0;
+    if (!showAuthor || !author.trim()) { /* auteur masqué */ } else { const ay = authorY ?? H - 305; ctx.textBaseline = 'middle'; ctx.fillText(author.toUpperCase(), W / 2, ay); ctx.textBaseline = 'top'; } ctx.shadowBlur = 0;
     if (badgeOn && badgeText.trim()) {
       const st = BADGE_STYLES.find((b) => b.id === badgeStyle)!; const r = badgeSize;
       const dcx = W - r - 90, dcy = badgePos === 'haut' ? (genre.titlePos === 'top' ? y + r + 80 : r + 120) : H - r - 380;
@@ -284,7 +284,7 @@ const STEPS = [
             <label className="block text-sm">Sous-titre<input className={input} value={subtitle} onChange={(e) => setSubtitle(e.target.value)} /></label>
             <label className="block text-sm">Auteur<input className={input} value={author} onChange={(e) => setAuthor(e.target.value)} /></label>
             <div className="flex flex-wrap items-center gap-1"><span className="text-xs text-foreground">Couleur du nom :</span><button onClick={() => setAColor('')} className={`v3-chip-toggle rounded px-2 text-xs ${!aColor ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>Modèle</button>{COLORS.map((c) => <button key={c} aria-label={`Couleur auteur ${c}`} onClick={() => setAColor(c)} className={`v3-chip-toggle h-6 w-6 rounded-full border-2 ${aColor === c ? 'border-primary' : 'border-border'}`} style={{ background: c }} />)}<input type="color" aria-label="Autre couleur auteur" value={aColor || '#ffffff'} onChange={(e) => setAColor(e.target.value)} className="h-6 w-8" /></div>
-            <div className="flex flex-wrap items-center gap-1"><span className="text-xs text-foreground">Place du nom :</span>{([['Haut', 140], ['Milieu', H / 2], ['Bas', H - 200]] as const).map(([l, v]) => <button key={l} onClick={() => setAuthorY(v)} className={`v3-chip-toggle rounded px-2 text-xs ${(authorY ?? H - 200) === v ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>{l}</button>)}<span className="text-xs text-muted-foreground">ou glissez-le avec la souris</span></div>
+            <div className="flex flex-wrap items-center gap-1"><span className="text-xs text-foreground">Place du nom :</span>{([['Haut', 245], ['Milieu', H / 2], ['Bas', H - 305]] as const).map(([l, v]) => <button key={l} onClick={() => setAuthorY(v)} className={`v3-chip-toggle rounded px-2 text-xs ${(authorY ?? H - 305) === v ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}>{l}</button>)}<span className="text-xs text-muted-foreground">ou glissez-le avec la souris</span></div>
             <div className="border-t border-border pt-3"><p className="mb-2 text-sm font-semibold">Textes en plus sur l'image</p>
               {extras.map((ex) => <div key={ex.id} className="mb-3 space-y-2 rounded-lg border border-border p-2">
                 <textarea className={input} rows={2} value={ex.text} onChange={(e) => upd(ex.id, { text: e.target.value })} />
@@ -328,11 +328,11 @@ const STEPS = [
           <canvas ref={canvasRef} width={W * S} height={H * S} className="w-full max-w-[440px] touch-none cursor-move rounded shadow-2xl"
             onPointerDown={(e) => { const p = toCover(e); const b = lastBadge.current;
               if (badgeOn && Math.hypot(p.x - b.x, p.y - b.y) <= b.r) drag.current = { kind: 'badge' };
-              else if (showAuthor && author.trim() && Math.abs(p.y - (authorY ?? H - 200)) < 70) drag.current = { kind: 'author' };
+              else if (showAuthor && author.trim() && Math.abs(p.y - (authorY ?? H - 305)) < 70) drag.current = { kind: 'author' };
               else { const hit = [...extras].reverse().find((x) => Math.abs(p.x - (x.x / 100) * W) < 400 && p.y - (x.y / 100) * H > -60 && p.y - (x.y / 100) * H < x.size * 3); if (hit) drag.current = { kind: 'extra', id: hit.id }; }
               if (drag.current) (e.target as HTMLCanvasElement).setPointerCapture(e.pointerId); }}
             onPointerMove={(e) => { const d = drag.current; if (!d) return; const p = toCover(e);
-              if (d.kind === 'author') setAuthorY(Math.min(H - 60, Math.max(60, p.y)));
+              if (d.kind === 'author') setAuthorY(Math.min(H - 160, Math.max(160, p.y)));
               else if (d.kind === 'badge') setBadgeXY({ x: Math.min(W, Math.max(0, p.x)), y: Math.min(H, Math.max(0, p.y)) });
               else upd(d.id, { x: Math.min(95, Math.max(5, (p.x / W) * 100)), y: Math.min(95, Math.max(2, (p.y / H) * 100)) }); }}
             onPointerUp={() => { drag.current = null; }} />
