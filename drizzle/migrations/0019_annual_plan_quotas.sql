@@ -1,4 +1,3 @@
--- Quotas mensuels identiques en facturation annuelle (et tarifs fidélité).
 CREATE OR REPLACE FUNCTION public.monthly_quota_status(_user_id uuid)
  RETURNS TABLE(plan text, books_used integer, books_limit integer, covers_used integer, covers_limit integer)
  LANGUAGE plpgsql
