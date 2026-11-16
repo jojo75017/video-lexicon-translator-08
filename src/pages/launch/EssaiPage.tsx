@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import useLaunchSettings from '@/hooks/useLaunchSettings';
 import essaiVideo from '@/assets/videos/essai-gratuit-paysage.mp4.asset.json';
 import essaiPoster from '@/assets/essai-liseuse-vignette.jpg.asset.json';
+import essaiResultat from '@/assets/essai-liseuse-resultat.jpg.asset.json';
 import ChapterFlipbook from '@/components/essai/ChapterFlipbook';
 import { buildTrialPdf, downloadBlob, slugify } from '@/lib/essai/trialPdf';
 
@@ -256,19 +257,19 @@ export default function EssaiPage() {
 
       <main className="mx-auto max-w-6xl px-5 py-10">
         {!outlineResult ? (
-          <div className="mx-auto max-w-2xl">
+          <div className="grid items-center gap-8 lg:grid-cols-[1fr_0.85fr] lg:gap-14">
+           <div>
             <h1
-              className="v3-serif text-3xl font-bold leading-tight md:text-5xl"
+              className="v3-serif text-3xl font-medium not-italic leading-[1.15] tracking-tight md:text-[2.6rem]"
               style={{ color: 'var(--v3-ink, #2A2118)' }}
             >
-              Voyez votre idée prendre la forme d’un livre.
+              Votre idée. Les premières pages de votre livre.
             </h1>
             <p className="mt-4 text-base leading-relaxed text-[#5B5245]">
-              Une phrase suffit pour découvrir votre titre, votre sous-titre, votre plan en 12 chapitres
-              et les premières pages du chapitre 1 dans une liseuse interactive.
+              Une phrase suffit pour obtenir un titre, un plan en 12 chapitres et le début de votre chapitre 1.
             </p>
 
-            <div className="mt-5 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
+            <div className="mt-6 space-y-4 rounded-2xl border border-black/[0.06] bg-white/80 p-5 md:p-6">
               <label className="block text-sm font-semibold text-[#2A2118]">
                 Quelle est votre idée de livre ?
                 <textarea
@@ -277,7 +278,7 @@ export default function EssaiPage() {
                   rows={3}
                   maxLength={2000}
                   placeholder="Exemple : un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours."
-                  className="mt-2 w-full rounded-xl border border-black/15 px-3 py-3 text-base font-normal focus:border-[#0F2E1F] focus:outline-none"
+                  className="mt-2 w-full rounded-lg border border-black/10 bg-[#FBF8F3]/60 px-3 py-3 text-base font-normal leading-relaxed focus:border-[#0F2E1F] focus:outline-none"
                 />
               </label>
 
@@ -314,7 +315,7 @@ export default function EssaiPage() {
                 type="button"
                 onClick={() => void generate()}
                 disabled={generating || !trialOpen || settingsLoading}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-lg transition hover:bg-[#14532D] disabled:opacity-60"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-sm transition hover:bg-[#14532D] disabled:opacity-60"
               >
                 {generating ? (
                   <>
@@ -322,7 +323,7 @@ export default function EssaiPage() {
                   </>
                 ) : (
                   <>
-                    <BookOpen className="h-5 w-5" /> Voir l’aperçu de mon livre
+                    <BookOpen className="h-5 w-5" /> Créer mon aperçu gratuit
                   </>
                 )}
               </button>
@@ -333,10 +334,10 @@ export default function EssaiPage() {
               ) : (
                 <div className="text-center">
                   <p className="text-sm font-semibold text-[#0F2E1F]">
-                    Gratuit · Sans carte bancaire · Aperçu sans e-mail
+                    Sans carte bancaire · Aperçu sans e-mail
                   </p>
                   <p className="mt-1 text-xs text-[#8A8072]">
-                    Votre e-mail est demandé ensuite pour lire la suite du chapitre 1 et télécharger le PDF.
+                    Votre e-mail débloque ensuite la suite du chapitre et le PDF.
                   </p>
                 </div>
               )}
@@ -401,10 +402,11 @@ export default function EssaiPage() {
                   concurrent ne détourne le visiteur avant sa génération. */}
 
             </div>
-            {/* Vidéo sous le formulaire : le bouton reste visible dès l'ouverture sur mobile. */}
-            <div className="mt-5 rounded-2xl border border-black/5 bg-white p-4 shadow-sm">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-                Voir un exemple de livre · 30 s
+           </div>
+            {/* Vrai résultat EbookStudio : visible dès l'arrivée sur ordinateur, sous la réassurance sur mobile. */}
+            <figure className="relative">
+              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
+                Un vrai résultat généré par EbookStudio
               </p>
               {videoStarted ? (
                 <video
@@ -413,24 +415,27 @@ export default function EssaiPage() {
                   controls
                   autoPlay
                   playsInline
-                  className="mt-3 w-full rounded-xl bg-black"
+                  className="w-full rounded-2xl bg-black"
                 />
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setVideoStarted(true)}
-                  aria-label="Voir un exemple de livre, vidéo de 30 secondes"
-                  className="group relative mt-3 block w-full overflow-hidden rounded-xl"
-                >
-                  <img src={essaiPoster.url} alt="La liseuse interactive EbookStudio" className="w-full" loading="lazy" />
-                  <span className="absolute inset-0 flex items-center justify-center bg-black/25">
-                    <span className="rounded-full bg-white/95 px-4 py-2 text-sm font-bold text-[#0F2E1F] shadow-lg">
-                      ▶ Voir un exemple de livre · 30 s
-                    </span>
-                  </span>
-                </button>
+                <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_50px_-25px_rgba(15,46,31,0.35)]">
+                  <img
+                    src={essaiResultat.url}
+                    alt="Liseuse EbookStudio : titre « Ce soir, on mange sain ! » et début du chapitre 1"
+                    className="block max-h-[520px] w-full object-cover object-top"
+                  />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
+                  <button
+                    type="button"
+                    onClick={() => setVideoStarted(true)}
+                    aria-label="Voir la démo, vidéo de 30 secondes"
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-[#0F2E1F]/15 bg-white/95 px-4 py-2 text-sm font-semibold text-[#0F2E1F] shadow-sm transition hover:bg-white"
+                  >
+                    ▶ Voir la démo · 30 s
+                  </button>
+                </div>
               )}
-            </div>
+            </figure>
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-start">
