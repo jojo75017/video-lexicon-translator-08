@@ -7,6 +7,9 @@ const PLAN_LABEL: Record<string, string> = {
   v3m_debutant_monthly: "Débutant · 19 €/mois",
   v3m_auteur_monthly: "Auteur · 29 €/mois",
   v3m_vip_monthly: "Édition VIP · 59 €/mois",
+  v3m_debutant_annual: "Débutant · 190 €/an",
+  v3m_auteur_annual: "Auteur · 290 €/an",
+  v3m_vip_annual: "Édition VIP · 590 €/an",
 };
 
 /** Affiché seulement pour les abonnés mensuels : quotas du mois + gestion/arrêt de l'abonnement. */

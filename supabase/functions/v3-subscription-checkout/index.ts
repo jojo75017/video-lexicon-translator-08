@@ -15,6 +15,10 @@ const ALLOWED_PRICES = new Set([
   "v3m_debutant_monthly",
   "v3m_auteur_monthly",
   "v3m_vip_monthly",
+  // Mêmes formules à l'année : 10 mois payés, 2 mois offerts
+  "v3m_debutant_annual",
+  "v3m_auteur_annual",
+  "v3m_vip_annual",
   // Mêmes formules à -20 % à vie pour anciens clients V2 (droit revérifié)
   "v3m_debutant_monthly_legacy",
   "v3m_auteur_monthly_legacy",

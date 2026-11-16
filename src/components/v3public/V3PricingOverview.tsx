@@ -25,19 +25,41 @@ const MONTHLY_PRICE_IDS = {
   vip: 'v3m_vip_monthly',
 } as const;
 
+/** Facturation annuelle : 10 mois payés, 2 mois offerts. */
+const ANNUAL_PRICE_IDS = {
+  debutant: 'v3m_debutant_annual',
+  auteur: 'v3m_auteur_annual',
+  vip: 'v3m_vip_annual',
+} as const;
+const ANNUAL_MONTHS_PAID = 10;
+const euros = (n: number) => n.toLocaleString('fr-FR', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
+
 export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotPlanLabel }: { baseAvailable?: boolean; detailsHref?: string; kdpPilotPlanLabel?: string }) {
   const [checkout, setCheckout] = useState<{ priceId: string; name: string } | null>(null);
+  const [annual, setAnnual] = useState(false);
   return (
     <section className="v3-shell py-7" aria-labelledby="v3-offers-title">
       <header className="mb-7">
-        <p className="text-xs font-bold uppercase text-primary">Formule mensuelle, sans engagement</p>
+        <p className="text-xs font-bold uppercase text-primary">{annual ? 'Facturation annuelle, 2 mois offerts' : 'Formule mensuelle, sans engagement'}</p>
         <h2 id="v3-offers-title" className="mt-2 text-3xl font-semibold text-foreground">Trois formules pour écrire et publier, dès 19 €/mois</h2>
         <p className="mt-3 text-muted-foreground">Débutant pour découvrir, Auteur pour aller plus loin, Édition VIP pour les studios professionnels. Chaque formule inclut tout le contenu des formules précédentes.</p>
       </header>
+      <div role="radiogroup" aria-label="Période de facturation" className="mx-auto mb-7 flex w-fit rounded-full border bg-card p-1">
+        <button type="button" role="radio" aria-checked={!annual} onClick={() => setAnnual(false)}
+          className={`v3-chip-toggle rounded-full px-5 py-2 text-sm font-semibold transition ${!annual ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
+          Mensuel
+        </button>
+        <button type="button" role="radio" aria-checked={annual} onClick={() => setAnnual(true)}
+          className={`v3-chip-toggle rounded-full px-5 py-2 text-sm font-semibold transition ${annual ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>
+          Annuel · 2 mois offerts
+        </button>
+      </div>
       <div className="grid gap-5 lg:grid-cols-3">
         {V3_MONTHLY_OFFERS.map((p) => {
           const Icon = ICONS[p.id];
           const highlight = p.id === 'auteur';
+          const yearly = p.price * ANNUAL_MONTHS_PAID;
+          const saved = p.price * 12 - yearly;
           return (
             <article key={p.id} className={`relative flex flex-col rounded-lg bg-card p-6 text-card-foreground ${highlight ? 'border-2 border-primary' : 'border'}`}>
               <div className="flex items-center justify-between gap-2">
@@ -45,7 +67,14 @@ export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotP
                 <span className="text-xs font-bold uppercase text-primary">{BADGES[p.id]}</span>
               </div>
               <h3 className="mt-3 text-xl font-semibold">{p.name}</h3>
-              <p className="mt-4 text-3xl font-bold">{p.price} € <span className="text-base font-medium text-muted-foreground">/mois</span></p>
+              {annual ? (
+                <>
+                  <p className="mt-4 text-3xl font-bold">{yearly} € <span className="text-base font-medium text-muted-foreground">/an</span></p>
+                  <p className="mt-1 text-sm text-muted-foreground"><s>{p.price * 12} €</s> · soit {euros(Math.round((yearly / 12) * 100) / 100)} €/mois · <strong className="text-primary">{saved} € économisés</strong></p>
+                </>
+              ) : (
+                <p className="mt-4 text-3xl font-bold">{p.price} € <span className="text-base font-medium text-muted-foreground">/mois</span></p>
+              )}
               <p className="mt-1 text-xs text-muted-foreground">
                 {p.booksPerMonth === null ? 'Livres illimités' : `${p.booksPerMonth} livres par mois`} · {p.coversPerMonth} couvertures par mois
               </p>
@@ -54,16 +83,24 @@ export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotP
                   <li key={item} className="flex gap-2 text-sm"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />{item}</li>
                 ))}
               </ul>
-              <Button onClick={() => setCheckout({ priceId: MONTHLY_PRICE_IDS[p.id], name: `${p.name} — ${p.price} €/mois` })}>
-                S'abonner — {p.price} €/mois <ArrowRight />
-              </Button>
+              {annual ? (
+                <Button onClick={() => setCheckout({ priceId: ANNUAL_PRICE_IDS[p.id], name: `${p.name} — ${yearly} €/an (2 mois offerts)` })}>
+                  S'abonner à l'année — {yearly} €/an <ArrowRight />
+                </Button>
+              ) : (
+                <Button onClick={() => setCheckout({ priceId: MONTHLY_PRICE_IDS[p.id], name: `${p.name} — ${p.price} €/mois` })}>
+                  S'abonner — {p.price} €/mois <ArrowRight />
+                </Button>
+              )}
               <Button asChild variant="ghost" className="mt-2">{detailsHref.startsWith("#") ? <a href={detailsHref}>Voir tout ce qui est inclus</a> : <Link to={detailsHref}>Voir tout ce qui est inclus</Link>}</Button>
             </article>
           );
         })}
       </div>
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        Sans engagement : vous pouvez arrêter à tout moment, l'accès reste ouvert jusqu'à la fin du mois payé.
+        {annual
+          ? "Formule annuelle : un seul paiement pour 12 mois, les quotas mensuels restent identiques. Renouvellement annulable à tout moment depuis votre espace. "
+          : "Sans engagement : vous pouvez arrêter à tout moment, l'accès reste ouvert jusqu'à la fin du mois payé. "}
         En cas d'impayé, l'accès est simplement mis en pause — vous le retrouvez dès le règlement.
       </p>
       {checkout && (
