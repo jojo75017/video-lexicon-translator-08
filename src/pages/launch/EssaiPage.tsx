@@ -86,7 +86,7 @@ export default function EssaiPage() {
   const [params] = useSearchParams();
   const { settings, loading: settingsLoading } = useLaunchSettings();
 
-  const [ideaText, setIdea] = useState('');
+  const [ideaText, setIdea] = useState(EXAMPLES[1].idea);
   const idea = ideaText;
   const [audience, setAudience] = useState('');
   const [tone, setTone] = useState(TONES[0]);
@@ -274,13 +274,12 @@ export default function EssaiPage() {
 
             <div className="mt-5 space-y-4 rounded-2xl border border-black/5 bg-white p-6 shadow-sm">
               <label className="block text-sm font-semibold text-[#2A2118]">
-                Votre idée de livre (une phrase suffit) :
+                Votre idée de livre (déjà remplie avec un exemple, modifiez-la si vous voulez) :
                 <textarea
                   value={idea}
                   onChange={(e) => setIdea(e.target.value)}
                   rows={3}
                   maxLength={2000}
-                  autoFocus
                   placeholder="Exemple : un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours."
                   className="mt-2 w-full rounded-xl border border-black/15 px-3 py-3 text-base font-normal focus:border-[#0F2E1F] focus:outline-none"
                 />
@@ -308,22 +307,30 @@ export default function EssaiPage() {
                 </p>
               )}
 
-              <div className="flex flex-wrap gap-2">
-                <span className="text-xs text-[#8A8072]">Pas d'idée précise ?</span>
-                {EXAMPLES.map((ex, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => { setIdea(ex.idea); if (!generating) void generate(ex.idea); }}
-                    className="rounded-full border border-black/10 bg-[#FBF8F3] px-3 py-1 text-xs text-[#5B5245] transition hover:border-[#0F2E1F]/40 hover:text-[#0F2E1F]"
-                  >
-                    {ex.label}
-                  </button>
-                ))}
+              <div>
+                <p className="mb-2 text-sm font-semibold text-[#2A2118]">
+                  👉 Ou choisissez un thème en 1 clic (aucune saisie) :
+                </p>
+                <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+                  {EXAMPLES.map((ex, i) => {
+                    const active = idea === ex.idea;
+                    return (
+                      <button
+                        key={i}
+                        type="button"
+                        aria-pressed={active}
+                        disabled={generating}
+                        onClick={() => { setIdea(ex.idea); void generate(ex.idea); }}
+                        className={`rounded-xl border-2 px-3 py-3 text-left text-sm font-semibold transition disabled:opacity-60 ${active ? 'border-[#0F2E1F] bg-[#0F2E1F]/5 text-[#0F2E1F]' : 'border-black/10 bg-[#FBF8F3] text-[#5B5245] hover:border-[#0F2E1F]/50'}`}
+                      >
+                        {ex.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
-              <p className="text-sm font-medium text-[#5B5245]">
-                … ou écrivez <strong className="text-[#0F2E1F]">le vôtre</strong> dans le champ ci-dessus ✍️
-              </p>
+
+
 
 
               <button
