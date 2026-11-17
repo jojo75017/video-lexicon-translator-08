@@ -11,6 +11,7 @@ import type { Chapter } from '@/hooks/useSubscriptionGeneration';
 import { Button } from '@/components/ui/button';
 import SavedBookFlipbook from '@/components/flipbook/SavedBookFlipbook';
 import ChapterReaderEditor from '@/components/v3public/ChapterReaderEditor';
+import KdpBookChecklist from '@/components/v3public/KdpBookChecklist';
 import { loadStudioCovers, indexCoversByTitle, normalizeTitle, fallbackGradientFor, type StudioCover } from '@/lib/studioCovers';
 
 type Book = {
@@ -57,6 +58,7 @@ export default function V3BookManagerPage() {
   /** Tous les livres du compte (tous types) : la correction éditoriale doit pouvoir en prendre n'importe lequel. */
   const [allBooks, setAllBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState('');
   const [editing, setEditing] = useState<Book | null>(null);
   const [exporting, setExporting] = useState<Book | null>(null);
   const [exportLoadingId, setExportLoadingId] = useState<string | null>(null);
@@ -72,6 +74,7 @@ export default function V3BookManagerPage() {
   const load = async () => {
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) { nav('/v3/auth'); return; }
+    setUserId(auth.user.id);
     const { data, error } = await supabase.from('ebook_projects')
       .select('id,title,author_name,kdp_description,chapters,number_of_chapters,project_type,updated_at,draft_state')
       .eq('user_id', auth.user.id)
@@ -297,6 +300,8 @@ export default function V3BookManagerPage() {
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
               </div>
+              <KdpBookChecklist key={`${b.id}:${b.updated_at}`} bookId={b.id} userId={userId} revision={b.updated_at || ''}
+                coverId={covers[normalizeTitle(b.title)]?.id} onRead={() => setReading(b)} onExport={() => void openExport(b)} />
             </div>
           );})}
         </div>

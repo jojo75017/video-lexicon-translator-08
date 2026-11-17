@@ -153,7 +153,7 @@ export default function V3KdpDataPage() {
           </Link>
         </div>
       ) : (
-        <div className="mt-6">
+        <div id="pack-kdp" className="mt-6 scroll-mt-24">
           <V3KdpPublishPanel
             title={book.title}
             subtitle={subtitle === 'Workflow V3 complet' ? '' : subtitle}
