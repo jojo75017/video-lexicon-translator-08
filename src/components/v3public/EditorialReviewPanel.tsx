@@ -152,9 +152,10 @@ export default function EditorialReviewPanel({ books, initialBookId, autoLoad, o
     try {
       const { data: auth } = await supabase.auth.getUser();
       if (!auth.user) throw new Error('Connexion requise.');
-      const { data: current, error: readError } = await supabase.from('ebook_projects').select('chapters,title,author_name,kdp_description')
+      const { data: current, error: readError } = await supabase.from('ebook_projects').select('chapters,title,author_name,kdp_description,updated_at')
         .eq('id', book.id).eq('user_id', auth.user.id).single();
       if (readError) throw readError;
+      if (!current.updated_at) throw new Error('Date de sauvegarde introuvable : rechargez le livre avant de corriger.');
       if (JSON.stringify(current.chapters) !== JSON.stringify(source)) throw new Error('Le manuscrit a changé depuis son chargement. Rechargez-le et relancez l’analyse avant de corriger.');
       const corrected = applyEditorialPatches(source, selected.map(i => patches[i]));
       const { data: latest, error: historyError } = await supabase.from('ebook_project_versions').select('version_number')
@@ -167,13 +168,16 @@ export default function EditorialReviewPanel({ books, initialBookId, autoLoad, o
       });
       if (backupError) throw backupError;
       const { data: saved, error: saveError } = await supabase.from('ebook_projects').update({ chapters: corrected as never })
-        .eq('id', book.id).eq('user_id', auth.user.id).eq('chapters', JSON.stringify(current.chapters)).select('id');
+        .eq('id', book.id).eq('user_id', auth.user.id).eq('updated_at', current.updated_at).select('id');
       if (saveError) throw saveError;
       if (!saved?.length) throw new Error('Le manuscrit a changé : aucune correction appliquée. Rechargez le livre.');
       setSource(corrected); setChapters(corrected.map(c => ({ title: String(c.title || c.titre || ''), content: chapterText(c) })));
       setReport(null); setPatches([]); setSelected([]); onSaved?.();
       toast.success('Corrections enregistrées. Le manuscrit original est conservé dans les sauvegardes.');
-    } catch (error) { toast.error(error instanceof Error ? error.message : 'Enregistrement impossible.'); }
+    } catch (error) {
+      const message = error && typeof error === 'object' && 'message' in error ? String(error.message) : 'Enregistrement impossible.';
+      toast.error(message);
+    }
     finally { setSaving(false); }
   };
 

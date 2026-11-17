@@ -21,6 +21,7 @@
 - [x] Rendre le suivi des essais immédiatement visible et accessible en orange, sans les réglages du lancement ; accès connecté, copie des emails et export CSV vérifiés.
 
 ## Améliorations de l'outil (demandées le 17/11/2026)
+- [x] Enregistrement des corrections : filtre de 63 293 caractères reproduit en échec ; remplacé par updated_at, 7 tests réussis. Sauvegarde originale et réenregistrement réel du roman vérifiés connecté, texte inchangé.
 - [x] Relecture refusée (402 fournisseur) : explication de crédits/facturation et statut préservé, message JSON affiché ; 8 tests réussis sans nouvel appel payant. Analyse bloquée jusqu’au rétablissement du compte fournisseur.
 - [x] Grand parcours 15 étapes : nettoyage automatique + règle « une seule découverte » sur chaque chapitre
 - [ ] « Mes livres » : bouton Lire/Modifier, vraies couvertures, noms des deux corrections clarifiés (fait le 17/11)
