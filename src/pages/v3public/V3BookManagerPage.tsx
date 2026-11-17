@@ -211,7 +211,7 @@ export default function V3BookManagerPage() {
       {tab === 'editorial' ? (
         loading ? <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
         : allBooks.length === 0 ? <p className="mt-10 text-center text-sm text-[var(--v3-muted)]">Aucun livre enregistré à analyser pour l’instant.</p>
-        : <EditorialReviewPanel books={allBooks} initialBookId={selectedBookId || undefined} autoLoad={Boolean(selectedBookId)} />
+        : <EditorialReviewPanel onSaved={() => void load()} books={allBooks} initialBookId={selectedBookId || undefined} autoLoad={Boolean(selectedBookId)} />
       ) : loading ? (
         <div className="mt-12 text-center text-[var(--v3-muted)]">Chargement…</div>
       ) : displayRows.length === 0 ? (
