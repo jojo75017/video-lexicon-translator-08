@@ -417,7 +417,7 @@ export default function EssaiPage() {
                 >
                   <span className="text-3xl">{s.icon}</span>
                   <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>{s.genre}</p>
-                  <p className="v3-serif mt-2 text-lg leading-snug">{s.idea}</p>
+                  <p className="v3-serif mt-2 text-lg leading-snug not-italic" style={{ color: "#FFFFFF" }}>{s.idea}</p>
                   <p className="mt-4 text-sm font-semibold text-white/85 group-hover:text-white">Essayer cette idée →</p>
                 </button>
               ))}
