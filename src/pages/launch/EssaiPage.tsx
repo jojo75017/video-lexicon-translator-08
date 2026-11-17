@@ -57,6 +57,31 @@ const EXAMPLES: Array<{ label: string; idea: string }> = [
   { label: '🐕 Éduquer son chiot', idea: 'Un guide bienveillant pour éduquer son chiot pendant ses six premiers mois.' },
 ];
 
+
+const SAMPLES = [
+  {
+    icon: '🔎', genre: 'Roman policier', cover: 'linear-gradient(160deg,#1B2A4A,#0E1A33)',
+    idea: "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël.",
+    title: 'La Nuit du boulanger',
+    plan: ['Le four est resté froid', 'Les rumeurs du port', 'La farine sur la lande'],
+    extract: "Le matin de Noël, pour la première fois depuis trente ans, l’odeur du pain ne monta pas sur Locmaria. Devant la boulangerie fermée, les habitants attendaient en silence, et Anne Le Gall comprit que quelque chose ne tournait pas rond.",
+  },
+  {
+    icon: '🌱', genre: 'Guide pratique', cover: 'linear-gradient(160deg,#2F5D3A,#173322)',
+    idea: 'Un guide pratique pour cultiver ses légumes sur un balcon de ville, même sans expérience.',
+    title: 'Mon potager sur le balcon',
+    plan: ['Bien choisir son emplacement', 'Les bacs et le terreau', 'Dix légumes faciles pour débuter'],
+    extract: "Avant d’acheter la moindre graine, observez votre balcon une journée entière. Notez les heures où le soleil l’éclaire : c’est cette simple observation qui décidera de vos premières récoltes.",
+  },
+  {
+    icon: '🦊', genre: 'Livre jeunesse', cover: 'linear-gradient(160deg,#B4532A,#6E2C14)',
+    idea: "Une histoire pour enfants de 4 à 7 ans : un petit renard qui apprend à vaincre sa peur du noir.",
+    title: 'Pip, le renard qui avait peur du noir',
+    plan: ['Quand la lune se cache', 'La luciole bavarde', 'Le terrier plein d’étoiles'],
+    extract: "Chaque soir, quand le soleil se couchait derrière la colline, Pip tirait sa couverture jusqu’au bout de son museau. Le noir, pensait-il, était rempli de choses qui grognent.",
+  },
+];
+
 const LOCKED = [
   'Les chapitres 2 à 12, écrits dans la continuité du premier (jusqu’à 40 chapitres possibles)',
   'La correction professionnelle en 4 passes',
@@ -96,6 +121,9 @@ export default function EssaiPage() {
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showMoreExamples, setShowMoreExamples] = useState(false);
   const [videoStarted, setVideoStarted] = useState(false);
+  const [sampleIdx, setSampleIdx] = useState(0);
+  const formRef = useRef<HTMLDivElement>(null);
+  const ideaRef = useRef<HTMLTextAreaElement>(null);
 
   const [generating, setGenerating] = useState(false);
   const [outlineResult, setOutlineResult] = useState<OutlineResult | null>(null);
@@ -241,6 +269,210 @@ export default function EssaiPage() {
     return `/formules?${q.toString()}`;
   })();
 
+  const scrollToForm = () => {
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => ideaRef.current?.focus({ preventScroll: true }), 500);
+  };
+  const pickSample = (i: number) => {
+    setSampleIdx(i);
+    setIdea(SAMPLES[i].idea);
+    void track('example_card_click', params);
+    scrollToForm();
+  };
+  const sample = SAMPLES[sampleIdx];
+  const NAVY = '#0E1A33';
+  const IVORY = '#FAF6EE';
+  const ORANGE = '#E8621A';
+  const GOLD = '#C9A24A';
+
+  const ctaButton = (onClick: () => void, extra = '') => (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={generating || !trialOpen || settingsLoading}
+      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110 disabled:opacity-60 ${extra}`}
+      style={{ background: ORANGE }}
+    >
+      {generating ? (
+        <><Loader2 className="h-5 w-5 animate-spin" /> {GEN_STEPS[genStep]}</>
+      ) : (
+        <><Sparkles className="h-5 w-5" /> Transformer cette idée en début de livre</>
+      )}
+    </button>
+  );
+
+  if (!outlineResult) {
+    return (
+      <div className="min-h-screen" style={{ background: IVORY }}>
+        {/* 1. Ouverture */}
+        <section style={{ background: NAVY }} className="overflow-hidden text-white">
+          <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-5">
+            <span className="v3-serif text-lg font-bold not-italic" style={{ color: "#fff" }}>EbookStudio</span>
+            <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: GOLD }}>
+              Maison d’édition augmentée
+            </span>
+          </header>
+          <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 [&>*]:min-w-0 pb-16 pt-6 lg:grid-cols-[1fr_0.9fr] lg:gap-14 lg:pb-24">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: GOLD }}>Essai gratuit</p>
+              <h1 className="v3-serif mt-3 break-words text-[2rem] font-medium not-italic leading-[1.1] tracking-tight md:text-[3rem]" style={{ color: "#fff" }}>
+                Votre livre commence par une phrase.
+              </h1>
+              <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75">
+                L’essai vous propose un titre, un plan en 12 chapitres et les premières lignes de votre chapitre 1.
+              </p>
+              <div ref={formRef} className="mt-7 space-y-4 rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10 md:p-6">
+                <label className="block text-sm font-semibold text-white/90">
+                  Votre idée de livre
+                  <textarea
+                    ref={ideaRef}
+                    value={idea}
+                    onChange={(e) => setIdea(e.target.value)}
+                    rows={3}
+                    maxLength={2000}
+                    className="mt-2 w-full rounded-lg border-0 bg-white px-3 py-3 text-base font-normal leading-relaxed text-[#1E2533] focus:outline-none focus:ring-2"
+                  />
+                </label>
+                {ctaButton(() => void generate())}
+                <p className="text-center text-sm text-white/80" aria-live="polite">
+                  {generating ? `Étape ${genStep + 1}/3 · environ 20 secondes, restez sur la page.` : 'Aperçu gratuit, sans e-mail ni carte bancaire.'}
+                </p>
+                <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="flex w-full items-center justify-center gap-1 text-xs font-semibold" style={{ color: GOLD }}>
+                  <ChevronDown className={`h-3.5 w-3.5 transition ${showAdvanced ? 'rotate-180' : ''}`} /> Affiner (public, ton, langue) facultatif
+                </button>
+                {showAdvanced && (
+                  <div className="grid gap-3 border-t border-white/10 pt-4 text-[#1E2533] sm:grid-cols-3">
+                    <input value={audience} onChange={(e) => setAudience(e.target.value)} placeholder="Public visé" className="rounded-lg px-3 py-2 text-sm" />
+                    <select value={tone} onChange={(e) => setTone(e.target.value)} className="rounded-lg px-3 py-2 text-sm">
+                      {TONES.map((t) => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                    <select value={language} onChange={(e) => setLanguage(e.target.value)} className="rounded-lg px-3 py-2 text-sm">
+                      {LANGUAGES.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+                    </select>
+                  </div>
+                )}
+                {!trialOpen && !settingsLoading && (
+                  <p className="text-center text-sm text-red-300">L'essai gratuit est momentanément fermé. Revenez très vite.</p>
+                )}
+              </div>
+            </div>
+            {/* Couverture + extrait du même livre que l'idée */}
+            <figure className="grid grid-cols-[0.8fr_1.2fr] gap-3 [&>*]:min-w-0 md:gap-4">
+              <div className="flex aspect-[2/3] flex-col justify-between rounded-md p-4 shadow-2xl" style={{ background: sample.cover, color: '#fff' }}>
+                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: GOLD }}>{sample.genre}</span>
+                <span className="v3-serif text-lg font-bold not-italic leading-tight md:text-xl" style={{ color: "#fff" }}>{sample.title}</span>
+                <span className="text-[10px] uppercase tracking-widest text-white/70">EbookStudio</span>
+              </div>
+              <div className="rounded-md p-4 text-[#2A2118] shadow-2xl" style={{ background: IVORY }}>
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Chapitre 1</p>
+                <p className="v3-serif mt-1 text-base font-bold">{sample.plan[0]}</p>
+                <p className="v3-serif mt-2 text-[15px] leading-relaxed">{sample.extract}</p>
+              </div>
+            </figure>
+          </div>
+        </section>
+
+        {/* 2. Démonstration */}
+        <section className="mx-auto max-w-6xl px-5 py-16">
+          <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">Voyez ce qu’une phrase peut devenir</h2>
+          <div className="mt-10 grid items-stretch gap-6 md:grid-cols-[0.8fr_1.2fr]">
+            <div className="rounded-2xl border border-black/5 bg-white p-6">
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>La phrase de départ</p>
+              <p className="v3-serif mt-4 text-xl italic leading-relaxed text-[#1E2533]">« {SAMPLES[0].idea} »</p>
+            </div>
+            <div className="rounded-2xl border bg-white p-6" style={{ borderColor: GOLD }}>
+              <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Le résultat EbookStudio</p>
+              <p className="v3-serif mt-3 text-2xl font-bold text-[#1E2533]">{SAMPLES[0].title}</p>
+              <ol className="mt-3 space-y-1 text-sm text-[#5B5245]">
+                {SAMPLES[0].plan.map((p, i) => <li key={p}>{i + 1}. {p}</li>)}
+                <li className="text-[#8A8072]">… et 9 autres chapitres</li>
+              </ol>
+              <p className="v3-serif mt-4 border-t border-black/5 pt-4 text-[15px] leading-relaxed text-[#2A2118]">{SAMPLES[0].extract}</p>
+            </div>
+          </div>
+          <div className="mx-auto mt-8 max-w-3xl">
+            {videoStarted ? (
+              <video src={essaiVideo.url} poster={essaiPoster.url} controls autoPlay playsInline className="w-full rounded-2xl bg-black" />
+            ) : (
+              <button type="button" onClick={() => setVideoStarted(true)} className="mx-auto block rounded-full border px-5 py-2.5 text-sm font-semibold text-[#1E2533] hover:bg-white" style={{ borderColor: GOLD }}>
+                ▶ Voir la démo vidéo · 30 s
+              </button>
+            )}
+          </div>
+        </section>
+
+        {/* 3. Exemples */}
+        <section className="bg-white py-16">
+          <div className="mx-auto max-w-6xl px-5">
+            <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">Quelle idée voulez-vous essayer ?</h2>
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {SAMPLES.map((s, i) => (
+                <button
+                  key={s.genre}
+                  type="button"
+                  onClick={() => pickSample(i)}
+                  aria-pressed={sampleIdx === i}
+                  className="v3-chip-toggle group rounded-2xl p-6 text-left text-white shadow-md transition hover:-translate-y-1"
+                  style={{ background: s.cover, outline: sampleIdx === i ? `3px solid ${GOLD}` : 'none', outlineOffset: 3 }}
+                >
+                  <span className="text-3xl">{s.icon}</span>
+                  <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>{s.genre}</p>
+                  <p className="v3-serif mt-2 text-lg leading-snug">{s.idea}</p>
+                  <p className="mt-4 text-sm font-semibold text-white/85 group-hover:text-white">Essayer cette idée →</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Parcours */}
+        <section className="mx-auto max-w-6xl px-5 py-16">
+          <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">De votre idée à votre premier chapitre</h2>
+          <ol className="mt-10 grid gap-5 md:grid-cols-3">
+            {[
+              ['Choisissez ou saisissez une idée', 'Une seule phrase suffit, ou un clic sur un exemple.'],
+              ['Lisez gratuitement l’aperçu', 'Titre, plan en 12 chapitres et début du chapitre 1, sans e-mail.'],
+              ['Recevez la suite', 'Votre e-mail débloque la suite du chapitre et le téléchargement du PDF.'],
+            ].map(([t, d], i) => (
+              <li key={t} className="rounded-2xl border border-black/5 bg-white p-6">
+                <span className="v3-serif text-4xl font-bold" style={{ color: ORANGE }}>{i + 1}</span>
+                <p className="mt-2 text-lg font-bold text-[#1E2533]">{t}</p>
+                <p className="mt-1 text-sm text-[#5B5245]">{d}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* 5. FAQ */}
+        <section className="mx-auto max-w-3xl px-5 pb-16">
+          <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">Questions fréquentes</h2>
+          <div className="mt-8 space-y-3">
+            {[
+              ['Puis-je essayer sans idée ?', 'Oui. Une idée est déjà prête dans le champ, et trois exemples se choisissent d’un clic.'],
+              ['Que vais-je obtenir ?', 'Un titre, un sous-titre, un plan en 12 chapitres et le début de votre chapitre 1, écrits pour votre idée.'],
+              ['Quand faut-il donner mon e-mail ?', 'Seulement après avoir lu l’aperçu, si vous voulez la suite du chapitre et le PDF.'],
+              ['Faut-il une carte bancaire ?', 'Non. L’essai est entièrement gratuit, sans carte bancaire.'],
+            ].map(([q, a]) => (
+              <details key={q} className="rounded-xl border border-black/5 bg-white p-5">
+                <summary className="cursor-pointer font-semibold text-[#1E2533]">{q}</summary>
+                <p className="mt-2 text-sm leading-relaxed text-[#5B5245]">{a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* 6. Dernière invitation */}
+        <section style={{ background: NAVY }} className="px-5 py-16 text-center text-white">
+          <h2 className="v3-serif text-3xl font-medium not-italic md:text-4xl" style={{ color: "#fff" }}>Et si vous commenciez par une phrase ?</h2>
+          <p className="mt-3 text-white/70">Votre idée vous attend en haut de la page.</p>
+          <div className="mx-auto mt-8 max-w-md">{ctaButton(scrollToForm)}</div>
+          <p className="mt-3 text-sm text-white/60">Aperçu gratuit, sans e-mail ni carte bancaire.</p>
+        </section>
+      </div>
+    );
+  }
+
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--v3-cream, #FBF8F3)' }}>
       {/* En-tête minimal : le visiteur reste dans son livre, rien d'autre. */}
@@ -256,188 +488,6 @@ export default function EssaiPage() {
       </header>
 
       <main className="mx-auto max-w-6xl px-5 py-10">
-        {!outlineResult ? (
-          <div className="grid items-center gap-8 lg:grid-cols-[1fr_0.85fr] lg:gap-14">
-           <div>
-            <h1
-              className="v3-serif text-3xl font-medium not-italic leading-[1.15] tracking-tight md:text-[2.6rem]"
-              style={{ color: 'var(--v3-ink, #2A2118)' }}
-            >
-              Votre idée. Les premières pages de votre livre.
-            </h1>
-            <p className="mt-4 text-base leading-relaxed text-[#5B5245]">
-              Une phrase suffit pour obtenir un titre, un plan en 12 chapitres et le début de votre chapitre 1.
-            </p>
-
-            <div className="mt-6 space-y-4 rounded-2xl border border-black/[0.06] bg-white/80 p-5 md:p-6">
-              <label className="block text-sm font-semibold text-[#2A2118]">
-                Quelle est votre idée de livre ?
-                <textarea
-                  value={idea}
-                  onChange={(e) => setIdea(e.target.value)}
-                  rows={3}
-                  maxLength={2000}
-                  placeholder="Exemple : un guide pour aider les jeunes parents à retrouver un sommeil normal en 30 jours."
-                  className="mt-2 w-full rounded-lg border border-black/10 bg-[#FBF8F3]/60 px-3 py-3 text-base font-normal leading-relaxed focus:border-[#0F2E1F] focus:outline-none"
-                />
-              </label>
-
-              <div>
-                <div className="flex flex-wrap gap-2">
-                  {(showMoreExamples ? EXAMPLES : EXAMPLES.slice(0, 2)).map((ex, i) => {
-                    const active = idea === ex.idea;
-                    return (
-                      <button
-                        key={i}
-                        type="button"
-                        aria-pressed={active}
-                        disabled={generating}
-                        onClick={() => setIdea(ex.idea)}
-                        className={`v3-chip-toggle rounded-full border-2 px-3 py-2 text-sm font-semibold transition disabled:opacity-60 ${active ? 'border-[#0F2E1F] bg-[#0F2E1F]/5 text-[#0F2E1F]' : 'border-black/10 bg-[#FBF8F3] text-[#5B5245] hover:border-[#0F2E1F]/50'}`}
-                      >
-                        {ex.label}
-                      </button>
-                    );
-                  })}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowMoreExamples((v) => !v)}
-                  aria-expanded={showMoreExamples}
-                  className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-[#8A6D1B]"
-                >
-                  <ChevronDown className={`h-3.5 w-3.5 transition ${showMoreExamples ? 'rotate-180' : ''}`} />
-                  {showMoreExamples ? 'Moins d’exemples' : 'Voir d’autres exemples'}
-                </button>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => void generate()}
-                disabled={generating || !trialOpen || settingsLoading}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-6 py-4 text-base font-bold text-white shadow-sm transition hover:bg-[#14532D] disabled:opacity-60"
-              >
-                {generating ? (
-                  <>
-                    <Loader2 className="h-5 w-5 animate-spin" /> {GEN_STEPS[genStep]}
-                  </>
-                ) : (
-                  <>
-                    <BookOpen className="h-5 w-5" /> Créer mon aperçu gratuit
-                  </>
-                )}
-              </button>
-              {generating ? (
-                <p className="text-center text-sm text-[#8A8072]" aria-live="polite">
-                  Étape {genStep + 1}/3 · environ 20 secondes, restez sur la page.
-                </p>
-              ) : (
-                <div className="text-center">
-                  <p className="text-sm font-semibold text-[#0F2E1F]">
-                    Sans carte bancaire · Aperçu sans e-mail
-                  </p>
-                  <p className="mt-1 text-xs text-[#8A8072]">
-                    Votre e-mail débloque ensuite la suite du chapitre et le PDF.
-                  </p>
-                </div>
-              )}
-
-              <button
-                type="button"
-                onClick={() => setShowAdvanced((v) => !v)}
-                className="flex w-full items-center justify-center gap-1 text-xs font-semibold text-[#8A6D1B]"
-              >
-                <ChevronDown className={`h-3.5 w-3.5 transition ${showAdvanced ? 'rotate-180' : ''}`} />
-                Affiner (public, ton, langue) — facultatif
-              </button>
-
-              {showAdvanced && (
-                <div className="grid gap-4 border-t border-black/5 pt-4 sm:grid-cols-3">
-                  <label className="block text-xs font-semibold text-[#2A2118]">
-                    Public visé
-                    <input
-                      value={audience}
-                      onChange={(e) => setAudience(e.target.value)}
-                      placeholder="Jeunes parents débordés"
-                      className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
-                    />
-                  </label>
-                  <label className="block text-xs font-semibold text-[#2A2118]">
-                    Ton du livre
-                    <select
-                      value={tone}
-                      onChange={(e) => setTone(e.target.value)}
-                      className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
-                    >
-                      {TONES.map((t) => (
-                        <option key={t} value={t}>
-                          {t}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="block text-xs font-semibold text-[#2A2118]">
-                    Langue
-                    <select
-                      value={language}
-                      onChange={(e) => setLanguage(e.target.value)}
-                      className="mt-2 w-full rounded-xl border border-black/15 px-3 py-2 text-sm font-normal focus:border-[#0F2E1F] focus:outline-none"
-                    >
-                      {LANGUAGES.map((l) => (
-                        <option key={l.code} value={l.code}>
-                          {l.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-              )}
-
-              {!trialOpen && !settingsLoading && (
-                <p className="text-center text-sm text-red-700">
-                  L'essai gratuit est momentanément fermé. Revenez très vite.
-                </p>
-              )}
-              {/* Un seul appel à l'action sur ce premier écran : aucun lien
-                  concurrent ne détourne le visiteur avant sa génération. */}
-
-            </div>
-           </div>
-            {/* Vrai résultat EbookStudio : visible dès l'arrivée sur ordinateur, sous la réassurance sur mobile. */}
-            <figure className="relative">
-              <p className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6D1B]">
-                Un vrai résultat généré par EbookStudio
-              </p>
-              {videoStarted ? (
-                <video
-                  src={essaiVideo.url}
-                  poster={essaiPoster.url}
-                  controls
-                  autoPlay
-                  playsInline
-                  className="w-full rounded-2xl bg-black"
-                />
-              ) : (
-                <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] bg-white shadow-[0_20px_50px_-25px_rgba(15,46,31,0.35)]">
-                  <img
-                    src={essaiResultat.url}
-                    alt="Liseuse EbookStudio : titre « Ce soir, on mange sain ! » et début du chapitre 1"
-                    className="block max-h-[520px] w-full object-cover object-top"
-                  />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-white to-transparent" />
-                  <button
-                    type="button"
-                    onClick={() => setVideoStarted(true)}
-                    aria-label="Voir la démo, vidéo de 30 secondes"
-                    className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-[#0F2E1F]/15 bg-white/95 px-4 py-2 text-sm font-semibold text-[#0F2E1F] shadow-sm transition hover:bg-white"
-                  >
-                    ▶ Voir la démo · 30 s
-                  </button>
-                </div>
-              )}
-            </figure>
-          </div>
-        ) : (
           <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-start">
             {/* Le livre */}
             <section className="rounded-2xl border border-black/5 bg-white p-7 shadow-sm">
@@ -616,7 +666,6 @@ export default function EssaiPage() {
 
             </aside>
           </div>
-        )}
         <EssaiTestimonials />
       </main>
     </div>
