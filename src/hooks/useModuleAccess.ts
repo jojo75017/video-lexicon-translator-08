@@ -53,6 +53,14 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
         setReason(ok ? (st?.reason === 'plan' ? 'plan' : 'purchased') : null);
         return;
       }
+      // Audiolivres et voix off : offerts dans les abonnements Auteur (29 €) et Édition (59 €).
+      if (moduleKey === 'audio_premium') {
+        const { data: q } = await supabase.rpc('get_my_monthly_quota');
+        const plan = String((q as any)?.[0]?.plan ?? '');
+        if (plan.startsWith('v3m_auteur_') || plan.startsWith('v3m_vip_')) {
+          setHasAccess(true); setReason('plan'); return;
+        }
+      }
       const env = getStripeEnvironment();
       const { data } = await supabase.rpc('get_my_module_entitlements');
       const owned = (data ?? []).some(

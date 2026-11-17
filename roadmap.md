@@ -22,3 +22,4 @@
 
 ## Évolutions
 - [x] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)
+- [x] Audiolivres et voix off offerts dans les formules Auteur 29 € et Édition 59 €

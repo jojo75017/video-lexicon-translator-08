@@ -418,6 +418,7 @@ export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
       "KDP étranger (publication multi-pays)",
       "Recherche de niches avancée",
       "Rédaction en 10 langues",
+      "🎁 Audiolivres et voix off offerts",
     ],
   },
   {
@@ -432,7 +433,6 @@ export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
       "50 couvertures par mois ; connecter une clé ne supprime pas ce quota",
       "Studio Couverture Broché KDP : tranche, 4e de couverture, PDF 300 DPI",
       "Studio Album illustré jeunesse",
-      "Audiolivres et voix off",
       "Amazon Spy et outils d'éditeur",
     ],
   },
