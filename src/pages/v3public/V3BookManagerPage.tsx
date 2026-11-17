@@ -10,6 +10,8 @@ import { normalizeManuscript } from '@/utils/manuscriptNormalizer';
 import type { Chapter } from '@/hooks/useSubscriptionGeneration';
 import { Button } from '@/components/ui/button';
 import SavedBookFlipbook from '@/components/flipbook/SavedBookFlipbook';
+import ChapterReaderEditor from '@/components/v3public/ChapterReaderEditor';
+import { loadStudioCovers, indexCoversByTitle, normalizeTitle, fallbackGradientFor, type StudioCover } from '@/lib/studioCovers';
 
 type Book = {
   id: string;
@@ -62,6 +64,9 @@ export default function V3BookManagerPage() {
   const [tab, setTab] = useState<'books' | 'editorial'>('books');
   const [selectedBookId, setSelectedBookId] = useState<string>('');
   const [flipBook, setFlipBook] = useState<Book | null>(null);
+  const [reading, setReading] = useState<Book | null>(null);
+  const [covers, setCovers] = useState<Record<string, StudioCover>>({});
+  useEffect(() => { void loadStudioCovers().then((c) => setCovers(indexCoversByTitle(c))); }, []);
 
 
   const load = async () => {
@@ -198,7 +203,7 @@ export default function V3BookManagerPage() {
 
 
       <div className="mt-6 flex gap-2 border-b border-black/10">
-        {([['books', correctedOnly ? 'Mes livres corrigés' : 'Mes livres'], ['editorial', 'Correction éditoriale']] as const).map(([k, l]) => (
+        {([['books', correctedOnly ? 'Mes livres corrigés' : 'Mes livres'], ['editorial', 'Vérifier la cohérence']] as const).map(([k, l]) => (
           <button key={k} onClick={() => setTab(k)} className={`px-4 py-2 text-sm font-semibold -mb-px border-b-2 ${tab === k ? 'border-[var(--v3-orange)] text-[var(--v3-ink)]' : 'border-transparent text-[var(--v3-muted)]'}`}>{l}</button>
         ))}
       </div>
@@ -217,7 +222,7 @@ export default function V3BookManagerPage() {
               <p className="text-sm font-semibold">Aucun livre corrigé pour l’instant.</p>
               <p className="mt-2 text-sm text-[var(--v3-muted)]">
                 Un livre apparaît ici automatiquement dès qu’une correction complète est terminée.
-                Ouvrez « Corriger mon livre », importez votre document (ou cliquez sur « Corriger ce livre »
+                Ouvrez « Corriger mon livre », importez votre document (ou cliquez sur « Corriger le texte »
                 depuis Mes livres), puis lancez la correction : l’enregistrement se fait tout seul.
               </p>
               <button onClick={() => nav('/v3/corriger')} className="v3-btn v3-btn-primary mt-5">
@@ -245,7 +250,11 @@ export default function V3BookManagerPage() {
             return (
 
             <div key={b.id} className="v3-card flex flex-wrap items-center gap-4">
-              <div className="w-14 h-20 rounded bg-[#1F2937] shrink-0" />
+              {covers[normalizeTitle(b.title)]?.thumbUrl ? (
+                <img src={covers[normalizeTitle(b.title)]!.thumbUrl!} alt={`Couverture de ${b.title}`} className="w-14 h-20 rounded object-cover shrink-0" loading="lazy" />
+              ) : (
+                <div className="w-14 h-20 rounded shrink-0 grid place-items-center p-1 text-center text-[8px] font-semibold leading-tight" style={{ background: fallbackGradientFor(b.id), color: '#F9FAFB' }}>{(b.title || '').slice(0, 40)}</div>
+              )}
               <div className="flex-1 min-w-[260px]">
                 <div className="font-semibold flex items-center gap-2 text-base">
                   <span className="line-clamp-2" style={{ color: "#F9FAFB" }}>{b.title || 'Livre sans titre'}</span>
@@ -259,14 +268,17 @@ export default function V3BookManagerPage() {
                 </div>
               </div>
               <div className="flex flex-wrap justify-end gap-2">
+                <button onClick={() => setReading(b)} title="Relire et modifier chaque chapitre" className="v3-btn v3-btn-primary text-xs">
+                  <Pencil className="w-3.5 h-3.5" /> Lire / Modifier
+                </button>
                 <Button variant="secondary" size="sm" onClick={() => setFlipBook(b)}>
                   <BookOpen className="mr-2 h-4 w-4" /> Voir votre Flipbook
                 </Button>
                 <button onClick={() => nav(`/v3/corriger?projectId=${b.id}`)} className="v3-btn v3-btn-outline text-xs">
-                  <Wand2 className="w-3.5 h-3.5" /> Corriger ce livre
+                  <Wand2 className="w-3.5 h-3.5" /> Corriger le texte
                 </button>
                 <button onClick={() => { setSelectedBookId(b.id); setTab('editorial'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="v3-btn v3-btn-outline text-xs">
-                  <Wand2 className="w-3.5 h-3.5" /> Correction éditoriale
+                  <Wand2 className="w-3.5 h-3.5" /> Vérifier la cohérence
                 </button>
 
                 <button
@@ -290,6 +302,7 @@ export default function V3BookManagerPage() {
         </div>
       )}
 
+      {reading && <ChapterReaderEditor key={reading.id} book={reading} onClose={() => setReading(null)} onSaved={() => void load()} />}
       {flipBook && <SavedBookFlipbook key={flipBook.id} book={flipBook} onClose={() => setFlipBook(null)} />}
       {exporting && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/50 px-4 py-8" onClick={() => setExporting(null)}>

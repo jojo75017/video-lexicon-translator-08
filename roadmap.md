@@ -22,7 +22,7 @@
 
 ## Améliorations de l'outil (demandées le 17/11/2026)
 - [x] Grand parcours 15 étapes : nettoyage automatique + règle « une seule découverte » sur chaque chapitre
-- [ ] « Mes livres » : bouton Lire/Modifier, vraies couvertures, noms des deux corrections clarifiés
+- [ ] « Mes livres » : bouton Lire/Modifier, vraies couvertures, noms des deux corrections clarifiés (fait le 17/11)
 - [ ] Correction éditoriale : bouton « Appliquer les corrections suggérées »
 - [ ] Mise en ligne KDP : liste en 4 étapes sur la fiche du livre
 - [ ] Accueil nouveaux abonnés : 3 choix à la première connexion
