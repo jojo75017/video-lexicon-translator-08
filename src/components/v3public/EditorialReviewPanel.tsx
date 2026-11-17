@@ -3,6 +3,7 @@ import { Loader2, ScanSearch, CheckCircle2, BookOpen, RefreshCw, Wand2, Save } f
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
+import { edgeFunctionError } from '@/lib/edgeFunctionError';
 import { applyEditorialPatches, chapterText, type EditorialPatch, type ManuscriptChapter } from '@/lib/editorialCorrections';
 import { getProvider, getActiveAIKey, getOpenRouterModel } from '@/services/aiWritingService';
 
@@ -110,7 +111,7 @@ export default function EditorialReviewPanel({ books, initialBookId, autoLoad, o
           userModel: getProvider() === 'openrouter' ? getOpenRouterModel() : undefined,
         },
       });
-      if (error || data?.error) throw new Error(data?.error || error?.message);
+      if (error || data?.error) throw new Error(await edgeFunctionError(error, data));
       setReport(data as Report);
     } catch (e: any) {
       toast.error(e?.message || 'Analyse impossible.');
@@ -133,7 +134,7 @@ export default function EditorialReviewPanel({ books, initialBookId, autoLoad, o
           chapters, chapterNumber, issues: notes, userProvider: getProvider(), userApiKey: getActiveAIKey(),
           userModel: getProvider() === 'openrouter' ? getOpenRouterModel() : undefined,
         } });
-        if (error || data?.error) throw new Error(data?.error || error?.message);
+        if (error || data?.error) throw new Error(await edgeFunctionError(error, data));
         for (const patch of (data?.corrections || []) as EditorialPatch[]) {
           if (patch.chapitre !== chapterNumber || /[—–]/.test(patch.remplacement || '')) continue;
           try { applyEditorialPatches(source, [...proposed, patch]); proposed.push(patch); } catch { /* Ambiguous proposals stay unapplied. */ }

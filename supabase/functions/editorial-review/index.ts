@@ -70,8 +70,10 @@ Réponds UNIQUEMENT en JSON : {"score": 0-100, "synthese": "3 phrases", "categor
     const r = await fetch(endpoint, { method: "POST", headers, body: JSON.stringify(body), signal: ctrl.signal }).finally(() => clearTimeout(t));
     if (!r.ok) {
       console.error("editorial-review", r.status);
+      const providerName = engine === 'openrouter' ? 'OpenRouter' : engine === 'gemini' ? 'Gemini' : engine === 'claude' ? 'Anthropic' : 'OpenAI';
+      if (r.status === 402) return json({ error: `${providerName} a refusé la relecture pour un problème de crédits ou de facturation (402). Vérifiez le solde et la facturation de votre compte ${providerName}, puis relancez l’analyse une fois le problème réglé. Votre livre n’a pas été modifié.` }, 402);
       if (r.status === 429) return json({ error: "Limite de requêtes de votre clé IA atteinte, réessayez dans une minute." }, 429);
-      if (r.status === 401 || r.status === 403) return json({ error: "Clé API refusée par votre fournisseur IA." }, 400);
+      if (r.status === 401 || r.status === 403) return json({ error: `Accès refusé par ${providerName} (${r.status}). Vérifiez les autorisations de votre compte et de votre clé avant de relancer. Votre livre n’a pas été modifié.` }, r.status);
       return json({ error: `Le service IA a répondu ${r.status}.` }, 502);
     }
     const d = await r.json();
