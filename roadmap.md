@@ -20,6 +20,13 @@
 
 - [x] Rendre le suivi des essais immédiatement visible et accessible en orange, sans les réglages du lancement ; accès connecté, copie des emails et export CSV vérifiés.
 
+## Améliorations de l'outil (demandées le 17/11/2026)
+- [x] Grand parcours 15 étapes : nettoyage automatique + règle « une seule découverte » sur chaque chapitre
+- [ ] « Mes livres » : bouton Lire/Modifier, vraies couvertures, noms des deux corrections clarifiés
+- [ ] Correction éditoriale : bouton « Appliquer les corrections suggérées »
+- [ ] Mise en ligne KDP : liste en 4 étapes sur la fiche du livre
+- [ ] Accueil nouveaux abonnés : 3 choix à la première connexion
+
 ## Évolutions
 - [x] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)
 - [x] Audiolivres et voix off offerts dans les formules Auteur 29 € et Édition 59 €

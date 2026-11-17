@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { detectBookType, nonFictionProductionPrompt } from '../_shared/bookWritingPolicy.ts';
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { sanitizeEditorialContent, NO_REDISCOVERY_RULE } from '../_shared/editorialSanitizer.ts';
 
 const requireUser = async (req: Request) => {
   const authHeader = req.headers.get('Authorization');
@@ -1903,7 +1904,7 @@ RÈGLES STRICTES :
 - Aucune redite, aucun remplissage, aucun méta-discours
 - Style vivant, concret, immersif
 - Si ce n'est pas le dernier segment, ne conclus pas le chapitre
-- Retourne uniquement un JSON valide${personnagesSection}
+- Retourne uniquement un JSON valide${personnagesSection}${NO_REDISCOVERY_RULE}
 ${LANGUE_RULE}`
             : `${LANGUE_RULE}
 Tu es un AUTEUR BEST-SELLER avec 20 ans d'expérience. Tu rédiges des chapitres EXCEPTIONNELS dans le genre "${category}".
@@ -1943,7 +1944,7 @@ STYLE PROFESSIONNEL :
 - Phrases courtes percutantes alternées avec développements fluides
 - Montrer (show) au lieu d'expliquer (tell)
 - Supprimer tout adverbe inutile (vraiment, absolument, totalement)
-- Aucune tournure passive excessive${personnagesSection}`;
+- Aucune tournure passive excessive${personnagesSection}${chapitre.numero > 1 ? NO_REDISCOVERY_RULE : ''}`;
           const p4UserPrompt = totalParts > 1
             ? `Rédige uniquement le SEGMENT ${partNumber}/${totalParts} du chapitre, en ${segmentMinWords}-${segmentMaxWords} mots :
 
@@ -2055,6 +2056,15 @@ ${LANGUE_RULE}`,
               }
             } catch (refineErr) {
               console.warn(`Passe éditoriale Pro ignorée pour Ch.${chapitreGenere.numero}:`, refineErr instanceof Error ? refineErr.message : refineErr);
+            }
+          }
+
+          // Filtre éditorial final : actes, parties, balises, consignes IA, tirets longs.
+          if (typeof chapitreGenere?.contenu === 'string') {
+            const sanitized = sanitizeEditorialContent(chapitreGenere.contenu);
+            if (sanitized.length > 80) {
+              chapitreGenere.contenu = sanitized;
+              chapitreGenere.nombreMots = sanitized.split(/\s+/).filter(Boolean).length;
             }
           }
 
