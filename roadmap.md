@@ -27,7 +27,7 @@
 - [ ] « Mes livres » : bouton Lire/Modifier, vraies couvertures, noms des deux corrections clarifiés (fait le 17/11)
 - [x] Correction éditoriale : choix chapitre/livre, propositions avant/après, validation et sauvegarde préalable ; 11 tests réussis. Livre réel chargé connecté ; génération réelle à confirmer avec une clé IA configurée dans la session de test. Non publié.
 - [x] Mise en ligne KDP : 4 étapes sur chaque livre, accès manuscrit/couverture/fiche/pack et validations locales ; 3 tests réussis, fiche réelle et retour aux validations vérifiés connecté sur ordinateur/mobile, sans publication.
-- [ ] Accueil nouveaux abonnés : 3 choix à la première connexion
+- [x] Accueil nouveaux abonnés : trois choix et rappel clés personnelles, mémorisés par compte sur cet appareil ; 4 tests réussis, ancien compte réel inchangé, nouvel abonnement simulé localement sur ordinateur/mobile et liens clés/écriture vérifiés. Première arrivée d’un véritable nouvel abonné reste à confirmer ; non publié.
 
 ## Évolutions
 - [x] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)

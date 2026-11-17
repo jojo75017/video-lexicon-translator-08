@@ -1,0 +1,14 @@
+.subscriber-welcome {
+  --welcome-background: var(--v3-surface, #151d2c);
+  --welcome-foreground: var(--nav-text, #f1f5f9);
+  --welcome-border: var(--nav-border, #243248);
+  --welcome-accent: var(--v3-orange, #ff9e2d);
+  background: var(--welcome-background);
+  color: var(--welcome-foreground);
+  border-block: 1px solid var(--welcome-border);
+}
+.subscriber-welcome h2, .subscriber-welcome span, .subscriber-welcome a, .subscriber-welcome p { color: var(--welcome-foreground) !important; }
+.subscriber-welcome .welcome-choice { background: var(--welcome-background) !important; border: 1px solid var(--welcome-border); color: var(--welcome-foreground) !important; }
+.subscriber-welcome .welcome-choice:hover { border-color: var(--welcome-accent); }
+.subscriber-welcome .welcome-key { background: var(--welcome-accent) !important; color: var(--welcome-background) !important; }
+.subscriber-welcome .welcome-key span { color: inherit !important; }

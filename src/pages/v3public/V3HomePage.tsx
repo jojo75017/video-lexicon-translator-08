@@ -3,6 +3,7 @@ import { Link, Navigate } from 'react-router-dom';
 import V3QuickShortcuts from '@/components/v3public/V3QuickShortcuts';
 import { supabase } from '@/integrations/supabase/client';
 import V3SubscriberHome from '@/components/v3public/V3SubscriberHome';
+import SubscriberWelcome from '@/components/v3public/SubscriberWelcome';
 import V3CoversGallery from '@/components/v3public/V3CoversGallery';
 import V3SubscriberWorkshops from '@/components/v3public/V3SubscriberWorkshops';
 import V3SubscriberFaq from '@/components/v3public/V3SubscriberFaq';
@@ -101,6 +102,7 @@ export default function V3HomePage() {
             📞 Besoin d'aide ? Réserver un appel de 30 min
           </a>
         </div>
+        <SubscriberWelcome key={user.id} userId={user.id} />
         <V3SubscriberHome user={user} />
         <V3CoversGallery />
         <V3ClusterSites />
