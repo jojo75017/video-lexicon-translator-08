@@ -21,4 +21,4 @@
 - [x] Rendre le suivi des essais immédiatement visible et accessible en orange, sans les réglages du lancement ; accès connecté, copie des emails et export CSV vérifiés.
 
 ## Évolutions
-- [ ] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)
+- [x] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)

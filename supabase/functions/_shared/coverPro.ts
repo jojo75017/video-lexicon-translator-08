@@ -92,8 +92,9 @@ export async function hasCoverProRight(
   );
   if (owns) return { granted: true, reason: "purchased" };
 
-  // Inclus d'office dans les abonnements actifs Édition et Maison d'Édition
-  // (hors anciens accès à vie, qui gardent l'achat à l'unité).
+  // Cadeau de bienvenue (17/11/2026) : inclus dans tous les abonnements actifs,
+  // mensuels ou annuels (Starter, Auteur, Édition). Les anciens accès à vie
+  // gardent l'achat à l'unité.
   const { data: sub } = await service
     .from("subscribers")
     .select("plan_tier,plan_type,status")
@@ -101,8 +102,7 @@ export async function hasCoverProRight(
     .maybeSingle();
   const s = sub as { plan_tier?: string; plan_type?: string; status?: string } | null;
   const included = !!s && ["active", "trialing"].includes((s.status ?? "").toLowerCase()) &&
-    ["edition", "maison"].includes((s.plan_tier ?? "").toLowerCase()) &&
-    (s.plan_type ?? "").toLowerCase() === "subscription";
+    ["subscription", "annual"].includes((s.plan_type ?? "").toLowerCase());
   return included ? { granted: true, reason: "plan" } : { granted: false, reason: null };
 }
 
