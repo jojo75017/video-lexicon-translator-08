@@ -43,7 +43,7 @@ export default function KdpBookChecklist({ bookId, userId, revision, coverId, on
           <div key={label} className="flex flex-wrap items-center justify-between gap-2 border-b border-border pb-3">
             <label className="flex items-center gap-3 text-sm font-semibold text-foreground cursor-pointer">
               <input type="checkbox" checked={checked[index]} onChange={e => toggle(index, e.target.checked)} className="h-4 w-4 accent-primary" />
-              <span>{index + 1}. {label}</span>
+              <span className="text-foreground">{index + 1}. {label}</span>
             </label>
             {to ? <Button asChild size="sm" variant="outline"><Link to={to}><Icon className="mr-2 h-4 w-4" />{action}</Link></Button>
               : <Button size="sm" variant="outline" onClick={onClick}><Icon className="mr-2 h-4 w-4" />{action}</Button>}
