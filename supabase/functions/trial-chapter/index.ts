@@ -141,7 +141,7 @@ Deno.serve(async (req) => {
       const langCode = LANGUAGES[String(body?.language ?? "fr")] ? String(body.language) : "fr";
       const langName = LANGUAGES[langCode];
 
-      const raw = await callAI([
+      const outlineMessages = [
         {
           role: "system",
           content:
@@ -159,9 +159,15 @@ Deno.serve(async (req) => {
             `{ "title": "titre commercial court", "subtitle": "sous-titre qui explique la promesse", ` +
             `"outline": [{"title":"Chapitre 1 — …","summary":"2 phrases"}, … exactement 12 chapitres] }`,
         },
-      ], 2500);
+      ];
+      let parsed: any;
+      try {
+        parsed = extractJson(await callAI(outlineMessages, 6000));
+      } catch (e) {
+        console.warn('outline retry', String(e));
+        parsed = extractJson(await callAI(outlineMessages, 6000));
+      }
 
-      const parsed = extractJson(raw);
       const outline = Array.isArray(parsed.outline)
         ? parsed.outline.slice(0, 20).map((c: any, i: number) => ({
             title: String(c?.title ?? `Chapitre ${i + 1}`).slice(0, 200),

@@ -121,6 +121,7 @@ export default function ChapterFlipbook({ title, chapterTitle, paragraphs, chars
           onClick={() => go('next')}
           disabled={index + step > last}
           className="inline-flex items-center gap-1 rounded-lg bg-[#008296] px-3 py-2 text-sm font-semibold text-white disabled:opacity-40"
+          style={{ color: "#FFFFFF" }}
         >
           <span className="hidden sm:inline">Page suivante</span> <ChevronRight className="h-4 w-4" />
         </button>
