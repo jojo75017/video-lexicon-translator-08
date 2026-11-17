@@ -66,4 +66,4 @@
 - Stripe return_url always comes from src/lib/paymentReturnUrl.ts and points at the public /merci thank-you page, never at a /v3/* address, because legacy /v3 aliases redirect (the old /v3/offres/merci sent buyers back to the pricing page instead of a thank-you screen).
 
 - The dedicated admin trial overview reuses AdminLancementPage in trials-only mode, keeping existing data and exports separate from launch controls without duplicating capture logic.
-- Chapter generation output passes through src/lib/editorialSanitizer.ts and continuity uses the previous chapter's ending, so scaffolding never reaches books and revelations are not replayed.
+- Chapters pass through editorialSanitizer; continuity uses the prior chapter's ending to stop replayed scenes.
