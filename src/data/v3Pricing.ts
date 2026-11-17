@@ -396,6 +396,7 @@ export const V3_MONTHLY_OFFERS: V3MonthlyOffer[] = [
     coversPerMonth: 10,
     features: [
       "20 livres par mois · 10 couvertures par mois",
+      "🎁 Cadeau de bienvenue : vous aurez un studio professionnel pour vos couvertures",
       "Écriture guidée : écrire un livre à partir d'une idée ou de son sommaire",
       "Rédaction chapitre par chapitre avec les robots",
       "Mise en page et exports PDF, Word (DOCX) et EPUB",
