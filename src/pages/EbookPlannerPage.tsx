@@ -1,3 +1,4 @@
+import { buildContinuityMemory } from '@/lib/editorialSanitizer';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { countWords } from '@/lib/manuscriptParser';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -949,7 +950,17 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
     
     const chapter = chapters.find(c => c.id === chapterId);
     if (!chapter) return;
-    const content = await generateChapterContent(chapter, targetWordsPerChapter);
+    const idx = chapters.findIndex(c => c.id === chapterId);
+    const prev = chapters.slice(0, idx).reverse().find(c => c.content);
+    const content = await generateChapterContent(
+      chapter,
+      targetWordsPerChapter,
+      bookDescription || undefined,
+      idx,
+      chapters.length,
+      prev?.content ? buildContinuityMemory(prev.content) : undefined,
+      chapters.map(c => c.title)
+    );
     if (content) updateChapterContent(chapterId, content);
   };
 
@@ -1152,7 +1163,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             updateChapterContent(chapter.id, chapterContent);
             currentChapters[i] = { ...chapter, content: chapterContent };
             // Créer un résumé du chapitre pour le suivant
-            previousChapterSummary = chapterContent.substring(0, 500) + '...';
+            previousChapterSummary = buildContinuityMemory(chapterContent);
           } else {
             // Échec persistant : on arrête proprement pour ne pas "bloquer" silencieusement
             toast.error(
@@ -1172,7 +1183,7 @@ const EbookPlannerPage: React.FC<EbookPlannerPageProps> = ({
             await wait(4000);
           }
         } else {
-          previousChapterSummary = chapter.content.substring(0, 500) + '...';
+          previousChapterSummary = buildContinuityMemory(chapter.content);
         }
         currentProgress++;
 

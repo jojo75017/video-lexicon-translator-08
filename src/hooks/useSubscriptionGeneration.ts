@@ -1,3 +1,4 @@
+import { sanitizeEditorialContent, NO_REDISCOVERY_RULE } from '@/lib/editorialSanitizer';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
@@ -162,7 +163,7 @@ INSTRUCTIONS POUR LES PERSONNAGES:
     
     // Résumé du chapitre précédent pour la continuité
     const previousContext = previousChapterSummary 
-      ? `\n\nRésumé du chapitre précédent (pour assurer la continuité):\n${previousChapterSummary}\n\nAssure une transition fluide depuis ce qui précède.` 
+      ? `\n\nFIN EXACTE DU CHAPITRE PRÉCÉDENT (la suite commence ICI) :\n« ${previousChapterSummary} »\n\nOuvre ce chapitre sur la conséquence directe de cette fin.` 
       : '';
 
     // Plan complet du livre : indispensable pour éviter les doublons entre chapitres
@@ -192,8 +193,8 @@ INSTRUCTIONS CRITIQUES:
 
 Rédige directement le contenu du chapitre, sans titre ni numérotation.`;
 
-    const content = await callGenerateContent('chapters_generated', prompt);
-    return content;
+    const content = await callGenerateContent('chapters_generated', prompt + ((chapterIndex ?? 0) > 0 ? NO_REDISCOVERY_RULE : ''));
+    return content ? sanitizeEditorialContent(content) : content;
   };
 
   const generateSubChapterContent = async (subChapter: SubChapter, wordsPerSubChapter: number = 200, synopsis?: string, parentChapterTitle?: string) => {
