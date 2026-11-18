@@ -37,14 +37,17 @@ const modules: [string, string, string][] = [
   ['7','Publicité Amazon Ads','Préparer des campagnes Sponsored Products à petit budget, sans lancement automatique ni dépense surprise. Facultatif, mais un vrai accélérateur.'],
   ['8','Aller plus loin','Livre audio, traductions, séries, livres illustrés : penser catalogue et revenus durables à partir de chaque livre.'],
 ];
-const bonus: [string, string, string][] = [
-  ['⭐ Séance d’accueil de 30 minutes avec Georges','Toutes les formules','En visioconférence : nous configurons vos clés et lançons ensemble votre premier livre. Vous ne restez jamais bloqué.'],
-  ['🎨 Studio Couvertures professionnel','Dès la formule Auteur','Première, dos et quatrième de couverture aux dimensions exactes d’Amazon, prêtes à téléverser.'],
-  ['🎧 Studio Audio et voix off','Dès la formule Auteur','Transformez votre texte en livre audio pour toucher le marché de l’écoute, sans repartir de zéro.'],
-  ['📅 Pack lancement et calendrier Amazon Ads','Toutes les formules','Le plan jour par jour pour vos premiers avis et vos premières campagnes, sans gaspiller votre budget.'],
-  ['📖 Fiction, romans et séries','Toutes les formules','Intrigues qui tiennent debout, personnages constants, aucune scène rejouée : la méthode éprouvée sur un roman de 241 pages.'],
-  ['🧸 Livres illustrés pour enfants','Toutes les formules','L’album illustré 3–6 ans, une niche souvent ignorée et parmi les plus vendues sur Amazon.'],
+const bonus: [string, string, string, number][] = [
+  ['⭐ Séance d’accueil privée de 30 min avec Georges','Toutes les formules','En visioconférence individuelle : nous configurons vos clés IA, cadrons votre premier livre et levons chaque blocage. Vous démarrez tout de suite.',150],
+  ['🗺️ La Bible des 600 niches rentables Amazon KDP','Toutes les formules','600 micro-niches analysées (romance, thriller, santé, finances, jeunesse…) avec classement, concurrence et potentiel. Fini les semaines à chercher un sujet.',197],
+  ['🎨 Studio Couvertures professionnel','Dès la formule Auteur','Première, dos et quatrième aux dimensions exactes d’Amazon. Économie : 100 € à 250 € de graphiste par livre.',147],
+  ['🎧 Studio Audio et voix off','Dès la formule Auteur','Votre manuscrit transformé en livre audio avec des voix naturelles, pour doubler vos sources de revenus.',147],
+  ['📅 Pack lancement et calendrier Amazon Ads 30 jours','Toutes les formules','La méthode testée sur « Le Fils d’El Cuervo » : planning jour par jour, premiers avis et campagne à 2 €/jour sans risque.',97],
+  ['✍️ Pack 100 modèles de textes Amazon','Toutes les formules','Titres accrocheurs, sous-titres, descriptions qui donnent envie d’acheter et contenu A+ prêts à adapter.',67],
+  ['📖 Atelier roman et fiction longue','Toutes les formules','Intrigues cohérentes jusqu’à 240 pages et plus : mémoire des personnages, aucune scène rejouée, aucune scorie.',97],
+  ['🧸 Album illustré jeunesse 3–6 ans','Toutes les formules','La méthode pas à pas pour l’une des niches les plus vendues et les plus fidèles d’Amazon.',67],
 ];
+const bonusTotal = bonus.reduce((t, x) => t + x[3], 0);
 const profils = [
   ['Profil 1', 'Vous cherchez un complément de revenu', 'Décorrélez votre temps de votre argent. En publiant régulièrement sur des thématiques porteuses, vous créez de véritables « actifs numériques » qui travaillent pour vous sur Amazon, même pendant que vous dormez.'],
   ['Profil 2', 'Vous êtes coach, consultant, thérapeute ou pro', 'Le livre est la meilleure carte de visite au monde. Il assoit votre crédibilité, justifie vos tarifs et attire des clients qualifiés. EbookStudio transforme votre expertise en livre sans y passer vos week-ends.'],
@@ -124,7 +127,12 @@ export default function FormulesPubliquesPage() {
       <H2>Pourquoi 9 livres sur 10 ne voient jamais le jour</H2>
       <Lead>Ce n’est pas un manque de talent. C’est un parcours semé d’obstacles que personne ne vous explique.</Lead>
       <div className="grid gap-6 md:grid-cols-3">
-        {douleurs.map(([t, d]) => <div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: '#e2e8f0', background: '#f8fafc' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
+        {douleurs.map(([t, d]) => <div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: '#e2e8f0', background: '#f8fafc' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P>
+          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
+      </div>
+      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
+        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
+        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
       </div>
     </Light>
 
@@ -148,7 +156,12 @@ export default function FormulesPubliquesPage() {
       <H2>Tout, de A à Z, dans un seul atelier</H2>
       <Lead>Nous vous facilitons 90 % du travail : vous gardez le plaisir de créer, nos agents s’occupent du reste.</Lead>
       <div className="grid gap-6 md:grid-cols-3">
-        {[['🤖 ChatGPT + Gemini','Les deux meilleures intelligences artificielles du moment travaillent ensemble sur votre livre.'],['👥 16 agents spécialisés','Une vraie équipe éditoriale virtuelle : de l’idée jusqu’à la mise en ligne sur Amazon.'],['✍️ Correction éditoriale','Répétitions, incohérences, personnages qui changent : tout est repéré et corrigé.']].map(([t,d])=><div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: OR, background: '#fff7ed' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
+        {[['🤖 ChatGPT + Gemini','Les deux meilleures intelligences artificielles du moment travaillent ensemble sur votre livre.'],['👥 16 agents spécialisés','Une vraie équipe éditoriale virtuelle : de l’idée jusqu’à la mise en ligne sur Amazon.'],['✍️ Correction éditoriale','Répétitions, incohérences, personnages qui changent : tout est repéré et corrigé.']].map(([t,d])=><div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: OR, background: '#fff7ed' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P>
+          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
+      </div>
+      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
+        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
+        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
       </div>
       <div className="mx-auto mt-12 max-w-3xl rounded-2xl p-8" style={{ background: NUIT, color: BLANC }}>
         <div className="mb-3 text-sm font-bold uppercase tracking-widest" style={{ color: OR }}>Le mot de Georges, fondateur</div>
@@ -198,7 +211,12 @@ export default function FormulesPubliquesPage() {
       <H2>Un livre peut rapporter bien plus que des ventes Amazon</H2>
       <div className="mx-auto mt-6 max-w-3xl text-center text-lg leading-relaxed" style={{ color: '#334155', ...FONT }}>Ce que vous vendez, ce n’est pas « un livre » : c’est une solution à un problème. Et votre ouvrage devient une porte d’entrée vers d’autres sources de revenus.</div>
       <div className="mt-10 grid gap-6 md:grid-cols-4">
-        {revenus.map(([t, d]) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: BLANC, borderTop: `5px solid ${OR}` }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
+        {revenus.map(([t, d]) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: BLANC, borderTop: `5px solid ${OR}` }}><H3 color={ENCRE}>{t}</H3><P>{d}</P>
+          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
+      </div>
+      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
+        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
+        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
       </div>
     </Light>
 
@@ -246,9 +264,14 @@ export default function FormulesPubliquesPage() {
       <H2>Vos bonus exclusifs, offerts avec votre abonnement</H2>
       <Lead>La partie que tout le monde adore : des outils et un accompagnement qui font gagner des semaines de travail.</Lead>
       <div className="mt-10 grid gap-6 md:grid-cols-3">
-        {bonus.map(([t, f, d], i) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: i === 0 ? '#fff7ed' : BLANC, border: `2px solid ${i === 0 ? OR : '#e2e8f0'}` }}>
+        {bonus.map(([t, f, d, v], i) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: i === 0 ? '#fff7ed' : BLANC, border: `2px solid ${i === 0 ? OR : '#e2e8f0'}` }}>
           <div className="mb-2 text-sm font-bold uppercase tracking-widest" style={{ color: '#008296' }}>Bonus {i + 1} · {f}</div>
-          <H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
+          <H3 color={ENCRE}>{t}</H3><P>{d}</P>
+          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
+      </div>
+      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
+        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
+        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
       </div>
     </Light>
 
