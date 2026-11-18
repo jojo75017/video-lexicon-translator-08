@@ -34,7 +34,7 @@ const ANNUAL_PRICE_IDS = {
 const ANNUAL_MONTHS_PAID = 10;
 const euros = (n: number) => n.toLocaleString('fr-FR', { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 });
 
-export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotPlanLabel }: { baseAvailable?: boolean; detailsHref?: string; kdpPilotPlanLabel?: string }) {
+export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotPlanLabel, hideExistingCustomers = false }: { baseAvailable?: boolean; detailsHref?: string; kdpPilotPlanLabel?: string; hideExistingCustomers?: boolean }) {
   const [checkout, setCheckout] = useState<{ priceId: string; name: string } | null>(null);
   const [annual, setAnnual] = useState(false);
   return (
@@ -107,14 +107,14 @@ export default function V3PricingOverview({ detailsHref = "/v3/plans", kdpPilotP
         <V3SubscribeCheckout priceId={checkout.priceId} planName={checkout.name} onClose={() => setCheckout(null)} />
       )}
       <V3StarterKdpPilotBanner planLabel={kdpPilotPlanLabel} />
-      <section className="mt-6 border-y py-5 text-foreground">
+      {!hideExistingCustomers && <section className="mt-6 border-y py-5 text-foreground">
         <Gift className="h-6 w-6 text-primary" />
         <h3 className="mt-3 text-xl font-semibold">Déjà client ? Vous gardez vos droits</h3>
         <p className="mt-4 text-sm text-muted-foreground">Vos achats, vos formules à vie et vos abonnements déjà souscrits ne changent pas. Aucun nouvel achat n'est obligatoire.</p>
         <p className="mt-4 text-sm">{V2_ACCESS_NOTE}</p>
         <Button asChild variant="outline" className="mt-5"><Link to="/v3/upsells">Voir les compléments & options <ArrowRight /></Link></Button>
         <Button asChild variant="ghost" className="mt-2"><Link to="/v3/compte">Mon accès actuel</Link></Button>
-      </section>
+      </section>}
     </section>
   );
 }
