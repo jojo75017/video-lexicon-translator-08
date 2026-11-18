@@ -1,6 +1,8 @@
 import standingScene from '@/assets/mockup-standing-scene.jpg';
 import handScene from '@/assets/mockup-hand-scene.jpg';
 import womanScene from '@/assets/mockup-woman-scene.jpg';
+import desktopScene from '@/assets/mockup-desktop-scene.jpg';
+import phoneScene from '@/assets/mockup-phone-scene.jpg';
 import deskScene from '@/assets/mockup-desk-oak-scene.jpg';
 import deskModernScene from '@/assets/mockup-desk-modern-scene.jpg';
 import deskWalnutScene from '@/assets/mockup-desk-walnut-scene.jpg';
@@ -14,11 +16,11 @@ import cat_historiqueScene from '@/assets/mockup-cat-historique-scene.jpg';
 import cat_devpersoScene from '@/assets/mockup-cat-devperso-scene.jpg';
 import cat_cuisineScene from '@/assets/mockup-cat-cuisine-scene.jpg';
 
-export type MockupModel = 'standing' | 'hand' | 'hand-woman' | 'desk' | 'desk-modern' | 'desk-walnut' | 'cat-jeunesse' | 'cat-thriller' | 'cat-romance' | 'cat-fantasy' | 'cat-historique' | 'cat-devperso' | 'cat-cuisine' | 'reader' | 'stack';
+export type MockupModel = 'standing' | 'hand' | 'hand-woman' | 'desk' | 'desk-modern' | 'desk-walnut' | 'cat-jeunesse' | 'cat-thriller' | 'cat-romance' | 'cat-fantasy' | 'cat-historique' | 'cat-devperso' | 'cat-cuisine' | 'reader' | 'stack' | 'screen-desktop' | 'screen-phone';
 type Point = [number, number];
 type Quad = [Point, Point, Point, Point];
 // Coordinates measured on the photographs at 1024 × 768, clockwise from top left.
-type Scene = { src: string; faces: Quad[] };
+type Scene = { src: string; faces: Quad[]; flat?: boolean };
 export type MockupCategory = 'universel' | 'jeunesse' | 'thriller' | 'romance' | 'fantasy' | 'historique' | 'devperso' | 'cuisine';
 export const MOCKUP_CATEGORIES: { id: MockupCategory; label: string }[] = [
   { id: 'universel', label: 'Tous genres' },
@@ -38,6 +40,8 @@ export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string; prev
   { id: 'desk-modern', label: 'Bureau d’écrivain', desc: 'Bois clair · style épuré moderne', preview: deskModernScene, category: 'universel' },
   { id: 'desk-walnut', label: 'Table en noyer', desc: 'Bibliothèque élégante · lumière chaude', preview: deskWalnutScene, category: 'universel' },
   { id: 'reader', label: 'Liseuse Kindle', desc: 'Coin lecture · lin et céramique', preview: readerScene, category: 'universel' },
+  { id: 'screen-desktop', label: 'Écran d’ordinateur', desc: 'Bureau clair · couverture à l’écran', preview: desktopScene, category: 'universel' },
+  { id: 'screen-phone', label: 'Téléphone en main', desc: 'Café cosy · lecture sur smartphone', preview: phoneScene, category: 'universel' },
   { id: 'stack', label: 'Duo de livres', desc: 'Collection · atelier éditorial', preview: stackScene, category: 'universel' },
   { id: 'cat-jeunesse', label: 'Jeunesse', desc: 'Chambre d’enfant · jouets en bois', preview: cat_jeunesseScene, category: 'jeunesse' },
   { id: 'cat-thriller', label: 'Thriller & polar', desc: 'Bureau nocturne · pluie sur la ville', preview: cat_thrillerScene, category: 'thriller' },
@@ -52,6 +56,8 @@ const scenes: Record<MockupModel, Scene> = {
   standing: { src: standingScene, faces: [[[286, 64], [696, 42], [697, 678], [287, 658]]] },
   hand: { src: handScene, faces: [[[384, 126], [681, 123], [681, 588], [385, 572]]] },
   'hand-woman': { src: womanScene, faces: [[[417.5, 359], [630.5, 359], [631.5, 677], [417.5, 677]]] },
+  'screen-desktop': { src: desktopScene, flat: true, faces: [[[397.4, 103.7], [626.6, 103.7], [626.6, 470.4], [397.4, 470.4]]] },
+  'screen-phone': { src: phoneScene, flat: true, faces: [[[350.7, 131.8], [626, 131.8], [626, 572.2], [350.7, 572.2]]] },
   desk: { src: deskScene, faces: [deskFace] },
   'desk-modern': { src: deskModernScene, faces: [deskFace] },
   'desk-walnut': { src: deskWalnutScene, faces: [deskFace] },
@@ -133,7 +139,7 @@ function projectCover(ctx: CanvasRenderingContext2D, texture: HTMLCanvasElement,
 function facePath(ctx: CanvasRenderingContext2D, quad: Quad) {
   ctx.beginPath(); quad.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
 }
-function placeCover(ctx: CanvasRenderingContext2D, cover: HTMLImageElement, scene: HTMLImageElement, quad: Quad) {
+function placeCover(ctx: CanvasRenderingContext2D, cover: HTMLImageElement, scene: HTMLImageElement, quad: Quad, flat = false) {
   const distance = (a: Point, b: Point) => Math.hypot(a[0] - b[0], a[1] - b[1]);
   const width = (distance(quad[0], quad[1]) + distance(quad[3], quad[2])) / 2;
   const height = (distance(quad[0], quad[3]) + distance(quad[1], quad[2])) / 2;
@@ -157,6 +163,8 @@ function placeCover(ctx: CanvasRenderingContext2D, cover: HTMLImageElement, scen
   ctx.save(); facePath(ctx, quad); ctx.clip();
   projectCover(ctx, texture, quad);
   // Reuse the photograph's actual paper texture and lighting, rather than painting fake reflections.
+  // Screens emit light: keep the artwork as-is, no paper shading or spine fold.
+  if (flat) { ctx.restore(); return; }
   ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.55;
   ctx.drawImage(scene, 0, 0, 1600, 1200);
   ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
@@ -176,7 +184,7 @@ export async function renderMockup(canvas: HTMLCanvasElement, cover: HTMLImageEl
   ctx.drawImage(photo, 0, 0, 1600, 1200);
   for (const face of spec.faces) {
     const quad = face.map(([x, y]): Point => [x * 1600 / 1024, y * 1200 / 768]) as Quad;
-    placeCover(ctx, cover, photo, quad);
+    placeCover(ctx, cover, photo, quad, !!spec.flat);
   }
   if (model === 'hand') {
     // The photographed supporting thumb is in front of the paper: retain its original pixels.
