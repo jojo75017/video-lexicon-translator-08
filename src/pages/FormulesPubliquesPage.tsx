@@ -295,5 +295,35 @@ export default function FormulesPubliquesPage() {
         <Cta label="Je publie mon livre" />
       </div>
     </Dark>
+    {/* DEUX VIES */}
+    <Dark>
+      <div className="text-center"><H2>Dans 3 mois, vous aurez deux vies possibles</H2></div>
+      <div className="mt-10 grid gap-6 md:grid-cols-2">
+        <div className="rounded-2xl p-8" style={{ background: '#1e293b', border: '2px solid #475569' }}>
+          <H3 color="#cbd5e1">Vie n° 1</H3>
+          <div className="mt-3 text-lg leading-relaxed" style={{ color: '#cbd5e1' }}>Vous refermez cette page. Rien ne change. Le rêve du livre est toujours là, toujours repoussé. Dans 5 ans, vous serez exactement au même endroit, mais avec 5 ans de plus.</div>
+        </div>
+        <div className="rounded-2xl p-8" style={{ background: '#0b1120', border: `3px solid ${OR}`, boxShadow: '0 0 40px rgba(255,158,45,.25)' }}>
+          <H3 color={OR}>Vie n° 2</H3>
+          <div className="mt-3 text-lg leading-relaxed" style={{ color: BLANC }}>Vous tenez votre livre entre vos mains. Votre nom est sur la couverture. Un premier virement Amazon est tombé. Vos proches sont stupéfaits. Et vous savez, pour le reste de votre vie, que vous êtes auteur publié.</div>
+        </div>
+      </div>
+      <div className="mx-auto mt-10 max-w-3xl rounded-2xl p-8 text-lg leading-relaxed" style={{ background: '#111a2e', color: '#e2e8f0', border: '1px solid #334155' }}>
+        <strong style={{ color: OR }}>P.S.</strong> Si vous êtes encore là, c’est qu’une partie de vous sait que c’est le bon moment. Souvenez-vous : vous avez une garantie qui vous protège pendant 30 jours. Le pire qui puisse vous arriver, c’est d’avoir appris des choses gratuitement et publié votre premier livre sans vente. Le meilleur ? Publier plusieurs livres qui vous rapportent un beau complément de revenu tous les mois.
+      </div>
+      <div className="mt-8 text-center"><a href="#formules" className="inline-flex rounded-xl px-8 py-4 text-lg font-bold" style={{ background: OR, color: '#0b1120' }}>Je choisis ma formule maintenant →</a></div>
+      <div className="mx-auto mt-12 max-w-4xl text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
+        Les informations présentées sur cette page et dans l’atelier EbookStudio sont fournies à titre informatif et éducatif. Les exemples de livres et de revenus reflètent des expériences individuelles et ne constituent en aucun cas une promesse ou une garantie de gains. Chaque auteur obtient des résultats différents selon son implication, ses choix de sujets et la qualité de son travail. Publier des livres sur Amazon KDP, même avec l’aide de l’intelligence artificielle, demande du travail, de la régularité et le respect des règles d’Amazon. EbookStudio ne peut être tenu responsable des résultats individuels de ses abonnés. Garantie de 30 jours selon les conditions précisées dans nos CGV.
+      </div>
+    </Dark>
+
+    <footer className="px-5 py-10 text-center text-sm" style={{ background: '#05080f', color: '#94a3b8', ...FONT }}>
+      <nav className="mb-4 flex flex-wrap justify-center gap-6">
+        <a href="/mentions-legales" style={{ color: '#e2e8f0' }}>Mentions légales</a>
+        <a href="/politique-confidentialite" style={{ color: '#e2e8f0' }}>Politique de confidentialité</a>
+        <a href="/cgv" style={{ color: '#e2e8f0' }}>Conditions générales de vente</a>
+      </nav>
+      <div>© 2026 EbookStudio. Tous droits réservés.</div>
+    </footer>
   </main>;
 }
