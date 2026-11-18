@@ -7,6 +7,7 @@ import useLaunchSettings from '@/hooks/useLaunchSettings';
 import essaiVideo from '@/assets/videos/essai-gratuit-paysage.mp4.asset.json';
 import essaiPoster from '@/assets/essai-liseuse-vignette.jpg.asset.json';
 import essaiResultat from '@/assets/essai-liseuse-resultat.jpg.asset.json';
+import holoBook from '@/assets/essai-livre-holographique.jpg';
 import ChapterFlipbook from '@/components/essai/ChapterFlipbook';
 import { buildTrialPdf, downloadBlob, slugify } from '@/lib/essai/trialPdf';
 
@@ -279,7 +280,6 @@ export default function EssaiPage() {
     void track('example_card_click', params);
     scrollToForm();
   };
-  const sample = SAMPLES[sampleIdx];
   const NAVY = '#0E1A33';
   const IVORY = '#FAF6EE';
   const ORANGE = '#E8621A';
@@ -290,8 +290,8 @@ export default function EssaiPage() {
       type="button"
       onClick={onClick}
       disabled={generating || !trialOpen || settingsLoading}
-      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110 disabled:opacity-60 ${extra}`}
-      style={{ background: ORANGE }}
+      className={`inline-flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-base font-bold text-white essai-cta transition hover:scale-[1.02] hover:brightness-110 disabled:opacity-60 ${extra}`}
+      style={{ background: 'linear-gradient(90deg,#FF8A00,#FF5A00)' }}
     >
       {generating ? (
         <><Loader2 className="h-5 w-5 animate-spin" /> {GEN_STEPS[genStep]}</>
@@ -305,7 +305,11 @@ export default function EssaiPage() {
     return (
       <div className="min-h-screen" style={{ background: IVORY }}>
         {/* 1. Ouverture */}
-        <section style={{ background: NAVY }} className="overflow-hidden text-white">
+        <section style={{ background: 'radial-gradient(ellipse at 70% 30%, #3B0F6B 0%, #14062B 45%, #07030F 100%)' }} className="relative overflow-hidden text-white">
+          <style>{`@keyframes essaiFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-18px) rotate(1deg)}}@keyframes essaiGlow{0%,100%{opacity:.55}50%{opacity:1}}@keyframes essaiTwinkle{0%,100%{opacity:.2}50%{opacity:.9}}.essai-float{animation:essaiFloat 6s ease-in-out infinite}.essai-glow{animation:essaiGlow 4s ease-in-out infinite}.essai-star{animation:essaiTwinkle 3s ease-in-out infinite}.essai-cta{box-shadow:0 0 30px rgba(255,106,0,.55)}@media (prefers-reduced-motion:reduce){.essai-float,.essai-glow,.essai-star{animation:none}}`}</style>
+          {Array.from({ length: 40 }).map((_, i) => (
+            <span key={i} aria-hidden className="essai-star pointer-events-none absolute rounded-full bg-white" style={{ width: (i % 3) + 1, height: (i % 3) + 1, left: `${(i * 37) % 100}%`, top: `${(i * 53) % 100}%`, animationDelay: `${(i % 7) * 0.4}s` }} />
+          ))}
           <header className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-5 py-5">
             <span className="v3-serif text-lg font-bold not-italic" style={{ color: "#fff" }}>EbookStudio</span>
             <span className="text-[11px] font-semibold uppercase tracking-[0.18em]" style={{ color: GOLD }}>
@@ -314,14 +318,14 @@ export default function EssaiPage() {
           </header>
           <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 [&>*]:min-w-0 pb-16 pt-6 lg:grid-cols-[1fr_0.9fr] lg:gap-14 lg:pb-24">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: GOLD }}>Essai gratuit</p>
-              <h1 className="v3-serif mt-3 break-words text-[2rem] font-medium not-italic leading-[1.1] tracking-tight md:text-[3rem]" style={{ color: "#fff" }}>
-                Votre livre commence par une phrase.
+              <p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: '#C084FC' }}>✦ Essai gratuit · la nouvelle ère du livre</p>
+              <h1 className="mt-3 break-words text-[2.2rem] font-extrabold leading-[1.05] tracking-tight md:text-[3.6rem]" style={{ color: "#fff" }}>
+                Votre livre commence par <span style={{ background: 'linear-gradient(90deg,#C084FC,#F472B6)', WebkitBackgroundClip: 'text', color: 'transparent' }}>une phrase</span>.
               </h1>
               <p className="mt-4 max-w-xl text-base leading-relaxed text-white/75">
                 L’essai vous propose un titre, un plan en 12 chapitres et les premières lignes de votre chapitre 1.
               </p>
-              <div ref={formRef} className="mt-7 space-y-4 rounded-2xl bg-white/[0.06] p-5 ring-1 ring-white/10 md:p-6">
+              <div ref={formRef} className="mt-7 space-y-4 rounded-2xl p-5 ring-1 md:p-6" style={{ background: 'rgba(168,85,247,0.10)', borderColor: 'rgba(192,132,252,.35)', boxShadow: '0 0 40px rgba(168,85,247,.25)' }}>
                 <label className="block text-sm font-semibold text-white/90">
                   Votre idée de livre
                   <textarea
@@ -356,17 +360,16 @@ export default function EssaiPage() {
                 )}
               </div>
             </div>
-            {/* Couverture + extrait du même livre que l'idée */}
-            <figure className="grid grid-cols-[0.8fr_1.2fr] gap-3 [&>*]:min-w-0 md:gap-4">
-              <div className="flex aspect-[2/3] flex-col justify-between rounded-md p-4 shadow-2xl" style={{ background: sample.cover, color: '#fff' }}>
-                <span className="text-[10px] uppercase tracking-[0.2em]" style={{ color: GOLD }}>{sample.genre}</span>
-                <span className="v3-serif text-lg font-bold not-italic leading-tight md:text-xl" style={{ color: "#fff" }}>{sample.title}</span>
-                <span className="text-[10px] uppercase tracking-widest text-white/70">EbookStudio</span>
-              </div>
-              <div className="rounded-md p-4 text-[#2A2118] shadow-2xl" style={{ background: IVORY }}>
-                <p className="text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Chapitre 1</p>
-                <p className="v3-serif mt-1 text-base font-bold">{sample.plan[0]}</p>
-                <p className="v3-serif mt-2 text-[15px] leading-relaxed">{sample.extract}</p>
+            <figure className="relative mx-auto w-full max-w-md">
+              <div aria-hidden className="essai-glow absolute inset-0 rounded-full blur-3xl" style={{ background: 'radial-gradient(circle, rgba(168,85,247,.6), transparent 65%)' }} />
+              <img src={holoBook} alt="Livre lumineux d'où s'envolent les mots" width={1024} height={1024} className="essai-float relative rounded-3xl ring-1 ring-purple-400/30" />
+              <div className="relative mt-6 grid grid-cols-3 gap-2 text-center">
+                {[['12', 'chapitres planifiés'], ['20 s', 'pour le début'], ['0 €', 'sans carte']].map(([n, l]) => (
+                  <div key={l} className="rounded-xl px-2 py-3 ring-1 ring-purple-400/30" style={{ background: 'rgba(168,85,247,.12)' }}>
+                    <div className="text-2xl font-extrabold text-white">{n}</div>
+                    <div className="text-[11px] text-white/70">{l}</div>
+                  </div>
+                ))}
               </div>
             </figure>
           </div>
