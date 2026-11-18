@@ -127,12 +127,7 @@ export default function FormulesPubliquesPage() {
       <H2>Pourquoi 9 livres sur 10 ne voient jamais le jour</H2>
       <Lead>Ce n’est pas un manque de talent. C’est un parcours semé d’obstacles que personne ne vous explique.</Lead>
       <div className="grid gap-6 md:grid-cols-3">
-        {douleurs.map(([t, d]) => <div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: '#e2e8f0', background: '#f8fafc' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P>
-          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
-      </div>
-      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
-        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
-        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
+        {douleurs.map(([t, d]) => <div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: '#e2e8f0', background: '#f8fafc' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
       </div>
     </Light>
 
@@ -156,12 +151,7 @@ export default function FormulesPubliquesPage() {
       <H2>Tout, de A à Z, dans un seul atelier</H2>
       <Lead>Nous vous facilitons 90 % du travail : vous gardez le plaisir de créer, nos agents s’occupent du reste.</Lead>
       <div className="grid gap-6 md:grid-cols-3">
-        {[['🤖 ChatGPT + Gemini','Les deux meilleures intelligences artificielles du moment travaillent ensemble sur votre livre.'],['👥 16 agents spécialisés','Une vraie équipe éditoriale virtuelle : de l’idée jusqu’à la mise en ligne sur Amazon.'],['✍️ Correction éditoriale','Répétitions, incohérences, personnages qui changent : tout est repéré et corrigé.']].map(([t,d])=><div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: OR, background: '#fff7ed' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P>
-          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
-      </div>
-      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
-        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
-        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
+        {[['🤖 ChatGPT + Gemini','Les deux meilleures intelligences artificielles du moment travaillent ensemble sur votre livre.'],['👥 16 agents spécialisés','Une vraie équipe éditoriale virtuelle : de l’idée jusqu’à la mise en ligne sur Amazon.'],['✍️ Correction éditoriale','Répétitions, incohérences, personnages qui changent : tout est repéré et corrigé.']].map(([t,d])=><div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: OR, background: '#fff7ed' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
       </div>
       <div className="mx-auto mt-12 max-w-3xl rounded-2xl p-8" style={{ background: NUIT, color: BLANC }}>
         <div className="mb-3 text-sm font-bold uppercase tracking-widest" style={{ color: OR }}>Le mot de Georges, fondateur</div>
@@ -211,12 +201,7 @@ export default function FormulesPubliquesPage() {
       <H2>Un livre peut rapporter bien plus que des ventes Amazon</H2>
       <div className="mx-auto mt-6 max-w-3xl text-center text-lg leading-relaxed" style={{ color: '#334155', ...FONT }}>Ce que vous vendez, ce n’est pas « un livre » : c’est une solution à un problème. Et votre ouvrage devient une porte d’entrée vers d’autres sources de revenus.</div>
       <div className="mt-10 grid gap-6 md:grid-cols-4">
-        {revenus.map(([t, d]) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: BLANC, borderTop: `5px solid ${OR}` }}><H3 color={ENCRE}>{t}</H3><P>{d}</P>
-          <div className="mt-4 text-base font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>{v} €</span> <span style={{ color: '#047857' }}>OFFERT</span></div></div>)}
-      </div>
-      <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
-        <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
-        <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
+        {revenus.map(([t, d]) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: BLANC, borderTop: `5px solid ${OR}` }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
       </div>
     </Light>
 
