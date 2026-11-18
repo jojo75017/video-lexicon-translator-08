@@ -141,14 +141,26 @@ function placeCover(ctx: CanvasRenderingContext2D, cover: HTMLImageElement, scen
   const pixel = surface.getImageData(0, 0, 1, 1).data;
   surface.fillStyle = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
   surface.fillRect(0, 0, texture.width, texture.height);
+  // Extend the artwork's own edge pixels instead of painting a flat filler band around it.
   const fit = Math.min(texture.width / cover.naturalWidth, texture.height / cover.naturalHeight);
   const w = cover.naturalWidth * fit, h = cover.naturalHeight * fit;
-  surface.drawImage(cover, (texture.width - w) / 2, (texture.height - h) / 2, w, h);
+  const dx = (texture.width - w) / 2, dy = (texture.height - h) / 2;
+  // A blurred, stretched copy fills the margins with the cover's own colours, with no hard streaks.
+  surface.save();
+  surface.filter = 'blur(30px)';
+  surface.drawImage(cover, 0, 0, texture.width, texture.height);
+  surface.restore();
+  surface.drawImage(cover, dx, dy, w, h);
   ctx.save(); facePath(ctx, quad); ctx.clip();
   projectCover(ctx, texture, quad);
   // Reuse the photograph's actual paper texture and lighting, rather than painting fake reflections.
-  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.72;
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.55;
   ctx.drawImage(scene, 0, 0, 1600, 1200);
+  ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  // The spine folds away from the light: a soft gradient there is what sells the volume.
+  const spine = ctx.createLinearGradient(quad[0][0], quad[0][1], quad[0][0] + (quad[1][0] - quad[0][0]) * 0.14, quad[0][1]);
+  spine.addColorStop(0, 'rgba(0,0,0,0.30)'); spine.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = spine; ctx.fill();
   ctx.restore();
 }
 
