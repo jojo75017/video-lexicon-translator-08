@@ -104,6 +104,27 @@ export default function MerciPaiementPage() {
           </p>
         </div>
 
+        <section aria-labelledby="rdv-accueil" className="bg-white border-2 border-[#FF9E2D] rounded-xl p-5 space-y-3 shadow-sm">
+          <h2 id="rdv-accueil" className="text-xl font-bold text-[#232F3E] flex items-center gap-2">
+            <Phone className="w-5 h-5 text-[#FF9E2D]" />
+            Étape essentielle : votre séance d'accueil de 30 min avec Georges
+          </h2>
+          <p className="text-sm text-[#232F3E]/80">
+            Ne démarrez pas seul : choisissez ci-dessous le jour et l'heure qui vous conviennent. Georges configure avec vous
+            votre atelier, vérifie vos clés gratuites et vous aide à lancer votre premier livre.
+          </p>
+          <iframe
+            title="Réserver ma séance d'accueil avec Georges"
+            src={`${BOOKING_URL}?hide_gdpr_banner=1&embed_type=Inline&embed_domain=${typeof window !== 'undefined' ? window.location.hostname : 'ebookstudio.fr'}`}
+            className="w-full h-[700px] rounded-lg border border-gray-200"
+            loading="lazy"
+          />
+          <p className="text-xs text-[#232F3E]/60 text-center">
+            Le calendrier ne s'affiche pas ?{' '}
+            <a href={BOOKING_URL} target="_blank" rel="noopener noreferrer" className="underline text-[#008296]">Ouvrir la réservation dans un nouvel onglet</a>
+          </p>
+        </section>
+
         <Card className="border-[#008296]/30 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-start gap-3">
