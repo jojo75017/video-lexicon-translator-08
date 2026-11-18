@@ -47,6 +47,12 @@ const LANGUAGES: Array<{ code: string; label: string }> = [
   { code: 'nl', label: 'Néerlandais' },
 ];
 
+const QUICK_STARTS = [
+  { label: '🤠 Western & Aventure', hint: 'Le cavalier du canyon maudit', idea: 'Le cavalier solitaire et le trésor maudit du canyon rouge' },
+  { label: '🕵️ Polar & Suspense', hint: 'Le mystère du manoir brumeux', idea: 'Le mystère de la vieille horloge du manoir de Kerlann' },
+  { label: '🧘 Guide pratique', hint: 'Retrouver un sommeil réparateur', idea: 'Un guide simple pour retrouver un sommeil réparateur en 30 jours, sans médicaments.' },
+];
+
 const EXAMPLES: Array<{ label: string; idea: string }> = [
   { label: '🔎 Roman policier', idea: "Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël." },
   { label: '🌱 Guide pratique', idea: 'Un guide pratique pour cultiver ses légumes sur un balcon de ville, même sans expérience.' },
@@ -326,8 +332,27 @@ export default function EssaiPage() {
                 L’essai vous propose un titre, un plan en 12 chapitres et les premières lignes de votre chapitre 1.
               </p>
               <div ref={formRef} className="mt-7 space-y-4 rounded-2xl p-5 ring-1 md:p-6" style={{ background: 'rgba(168,85,247,0.10)', borderColor: 'rgba(192,132,252,.35)', boxShadow: '0 0 40px rgba(168,85,247,.25)' }}>
+                <div>
+                  <p className="text-sm font-semibold text-white/90">Choisissez une idée, l’essai démarre aussitôt :</p>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-3">
+                    {QUICK_STARTS.map((q) => (
+                      <button
+                        key={q.label}
+                        type="button"
+                        disabled={generating}
+                        onClick={() => { setIdea(q.idea); void generate(q.idea); }}
+                        className="rounded-xl px-3 py-3 text-left text-sm font-bold text-white ring-1 transition hover:scale-[1.02] disabled:opacity-60"
+                        style={{ background: 'rgba(255,158,45,.18)', borderColor: '#FF9E2D', boxShadow: 'inset 0 0 0 1px rgba(255,158,45,.6)' }}
+                      >
+                        <span className="block text-base" style={{ color: "#FFFFFF" }}>{q.label}</span>
+                        <span className="mt-1 block text-xs font-normal text-white/80">{q.hint}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="mt-4 text-center text-xs font-semibold uppercase tracking-wider text-white/60">ou écrivez votre propre titre ou idée</p>
+                </div>
                 <label className="block text-sm font-semibold text-white/90">
-                  Votre idée de livre
+                  Votre titre ou votre idée de livre
                   <textarea
                     ref={ideaRef}
                     value={idea}
