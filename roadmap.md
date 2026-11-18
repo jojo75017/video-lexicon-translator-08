@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Studio Mockups : accès spécial au-dessus de Mes livres, achat unique 27 €, droit séparé et inclusion Édition conservée ; 9 tests de règles + 16 tests cadeaux réussis, accès connecté et mobile vérifiés, ouverture du paiement sandbox confirmée sans prélèvement ; site non publié.
 - [x] Monitoring : corrections enregistrées préservées après annulation/changement de chapitre ; sauvegardes pédagogiques avec sous-titre mises à jour sans copie ; 8 tests réussis et deux parcours connectés vérifiés avec un livre temporaire supprimé après contrôle, sans publication.
 - [x] Cases et lecture du brouillon : fiche complète accessible à l’étape rédaction, synopsis et six personnages affichés, 32 titres visibles avec état non rédigé ; vérification connectée et 4 tests réussis, sans publication.
 - [x] Fils d’El Cuervo : fiche restaurée, 6 personnages et 32 parties conservés ; sauvegarde, validation et accès au bouton de rédaction vérifiés connecté, 4 tests réussis, sans génération ni publication.

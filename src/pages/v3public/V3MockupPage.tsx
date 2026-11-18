@@ -6,15 +6,16 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Download, Image as ImageIcon, Loader2, Lock, Upload, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
-import usePlanTier from '@/hooks/usePlanTier';
+import useModuleAccess from '@/hooks/useModuleAccess';
+import MockupStudioAccess from '@/components/v3public/MockupStudioAccess';
 import { loadStudioCovers, type StudioCover } from '@/lib/studioCovers';
 import { MOCKUP_MODELS, canvasToBlob, loadCover, renderMockup, type MockupModel } from '@/lib/mockup/bookMockups';
 
 /** Studio Mockups 3D : couverture choisie dans la bibliothèque ou importée, 5 modèles, téléchargement réservé à la formule Édition. */
 export default function V3MockupPage() {
   const [params] = useSearchParams();
-  const { tier } = usePlanTier();
-  const locked = tier === 'starter' || tier === 'auteur';
+  const { hasAccess, loading: accessLoading } = useModuleAccess('mockup-3d');
+  const locked = accessLoading || !hasAccess;
   const [covers, setCovers] = useState<StudioCover[] | null>(null);
   const [source, setSource] = useState<string>('');
   const [model, setModel] = useState<MockupModel>('standing');
@@ -51,7 +52,7 @@ export default function V3MockupPage() {
   };
 
   const download = async (type: 'image/png' | 'image/jpeg') => {
-    if (!canvasRef.current || !img) return;
+    if (locked || !canvasRef.current || !img) return;
     const blob = await canvasToBlob(canvasRef.current, type);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -69,6 +70,7 @@ export default function V3MockupPage() {
           <h1 className="text-3xl font-bold text-foreground">Studio Mockups 3D</h1>
           <p className="text-muted-foreground">Votre vraie couverture, présentée en 5 mises en scène. Le titre et le texte restent intacts.</p>
         </header>
+        <MockupStudioAccess />
 
         <div className="grid lg:grid-cols-[380px_1fr] gap-6">
           <Card className="p-5 space-y-5">
@@ -79,10 +81,10 @@ export default function V3MockupPage() {
               ) : covers.length ? (
                 <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto">
                   {covers.map((c) => (
-                    <button key={c.id} type="button" onClick={() => setSource(c.thumbUrl!)} title={c.bookTitle || c.projectName}
+                    <Button key={c.id} variant="ghost" type="button" onClick={() => { if (c.thumbUrl) setSource(c.thumbUrl); }} title={c.bookTitle || c.projectName}
                       className={`rounded border-2 overflow-hidden ${source === c.thumbUrl ? 'border-primary' : 'border-transparent'}`}>
-                      <img src={c.thumbUrl!} alt={c.bookTitle || c.projectName} className="w-full aspect-[2/3] object-cover" loading="lazy" />
-                    </button>
+                      <img src={c.thumbUrl || undefined} alt={c.bookTitle || c.projectName} className="w-full aspect-[2/3] object-cover" loading="lazy" />
+                    </Button>
                   ))}
                 </div>
               ) : (
@@ -119,8 +121,7 @@ export default function V3MockupPage() {
             </div>
             {locked ? (
               <div className="rounded-lg border border-border p-4 text-sm flex flex-wrap items-center gap-3">
-                <Lock className="h-4 w-4" /> Le téléchargement HD est inclus avec la formule Édition.
-                <Button asChild size="sm" className="ml-auto"><Link to="/formules">Passer à Édition</Link></Button>
+                <Lock className="h-4 w-4" /> {accessLoading ? 'Vérification de votre accès…' : 'Téléchargements HD : achat unique 27 € ou inclus avec Édition.'}
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">

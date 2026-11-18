@@ -155,6 +155,13 @@
       "when": 1794825840297,
       "tag": "0021_allow_subscription_plan_type",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1794994369207,
+      "tag": "0022_allow_mockup_studio_purchase",
+      "breakpoints": true
     }
   ]
 }

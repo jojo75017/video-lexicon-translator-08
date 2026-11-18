@@ -1,4 +1,5 @@
 import { isSafeRedirect } from "../_shared/safeRedirect.ts";
+import { requireUser } from "../_shared/authGuard.ts";
 // V3 — Checkout embarqué pour l'achat d'UN pack premium à la carte.
 // Paiement unique (one-time) via la gateway Lovable Payments.
 // Les prix sont définis côté serveur pour éviter toute manipulation client.
@@ -48,6 +49,7 @@ const PACKS: Record<string, { label: string; amount: number }> = {
   ebook_version_longue: { label: "Ebook Version Longue V4 — Accès à vie", amount: 4700 },
   // Précommande V4 — droit enregistré dès le paiement, outil activé à sa sortie.
   micro_series: { label: "Studio Micro-Séries IA V4 — Précommande accès à vie", amount: 6700 },
+  mockup_3d: { label: "Studio Mockups 3D — 5 modèles — Accès à vie", amount: 2700 },
 };
 
 Deno.serve(async (req) => {
@@ -62,7 +64,15 @@ Deno.serve(async (req) => {
     const { packId, email, environment, returnUrl } = await req.json();
 
     const env: StripeEnv = environment === "live" ? "live" : "sandbox";
-    const trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    let userId: string | null = null;
+    let trimmedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+    if (packId === "mockup_3d") {
+      const user = await requireUser(req);
+      if (user instanceof Response) return user;
+      if (!user.email) throw new Error("Email du compte requis");
+      userId = user.id;
+      trimmedEmail = user.email.toLowerCase();
+    }
     if (!trimmedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmedEmail)) {
       throw new Error("Email valide requis");
     }
@@ -75,7 +85,8 @@ Deno.serve(async (req) => {
     // Résoudre / créer le client Stripe (via gateway).
     const found = await stripeRequest(env, "GET", "/customers", { email: trimmedEmail, limit: 1 });
     const customerId: string = found?.data?.[0]?.id
-      ?? (await stripeRequest(env, "POST", "/customers", { email: trimmedEmail })).id;
+      ?? (await stripeRequest(env, "POST", "/customers", { email: trimmedEmail, ...(userId ? { metadata: { userId } } : {}) })).id;
+    if (userId) await stripeRequest(env, "POST", `/customers/${customerId}`, { metadata: { userId } });
 
     // Enregistrer la commande pour suivi (réutilise la table des commandes V3).
     const supabase = getSupabase();

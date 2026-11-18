@@ -132,6 +132,7 @@ const UPSELL_PACK_MODULES: Record<string, string> = {
   ebook_version_longue: "ebook-version-longue",
   ebook_version_longue_47: "ebook-version-longue",
   micro_series: "micro-series",
+  mockup_3d: "mockup-3d",
 };
 
 // Compléments achetés à l'unité via `v3-subscription-checkout`
@@ -175,6 +176,7 @@ async function grantAddonEntitlement(session: any, plan: string, env: StripeEnv)
 }
 
 async function handleV3UpsellPackCompleted(session: any, env: StripeEnv) {
+  if (session.payment_status === "unpaid") return;
   const orderId = session.metadata?.order_id;
   const packId = String(session.metadata?.pack_id || "");
   const email = (session.metadata?.email || session.customer_email || session.customer_details?.email || "").toLowerCase();
@@ -643,6 +645,11 @@ Deno.serve(async (req) => {
         } else {
           await handleCheckoutCompleted(session);
         }
+        break;
+      }
+      case "checkout.session.async_payment_succeeded": {
+        const session = event.data.object;
+        if (session.metadata?.kind === "v3_upsell_pack") await handleV3UpsellPackCompleted(session, env);
         break;
       }
       case "invoice.paid":

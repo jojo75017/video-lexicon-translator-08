@@ -36,7 +36,7 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
     // Formule Édition : les modules professionnels sont inclus, sans achat séparé.
     // Exception : Cover Studio Pro et Studio Jeunesse restent des options payantes
     // pour tout le monde (Plume, Édition et Maison d'Édition).
-    if (hasFull && !PURCHASE_ONLY_MODULES.has(moduleKey)) {
+    if (hasFull && moduleKey !== 'mockup-3d' && !PURCHASE_ONLY_MODULES.has(moduleKey)) {
       setHasAccess(true); setReason('plan'); setLoading(false); return;
     }
 
@@ -62,7 +62,16 @@ export function useModuleAccess(moduleKey: string | null | undefined) {
         }
       }
       const env = getStripeEnvironment();
-      const { data } = await supabase.rpc('get_my_module_entitlements');
+      const { data, error } = await supabase.rpc('get_my_module_entitlements');
+      if (error) throw error;
+      if (moduleKey === 'mockup-3d') {
+        const { data: quota, error: quotaError } = await supabase.rpc('get_my_monthly_quota');
+        if (quotaError) throw quotaError;
+        const plan = String(quota?.[0]?.plan ?? '');
+        const edition = plan.startsWith('v3m_vip_') || (data ?? []).some((r) =>
+          r.module === 'plan_edition' && PAID_STATUSES.has(String(r.status).toLowerCase()) && r.environment === env);
+        if (edition) { setHasAccess(true); setReason('plan'); return; }
+      }
       const owned = (data ?? []).some(
         (r: any) =>
           r.module === moduleKey &&

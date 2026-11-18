@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import SavedBookFlipbook from '@/components/flipbook/SavedBookFlipbook';
 import ChapterReaderEditor from '@/components/v3public/ChapterReaderEditor';
 import KdpBookChecklist from '@/components/v3public/KdpBookChecklist';
+import MockupStudioAccess from '@/components/v3public/MockupStudioAccess';
 import { loadStudioCovers, indexCoversByTitle, normalizeTitle, fallbackGradientFor, type StudioCover } from '@/lib/studioCovers';
 
 type Book = {
@@ -181,6 +182,7 @@ export default function V3BookManagerPage() {
   return (
     <div className="v3-dark-page"><section className="max-w-5xl mx-auto px-5 md:px-8 py-14">
       <div className="max-w-6xl mx-auto px-4 pt-4"><BackButton /></div>
+      {!correctedOnly && <MockupStudioAccess />}
       <div className="flex items-end justify-between flex-wrap gap-4">
         <div>
           <h1 className="v3-serif text-4xl font-bold">{correctedOnly ? 'Livres corrigés' : 'Mes livres'}</h1>
