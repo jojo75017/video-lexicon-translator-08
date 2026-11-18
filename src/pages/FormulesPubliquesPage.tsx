@@ -33,11 +33,16 @@ const etapes = [
   ['3', 'Une couverture pro', 'Studio Couvertures au format KDP, dos et quatrième calculés, puis mockups 3D pour vos réseaux.'],
   ['4', 'La publication Amazon', 'Fichiers Kindle et broché, fiche Amazon (description, mots-clés, catégories) et checklist pas à pas.'],
 ];
-const publics = [
-  ['Les débutants', 'Vous rêvez d’écrire votre premier livre mais vous n’avez jamais osé.'],
-  ['Les romanciers', 'Vous voulez aller plus vite sans perdre la cohérence de votre intrigue.'],
-  ['Les experts', 'Coachs, formateurs, artisans : transformez votre savoir en guide publié.'],
-  ['Les éditeurs KDP', 'Vous publiez régulièrement et cherchez un atelier complet et fiable.'],
+const profils = [
+  ['Profil 1', 'Vous cherchez un complément de revenu', 'Décorrélez votre temps de votre argent. En publiant régulièrement sur des thématiques porteuses, vous créez de véritables « actifs numériques » qui travaillent pour vous sur Amazon, même pendant que vous dormez.'],
+  ['Profil 2', 'Vous êtes coach, consultant, thérapeute ou pro', 'Le livre est la meilleure carte de visite au monde. Il assoit votre crédibilité, justifie vos tarifs et attire des clients qualifiés. EbookStudio transforme votre expertise en livre sans y passer vos week-ends.'],
+  ['Profil 3', 'Vous avez une histoire à raconter', 'Un roman qui vous trotte dans la tête, l’histoire de votre vie ou un livre pour enfants. L’IA devient votre plume personnelle : elle ne remplace pas votre créativité, elle lui donne des ailes.'],
+];
+const revenus = [
+  ['Vente en direct', 'Vendez aussi sur votre propre site, sans intermédiaire, en gardant la totalité des revenus.'],
+  ['Livre audio', 'Transformez le même texte en audiolivre avec voix off, inclus dès la formule Auteur.'],
+  ['Liste d’emails', 'Vos lecteurs deviennent une audience fidèle pour vos prochains livres.'],
+  ['Affiliation et services', 'Recommandez des outils, proposez un accompagnement ou une formation à vos lecteurs.'],
 ];
 const atouts = [
   ['Double moteur ChatGPT + Gemini', 'Gemini construit l’architecture et la mémoire de votre livre, ChatGPT rédige chaque chapitre avec une vraie plume.'],
@@ -143,9 +148,45 @@ export default function FormulesPubliquesPage() {
     {/* POUR QUI */}
     <Light>
       <Kicker>Pour qui ?</Kicker>
-      <H2>EbookStudio est fait pour vous si…</H2>
+      <H2>À qui s’adresse EbookStudio ?</H2>
+      <div className="mt-10 grid gap-6 md:grid-cols-3">
+        {profils.map(([n, t, d]) => <div key={t} className="rounded-2xl p-8 shadow-lg" style={{ background: BLANC, borderTop: `5px solid #008296` }}><div className="mb-2 text-sm font-bold uppercase tracking-widest" style={{ color: OR }}>{n}</div><H3 color="#008296">{t}</H3><P>{d}</P></div>)}
+      </div>
+    </Light>
+
+    {/* GAINS */}
+    <Dark>
+      <Kicker>Parlons vrai</Kicker>
+      <H2>Combien pouvez-vous réellement gagner ?</H2>
+      <div className="mx-auto mt-8 max-w-3xl space-y-5 text-lg leading-relaxed" style={{ color: '#e2e8f0', ...FONT }}>
+        <div>Personne ne peut vous garantir un revenu. Tout dépend de vos sujets, de la qualité de vos livres, de votre régularité et de votre capacité à répondre à une vraie demande.</div>
+        <div>Oui, certains gagnent 0 ou 50 € par mois. Ce sont ceux qui publient des livres génériques, écrits vite fait avec une IA basique, dans des niches saturées, avec une couverture bâclée. <strong style={{ color: BLANC }}>Ce n’est pas ce que nous vous proposons.</strong></div>
+        <div>La différence entre un livre qui fait 30 €/mois et un livre qui fait 800 €/mois, ce n’est pas le talent d’écriture : c’est <strong style={{ color: OR }}>le choix de la thématique et la qualité du livre</strong>. C’est exactement ce que nos 16 agents et la correction éditoriale vous apportent.</div>
+      </div>
+      <div className="mx-auto mt-10 max-w-3xl rounded-2xl p-8" style={{ background: NUIT2, border: `2px solid ${OR}` }}>
+        <H3 color={OR}>Un exemple concret</H3>
+        <P dark>Un livre bien positionné rapporte 300 € par mois, soit environ 3 000 € par an. S’il se vend tranquillement pendant 3 ans, il vous rapporte <strong style={{ color: BLANC }}>environ 8 000 à 12 000 €</strong>.</P>
+      </div>
+      <div className="mx-auto mt-10 max-w-4xl">
+        <H3 color={BLANC}>Et si vous publiez un livre par mois ?</H3>
+        <div className="mt-6 flex h-48 items-end gap-2">
+          {Array.from({ length: 12 }, (_, i) => <div key={i} className="flex flex-1 flex-col items-center gap-2"><div className="w-full rounded-t-md" style={{ height: `${(i + 1) * 8.3}%`, background: OR }} /><div className="text-sm font-bold" style={{ color: '#e2e8f0' }}>{i + 1}</div></div>)}
+        </div>
+        <div className="mt-6 space-y-4 text-lg leading-relaxed" style={{ color: '#e2e8f0', ...FONT }}>
+          <div>Le mois 1, vous avez 1 livre en ligne. Le mois 6, vous en avez 6. Chaque nouveau livre s’ajoute aux autres. Rien ne disparaît, tout se cumule.</div>
+          <div>Tous ne seront pas des best-sellers, c’est normal. Mais si sur 12 livres, 3 tournent bien, 2 décollent et les autres font de petits revenus réguliers, vous terminez l’année avec un vrai complément de revenu mensuel, construit brique par brique.</div>
+          <div className="text-sm" style={{ color: '#94a3b8' }}>Exemple illustratif, sans garantie de résultat.</div>
+        </div>
+      </div>
+    </Dark>
+
+    {/* AU-DELA D'AMAZON */}
+    <Light>
+      <Kicker>Revenus multiples</Kicker>
+      <H2>Un livre peut rapporter bien plus que des ventes Amazon</H2>
+      <div className="mx-auto mt-6 max-w-3xl text-center text-lg leading-relaxed" style={{ color: '#334155', ...FONT }}>Ce que vous vendez, ce n’est pas « un livre » : c’est une solution à un problème. Et votre ouvrage devient une porte d’entrée vers d’autres sources de revenus.</div>
       <div className="mt-10 grid gap-6 md:grid-cols-4">
-        {publics.map(([t, d]) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: BLANC, borderTop: `5px solid #008296` }}><H3 color="#008296">{t}</H3><P>{d}</P></div>)}
+        {revenus.map(([t, d]) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: BLANC, borderTop: `5px solid ${OR}` }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
       </div>
     </Light>
 
