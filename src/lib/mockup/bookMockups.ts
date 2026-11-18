@@ -1,112 +1,140 @@
-/**
- * Mockups 3D dessinés localement à partir de la vraie couverture :
- * aucun appel IA, la couverture (titre, texte) n'est jamais redessinée ni déformée.
- */
+import standingScene from '@/assets/mockup-standing-scene.jpg';
+import handScene from '@/assets/mockup-hand-scene.jpg';
+import deskScene from '@/assets/mockup-desk-scene.jpg';
+import readerScene from '@/assets/mockup-reader-scene.jpg';
+import stackScene from '@/assets/mockup-stack-scene.jpg';
+
 export type MockupModel = 'standing' | 'hand' | 'desk' | 'reader' | 'stack';
-
-export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string }[] = [
-  { id: 'standing', label: 'Livre broché debout', desc: 'Vue 3/4 avec tranche et ombre, idéal fiche Amazon' },
-  { id: 'hand', label: 'Livre tenu en main', desc: 'Format carré pour publicités Facebook / Instagram' },
-  { id: 'desk', label: 'Livre sur table en bois', desc: 'Ambiance bureau d’auteur pour réseaux et newsletters' },
-  { id: 'reader', label: 'Liseuse Kindle', desc: 'Couverture affichée sur l’écran pour la version eBook' },
-  { id: 'stack', label: 'Duo de livres', desc: 'Effet collection pour pages de vente' },
+type Point = [number, number];
+type Quad = [Point, Point, Point, Point];
+// Coordinates measured on the photographs at 1024 × 768, clockwise from top left.
+type Scene = { src: string; faces: Quad[] };
+export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string; preview: string }[] = [
+  { id: 'standing', label: 'Livre broché debout', desc: 'Pierre claire · lumière naturelle', preview: standingScene },
+  { id: 'hand', label: 'Livre tenu en main', desc: 'Portrait de lecteur · maille et papier', preview: handScene },
+  { id: 'desk', label: 'Livre sur table en bois', desc: 'Hacienda 1842 · lumière dorée', preview: deskScene },
+  { id: 'reader', label: 'Liseuse Kindle', desc: 'Coin lecture · lin et céramique', preview: readerScene },
+  { id: 'stack', label: 'Duo de livres', desc: 'Collection · atelier éditorial', preview: stackScene },
 ];
-
-export const loadCover = async (src: string): Promise<HTMLImageElement> => {
-  const blob = src.startsWith('data:') || src.startsWith('blob:') ? null : await (await fetch(src)).blob();
-  const url = blob ? URL.createObjectURL(blob) : src;
-  return await new Promise((res, rej) => {
-    const i = new Image();
-    i.onload = () => res(i);
-    i.onerror = () => rej(new Error('Couverture illisible.'));
-    i.src = url;
-  });
+const scenes: Record<MockupModel, Scene> = {
+  standing: { src: standingScene, faces: [[[286, 64], [696, 42], [697, 678], [287, 658]]] },
+  hand: { src: handScene, faces: [[[384, 126], [681, 123], [681, 588], [385, 572]]] },
+  desk: { src: deskScene, faces: [[[297, 109], [684, 96], [683, 663], [297, 638]]] },
+  reader: { src: readerScene, faces: [[[359, 142], [670, 142], [670, 569], [360, 569]]] },
+  stack: { src: stackScene, faces: [[[172, 200], [448, 196], [449, 642], [172, 628]], [[552, 133], [878, 116], [877, 667], [552, 641]]] },
 };
 
-type Ctx = CanvasRenderingContext2D;
-
-function shadow(ctx: Ctx, cx: number, cy: number, rx: number, ry: number, a = 0.35) {
-  ctx.save(); ctx.filter = 'blur(26px)'; ctx.fillStyle = `rgba(0,0,0,${a})`;
-  ctx.beginPath(); ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
-}
-
-/** Livre broché : pages côté droit, couverture entière, reflet de dos. */
-function book(ctx: Ctx, img: HTMLImageElement, x: number, y: number, bw: number, bh: number) {
-  const depth = Math.round(bw * 0.035);
-  ctx.fillStyle = '#ebe6db';
-  ctx.beginPath(); ctx.moveTo(x + bw, y + 6); ctx.lineTo(x + bw + depth, y + depth); ctx.lineTo(x + bw + depth, y + bh + depth - 6); ctx.lineTo(x + bw, y + bh); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#d8d1c2';
-  ctx.beginPath(); ctx.moveTo(x + 4, y + bh); ctx.lineTo(x + bw, y + bh); ctx.lineTo(x + bw + depth, y + bh + depth - 6); ctx.lineTo(x + depth + 4, y + bh + depth - 6); ctx.closePath(); ctx.fill();
-  ctx.drawImage(img, x, y, bw, bh);
-  const spine = bw * 0.06;
-  const g = ctx.createLinearGradient(x, 0, x + spine, 0);
-  g.addColorStop(0, 'rgba(0,0,0,0.4)'); g.addColorStop(0.5, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.fillStyle = g; ctx.fillRect(x, y, spine, bh);
-  const s = ctx.createLinearGradient(x, y, x + bw, y + bh);
-  s.addColorStop(0, 'rgba(255,255,255,0.1)'); s.addColorStop(0.5, 'rgba(255,255,255,0)'); s.addColorStop(1, 'rgba(0,0,0,0.12)');
-  ctx.fillStyle = s; ctx.fillRect(x, y, bw, bh);
-}
-
-const ratioOf = (img: HTMLImageElement) => (img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 2 / 3);
-
-function bg(ctx: Ctx, W: number, H: number, top: string, bottom: string) {
-  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, top); g.addColorStop(1, bottom);
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-}
-
-export function renderMockup(canvas: HTMLCanvasElement, img: HTMLImageElement, model: MockupModel) {
-  const W = 1600, H = model === 'hand' || model === 'reader' ? 1600 : 1200;
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d'); if (!ctx) throw new Error('Dessin indisponible.');
-  const r = ratioOf(img);
-  ctx.clearRect(0, 0, W, H);
-
-  if (model === 'standing') {
-    bg(ctx, W, H, '#f4f1ea', '#d9d3c7');
-    const bh = 960, bw = bh * r, x = (W - bw) / 2, y = 90;
-    shadow(ctx, x + bw / 2 + 30, y + bh + 30, bw * 0.6, 40);
-    book(ctx, img, x, y, bw, bh);
-  } else if (model === 'hand') {
-    bg(ctx, W, H, '#cfd8cf', '#8a9a88');
-    const bh = 1100, bw = bh * r, x = (W - bw) / 2, y = 200;
-    shadow(ctx, x + bw / 2, y + bh + 20, bw * 0.55, 50, 0.3);
-    book(ctx, img, x, y, bw, bh);
-    // mains stylisées (pouces) sur les bords
-    ctx.fillStyle = '#e3b894';
-    for (const side of [-1, 1]) {
-      const hx = side < 0 ? x - 20 : x + bw + 20;
-      ctx.beginPath(); ctx.ellipse(hx, y + bh * 0.62, 70, 150, side * 0.15, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(hx - side * 55, y + bh * 0.55, 34, 70, side * -0.35, 0, Math.PI * 2); ctx.fill();
-    }
-  } else if (model === 'desk') {
-    bg(ctx, W, H, '#3b2f28', '#2a211c');
-    const wood = ctx.createLinearGradient(0, 700, 0, H); wood.addColorStop(0, '#8a5a36'); wood.addColorStop(1, '#5c3a22');
-    ctx.fillStyle = wood; ctx.fillRect(0, 760, W, H - 760);
-    ctx.strokeStyle = 'rgba(0,0,0,0.12)'; ctx.lineWidth = 3;
-    for (let i = 0; i < 8; i++) { ctx.beginPath(); ctx.moveTo(0, 800 + i * 55); ctx.bezierCurveTo(500, 780 + i * 55, 1100, 830 + i * 55, W, 800 + i * 55); ctx.stroke(); }
-    const bh = 820, bw = bh * r, x = (W - bw) / 2, y = 160;
-    shadow(ctx, x + bw / 2 + 40, y + bh + 20, bw * 0.65, 36, 0.5);
-    book(ctx, img, x, y, bw, bh);
-  } else if (model === 'reader') {
-    bg(ctx, W, H, '#e8eef2', '#b9c6cf');
-    const sh = 1080, sw = sh * Math.min(r, 0.75), dw = sw + 120, dh = sh + 220, dx = (W - dw) / 2, dy = (H - dh) / 2;
-    shadow(ctx, W / 2, dy + dh + 20, dw * 0.55, 40);
-    ctx.fillStyle = '#1b1d21'; ctx.beginPath(); ctx.roundRect(dx, dy, dw, dh, 60); ctx.fill();
-    const sx = dx + 60, sy = dy + 90;
-    ctx.fillStyle = '#fff'; ctx.fillRect(sx, sy, sw, sh);
-    const fit = Math.min(sw / img.naturalWidth, sh / img.naturalHeight);
-    const iw = img.naturalWidth * fit, ih = img.naturalHeight * fit;
-    ctx.drawImage(img, sx + (sw - iw) / 2, sy + (sh - ih) / 2, iw, ih);
-    const gl = ctx.createLinearGradient(sx, sy, sx + sw, sy + sh); gl.addColorStop(0, 'rgba(255,255,255,0.18)'); gl.addColorStop(0.4, 'rgba(255,255,255,0)');
-    ctx.fillStyle = gl; ctx.fillRect(sx, sy, sw, sh);
-  } else {
-    bg(ctx, W, H, '#1f2a3a', '#0e141d');
-    const bh = 860, bw = bh * r;
-    shadow(ctx, W / 2, 120 + bh + 30, bw * 1.1, 46, 0.55);
-    book(ctx, img, W / 2 - bw - 10, 170, bw * 0.95, bh * 0.95);
-    book(ctx, img, W / 2 - bw * 0.25, 120, bw, bh);
+export async function loadCover(src: string): Promise<HTMLImageElement> {
+  let objectUrl: string | undefined;
+  if (!src.startsWith('data:') && !src.startsWith('blob:')) {
+    const response = await fetch(src);
+    if (!response.ok) throw new Error('Impossible de charger cette image.');
+    objectUrl = URL.createObjectURL(await response.blob());
   }
+  try {
+    return await new Promise((resolve, reject) => {
+      const image = new Image();
+      image.onload = () => resolve(image);
+      image.onerror = () => reject(new Error('Image illisible.'));
+      image.src = objectUrl || src;
+    });
+  } finally { if (objectUrl) URL.revokeObjectURL(objectUrl); }
+}
+const sceneCache = new Map<string, Promise<HTMLImageElement>>();
+function loadScene(src: string) {
+  const cached = sceneCache.get(src);
+  if (cached) return cached;
+  const pending = loadCover(src).catch((error) => { sceneCache.delete(src); throw error; });
+  sceneCache.set(src, pending);
+  return pending;
 }
 
-export const canvasToBlob = (c: HTMLCanvasElement, type: 'image/png' | 'image/jpeg') =>
-  new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('Export impossible.'))), type, 0.92));
+/** Inverse homography sampled once per output pixel: no triangle seams across lettering. */
+function projectCover(ctx: CanvasRenderingContext2D, texture: HTMLCanvasElement, quad: Quad) {
+  const [p0, p1, p2, p3] = quad;
+  const dx1 = p1[0] - p2[0], dx2 = p3[0] - p2[0];
+  const dy1 = p1[1] - p2[1], dy2 = p3[1] - p2[1];
+  const dx3 = p0[0] - p1[0] + p2[0] - p3[0], dy3 = p0[1] - p1[1] + p2[1] - p3[1];
+  const det = dx1 * dy2 - dx2 * dy1;
+  const g = det ? (dx3 * dy2 - dx2 * dy3) / det : 0;
+  const h = det ? (dx1 * dy3 - dx3 * dy1) / det : 0;
+  const a = p1[0] - p0[0] + g * p1[0], b = p3[0] - p0[0] + h * p3[0], c = p0[0];
+  const d = p1[1] - p0[1] + g * p1[1], e = p3[1] - p0[1] + h * p3[1], f = p0[1];
+  const inverse = [e - f * h, c * h - b, b * f - c * e, f * g - d, a - c * g, c * d - a * f, d * h - e * g, b * g - a * h, a * e - b * d];
+  const left = Math.floor(Math.min(...quad.map(p => p[0]))), top = Math.floor(Math.min(...quad.map(p => p[1])));
+  const width = Math.ceil(Math.max(...quad.map(p => p[0]))) - left;
+  const height = Math.ceil(Math.max(...quad.map(p => p[1]))) - top;
+  const layer = document.createElement('canvas'); layer.width = width; layer.height = height;
+  const target = layer.getContext('2d'), sourceContext = texture.getContext('2d');
+  if (!target || !sourceContext) throw new Error('Dessin indisponible.');
+  const source = sourceContext.getImageData(0, 0, texture.width, texture.height).data;
+  const result = target.createImageData(width, height), out = result.data;
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    const X = x + left + 0.5, Y = y + top + 0.5;
+    const den = inverse[6] * X + inverse[7] * Y + inverse[8];
+    const u = (inverse[0] * X + inverse[1] * Y + inverse[2]) / den;
+    const v = (inverse[3] * X + inverse[4] * Y + inverse[5]) / den;
+    if (u < 0 || v < 0 || u > 1 || v > 1) continue;
+    const sx = u * (texture.width - 1), sy = v * (texture.height - 1);
+    const x0 = Math.floor(sx), y0 = Math.floor(sy), x1 = Math.min(x0 + 1, texture.width - 1), y1 = Math.min(y0 + 1, texture.height - 1);
+    const fx = sx - x0, fy = sy - y0, index = (y * width + x) * 4;
+    for (let channel = 0; channel < 3; channel++) {
+      out[index + channel] = source[(y0 * texture.width + x0) * 4 + channel] * (1 - fx) * (1 - fy)
+        + source[(y0 * texture.width + x1) * 4 + channel] * fx * (1 - fy)
+        + source[(y1 * texture.width + x0) * 4 + channel] * (1 - fx) * fy
+        + source[(y1 * texture.width + x1) * 4 + channel] * fx * fy;
+    }
+    out[index + 3] = 255;
+  }
+  target.putImageData(result, 0, 0); ctx.drawImage(layer, left, top);
+}
+function facePath(ctx: CanvasRenderingContext2D, quad: Quad) {
+  ctx.beginPath(); quad.forEach(([x, y], index) => index ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.closePath();
+}
+function placeCover(ctx: CanvasRenderingContext2D, cover: HTMLImageElement, scene: HTMLImageElement, quad: Quad) {
+  const distance = (a: Point, b: Point) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  const width = (distance(quad[0], quad[1]) + distance(quad[3], quad[2])) / 2;
+  const height = (distance(quad[0], quad[3]) + distance(quad[1], quad[2])) / 2;
+  const texture = document.createElement('canvas');
+  texture.width = Math.round(width * 2); texture.height = Math.round(height * 2);
+  const surface = texture.getContext('2d'); if (!surface) throw new Error('Dessin indisponible.');
+  surface.drawImage(cover, 0, 0, 1, 1);
+  const pixel = surface.getImageData(0, 0, 1, 1).data;
+  surface.fillStyle = `rgb(${pixel[0]},${pixel[1]},${pixel[2]})`;
+  surface.fillRect(0, 0, texture.width, texture.height);
+  const fit = Math.min(texture.width / cover.naturalWidth, texture.height / cover.naturalHeight);
+  const w = cover.naturalWidth * fit, h = cover.naturalHeight * fit;
+  surface.drawImage(cover, (texture.width - w) / 2, (texture.height - h) / 2, w, h);
+  ctx.save(); facePath(ctx, quad); ctx.clip();
+  projectCover(ctx, texture, quad);
+  // Reuse the photograph's actual paper texture and lighting, rather than painting fake reflections.
+  ctx.globalCompositeOperation = 'multiply'; ctx.globalAlpha = 0.72;
+  ctx.drawImage(scene, 0, 0, 1600, 1200);
+  ctx.restore();
+}
+
+/** Render offscreen first so late image loads never replace a newer model or export stale content. */
+export async function renderMockup(canvas: HTMLCanvasElement, cover: HTMLImageElement, model: MockupModel): Promise<void> {
+  const spec = scenes[model], photo = await loadScene(spec.src);
+  const frame = document.createElement('canvas'); frame.width = 1600; frame.height = 1200;
+  const ctx = frame.getContext('2d'); if (!ctx) throw new Error('Dessin indisponible.');
+  ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(photo, 0, 0, 1600, 1200);
+  for (const face of spec.faces) {
+    const quad = face.map(([x, y]): Point => [x * 1600 / 1024, y * 1200 / 768]) as Quad;
+    placeCover(ctx, cover, photo, quad);
+  }
+  if (model === 'hand') {
+    // The photographed supporting thumb is in front of the paper: retain its original pixels.
+    ctx.save();
+    ctx.beginPath();
+    const points: Point[] = [[383, 569], [407, 567], [433, 570], [452, 576], [470, 585], [471, 604], [380, 604]];
+    points.forEach(([x, y], i) => i ? ctx.lineTo(x * 1.5625, y * 1.5625) : ctx.moveTo(x * 1.5625, y * 1.5625));
+    ctx.closePath(); ctx.clip(); ctx.drawImage(photo, 0, 0, 1600, 1200); ctx.restore();
+  }
+  canvas.width = 1600; canvas.height = 1200;
+  const output = canvas.getContext('2d'); if (!output) throw new Error('Dessin indisponible.');
+  output.drawImage(frame, 0, 0);
+}
+export const canvasToBlob = (canvas: HTMLCanvasElement, type: 'image/png' | 'image/jpeg') =>
+  new Promise<Blob>((resolve, reject) => canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error('Export impossible.')), type, 0.96));

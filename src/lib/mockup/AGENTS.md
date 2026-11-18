@@ -1,0 +1,1 @@
+- Mockup previews and exports use the same photographic scene templates and inverse projective sampling of original cover pixels, preserving lettering without AI redraws or mesh seams; load offscreen and publish only the latest selection.

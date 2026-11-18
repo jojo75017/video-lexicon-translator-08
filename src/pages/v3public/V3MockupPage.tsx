@@ -21,7 +21,10 @@ export default function V3MockupPage() {
   const [model, setModel] = useState<MockupModel>('standing');
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [busy, setBusy] = useState(false);
+  const [rendering, setRendering] = useState(false);
+  const [ready, setReady] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const manuallySelected = useRef(false);
 
   useEffect(() => {
     void loadStudioCovers().then((list) => {
@@ -29,30 +32,52 @@ export default function V3MockupPage() {
       setCovers(usable);
       const wanted = params.get('titre')?.toLowerCase();
       const match = wanted ? usable.find((c) => (c.bookTitle || c.projectName).toLowerCase() === wanted) : null;
-      if (match?.thumbUrl) setSource(match.thumbUrl);
+      if (match?.thumbUrl && !manuallySelected.current) setSource(match.thumbUrl);
     });
   }, [params]);
 
   useEffect(() => {
     if (!source) { setImg(null); return; }
+    let active = true;
     setBusy(true);
-    loadCover(source).then(setImg).catch((e) => toast.error(e.message)).finally(() => setBusy(false));
+    setReady(false);
+    loadCover(source).then((image) => { if (active) setImg(image); })
+      .catch((e) => { if (active) { setImg(null); toast.error(e.message); } })
+      .finally(() => { if (active) setBusy(false); });
+    return () => { active = false; };
   }, [source]);
 
   useEffect(() => {
-    if (img && canvasRef.current) renderMockup(canvasRef.current, img, model);
-  }, [img, model]);
+    if (!img || busy) return;
+    let active = true;
+    setRendering(true);
+    setReady(false);
+    const frame = document.createElement('canvas');
+    void renderMockup(frame, img, model).then(() => {
+      const canvas = canvasRef.current;
+      if (!active || !canvas) return;
+      canvas.width = frame.width;
+      canvas.height = frame.height;
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Aperçu indisponible.');
+      context.drawImage(frame, 0, 0);
+      setReady(true);
+    }).catch((error) => { if (active) toast.error(error.message); })
+      .finally(() => { if (active) setRendering(false); });
+    return () => { active = false; };
+  }, [img, model, busy]);
 
   const onFile = (f?: File) => {
     if (!f) return;
     if (!/^image\/(png|jpe?g|webp)$/.test(f.type)) { toast.error('Choisissez une image JPG, PNG ou WEBP.'); return; }
     const reader = new FileReader();
+    manuallySelected.current = true;
     reader.onload = () => setSource(String(reader.result));
     reader.readAsDataURL(f);
   };
 
   const download = async (type: 'image/png' | 'image/jpeg') => {
-    if (locked || !canvasRef.current || !img) return;
+    if (locked || !canvasRef.current || !img || !ready || rendering || busy) return;
     const blob = await canvasToBlob(canvasRef.current, type);
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
@@ -73,7 +98,7 @@ export default function V3MockupPage() {
         <MockupStudioAccess />
 
         <div className="grid lg:grid-cols-[380px_1fr] gap-6">
-          <Card className="p-5 space-y-5">
+          <div className="space-y-5">
             <section>
               <h2 className="font-semibold mb-2 flex items-center gap-2"><BookOpen className="h-4 w-4" /> 1. Ma couverture</h2>
               {covers === null ? (
@@ -81,9 +106,9 @@ export default function V3MockupPage() {
               ) : covers.length ? (
                 <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto">
                   {covers.map((c) => (
-                    <Button key={c.id} variant="ghost" type="button" onClick={() => { if (c.thumbUrl) setSource(c.thumbUrl); }} title={c.bookTitle || c.projectName}
-                      className={`rounded border-2 overflow-hidden ${source === c.thumbUrl ? 'border-primary' : 'border-transparent'}`}>
-                      <img src={c.thumbUrl || undefined} alt={c.bookTitle || c.projectName} className="w-full aspect-[2/3] object-cover" loading="lazy" />
+                    <Button key={c.id} variant="ghost" type="button" onClick={() => { if (c.thumbUrl && source !== c.thumbUrl) { manuallySelected.current = true; setReady(false); setSource(c.thumbUrl); } }} title={c.bookTitle || c.projectName}
+                      className={`h-auto p-0 rounded border-2 overflow-hidden ${source === c.thumbUrl ? 'border-primary' : 'border-transparent'}`}>
+                      <img src={c.thumbUrl || undefined} alt={c.bookTitle || c.projectName} className="w-full aspect-[2/3] object-contain" loading="lazy" />
                     </Button>
                   ))}
                 </div>
@@ -101,22 +126,23 @@ export default function V3MockupPage() {
               <h2 className="font-semibold mb-2">2. Le modèle</h2>
               <div className="space-y-2">
                 {MOCKUP_MODELS.map((m) => (
-                  <button key={m.id} type="button" onClick={() => setModel(m.id)} aria-pressed={model === m.id}
-                    className={`w-full text-left rounded-lg border p-3 transition ${model === m.id ? 'border-primary bg-primary/10' : 'border-border hover:bg-muted'}`}>
-                    <div className="text-sm font-semibold">{m.label}</div>
-                    <div className="text-xs text-muted-foreground">{m.desc}</div>
-                  </button>
+                  <Button key={m.id} variant="outline" type="button" onClick={() => { if (model !== m.id) { setReady(false); setModel(m.id); } }} aria-pressed={model === m.id}
+                    className={`v3-chip-toggle w-full h-auto text-left justify-start rounded-lg border p-2 gap-3 transition whitespace-normal ${model === m.id ? 'border-primary bg-primary/10' : 'border-border hover:bg-muted'}`}>
+                    <img src={m.preview} width={1600} height={1200} alt="" loading="lazy" className="w-24 aspect-[4/3] object-cover rounded shrink-0" />
+                    <span className="min-w-0"><span className="block text-sm font-semibold">{m.label}</span>
+                    <span className="block text-xs text-muted-foreground mt-1">{m.desc}</span></span>
+                  </Button>
                 ))}
               </div>
             </section>
-          </Card>
+          </div>
 
           <Card className="p-5 flex flex-col gap-4">
-            <div className="flex-1 grid place-items-center rounded-lg bg-muted min-h-[420px]">
-              {busy ? <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /> : img ? (
-                <canvas ref={canvasRef} className="max-w-full max-h-[640px] h-auto rounded shadow-lg" />
-              ) : (
-                <div className="text-center text-muted-foreground"><ImageIcon className="h-12 w-12 mx-auto mb-2" />Choisissez ou importez une couverture</div>
+            <div className="relative grid place-items-center rounded-lg bg-muted aspect-[4/3] overflow-hidden" aria-busy={busy || rendering}>
+              <canvas ref={canvasRef} width={1600} height={1200} aria-label="Aperçu du mockup de votre couverture" className={`w-full h-auto ${ready && !busy && !rendering ? '' : 'invisible'}`} />
+              {(busy || rendering) && <div className="absolute inset-0 grid place-items-center"><Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /></div>}
+              {!img && !busy && (
+                <div className="absolute text-center text-muted-foreground"><ImageIcon className="h-12 w-12 mx-auto mb-2" />Choisissez ou importez une couverture</div>
               )}
             </div>
             {locked ? (
@@ -125,8 +151,8 @@ export default function V3MockupPage() {
               </div>
             ) : (
               <div className="flex flex-wrap gap-2">
-                <Button disabled={!img} onClick={() => void download('image/png')}><Download className="h-4 w-4 mr-2" />Télécharger PNG HD</Button>
-                <Button disabled={!img} variant="outline" onClick={() => void download('image/jpeg')}><Download className="h-4 w-4 mr-2" />Télécharger JPG</Button>
+                <Button disabled={!ready || rendering || busy} onClick={() => void download('image/png')}><Download className="h-4 w-4 mr-2" />Télécharger PNG HD</Button>
+                <Button disabled={!ready || rendering || busy} variant="outline" onClick={() => void download('image/jpeg')}><Download className="h-4 w-4 mr-2" />Télécharger JPG</Button>
               </div>
             )}
           </Card>
