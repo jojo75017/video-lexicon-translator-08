@@ -1,5 +1,6 @@
 import standingScene from '@/assets/mockup-standing-scene.jpg';
 import handScene from '@/assets/mockup-hand-scene.jpg';
+import womanScene from '@/assets/mockup-woman-scene.jpg';
 import deskScene from '@/assets/mockup-desk-oak-scene.jpg';
 import deskModernScene from '@/assets/mockup-desk-modern-scene.jpg';
 import deskWalnutScene from '@/assets/mockup-desk-walnut-scene.jpg';
@@ -13,7 +14,7 @@ import cat_historiqueScene from '@/assets/mockup-cat-historique-scene.jpg';
 import cat_devpersoScene from '@/assets/mockup-cat-devperso-scene.jpg';
 import cat_cuisineScene from '@/assets/mockup-cat-cuisine-scene.jpg';
 
-export type MockupModel = 'standing' | 'hand' | 'desk' | 'desk-modern' | 'desk-walnut' | 'cat-jeunesse' | 'cat-thriller' | 'cat-romance' | 'cat-fantasy' | 'cat-historique' | 'cat-devperso' | 'cat-cuisine' | 'reader' | 'stack';
+export type MockupModel = 'standing' | 'hand' | 'hand-woman' | 'desk' | 'desk-modern' | 'desk-walnut' | 'cat-jeunesse' | 'cat-thriller' | 'cat-romance' | 'cat-fantasy' | 'cat-historique' | 'cat-devperso' | 'cat-cuisine' | 'reader' | 'stack';
 type Point = [number, number];
 type Quad = [Point, Point, Point, Point];
 // Coordinates measured on the photographs at 1024 × 768, clockwise from top left.
@@ -32,6 +33,7 @@ export const MOCKUP_CATEGORIES: { id: MockupCategory; label: string }[] = [
 export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string; preview: string; category: MockupCategory }[] = [
   { id: 'standing', label: 'Livre broché debout', desc: 'Pierre claire · lumière naturelle', preview: standingScene, category: 'universel' },
   { id: 'hand', label: 'Livre tenu en main', desc: 'Portrait de lecteur · maille et papier', preview: handScene, category: 'universel' },
+  { id: 'hand-woman', label: 'Lectrice souriante', desc: 'Femme tenant le livre · salon lumineux', preview: womanScene, category: 'universel' },
   { id: 'desk', label: 'Table en chêne clair', desc: 'Coin lecture cosy · lumière du jour', preview: deskScene, category: 'universel' },
   { id: 'desk-modern', label: 'Bureau d’écrivain', desc: 'Bois clair · style épuré moderne', preview: deskModernScene, category: 'universel' },
   { id: 'desk-walnut', label: 'Table en noyer', desc: 'Bibliothèque élégante · lumière chaude', preview: deskWalnutScene, category: 'universel' },
@@ -49,6 +51,7 @@ const deskFace: Quad = [[297, 109], [684, 96], [683, 663], [297, 638]];
 const scenes: Record<MockupModel, Scene> = {
   standing: { src: standingScene, faces: [[[286, 64], [696, 42], [697, 678], [287, 658]]] },
   hand: { src: handScene, faces: [[[384, 126], [681, 123], [681, 588], [385, 572]]] },
+  'hand-woman': { src: womanScene, faces: [[[417.5, 359], [630.5, 359], [631.5, 677], [417.5, 677]]] },
   desk: { src: deskScene, faces: [deskFace] },
   'desk-modern': { src: deskModernScene, faces: [deskFace] },
   'desk-walnut': { src: deskWalnutScene, faces: [deskFace] },
@@ -182,6 +185,14 @@ export async function renderMockup(canvas: HTMLCanvasElement, cover: HTMLImageEl
     const points: Point[] = [[383, 569], [407, 567], [433, 570], [452, 576], [470, 585], [471, 604], [380, 604]];
     points.forEach(([x, y], i) => i ? ctx.lineTo(x * 1.5625, y * 1.5625) : ctx.moveTo(x * 1.5625, y * 1.5625));
     ctx.closePath(); ctx.clip(); ctx.drawImage(photo, 0, 0, 1600, 1200); ctx.restore();
+  }
+  if (model === 'hand-woman') {
+    // Both thumbs rest in front of the cover: keep the photographed fingers.
+    for (const pts of [[[640, 1060], [640, 1000], [672, 982], [706, 1000], [714, 1030], [700, 1060]], [[905, 1060], [905, 1020], [925, 988], [960, 982], [992, 1000], [992, 1060]]] as Point[][]) {
+      ctx.save(); ctx.beginPath();
+      pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+      ctx.closePath(); ctx.clip(); ctx.drawImage(photo, 0, 0, 1600, 1200); ctx.restore();
+    }
   }
   canvas.width = 1600; canvas.height = 1200;
   const output = canvas.getContext('2d'); if (!output) throw new Error('Dessin indisponible.');
