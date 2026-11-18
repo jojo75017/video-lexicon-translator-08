@@ -25,7 +25,7 @@ const douleurs = [
   ['💸 Une facture salée', 'Correcteur, graphiste, maquettiste : comptez 1 500 € à 3 000 € pour un seul livre.'],
   ['❌ Le refus d’Amazon', 'Une marge mal réglée, un dos de couverture faux d’un millimètre, et le fichier est rejeté.'],
   ['🌀 Les incohérences', 'Avec les IA classiques : chapitres qui se répètent, personnages qui changent, « Acte I » oubliés dans le texte.'],
-  ['🧩 Trop d’outils', 'ChatGPT, Canva, DeepL, un formateur… quatre abonnements pour un résultat bricolé.'],
+  ['🧩 Trop d’outils', 'Un outil d’écriture, Canva, DeepL, un formateur… quatre abonnements pour un résultat bricolé.'],
 ];
 const etapes = [
   ['1', 'Votre idée', 'Un titre, un thème ou trois lignes suffisent. Vous choisissez le genre : roman, guide, jeunesse, BD…'],
@@ -40,6 +40,9 @@ const publics = [
   ['Les éditeurs KDP', 'Vous publiez régulièrement et cherchez un atelier complet et fiable.'],
 ];
 const atouts = [
+  ['Double moteur ChatGPT + Gemini', 'Gemini construit l’architecture et la mémoire de votre livre, ChatGPT rédige chaque chapitre avec une vraie plume.'],
+  ['16 agents qui travaillent pour vous', 'Idée, plan, personnages, rédaction, style, humanisation, relecture, couverture, fiche Amazon : chacun son métier.'],
+  ['Correction éditoriale intégrée', 'Vos chapitres sont relus, les incohérences repérées et corrigées, comme chez un éditeur professionnel.'],
   ['Écriture blindée', 'Notre moteur éditorial retire les « Acte », « Partie » et répétitions, et interdit les découvertes rejouées d’un chapitre à l’autre.'],
   ['Mockups 3D intégrés', 'Votre livre posé sur une vraie table en bois ou un bureau : des visuels prêts pour Amazon et Facebook.'],
   ['Audio et voix off', 'Transformez vos textes en livre audio avec des voix naturelles (dès la formule Auteur).'],
@@ -120,6 +123,22 @@ export default function FormulesPubliquesPage() {
       </div>
       <div className="mt-12 text-center"><Cta label="Je commence mon livre" /></div>
     </Dark>
+
+
+    {/* WHAOUH */}
+    <Light>
+      <Kicker>Jamais vu ailleurs</Kicker>
+      <H2>Tout, de A à Z, dans un seul atelier</H2>
+      <Lead>Nous vous facilitons 90 % du travail : vous gardez le plaisir de créer, nos agents s’occupent du reste.</Lead>
+      <div className="grid gap-6 md:grid-cols-3">
+        {[['🤖 ChatGPT + Gemini','Les deux meilleures intelligences artificielles du moment travaillent ensemble sur votre livre.'],['👥 16 agents spécialisés','Une vraie équipe éditoriale virtuelle : de l’idée jusqu’à la mise en ligne sur Amazon.'],['✍️ Correction éditoriale','Répétitions, incohérences, personnages qui changent : tout est repéré et corrigé.']].map(([t,d])=><div key={t} className="rounded-2xl border-2 p-7" style={{ borderColor: OR, background: '#fff7ed' }}><H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
+      </div>
+      <div className="mx-auto mt-12 max-w-3xl rounded-2xl p-8" style={{ background: NUIT, color: BLANC }}>
+        <div className="mb-3 text-sm font-bold uppercase tracking-widest" style={{ color: OR }}>Le mot de Georges, fondateur</div>
+        <div className="text-lg leading-relaxed" style={{ color: '#e2e8f0', ...FONT }}>« Chez nos confrères, vous trouverez des logiciels qui font à peu près le travail. J’ai fait le tour du marché : un outil comme celui-ci, je n’en ai jamais vu. Avoir tout dedans, de A à Z, c’est du jamais vu. J’ai moi-même publié mon roman de 241 pages avec EbookStudio, et je vous accompagne personnellement lors de votre séance d’accueil. »</div>
+        <div className="mt-4 font-bold" style={{ color: OR }}>— Georges Boubet</div>
+      </div>
+    </Light>
 
     {/* POUR QUI */}
     <Light>
