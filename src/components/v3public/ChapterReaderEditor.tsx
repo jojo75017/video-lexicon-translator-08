@@ -15,6 +15,7 @@ type Raw = Record<string, unknown>;
 export default function ChapterReaderEditor({ book, onClose, onSaved }: Props) {
   const initial = useMemo<Raw[]>(() => (Array.isArray(book.chapters) ? book.chapters : []).map((c) => (c && typeof c === 'object' ? { ...(c as Raw) } : { content: String(c ?? '') })), [book.chapters]);
   const [chapters, setChapters] = useState<Raw[]>(initial);
+  const [savedChapters, setSavedChapters] = useState<Raw[]>(initial);
   const [index, setIndex] = useState(0);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -34,10 +35,12 @@ export default function ChapterReaderEditor({ book, onClose, onSaved }: Props) {
   };
 
   const save = async () => {
+    if (saving) return;
     setSaving(true);
     const { error } = await supabase.from('ebook_projects').update({ chapters: chapters as never }).eq('id', book.id);
     setSaving(false);
     if (error) return toast.error(`Enregistrement impossible : ${error.message}`);
+    setSavedChapters(chapters);
     toast.success('Chapitre enregistré ✓');
     setDirty(false);
     setEditing(false);
@@ -45,6 +48,7 @@ export default function ChapterReaderEditor({ book, onClose, onSaved }: Props) {
   };
 
   const close = () => {
+    if (saving) return;
     if (dirty && !confirm('Des modifications ne sont pas enregistrées. Fermer quand même ?')) return;
     onClose();
   };
@@ -62,7 +66,7 @@ export default function ChapterReaderEditor({ book, onClose, onSaved }: Props) {
           <div className="mt-5 grid gap-5 md:grid-cols-[220px_1fr]">
             <nav className="max-h-[65vh] overflow-y-auto space-y-1">
               {chapters.map((c, i) => (
-                <button key={i} onClick={() => { if (dirty && !confirm('Changer de chapitre sans enregistrer ?')) return; if (dirty) { setChapters(initial); setDirty(false); } setIndex(i); setEditing(false); }}
+                <button key={i} disabled={saving} onClick={() => { if (dirty && !confirm('Changer de chapitre sans enregistrer ?')) return; if (dirty) { setChapters(savedChapters); setDirty(false); } setIndex(i); setEditing(false); }}
                   className={`w-full text-left rounded px-3 py-2 text-sm ${i === index ? 'bg-[var(--v3-orange)]/20 font-semibold' : 'hover:bg-white/5'}`}>
                   {i + 1}. {titleOf(c, i)}
                 </button>
@@ -71,8 +75,8 @@ export default function ChapterReaderEditor({ book, onClose, onSaved }: Props) {
             <div className="min-w-0">
               {editing ? (
                 <>
-                  <input value={titleOf(current, index)} onChange={(e) => update('title', e.target.value)} className="w-full h-10 rounded-lg border border-black/10 px-3 text-sm text-[#111827]" aria-label="Titre du chapitre" />
-                  <textarea value={String(current[textKey] ?? '')} onChange={(e) => update('text', e.target.value)} className="mt-3 w-full h-[55vh] rounded-lg border border-black/10 px-3 py-2 text-sm leading-relaxed text-[#111827]" aria-label="Texte du chapitre" />
+                  <input disabled={saving} value={titleOf(current, index)} onChange={(e) => update('title', e.target.value)} className="w-full h-10 rounded-lg border border-black/10 px-3 text-sm text-[#111827]" aria-label="Titre du chapitre" />
+                  <textarea disabled={saving} value={String(current[textKey] ?? '')} onChange={(e) => update('text', e.target.value)} className="mt-3 w-full h-[55vh] rounded-lg border border-black/10 px-3 py-2 text-sm leading-relaxed text-[#111827]" aria-label="Texte du chapitre" />
                 </>
               ) : (
                 <article className="max-h-[60vh] overflow-y-auto pr-2">
@@ -87,7 +91,7 @@ export default function ChapterReaderEditor({ book, onClose, onSaved }: Props) {
                 </div>
                 {editing ? (
                   <div className="flex gap-2">
-                    <button onClick={() => { setChapters(initial); setDirty(false); setEditing(false); }} className="v3-btn v3-btn-ghost text-xs">Annuler</button>
+                    <button disabled={saving} onClick={() => { setChapters(savedChapters); setDirty(false); setEditing(false); }} className="v3-btn v3-btn-ghost text-xs">Annuler</button>
                     <button onClick={() => void save()} disabled={saving || !dirty} className="v3-btn v3-btn-primary text-xs"><Save className="h-3.5 w-3.5" /> {saving ? 'Enregistrement…' : 'Enregistrer'}</button>
                   </div>
                 ) : (

@@ -215,12 +215,16 @@ const EbookPedagogiqueGenerator: React.FC<PedagogiqueGeneratorProps> = ({ ebookT
         updated_at: new Date().toISOString(),
       };
       // Met à jour le projet existant du même titre plutôt que de créer un doublon.
-      const { data: existing } = await supabase
+      const { data: existing, error: lookupError } = await supabase
         .from('ebook_projects')
         .select('id')
         .eq('user_id', auth.user.id)
-        .eq('title', bookTitle.trim())
+        .eq('title', payload.title)
+        .eq('project_type', payload.project_type)
+        .order('updated_at', { ascending: false })
+        .limit(1)
         .maybeSingle();
+      if (lookupError) throw lookupError;
       if (existing?.id) {
         const { error } = await supabase.from('ebook_projects').update(payload).eq('id', existing.id);
         if (error) throw error;

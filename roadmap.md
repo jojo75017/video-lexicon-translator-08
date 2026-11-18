@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Monitoring : corrections enregistrées préservées après annulation/changement de chapitre ; sauvegardes pédagogiques avec sous-titre mises à jour sans copie ; 8 tests réussis et deux parcours connectés vérifiés avec un livre temporaire supprimé après contrôle, sans publication.
 - [x] Cases et lecture du brouillon : fiche complète accessible à l’étape rédaction, synopsis et six personnages affichés, 32 titres visibles avec état non rédigé ; vérification connectée et 4 tests réussis, sans publication.
 - [x] Fils d’El Cuervo : fiche restaurée, 6 personnages et 32 parties conservés ; sauvegarde, validation et accès au bouton de rédaction vérifiés connecté, 4 tests réussis, sans génération ni publication.
 - [ ] Corriger la couverture de Léo et le studio : scène continue, format carré jeunesse, aperçu et téléchargements vérifiés sans publication.
