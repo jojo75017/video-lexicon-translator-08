@@ -187,6 +187,14 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
               <span>Accueil</span>
             </NavLink>
             <NavLink
+              to="/v3/outils/mockup-3d"
+              className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
+              style={({ isActive }) => ({ padding: '8px 14px', gap: 6, background: '#EA580C', color: '#ffffff', border: '1px solid #C2410C', fontWeight: 700, ...(isActive ? { boxShadow: '0 0 0 2px rgba(234,88,12,0.35)' } : {}) })}
+            >
+              <span aria-hidden>🖼️</span>
+              <span>Studio Mockups · 27 €</span>
+            </NavLink>
+            <NavLink
               to="/v3/mes-livres"
               className="v3-btn h-9 rounded-full text-[12px] shrink-0 transition-transform"
               style={({ isActive }) => ({ padding: '8px 14px', gap: 6, background: '#7C3AED', color: '#ffffff', border: '1px solid #6D28D9', fontWeight: 700, ...(isActive ? { boxShadow: '0 0 0 2px rgba(124,58,237,0.35)' } : {}) })}
@@ -435,6 +443,14 @@ export default function V3MainTabs({ hideCategories = false }: { hideCategories?
               style={{ background: '#1D4ED8', color: '#ffffff', border: '1px solid #1e40af', fontWeight: 700, textShadow: 'none' }}
             >
               <span aria-hidden className="text-[15px]">🏠</span> Accueil
+            </NavLink>
+            <NavLink
+              to="/v3/outils/mockup-3d"
+              onClick={() => setMobileOpen(false)}
+              className="v3-btn h-10 w-full justify-center rounded-full font-sans text-[13px]"
+              style={{ background: '#EA580C', color: '#ffffff', border: '1px solid #C2410C', fontWeight: 700, textShadow: 'none' }}
+            >
+              🖼️ Studio Mockups · 27 €
             </NavLink>
             <NavLink
               to="/v3/mes-livres"
