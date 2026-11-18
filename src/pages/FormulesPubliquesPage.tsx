@@ -235,6 +235,12 @@ export default function FormulesPubliquesPage() {
         <H2>Choisissez votre formule</H2>
         <Lead dark>Starter 19 €, Auteur 29 €, Édition 59 € par mois. Sans engagement. Séance d’accueil de 30 minutes offerte.</Lead>
         <V3PricingOverview />
+        <div className="mx-auto mt-14 max-w-3xl rounded-3xl p-8 text-center md:p-10" style={{ background: '#0b1120', border: `2px solid ${OR}`, boxShadow: '0 0 40px rgba(255,158,45,.25)', ...FONT }}>
+          <div className="mb-3 text-sm font-bold uppercase tracking-widest" style={{ color: OR }}>🧪 Vous hésitez encore avant de choisir une formule ?</div>
+          <h3 className="mb-4 text-2xl font-extrabold md:text-3xl" style={{ color: BLANC }}>Testez la puissance de notre atelier en 2 minutes chrono</h3>
+          <div className="mb-7 text-lg leading-relaxed" style={{ color: '#e2e8f0' }}>Pas besoin de carte bancaire. Saisissez une simple idée et découvrez immédiatement le plan complet et les premières lignes rédigées par nos agents IA. Vous jugerez sur pièce la qualité du texte.</div>
+          <a href="/essai?utm_source=formules&utm_medium=encart" className="inline-flex items-center justify-center rounded-xl px-8 py-4 text-lg font-bold" style={{ background: OR, color: '#0b1120' }}>✨ Tester gratuitement en 1 clic (sans carte) →</a>
+        </div>
       </div>
     </section>
 
