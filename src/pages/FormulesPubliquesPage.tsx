@@ -79,13 +79,20 @@ const comparatif = [
   ['Accompagnement', 'Aucun', 'Séance d’accueil de 30 min'],
 ];
 const faq = [
-  ['Faut-il savoir écrire ?', 'Non. Vous apportez l’idée, EbookStudio vous accompagne à chaque étape et vous gardez la main sur chaque chapitre.'],
-  ['Amazon accepte-t-il les livres créés avec l’IA ?', 'Oui. Amazon demande simplement de déclarer l’usage de l’IA au moment de la publication.'],
+  ['Je n’ai jamais écrit une ligne de ma vie. Est-ce que ça va vraiment marcher pour moi ?', 'Oui. C’est même pour vous qu’EbookStudio a été créé. Vous n’avez pas besoin d’être écrivain : vous guidez, l’IA écrit, vous validez chaque chapitre.'],
+  ['Je suis nul(le) en informatique. Je vais y arriver ?', 'Si vous savez envoyer un e-mail, vous en savez suffisamment. Tout se fait dans votre navigateur, étape par étape, et la séance d’accueil de 30 min avec Georges vous lance sereinement.'],
+  ['Est-ce légal de publier un livre écrit avec l’IA ?', 'Oui, c’est 100 % légal. Amazon KDP autorise les livres assistés par IA : il suffit de le déclarer au moment de la publication. Nous vous montrons comment faire.'],
+  ['Combien d’argent puis-je espérer gagner ?', 'Aucun chiffre ne peut être garanti, ce serait malhonnête. Tout dépend du nombre de livres publiés, des sujets choisis et du travail fourni. Votre livre peut aussi devenir un point de départ pour d’autres revenus : audio, vente directe, services.'],
+  ['Combien de temps par semaine dois-je y consacrer ?', 'Comptez quelques heures par semaine pour avancer sereinement. Certains sortent un livre en quelques jours, d’autres prennent plusieurs semaines le soir et le week-end. Les deux rythmes fonctionnent.'],
+  ['Puis-je publier plusieurs livres ?', 'Oui, et c’est encouragé. Le deuxième livre va plus vite que le premier, le troisième encore plus. Plus vous avez de livres, plus ils se vendent entre eux : c’est l’effet catalogue.'],
+  ['Les lecteurs vont-ils sentir que c’est écrit par une IA ?', 'EbookStudio intègre l’humanisation du texte et un nettoyage éditorial : répétitions, tournures mécaniques et incohérences sont repérées et corrigées pour un texte naturel et agréable à lire.'],
+  ['Dois-je acheter des logiciels en plus ?', 'Non. Tout est dans l’atelier : rédaction, correction, couverture, mise en page et fiche Amazon. Vous utilisez vos clés IA gratuites (ou celles que vous avez déjà) pour de meilleurs résultats. Amazon KDP est gratuit.'],
+  ['Y a-t-il des frais cachés ?', 'Aucun. Vous payez votre formule, sans engagement, et c’est tout. Les formules mensuelles s’arrêtent quand vous voulez.'],
+  ['J’habite hors de France. Ça marche pour moi ?', 'Oui. L’atelier est en français, mais vos livres peuvent être vendus sur toutes les boutiques Amazon où KDP est disponible, et la traduction est intégrée.'],
+  ['Je suis coach, thérapeute ou consultant. Ça marche pour un livre « pro » ?', 'Parfaitement. Votre livre devient votre meilleure carte de visite, renforce votre crédibilité et attire des clients qualifiés.'],
+  ['Et si je n’ai aucune idée de sujet ?', 'L’atelier vous aide à trouver et valider un sujet qui a un public, avant de commencer à écrire.'],
   ['À qui appartiennent mes livres ?', 'À vous, entièrement. Vous publiez sous votre nom et touchez vos redevances.'],
-  ['Pourquoi mettre mes propres clés ?', 'Avec vos clés gratuites (ou celles que vous avez déjà), les résultats sont bien meilleurs. Nous vous montrons comment faire lors de la séance d’accueil.'],
-  ['Puis-je arrêter quand je veux ?', 'Oui, les formules mensuelles sont sans engagement.'],
-  ['Faut-il installer un logiciel ?', 'Non, tout fonctionne dans votre navigateur, sur ordinateur ou tablette.'],
-  ['Comment publier sur Amazon ?', 'EbookStudio prépare vos fichiers et votre fiche, et une checklist vous guide jusqu’à la mise en ligne.'],
+  ['J’ai encore des questions avant de me lancer', 'C’est normal. Écrivez-nous ou réservez directement un échange de 30 min avec Georges : il répond à toutes vos questions avant que vous décidiez.'],
 ];
 
 export default function FormulesPubliquesPage() {
