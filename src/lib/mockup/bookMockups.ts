@@ -1,10 +1,12 @@
 import standingScene from '@/assets/mockup-standing-scene.jpg';
 import handScene from '@/assets/mockup-hand-scene.jpg';
-import deskScene from '@/assets/mockup-desk-scene.jpg';
+import deskScene from '@/assets/mockup-desk-oak-scene.jpg';
+import deskModernScene from '@/assets/mockup-desk-modern-scene.jpg';
+import deskWalnutScene from '@/assets/mockup-desk-walnut-scene.jpg';
 import readerScene from '@/assets/mockup-reader-scene.jpg';
 import stackScene from '@/assets/mockup-stack-scene.jpg';
 
-export type MockupModel = 'standing' | 'hand' | 'desk' | 'reader' | 'stack';
+export type MockupModel = 'standing' | 'hand' | 'desk' | 'desk-modern' | 'desk-walnut' | 'reader' | 'stack';
 type Point = [number, number];
 type Quad = [Point, Point, Point, Point];
 // Coordinates measured on the photographs at 1024 × 768, clockwise from top left.
@@ -12,14 +14,19 @@ type Scene = { src: string; faces: Quad[] };
 export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string; preview: string }[] = [
   { id: 'standing', label: 'Livre broché debout', desc: 'Pierre claire · lumière naturelle', preview: standingScene },
   { id: 'hand', label: 'Livre tenu en main', desc: 'Portrait de lecteur · maille et papier', preview: handScene },
-  { id: 'desk', label: 'Livre sur table en bois', desc: 'Hacienda 1842 · lumière dorée', preview: deskScene },
+  { id: 'desk', label: 'Table en chêne clair', desc: 'Coin lecture cosy · lumière du jour', preview: deskScene },
+  { id: 'desk-modern', label: 'Bureau d’écrivain', desc: 'Bois clair · style épuré moderne', preview: deskModernScene },
+  { id: 'desk-walnut', label: 'Table en noyer', desc: 'Bibliothèque élégante · lumière chaude', preview: deskWalnutScene },
   { id: 'reader', label: 'Liseuse Kindle', desc: 'Coin lecture · lin et céramique', preview: readerScene },
   { id: 'stack', label: 'Duo de livres', desc: 'Collection · atelier éditorial', preview: stackScene },
 ];
+const deskFace: Quad = [[297, 109], [684, 96], [683, 663], [297, 638]];
 const scenes: Record<MockupModel, Scene> = {
   standing: { src: standingScene, faces: [[[286, 64], [696, 42], [697, 678], [287, 658]]] },
   hand: { src: handScene, faces: [[[384, 126], [681, 123], [681, 588], [385, 572]]] },
-  desk: { src: deskScene, faces: [[[297, 109], [684, 96], [683, 663], [297, 638]]] },
+  desk: { src: deskScene, faces: [deskFace] },
+  'desk-modern': { src: deskModernScene, faces: [deskFace] },
+  'desk-walnut': { src: deskWalnutScene, faces: [deskFace] },
   reader: { src: readerScene, faces: [[[359, 142], [670, 142], [670, 569], [360, 569]]] },
   stack: { src: stackScene, faces: [[[172, 200], [448, 196], [449, 642], [172, 628]], [[552, 133], [878, 116], [877, 667], [552, 641]]] },
 };
