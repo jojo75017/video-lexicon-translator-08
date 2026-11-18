@@ -1,96 +1,131 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import BackButton from '@/components/v3/BackButton';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Image as ImageIcon, Loader2 } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Download, Image as ImageIcon, Loader2, Lock, Upload, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
+import usePlanTier from '@/hooks/usePlanTier';
+import { loadStudioCovers, type StudioCover } from '@/lib/studioCovers';
+import { MOCKUP_MODELS, canvasToBlob, loadCover, renderMockup, type MockupModel } from '@/lib/mockup/bookMockups';
 
-const TEMPLATES = [
-  { id: 'standing', label: 'Livre debout (offert)', free: true },
-  { id: 'hand', label: 'Livre en main', free: false },
-  { id: 'shelf', label: 'Sur étagère', free: false },
-  { id: 'ipad', label: 'Sur iPad', free: false },
-  { id: 'stack', label: 'Pile de livres', free: false },
-];
-
+/** Studio Mockups 3D : couverture choisie dans la bibliothèque ou importée, 5 modèles, téléchargement réservé à la formule Édition. */
 export default function V3MockupPage() {
-  const [coverUrl, setCoverUrl] = useState('');
-  const [template, setTemplate] = useState('standing');
-  const [result, setResult] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [params] = useSearchParams();
+  const { tier } = usePlanTier();
+  const locked = tier === 'starter' || tier === 'auteur';
+  const [covers, setCovers] = useState<StudioCover[] | null>(null);
+  const [source, setSource] = useState<string>('');
+  const [model, setModel] = useState<MockupModel>('standing');
+  const [img, setImg] = useState<HTMLImageElement | null>(null);
+  const [busy, setBusy] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const handleGenerate = async () => {
-    if (!coverUrl) { toast.error('URL de couverture manquante'); return; }
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('generate-mockup', {
-        body: { coverUrl, template },
-      });
-      if (error) throw error;
-      setResult(data?.imageUrl || data?.url || '');
-      toast.success('Mockup généré ✨');
-    } catch (e: any) {
-      toast.error('Erreur : ' + (e.message || 'génération impossible'));
-    } finally {
-      setLoading(false);
-    }
+  useEffect(() => {
+    void loadStudioCovers().then((list) => {
+      const usable = list.filter((c) => c.thumbUrl);
+      setCovers(usable);
+      const wanted = params.get('titre')?.toLowerCase();
+      const match = wanted ? usable.find((c) => (c.bookTitle || c.projectName).toLowerCase() === wanted) : null;
+      if (match?.thumbUrl) setSource(match.thumbUrl);
+    });
+  }, [params]);
+
+  useEffect(() => {
+    if (!source) { setImg(null); return; }
+    setBusy(true);
+    loadCover(source).then(setImg).catch((e) => toast.error(e.message)).finally(() => setBusy(false));
+  }, [source]);
+
+  useEffect(() => {
+    if (img && canvasRef.current) renderMockup(canvasRef.current, img, model);
+  }, [img, model]);
+
+  const onFile = (f?: File) => {
+    if (!f) return;
+    if (!/^image\/(png|jpe?g|webp)$/.test(f.type)) { toast.error('Choisissez une image JPG, PNG ou WEBP.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => setSource(String(reader.result));
+    reader.readAsDataURL(f);
+  };
+
+  const download = async (type: 'image/png' | 'image/jpeg') => {
+    if (!canvasRef.current || !img) return;
+    const blob = await canvasToBlob(canvasRef.current, type);
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `mockup-${model}.${type === 'image/png' ? 'png' : 'jpg'}`;
+    a.click();
+    URL.revokeObjectURL(a.href);
   };
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] py-8 px-4">
-      <div className="max-w-5xl mx-auto">
-        <BackButton to="/v3/nouveautes" />
-
+    <div className="min-h-screen bg-background py-8 px-4">
+      <div className="max-w-6xl mx-auto">
+        <BackButton to="/v3/mes-livres" />
         <header className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
-              <ImageIcon className="h-6 w-6" />
-            </div>
-            <div>
-              <Badge className="bg-emerald-600 mb-1">🎁 OFFERT (1 template) · Illimité en Studio</Badge>
-              <h1 className="text-3xl font-bold text-[#232F3E]">Mockups 3D</h1>
-            </div>
-          </div>
-          <p className="text-slate-600">Prévisualisation professionnelle de votre livre pour pubs Facebook, Instagram et Amazon.</p>
+          <Badge className="mb-2">Inclus avec la formule Édition</Badge>
+          <h1 className="text-3xl font-bold text-foreground">Studio Mockups 3D</h1>
+          <p className="text-muted-foreground">Votre vraie couverture, présentée en 5 mises en scène. Le titre et le texte restent intacts.</p>
         </header>
 
-        <div className="grid md:grid-cols-2 gap-6">
-          <Card className="p-5 space-y-4">
-            <div>
-              <Label>URL de votre couverture (JPG/PNG)</Label>
-              <Input value={coverUrl} onChange={e => setCoverUrl(e.target.value)} placeholder="https://…/couverture.jpg" />
-            </div>
-            <div>
-              <Label className="mb-2 block">Template</Label>
-              <div className="grid grid-cols-2 gap-2">
-                {TEMPLATES.map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => setTemplate(t.id)}
-                    className={`text-left p-3 rounded-lg border transition ${template === t.id ? 'border-[#008296] bg-emerald-50' : 'border-slate-200 hover:border-slate-400'}`}
-                  >
-                    <div className="text-sm font-medium">{t.label}</div>
-                    {t.free ? <Badge variant="outline" className="text-xs mt-1">Offert</Badge> : <Badge className="bg-amber-500 text-xs mt-1">Payant</Badge>}
+        <div className="grid lg:grid-cols-[380px_1fr] gap-6">
+          <Card className="p-5 space-y-5">
+            <section>
+              <h2 className="font-semibold mb-2 flex items-center gap-2"><BookOpen className="h-4 w-4" /> 1. Ma couverture</h2>
+              {covers === null ? (
+                <p className="text-sm text-muted-foreground flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" /> Recherche de vos couvertures…</p>
+              ) : covers.length ? (
+                <div className="grid grid-cols-4 gap-2 max-h-56 overflow-y-auto">
+                  {covers.map((c) => (
+                    <button key={c.id} type="button" onClick={() => setSource(c.thumbUrl!)} title={c.bookTitle || c.projectName}
+                      className={`rounded border-2 overflow-hidden ${source === c.thumbUrl ? 'border-primary' : 'border-transparent'}`}>
+                      <img src={c.thumbUrl!} alt={c.bookTitle || c.projectName} className="w-full aspect-[2/3] object-cover" loading="lazy" />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Aucune couverture enregistrée. <Link to="/v3/studio-v4" className="underline text-primary">Créer une couverture</Link> ou importez la vôtre.</p>
+              )}
+              <label className="mt-3 flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border p-4 text-sm font-medium hover:bg-muted"
+                onDragOver={(e) => e.preventDefault()} onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files[0]); }}>
+                <Upload className="h-4 w-4" /> Importer une image (Canva, graphiste…)
+                <input type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" onChange={(e) => onFile(e.target.files?.[0])} />
+              </label>
+            </section>
+
+            <section>
+              <h2 className="font-semibold mb-2">2. Le modèle</h2>
+              <div className="space-y-2">
+                {MOCKUP_MODELS.map((m) => (
+                  <button key={m.id} type="button" onClick={() => setModel(m.id)} aria-pressed={model === m.id}
+                    className={`w-full text-left rounded-lg border p-3 transition ${model === m.id ? 'border-primary bg-primary/10' : 'border-border hover:bg-muted'}`}>
+                    <div className="text-sm font-semibold">{m.label}</div>
+                    <div className="text-xs text-muted-foreground">{m.desc}</div>
                   </button>
                 ))}
               </div>
-            </div>
-            <Button onClick={handleGenerate} disabled={loading} className="w-full bg-[#008296] hover:bg-[#006e7f]">
-              {loading ? <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Génération…</> : 'Générer le mockup'}
-            </Button>
+            </section>
           </Card>
 
-          <Card className="p-5 flex items-center justify-center min-h-[400px] bg-slate-50">
-            {result ? (
-              <img src={result} alt="Mockup" className="max-w-full max-h-[500px] rounded-lg shadow-xl" />
+          <Card className="p-5 flex flex-col gap-4">
+            <div className="flex-1 grid place-items-center rounded-lg bg-muted min-h-[420px]">
+              {busy ? <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" /> : img ? (
+                <canvas ref={canvasRef} className="max-w-full max-h-[640px] h-auto rounded shadow-lg" />
+              ) : (
+                <div className="text-center text-muted-foreground"><ImageIcon className="h-12 w-12 mx-auto mb-2" />Choisissez ou importez une couverture</div>
+              )}
+            </div>
+            {locked ? (
+              <div className="rounded-lg border border-border p-4 text-sm flex flex-wrap items-center gap-3">
+                <Lock className="h-4 w-4" /> Le téléchargement HD est inclus avec la formule Édition.
+                <Button asChild size="sm" className="ml-auto"><Link to="/formules">Passer à Édition</Link></Button>
+              </div>
             ) : (
-              <div className="text-slate-400 text-center">
-                <ImageIcon className="h-12 w-12 mx-auto mb-2" />
-                <p>Le mockup apparaîtra ici</p>
+              <div className="flex flex-wrap gap-2">
+                <Button disabled={!img} onClick={() => void download('image/png')}><Download className="h-4 w-4 mr-2" />Télécharger PNG HD</Button>
+                <Button disabled={!img} variant="outline" onClick={() => void download('image/jpeg')}><Download className="h-4 w-4 mr-2" />Télécharger JPG</Button>
               </div>
             )}
           </Card>
