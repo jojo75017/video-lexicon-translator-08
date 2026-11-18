@@ -5,20 +5,45 @@ import deskModernScene from '@/assets/mockup-desk-modern-scene.jpg';
 import deskWalnutScene from '@/assets/mockup-desk-walnut-scene.jpg';
 import readerScene from '@/assets/mockup-reader-scene.jpg';
 import stackScene from '@/assets/mockup-stack-scene.jpg';
+import cat_jeunesseScene from '@/assets/mockup-cat-jeunesse-scene.jpg';
+import cat_thrillerScene from '@/assets/mockup-cat-thriller-scene.jpg';
+import cat_romanceScene from '@/assets/mockup-cat-romance-scene.jpg';
+import cat_fantasyScene from '@/assets/mockup-cat-fantasy-scene.jpg';
+import cat_historiqueScene from '@/assets/mockup-cat-historique-scene.jpg';
+import cat_devpersoScene from '@/assets/mockup-cat-devperso-scene.jpg';
+import cat_cuisineScene from '@/assets/mockup-cat-cuisine-scene.jpg';
 
-export type MockupModel = 'standing' | 'hand' | 'desk' | 'desk-modern' | 'desk-walnut' | 'reader' | 'stack';
+export type MockupModel = 'standing' | 'hand' | 'desk' | 'desk-modern' | 'desk-walnut' | 'cat-jeunesse' | 'cat-thriller' | 'cat-romance' | 'cat-fantasy' | 'cat-historique' | 'cat-devperso' | 'cat-cuisine' | 'reader' | 'stack';
 type Point = [number, number];
 type Quad = [Point, Point, Point, Point];
 // Coordinates measured on the photographs at 1024 × 768, clockwise from top left.
 type Scene = { src: string; faces: Quad[] };
-export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string; preview: string }[] = [
-  { id: 'standing', label: 'Livre broché debout', desc: 'Pierre claire · lumière naturelle', preview: standingScene },
-  { id: 'hand', label: 'Livre tenu en main', desc: 'Portrait de lecteur · maille et papier', preview: handScene },
-  { id: 'desk', label: 'Table en chêne clair', desc: 'Coin lecture cosy · lumière du jour', preview: deskScene },
-  { id: 'desk-modern', label: 'Bureau d’écrivain', desc: 'Bois clair · style épuré moderne', preview: deskModernScene },
-  { id: 'desk-walnut', label: 'Table en noyer', desc: 'Bibliothèque élégante · lumière chaude', preview: deskWalnutScene },
-  { id: 'reader', label: 'Liseuse Kindle', desc: 'Coin lecture · lin et céramique', preview: readerScene },
-  { id: 'stack', label: 'Duo de livres', desc: 'Collection · atelier éditorial', preview: stackScene },
+export type MockupCategory = 'universel' | 'jeunesse' | 'thriller' | 'romance' | 'fantasy' | 'historique' | 'devperso' | 'cuisine';
+export const MOCKUP_CATEGORIES: { id: MockupCategory; label: string }[] = [
+  { id: 'universel', label: 'Tous genres' },
+  { id: 'jeunesse', label: 'Jeunesse' },
+  { id: 'thriller', label: 'Thriller & polar' },
+  { id: 'romance', label: 'Romance' },
+  { id: 'fantasy', label: 'Fantasy' },
+  { id: 'historique', label: 'Historique & western' },
+  { id: 'devperso', label: 'Développement personnel' },
+  { id: 'cuisine', label: 'Cuisine' },
+];
+export const MOCKUP_MODELS: { id: MockupModel; label: string; desc: string; preview: string; category: MockupCategory }[] = [
+  { id: 'standing', label: 'Livre broché debout', desc: 'Pierre claire · lumière naturelle', preview: standingScene, category: 'universel' },
+  { id: 'hand', label: 'Livre tenu en main', desc: 'Portrait de lecteur · maille et papier', preview: handScene, category: 'universel' },
+  { id: 'desk', label: 'Table en chêne clair', desc: 'Coin lecture cosy · lumière du jour', preview: deskScene, category: 'universel' },
+  { id: 'desk-modern', label: 'Bureau d’écrivain', desc: 'Bois clair · style épuré moderne', preview: deskModernScene, category: 'universel' },
+  { id: 'desk-walnut', label: 'Table en noyer', desc: 'Bibliothèque élégante · lumière chaude', preview: deskWalnutScene, category: 'universel' },
+  { id: 'reader', label: 'Liseuse Kindle', desc: 'Coin lecture · lin et céramique', preview: readerScene, category: 'universel' },
+  { id: 'stack', label: 'Duo de livres', desc: 'Collection · atelier éditorial', preview: stackScene, category: 'universel' },
+  { id: 'cat-jeunesse', label: 'Jeunesse', desc: 'Chambre d’enfant · jouets en bois', preview: cat_jeunesseScene, category: 'jeunesse' },
+  { id: 'cat-thriller', label: 'Thriller & polar', desc: 'Bureau nocturne · pluie sur la ville', preview: cat_thrillerScene, category: 'thriller' },
+  { id: 'cat-romance', label: 'Romance', desc: 'Marbre, pivoines et bougies', preview: cat_romanceScene, category: 'romance' },
+  { id: 'cat-fantasy', label: 'Fantasy', desc: 'Forêt enchantée · pierre et parchemin', preview: cat_fantasyScene, category: 'fantasy' },
+  { id: 'cat-historique', label: 'Historique & western', desc: 'Saloon · lanterne et boussole', preview: cat_historiqueScene, category: 'historique' },
+  { id: 'cat-devperso', label: 'Développement personnel', desc: 'Pièce zen · lumière du matin', preview: cat_devpersoScene, category: 'devperso' },
+  { id: 'cat-cuisine', label: 'Cuisine', desc: 'Plan de travail · herbes fraîches', preview: cat_cuisineScene, category: 'cuisine' },
 ];
 const deskFace: Quad = [[297, 109], [684, 96], [683, 663], [297, 638]];
 const scenes: Record<MockupModel, Scene> = {
@@ -27,6 +52,13 @@ const scenes: Record<MockupModel, Scene> = {
   desk: { src: deskScene, faces: [deskFace] },
   'desk-modern': { src: deskModernScene, faces: [deskFace] },
   'desk-walnut': { src: deskWalnutScene, faces: [deskFace] },
+  'cat-jeunesse': { src: cat_jeunesseScene, faces: [deskFace] },
+  'cat-thriller': { src: cat_thrillerScene, faces: [deskFace] },
+  'cat-romance': { src: cat_romanceScene, faces: [deskFace] },
+  'cat-fantasy': { src: cat_fantasyScene, faces: [deskFace] },
+  'cat-historique': { src: cat_historiqueScene, faces: [deskFace] },
+  'cat-devperso': { src: cat_devpersoScene, faces: [deskFace] },
+  'cat-cuisine': { src: cat_cuisineScene, faces: [deskFace] },
   reader: { src: readerScene, faces: [[[359, 142], [670, 142], [670, 569], [360, 569]]] },
   stack: { src: stackScene, faces: [[[172, 200], [448, 196], [449, 642], [172, 628]], [[552, 133], [878, 116], [877, 667], [552, 641]]] },
 };

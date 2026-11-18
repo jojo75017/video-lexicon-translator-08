@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import useModuleAccess from '@/hooks/useModuleAccess';
 import MockupStudioAccess from '@/components/v3public/MockupStudioAccess';
 import { loadStudioCovers, type StudioCover } from '@/lib/studioCovers';
-import { MOCKUP_MODELS, canvasToBlob, loadCover, renderMockup, type MockupModel } from '@/lib/mockup/bookMockups';
+import { MOCKUP_CATEGORIES, MOCKUP_MODELS, type MockupCategory, canvasToBlob, loadCover, renderMockup, type MockupModel } from '@/lib/mockup/bookMockups';
 
 /** Studio Mockups 3D : couverture choisie dans la bibliothèque ou importée, 5 modèles, téléchargement réservé à la formule Édition. */
 export default function V3MockupPage() {
@@ -19,6 +19,7 @@ export default function V3MockupPage() {
   const [covers, setCovers] = useState<StudioCover[] | null>(null);
   const [source, setSource] = useState<string>('');
   const [model, setModel] = useState<MockupModel>('standing');
+  const [category, setCategory] = useState<MockupCategory>('universel');
   const [img, setImg] = useState<HTMLImageElement | null>(null);
   const [busy, setBusy] = useState(false);
   const [rendering, setRendering] = useState(false);
@@ -123,9 +124,17 @@ export default function V3MockupPage() {
             </section>
 
             <section>
-              <h2 className="font-semibold mb-2">2. Le modèle</h2>
+              <h2 className="font-semibold mb-2">2. Le genre du livre</h2>
+              <div className="flex flex-wrap gap-2 mb-4">
+                {MOCKUP_CATEGORIES.map((c) => (
+                  <Button key={c.id} type="button" size="sm" variant="outline" aria-pressed={category === c.id}
+                    onClick={() => { setCategory(c.id); const first = MOCKUP_MODELS.find((m) => m.category === c.id); if (first && first.id !== model) { setReady(false); setModel(first.id); } }}
+                    className={`v3-chip-toggle rounded-full ${category === c.id ? 'border-primary bg-primary/10 text-primary' : 'border-border'}`}>{c.label}</Button>
+                ))}
+              </div>
+              <h2 className="font-semibold mb-2">3. Le décor</h2>
               <div className="space-y-2">
-                {MOCKUP_MODELS.map((m) => (
+                {MOCKUP_MODELS.filter((m) => m.category === category).map((m) => (
                   <Button key={m.id} variant="outline" type="button" onClick={() => { if (model !== m.id) { setReady(false); setModel(m.id); } }} aria-pressed={model === m.id}
                     className={`v3-chip-toggle w-full h-auto text-left justify-start rounded-lg border p-2 gap-3 transition whitespace-normal ${model === m.id ? 'border-primary bg-primary/10' : 'border-border hover:bg-muted'}`}>
                     <img src={m.preview} width={1600} height={1200} alt="" loading="lazy" className="w-24 aspect-[4/3] object-cover rounded shrink-0" />
