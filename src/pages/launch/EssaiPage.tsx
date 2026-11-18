@@ -303,7 +303,7 @@ export default function EssaiPage() {
 
   if (!outlineResult) {
     return (
-      <div className="min-h-screen" style={{ background: IVORY }}>
+      <div className="min-h-screen" style={{ background: '#07030F' }}>
         {/* 1. Ouverture */}
         <section style={{ background: 'radial-gradient(ellipse at 70% 30%, #3B0F6B 0%, #14062B 45%, #07030F 100%)' }} className="relative overflow-hidden text-white">
           <style>{`@keyframes essaiFloat{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-18px) rotate(1deg)}}@keyframes essaiGlow{0%,100%{opacity:.55}50%{opacity:1}}@keyframes essaiTwinkle{0%,100%{opacity:.2}50%{opacity:.9}}.essai-float{animation:essaiFloat 6s ease-in-out infinite}.essai-glow{animation:essaiGlow 4s ease-in-out infinite}.essai-star{animation:essaiTwinkle 3s ease-in-out infinite}.essai-cta{box-shadow:0 0 30px rgba(255,106,0,.55)}@media (prefers-reduced-motion:reduce){.essai-float,.essai-glow,.essai-star{animation:none}}`}</style>
@@ -375,80 +375,121 @@ export default function EssaiPage() {
           </div>
         </section>
 
-        {/* 2. Démonstration */}
-        <section className="mx-auto max-w-6xl px-5 py-16">
-          <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">Voyez ce qu’une phrase peut devenir</h2>
-          <div className="mt-10 grid items-stretch gap-6 md:grid-cols-[0.8fr_1.2fr]">
-            <div className="rounded-2xl border border-black/5 bg-white p-6">
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>La phrase de départ</p>
-              <p className="v3-serif mt-4 text-xl italic leading-relaxed text-[#1E2533]">« {SAMPLES[0].idea} »</p>
+        {/* 2. Avant / Maintenant */}
+        <section className="px-5 py-16" style={{ background: '#0B0618' }}>
+          <div className="mx-auto max-w-4xl">
+            <h2 className="v3-serif text-center text-3xl font-bold not-italic md:text-4xl" style={{ color: '#FFFFFF' }}>Écrire un livre a changé</h2>
+            <div className="mt-10 rounded-2xl p-6" style={{ background: '#1A1528', border: '1px solid #3A3350' }}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: '#C9C3D9' }}>Avant</p>
+              <ul className="mt-3 space-y-2 text-base" style={{ color: '#E6E1F0' }}>
+                <li style={{ color: '#FFFFFF' }}>✕ Des mois seul devant la page blanche</li>
+                <li style={{ color: '#FFFFFF' }}>✕ Des intrigues qui bloquent et des répétitions</li>
+                <li style={{ color: '#FFFFFF' }}>✕ Une mise en page Amazon KDP compliquée</li>
+              </ul>
             </div>
-            <div className="rounded-2xl border bg-white p-6" style={{ borderColor: GOLD }}>
-              <p className="text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>Le résultat EbookStudio</p>
-              <p className="v3-serif mt-3 text-2xl font-bold text-[#1E2533]">{SAMPLES[0].title}</p>
-              <ol className="mt-3 space-y-1 text-sm text-[#5B5245]">
-                {SAMPLES[0].plan.map((p, i) => <li key={p}>{i + 1}. {p}</li>)}
-                <li className="text-[#8A8072]">… et 9 autres chapitres</li>
+            <div className="my-4 text-center text-3xl" style={{ color: '#C084FC' }}>↓</div>
+            <div className="rounded-2xl p-6" style={{ background: '#1E1236', border: '1px solid #A855F7', boxShadow: '0 0 40px rgba(168,85,247,.3)' }}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: '#6EE7B7' }}>● Maintenant avec EbookStudio</p>
+              <ul className="mt-3 space-y-2 text-base" style={{ color: '#FFFFFF' }}>
+                <li style={{ color: '#FFFFFF' }}>✓ Un plan en 12 chapitres et le début du chapitre 1 en 20 secondes</li>
+                <li style={{ color: '#FFFFFF' }}>✓ Un français soigné et une histoire qui reste cohérente</li>
+                <li style={{ color: '#FFFFFF' }}>✓ PDF, Kindle et couverture prêts pour Amazon KDP</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* 3. Démonstration */}
+        <section className="px-5 py-16" style={{ background: '#0F0820' }}>
+          <div className="mx-auto max-w-6xl">
+          <h2 className="v3-serif text-center text-3xl font-bold not-italic md:text-4xl" style={{ color: '#FFFFFF' }}>Voyez ce qu’une phrase peut devenir</h2>
+          <div className="mt-10 grid items-stretch gap-6 md:grid-cols-[0.8fr_1.2fr]">
+            <div className="rounded-2xl p-6" style={{ background: '#1A1528', border: '1px solid #3A3350' }}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: '#FDBA74' }}>La phrase de départ</p>
+              <p className="v3-serif mt-4 text-xl italic leading-relaxed" style={{ color: '#FFFFFF' }}>« {SAMPLES[0].idea} »</p>
+            </div>
+            <div className="rounded-2xl p-6" style={{ background: '#1E1236', border: '1px solid #A855F7' }}>
+              <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: '#FDBA74' }}>Le résultat EbookStudio</p>
+              <p className="v3-serif mt-3 text-2xl font-bold not-italic" style={{ color: '#FFFFFF' }}>{SAMPLES[0].title}</p>
+              <ol className="mt-3 space-y-1 text-base" style={{ color: '#E6E1F0' }}>
+                {SAMPLES[0].plan.map((p, i) => <li key={p} style={{ color: '#FFFFFF' }}>{i + 1}. {p}</li>)}
+                <li style={{ color: '#C9C3D9' }}>… et 9 autres chapitres</li>
               </ol>
-              <p className="v3-serif mt-4 border-t border-black/5 pt-4 text-[15px] leading-relaxed text-[#2A2118]">{SAMPLES[0].extract}</p>
+              <p className="v3-serif mt-4 pt-4 text-base leading-relaxed" style={{ color: '#F3F0FA', borderTop: '1px solid #3A3350' }}>{SAMPLES[0].extract}</p>
             </div>
           </div>
           <div className="mx-auto mt-8 max-w-3xl">
             {videoStarted ? (
               <video src={essaiVideo.url} poster={essaiPoster.url} controls autoPlay playsInline className="w-full rounded-2xl bg-black" />
             ) : (
-              <button type="button" onClick={() => setVideoStarted(true)} className="mx-auto block rounded-full border px-5 py-2.5 text-sm font-semibold text-[#1E2533] hover:bg-white" style={{ borderColor: GOLD }}>
+              <button type="button" onClick={() => setVideoStarted(true)} className="mx-auto block rounded-full px-5 py-2.5 text-sm font-semibold" style={{ color: '#FFFFFF', border: '1px solid #C084FC', background: 'rgba(168,85,247,.15)' }}>
                 ▶ Voir la démo vidéo · 30 s
               </button>
             )}
           </div>
+          </div>
         </section>
 
-        {/* 3. Exemples */}
-        <section className="bg-white py-16">
+        {/* 4. Exemples */}
+        <section className="py-16" style={{ background: '#0B0618' }}>
           <div className="mx-auto max-w-6xl px-5">
-            <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">Quelle idée voulez-vous essayer ?</h2>
+            <h2 className="v3-serif text-center text-3xl font-bold not-italic md:text-4xl" style={{ color: '#FFFFFF' }}>Quelle idée voulez-vous essayer ?</h2>
             <div className="mt-10 grid gap-5 md:grid-cols-3">
-              {SAMPLES.map((s, i) => (
+              {SAMPLES.map((s, i) => {
+                const glow = ['#60A5FA', '#F472B6', '#34D399'][i % 3];
+                return (
                 <button
                   key={s.genre}
                   type="button"
                   onClick={() => pickSample(i)}
                   aria-pressed={sampleIdx === i}
-                  className="v3-chip-toggle group rounded-2xl p-6 text-left text-white shadow-md transition hover:-translate-y-1"
-                  style={{ background: s.cover, outline: sampleIdx === i ? `3px solid ${GOLD}` : 'none', outlineOffset: 3 }}
+                  className="v3-chip-toggle group rounded-2xl p-6 text-left transition hover:-translate-y-1"
+                  style={{ background: '#1A1528', border: `2px solid ${sampleIdx === i ? glow : '#3A3350'}`, boxShadow: `0 0 30px ${glow}40` }}
                 >
                   <span className="text-3xl">{s.icon}</span>
-                  <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: GOLD }}>{s.genre}</p>
-                  <p className="v3-serif mt-2 text-lg leading-snug not-italic" style={{ color: "#FFFFFF" }}>{s.idea}</p>
-                  <p className="mt-4 text-sm font-semibold text-white/85 group-hover:text-white">Essayer cette idée →</p>
+                  <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: glow }}>{s.genre}</p>
+                  <p className="v3-serif mt-2 text-lg leading-snug not-italic" style={{ color: '#FFFFFF' }}>{s.idea}</p>
+                  <p className="mt-4 text-sm font-semibold" style={{ color: '#FDBA74' }}>Essayer cette idée →</p>
                 </button>
-              ))}
+              );})}
             </div>
           </div>
         </section>
 
-        {/* 4. Parcours */}
-        <section className="mx-auto max-w-6xl px-5 py-16">
-          <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">De votre idée à votre premier chapitre</h2>
+        {/* 5. Bannière */}
+        <section className="px-5 py-14" style={{ background: 'linear-gradient(135deg,#3B0F6B,#14062B)' }}>
+          <div className="mx-auto max-w-3xl rounded-3xl p-8 text-center" style={{ border: '1px solid #C084FC', boxShadow: '0 0 50px rgba(168,85,247,.35)' }}>
+            <h2 className="v3-serif text-2xl font-bold not-italic md:text-3xl" style={{ color: '#FFFFFF' }}>Votre premier livre commence aujourd’hui.</h2>
+            <p className="mt-2 text-base" style={{ color: '#E6E1F0' }}>Et c’est 100 % gratuit pour essayer.</p>
+            <div className="mx-auto mt-6 max-w-md">{ctaButton(scrollToForm)}</div>
+            <p className="mt-3 text-sm" style={{ color: '#E6E1F0' }}>Accès immédiat · Sans carte bancaire · Sans engagement</p>
+          </div>
+        </section>
+
+        {/* 6. Parcours */}
+        <section className="px-5 py-16" style={{ background: '#0F0820' }}>
+          <div className="mx-auto max-w-6xl">
+          <h2 className="v3-serif text-center text-3xl font-bold not-italic md:text-4xl" style={{ color: '#FFFFFF' }}>De votre idée à votre premier chapitre</h2>
           <ol className="mt-10 grid gap-5 md:grid-cols-3">
             {[
               ['Choisissez ou saisissez une idée', 'Une seule phrase suffit, ou un clic sur un exemple.'],
               ['Lisez gratuitement l’aperçu', 'Titre, plan en 12 chapitres et début du chapitre 1, sans e-mail.'],
               ['Recevez la suite', 'Votre e-mail débloque la suite du chapitre et le téléchargement du PDF.'],
             ].map(([t, d], i) => (
-              <li key={t} className="rounded-2xl border border-black/5 bg-white p-6">
-                <span className="v3-serif text-4xl font-bold" style={{ color: ORANGE }}>{i + 1}</span>
-                <p className="mt-2 text-lg font-bold text-[#1E2533]">{t}</p>
-                <p className="mt-1 text-sm text-[#5B5245]">{d}</p>
+              <li key={t} className="rounded-2xl p-6" style={{ background: '#1A1528', border: '1px solid #3A3350' }}>
+                <span className="v3-serif text-4xl font-bold" style={{ color: '#FDBA74' }}>{i + 1}</span>
+                <p className="mt-2 text-lg font-bold" style={{ color: '#FFFFFF' }}>{t}</p>
+                <p className="mt-1 text-base" style={{ color: '#E6E1F0' }}>{d}</p>
               </li>
             ))}
           </ol>
+          </div>
         </section>
 
-        {/* 5. FAQ */}
-        <section className="mx-auto max-w-3xl px-5 pb-16">
-          <h2 className="v3-serif text-center text-3xl font-medium text-[#1E2533]">Questions fréquentes</h2>
+        {/* 7. FAQ */}
+        <section className="px-5 pb-16" style={{ background: '#0F0820' }}>
+          <div className="mx-auto max-w-3xl">
+          <h2 className="v3-serif text-center text-3xl font-bold not-italic" style={{ color: '#FFFFFF' }}>Questions fréquentes</h2>
           <div className="mt-8 space-y-3">
             {[
               ['Puis-je essayer sans idée ?', 'Oui. Une idée est déjà prête dans le champ, et trois exemples se choisissent d’un clic.'],
@@ -456,20 +497,21 @@ export default function EssaiPage() {
               ['Quand faut-il donner mon e-mail ?', 'Seulement après avoir lu l’aperçu, si vous voulez la suite du chapitre et le PDF.'],
               ['Faut-il une carte bancaire ?', 'Non. L’essai est entièrement gratuit, sans carte bancaire.'],
             ].map(([q, a]) => (
-              <details key={q} className="rounded-xl border border-black/5 bg-white p-5">
-                <summary className="cursor-pointer font-semibold text-[#1E2533]">{q}</summary>
-                <p className="mt-2 text-sm leading-relaxed text-[#5B5245]">{a}</p>
+              <details key={q} className="rounded-xl p-5" style={{ background: '#1A1528', border: '1px solid #3A3350' }}>
+                <summary className="cursor-pointer font-semibold" style={{ color: '#FFFFFF' }}>{q}</summary>
+                <p className="mt-2 text-base leading-relaxed" style={{ color: '#E6E1F0' }}>{a}</p>
               </details>
             ))}
           </div>
+          </div>
         </section>
 
-        {/* 6. Dernière invitation */}
-        <section style={{ background: NAVY }} className="px-5 py-16 text-center text-white">
-          <h2 className="v3-serif text-3xl font-medium not-italic md:text-4xl" style={{ color: "#fff" }}>Et si vous commenciez par une phrase ?</h2>
-          <p className="mt-3 text-white/70">Votre idée vous attend en haut de la page.</p>
+        {/* 8. Dernière invitation */}
+        <section className="px-5 py-16 text-center" style={{ background: '#07030F' }}>
+          <h2 className="v3-serif text-3xl font-bold not-italic md:text-4xl" style={{ color: '#FFFFFF' }}>Et si vous commenciez par une phrase ?</h2>
+          <p className="mt-3 text-base" style={{ color: '#E6E1F0' }}>Votre idée vous attend en haut de la page.</p>
           <div className="mx-auto mt-8 max-w-md">{ctaButton(scrollToForm)}</div>
-          <p className="mt-3 text-sm text-white/60">Aperçu gratuit, sans e-mail ni carte bancaire.</p>
+          <p className="mt-3 text-sm" style={{ color: '#E6E1F0' }}>Aperçu gratuit, sans e-mail ni carte bancaire.</p>
         </section>
       </div>
     );
