@@ -27,11 +27,23 @@ const douleurs = [
   ['🌀 Les incohérences', 'Avec les IA classiques : chapitres qui se répètent, personnages qui changent, « Acte I » oubliés dans le texte.'],
   ['🧩 Trop d’outils', 'Un outil d’écriture, Canva, DeepL, un formateur… quatre abonnements pour un résultat bricolé.'],
 ];
-const etapes = [
-  ['1', 'Votre idée', 'Un titre, un thème ou trois lignes suffisent. Vous choisissez le genre : roman, guide, jeunesse, BD…'],
-  ['2', 'Une rédaction cohérente', 'Chapitre par chapitre, avec une mémoire de l’histoire et un nettoyage automatique des répétitions et des scories.'],
-  ['3', 'Une couverture pro', 'Studio Couvertures au format KDP, dos et quatrième calculés, puis mockups 3D pour vos réseaux.'],
-  ['4', 'La publication Amazon', 'Fichiers Kindle et broché, fiche Amazon (description, mots-clés, catégories) et checklist pas à pas.'],
+const modules: [string, string, string][] = [
+  ['1','Bienvenue et opportunité Amazon KDP','Comprendre pourquoi publier avec l’IA n’a jamais été aussi accessible, comment fonctionne Amazon KDP et pourquoi un livre devient un actif que l’on peut multiplier.'],
+  ['2','Idée rentable et validation','Trouver un sujet que les lecteurs recherchent déjà, comprendre les mots-clés et valider la niche avant d’écrire, pour ne plus créer au hasard.'],
+  ['3','Écrire son livre avec l’IA','ChatGPT et Gemini, les 16 agents et la correction éditoriale transforment votre idée en manuscrit cohérent, humain et agréable à lire.'],
+  ['4','Couverture, design et mise en page','Une couverture qui donne envie de cliquer, un intérieur propre au format Amazon, et des visuels qui renforcent la valeur de votre livre.'],
+  ['5','Publication sur Amazon KDP','Votre fiche Amazon prête : description, mots-clés, catégories, versions Kindle et brochée, avec la checklist KDP étape par étape.'],
+  ['6','Lancement du livre','Un calendrier de lancement de 30 jours pour obtenir vos premiers lecteurs, vos premiers avis et une vraie dynamique de départ.'],
+  ['7','Publicité Amazon Ads','Préparer des campagnes Sponsored Products à petit budget, sans lancement automatique ni dépense surprise. Facultatif, mais un vrai accélérateur.'],
+  ['8','Aller plus loin','Livre audio, traductions, séries, livres illustrés : penser catalogue et revenus durables à partir de chaque livre.'],
+];
+const bonus: [string, string, string][] = [
+  ['⭐ Séance d’accueil de 30 minutes avec Georges','Toutes les formules','En visioconférence : nous configurons vos clés et lançons ensemble votre premier livre. Vous ne restez jamais bloqué.'],
+  ['🎨 Studio Couvertures professionnel','Dès la formule Auteur','Première, dos et quatrième de couverture aux dimensions exactes d’Amazon, prêtes à téléverser.'],
+  ['🎧 Studio Audio et voix off','Dès la formule Auteur','Transformez votre texte en livre audio pour toucher le marché de l’écoute, sans repartir de zéro.'],
+  ['📅 Pack lancement et calendrier Amazon Ads','Toutes les formules','Le plan jour par jour pour vos premiers avis et vos premières campagnes, sans gaspiller votre budget.'],
+  ['📖 Fiction, romans et séries','Toutes les formules','Intrigues qui tiennent debout, personnages constants, aucune scène rejouée : la méthode éprouvée sur un roman de 241 pages.'],
+  ['🧸 Livres illustrés pour enfants','Toutes les formules','L’album illustré 3–6 ans, une niche souvent ignorée et parmi les plus vendues sur Amazon.'],
 ];
 const profils = [
   ['Profil 1', 'Vous cherchez un complément de revenu', 'Décorrélez votre temps de votre argent. En publiant régulièrement sur des thématiques porteuses, vous créez de véritables « actifs numériques » qui travaillent pour vous sur Amazon, même pendant que vous dormez.'],
@@ -118,13 +130,13 @@ export default function FormulesPubliquesPage() {
 
     {/* SOLUTION */}
     <Dark>
-      <Kicker>La solution</Kicker>
-      <H2>EbookStudio : votre maison d’édition en 4 étapes</H2>
-      <Lead dark>Un seul atelier remplace le correcteur, le graphiste, le maquettiste et les quatre abonnements.</Lead>
+      <Kicker>Le programme complet</Kicker>
+      <H2>De l’idée au livre vendu sur Amazon : 8 étapes guidées</H2>
+      <Lead dark>Un seul atelier remplace le correcteur, le graphiste, le maquettiste et les abonnements dispersés. Chaque étape est accompagnée.</Lead>
       <div className="grid gap-6 md:grid-cols-2">
-        {etapes.map(([n, t, d]) => <div key={n} className="flex gap-5 rounded-2xl p-7" style={{ background: NUIT2, border: '1px solid #334155' }}>
+        {modules.map(([n, t, d]) => <div key={n} className="flex gap-5 rounded-2xl p-7" style={{ background: NUIT2, border: '1px solid #334155' }}>
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full text-2xl font-extrabold" style={{ background: OR, color: NUIT }}>{n}</div>
-          <div><H3 color={BLANC}>{t}</H3><P dark>{d}</P></div></div>)}
+          <div><div className="mb-1 text-sm font-bold uppercase tracking-widest" style={{ color: OR }}>Étape {n}</div><H3 color={BLANC}>{t}</H3><P dark>{d}</P></div></div>)}
       </div>
       <div className="mt-12 text-center"><Cta label="Je commence mon livre" /></div>
     </Dark>
@@ -227,6 +239,18 @@ export default function FormulesPubliquesPage() {
         </table>
       </div>
     </Dark>
+
+    {/* BONUS */}
+    <Light>
+      <Kicker>Vos bonus</Kicker>
+      <H2>Vos bonus exclusifs, offerts avec votre abonnement</H2>
+      <Lead>La partie que tout le monde adore : des outils et un accompagnement qui font gagner des semaines de travail.</Lead>
+      <div className="mt-10 grid gap-6 md:grid-cols-3">
+        {bonus.map(([t, f, d], i) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: i === 0 ? '#fff7ed' : BLANC, border: `2px solid ${i === 0 ? OR : '#e2e8f0'}` }}>
+          <div className="mb-2 text-sm font-bold uppercase tracking-widest" style={{ color: '#008296' }}>Bonus {i + 1} · {f}</div>
+          <H3 color={ENCRE}>{t}</H3><P>{d}</P></div>)}
+      </div>
+    </Light>
 
     {/* TARIFS */}
     <section id="formules" className="px-5 py-20" style={{ background: NUIT2, color: BLANC }}>
