@@ -73,8 +73,9 @@ export default function FormulesPubliquesPage() {
       <div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-2">
         <div>
           <span className="mb-5 inline-block rounded-full px-4 py-1.5 text-sm font-bold" style={{ background: OR, color: NUIT }}>✨ L’atelier français pour publier sur Amazon KDP</span>
-          <h1 className="mb-6 text-4xl font-extrabold leading-tight md:text-6xl" style={FONT}>Écrivez, habillez et publiez votre livre sur Amazon, <span style={{ color: OR }}>sans rester bloqué sur la page blanche</span></h1>
-          <div className="mb-8 text-xl leading-relaxed" style={{ color: '#e2e8f0' }}>De l’idée au livre en vente : rédaction cohérente chapitre après chapitre, couverture professionnelle, mockups 3D et fichiers prêts pour KDP. Tout au même endroit.</div>
+          <h1 className="mb-6 text-4xl font-extrabold leading-tight md:text-6xl" style={FONT}>Créez, publiez et générez un revenu avec des livres IA, <span style={{ color: OR }}>même si vous n’avez jamais écrit une ligne de votre vie</span></h1>
+          <div className="mb-4 text-xl font-semibold leading-relaxed" style={{ color: BLANC }}>L’intelligence artificielle fait 90 % du travail à votre place et Amazon se charge de vendre vos livres pendant que vous dormez.</div>
+          <div className="mb-8 text-lg leading-relaxed" style={{ color: '#e2e8f0' }}>La méthode complète pas à pas pour transformer une simple idée en livre publié et en source de revenus durable.</div>
           <Cta />
           <div className="mt-6 grid gap-2 text-base font-semibold" style={{ color: BLANC }}>
             <div>✅ Paiement sécurisé Stripe</div><div>✅ Sans engagement, dès 19 €/mois</div><div>✅ Séance d’accueil de 30 min avec Georges</div>
@@ -83,6 +84,19 @@ export default function FormulesPubliquesPage() {
         <img src={mockup} alt="Livre EbookStudio présenté en mockup 3D" className="w-full rounded-3xl shadow-2xl" width={1080} height={1080} />
       </div>
     </section>
+
+    {/* TOUT A CHANGÉ */}
+    <Dark>
+      <Kicker>Une époque totalement folle</Kicker>
+      <H2>Aujourd’hui, tout a changé avec l’intelligence artificielle</H2>
+      <Lead dark>Pour la première fois dans l’histoire, une personne ordinaire peut créer un livre de manière beaucoup plus simple… et surtout infiniment plus rapide qu’avant (vraiment… c’est le jour et la nuit). Ce qui demandait autrefois des mois, parfois des années, peut aujourd’hui avancer à une vitesse complètement différente.</Lead>
+      <Lead dark>Pourquoi ? Parce qu’avec les bons outils, la bonne méthode et les bonnes étapes, l’intelligence artificielle permet d’accélérer tout ce qui bloquait la majorité des gens.</Lead>
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-5">
+        {['Trouver une idée porteuse','Valider un sujet avant de perdre du temps','Structurer un plan clair','Rédiger beaucoup plus vite','Améliorer le style','Rendre le texte plus humain','Créer une couverture convaincante','Mettre le livre en page','Le publier sur Amazon','Et recommencer avec d’autres livres'].map((t, i) => <div key={t} className="rounded-2xl p-5 text-center" style={{ background: NUIT2, border: '1px solid #334155' }}>
+          <div className="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full font-extrabold" style={{ background: OR, color: NUIT }}>{i + 1}</div>
+          <div className="text-base font-bold" style={{ color: BLANC, ...FONT }}>{t}</div></div>)}
+      </div>
+    </Dark>
 
     {/* DOULEUR */}
     <Light>
