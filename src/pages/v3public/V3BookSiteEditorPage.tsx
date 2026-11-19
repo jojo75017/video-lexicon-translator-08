@@ -4,6 +4,8 @@ import { toast } from 'sonner';
 import { ExternalLink, Globe, Loader2, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { BookSiteView } from '@/pages/livre/BookSitePage';
+import { loadStudioCovers, indexCoversByTitle, normalizeTitle, LONG_SIGNED_TTL } from '@/lib/studioCovers';
+import { getSignedCoverUrl } from '@/lib/coverProjects';
 import { BOOK_SITE_THEMES, detectBookSiteTheme, firstExcerpt, slugifyTitle, type BookSiteTheme } from '@/lib/bookSite/themes';
 
 const db = supabase as unknown as { from: (t: string) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -15,6 +17,7 @@ export default function V3BookSiteEditorPage() {
   const [userId, setUserId] = useState('');
   const [f, setF] = useState<Form | null>(null);
   const [saving, setSaving] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const set = (patch: Partial<Form>) => setF((p) => (p ? { ...p, ...patch } : p));
 
   useEffect(() => { void (async () => {
@@ -26,8 +29,16 @@ export default function V3BookSiteEditorPage() {
     const { data: b, error } = await supabase.from('ebook_projects').select('title,author_name,kdp_description,chapters,project_type').eq('id', projectId).eq('user_id', auth.user.id).maybeSingle();
     if (error || !b) { toast.error('Livre introuvable.'); nav('/v3/mes-livres'); return; }
     const ex = firstExcerpt(b.chapters);
-    setF({ slug: slugifyTitle(b.title || ''), title: b.title || '', subtitle: '', author_name: b.author_name || '', description: b.kdp_description || '',
-      excerpt_title: ex.title, excerpt: ex.text, cover_url: '', theme: detectBookSiteTheme(`${b.title} ${b.kdp_description || ''} ${b.project_type || ''}`),
+    const plain = (b.kdp_description || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    const fallback = ex.text ? ex.text.split(/\n\n/)[0].slice(0, 400) + (ex.text.length > 400 ? '…' : '') : '';
+    let cover = '';
+    try {
+      const match = indexCoversByTitle(await loadStudioCovers())[normalizeTitle(b.title)];
+      if (match?.thumbPath) cover = (await getSignedCoverUrl(match.thumbPath, LONG_SIGNED_TTL)) || '';
+    } catch { /* pas de couverture trouvée */ }
+    const [mainTitle, ...rest] = (b.title || '').split(/\s*:\s*/);
+    setF({ slug: slugifyTitle(b.title || ''), title: mainTitle || b.title || '', subtitle: rest.join(' : '), author_name: b.author_name || '', description: plain || fallback,
+      excerpt_title: ex.title, excerpt: ex.text, cover_url: cover, theme: detectBookSiteTheme(`${b.title} ${b.kdp_description || ''} ${b.project_type || ''}`),
       amazon_kindle_url: '', amazon_paperback_url: '', published: false });
   })(); }, [projectId]); // eslint-disable-line
 
@@ -60,11 +71,14 @@ export default function V3BookSiteEditorPage() {
   const field = 'w-full rounded border border-border bg-background px-3 py-2 text-sm';
   return (
     <div className="mx-auto grid max-w-7xl gap-6 p-4 lg:grid-cols-[380px_1fr]">
-      <aside className="space-y-4 rounded-lg border border-border bg-card p-4 text-card-foreground lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-auto">
+      <aside className="book-site-editor space-y-4 rounded-lg border border-border bg-card p-4 text-card-foreground lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-auto">
         <h1 className="flex items-center gap-2 text-xl font-bold"><Globe className="h-5 w-5" /> Site web du livre</h1>
         <div><p className="mb-2 text-sm font-semibold">Ambiance</p><div className="grid grid-cols-2 gap-2">
           {BOOK_SITE_THEMES.map((t) => <button key={t.id} onClick={() => set({ theme: t.id })} className={`v3-chip-toggle rounded border p-2 text-left text-xs ${f.theme === t.id ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-background text-foreground'}`}><b className="block">{t.label}</b>{t.hint}</button>)}
         </div></div>
+        <p className="rounded border border-border bg-background p-3 text-sm text-foreground">✨ Tout est rempli automatiquement depuis votre livre : titre, auteur, présentation, extrait et couverture. Il ne reste qu’à cliquer sur « Publier le site ».</p>
+        <button type="button" onClick={() => setShowDetails((v) => !v)} className="v3-chip-toggle text-sm font-semibold underline">{showDetails ? 'Masquer les détails' : 'Modifier les détails (facultatif)'}</button>
+        {showDetails && <div className="space-y-4">
         <label className="block text-sm font-medium">Adresse<div className="flex items-center gap-1 text-xs text-muted-foreground">ebookstudio.fr/livre/<input className={field} value={f.slug} onChange={(e) => set({ slug: e.target.value.toLowerCase() })} /></div></label>
         <label className="block text-sm font-medium">Titre<input className={field} value={f.title} onChange={(e) => set({ title: e.target.value })} /></label>
         <label className="block text-sm font-medium">Sous-titre<input className={field} value={f.subtitle} onChange={(e) => set({ subtitle: e.target.value })} /></label>
@@ -76,6 +90,7 @@ export default function V3BookSiteEditorPage() {
         <label className="block text-sm font-medium">Lien Amazon broché<input className={field} placeholder="https://www.amazon.fr/dp/..." value={f.amazon_paperback_url} onChange={(e) => set({ amazon_paperback_url: e.target.value })} /></label>
         <label className="block text-sm font-medium">Titre de l’extrait<input className={field} value={f.excerpt_title} onChange={(e) => set({ excerpt_title: e.target.value })} /></label>
         <label className="block text-sm font-medium">Extrait (premières pages)<textarea rows={8} className={field} value={f.excerpt} onChange={(e) => set({ excerpt: e.target.value })} /></label>
+        </div>}
         <div className="flex flex-wrap gap-2">
           <button disabled={saving} onClick={() => void save(false)} className="v3-btn v3-btn-outline text-xs">Enregistrer le brouillon</button>
           <button disabled={saving || !f.title.trim()} onClick={() => void save(true)} className="v3-btn v3-btn-primary text-xs">{f.published ? 'Mettre à jour le site' : 'Publier le site'}</button>

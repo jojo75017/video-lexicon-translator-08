@@ -1032,3 +1032,14 @@ details.v3-genie-more > summary { color: #E6F4F1 !important; }
 .book-site .bs-btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.4rem;padding:.75rem 1.25rem;font-weight:700;background:hsl(var(--bs-accent));color:hsl(var(--bs-accent-fg))}
 .book-site .bs-btn-out{display:inline-flex;align-items:center;gap:.5rem;border-radius:.4rem;padding:.7rem 1.2rem;font-weight:700;border:2px solid hsl(var(--bs-accent));color:hsl(var(--bs-accent))}
 .book-site input{background:hsl(var(--bs-bg));color:hsl(var(--bs-fg));border:1px solid hsl(var(--bs-line))}
+
+/* Book site preview inside the dark member area: keep the template's own readable colors. */
+.v3-dark-page .book-site :is(h1,h2,h3,h4,p,li,label,span,div,a){color:inherit !important}
+.v3-dark-page .book-site{color:hsl(var(--bs-fg)) !important;background:hsl(var(--bs-bg)) !important}
+.v3-dark-page .book-site .bs-sub{color:hsl(var(--bs-sub)) !important}
+.v3-dark-page .book-site .bs-accent{color:hsl(var(--bs-accent)) !important}
+.v3-dark-page .book-site .bs-muted{background:hsl(var(--bs-muted)) !important}
+.v3-dark-page .book-site .bs-btn{color:hsl(var(--bs-accent-fg)) !important}
+.v3-dark-page .book-site input{background:hsl(var(--bs-bg)) !important;color:hsl(var(--bs-fg)) !important;border-color:hsl(var(--bs-line)) !important}
+.v3-dark-page .book-site-editor :is(label,p,h1,b){color:#F9FAFB !important}
+.v3-dark-page .book-site-editor :is(input,textarea){background:#0F172A !important;color:#F9FAFB !important;border-color:#475569 !important}
