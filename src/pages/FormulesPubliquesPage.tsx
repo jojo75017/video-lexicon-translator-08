@@ -47,14 +47,9 @@ const bonus: [string, string, string, number][] = [
   ['📖 Atelier roman et fiction longue','Toutes les formules','Intrigues cohérentes jusqu’à 240 pages et plus : mémoire des personnages, aucune scène rejouée, aucune scorie.',97],
   ['🧸 Album illustré jeunesse 3–6 ans','Toutes les formules','La méthode pas à pas pour l’une des niches les plus vendues et les plus fidèles d’Amazon.',67],
 ];
-const outilsInscription: [string, string[]][] = [
-  ['🚀 Démarrer', ['Clés API, première étape', 'Commence ici : 25 agents', 'Fonctionnalités (12 modules)', 'Workflow 15 agents pour écrire votre livre', 'Kit de démarrage (PDF)', 'Nouveautés']],
-  ['✍️ Écrire', ['Lancer mon livre (fiche + 15 agents)', 'Biographie : le récit de votre vie', 'Ebookstudio-Génie', 'Sommaire IA en dialogue', 'Table des matières', 'Roman et thriller en 15 agents', 'Studio Pro (Gemini + ChatGPT)', 'ContentStudio : du livre à la vidéo', 'Livres de jeux et énigmes', 'Coloriages Cherche et Trouve', 'BD et albums', 'Album illustré 3-6 ans', 'Histoires courtes et contes', 'Histoires du soir 3-7 ans', 'Corriger mon livre', 'HumanizeAI', 'Éditeur de texte', 'Traduction en 10 à 15 langues']],
-  ['📚 Livres spéciaux', ['VC Books : livres humoristiques', 'Guides illustrés de A à Z']],
-  ['🔎 Amazon KDP', ['Studio Recherche KDP', 'Recherche de mots-clés', 'Espion Amazon (ASIN)', 'Longue traîne', '7 mots-clés backend', 'Description KDP', '3 catégories KDP', 'Bio auteur', 'Contenu A+ Amazon', 'Audit KDP Pilot', 'Niches rentables', '600 niches']],
-  ['🎨 Habiller et publier', ['Studio de couverture', 'Mockups 3D', 'Livre audio (voix naturelles)', 'Calculateur de royalties', 'Outils offerts', 'Mes livres et livres corrigés', 'Page de présentation de votre livre']],
-  ['📣 Vendre', ['Plan 14 jours pour trouver des lecteurs', '30 jours de posts prêts', 'Obtenir des avis clients', 'Script vidéo HeyGen']],
-  ['🎓 Apprendre', ['Tutoriels de A à Z', 'Formation vidéo', 'Masterclass', 'Blog EbookStudio']],
+const outilsInscription: [string, string][] = [
+  ['🚀', 'Démarrer'], ['✍️', 'Créer un livre'], ['📚', 'Livres spéciaux'], ['🔎', 'Recherche KDP'],
+  ['🎨', 'Habiller & exporter'], ['📖', 'Mes livres'], ['📣', 'Vendre'], ['🎓', 'Apprendre'], ['🛟', 'Support'],
 ];
 const bonusTotal = bonus.reduce((t, x) => t + x[3], 0) + 67;
 const profils = [
@@ -264,10 +259,9 @@ export default function FormulesPubliquesPage() {
       <Kicker>Votre atelier</Kicker>
       <H2>Voici ce que vous aurez en vous inscrivant</H2>
       <Lead>Tous les outils de votre espace EbookStudio, rangés comme dans votre menu, de l’idée jusqu’à la vente.</Lead>
-      <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {outilsInscription.map(([cat, items]) => <div key={cat} className="rounded-2xl p-6 shadow-lg" style={{ background: BLANC, border: '2px solid #e2e8f0' }}>
-          <div className="mb-3 text-lg font-extrabold" style={{ color: ENCRE }}>{cat}</div>
-          <ul className="fp-light-list space-y-1.5">{items.map((it) => <li key={it} className="flex gap-2 text-base" style={{ color: '#1e293b', opacity: 1 }}><span style={{ color: '#047857' }}>✓</span>{it}</li>)}</ul>
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {outilsInscription.map(([ic, cat]) => <div key={cat} className="flex items-center gap-3 rounded-2xl p-5 shadow-lg" style={{ background: BLANC, border: '2px solid #e2e8f0' }}>
+          <span className="text-3xl">{ic}</span><span className="text-xl font-extrabold" style={{ color: ENCRE }}>{cat}</span>
         </div>)}
       </div>
     </Light>
