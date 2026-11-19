@@ -301,11 +301,11 @@ export default function V3BookManagerPage() {
                 </button>
                 {/cuervo/i.test(b.title || '') ? (
                   <button onClick={() => window.open('/livre/el-cuervo', '_blank', 'noopener')} className="v3-btn v3-btn-primary text-xs">
-                    <Globe className="w-3.5 h-3.5" /> Voir le site web
+                    <Globe className="w-3.5 h-3.5" /> Voir la page de présentation
                   </button>
                 ) : (
                   <button onClick={() => nav(`/v3/site-livre/${b.id}`)} className="v3-btn v3-btn-outline text-xs">
-                    <Globe className="w-3.5 h-3.5" /> Créer le site du livre
+                    <Globe className="w-3.5 h-3.5" /> Créer la page de présentation
                   </button>
                 )}
                 <button onClick={() => nav(`/v3/outils/mockup-3d?titre=${encodeURIComponent(b.title || '')}`)} className="v3-btn v3-btn-outline text-xs">🖼️ Créer un mockup 3D</button>

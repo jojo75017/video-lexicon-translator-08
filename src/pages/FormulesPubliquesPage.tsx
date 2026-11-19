@@ -257,10 +257,10 @@ export default function FormulesPubliquesPage() {
       <Lead>La partie que tout le monde adore : des outils et un accompagnement qui font gagner des semaines de travail.</Lead>
       <div className="mt-10 rounded-2xl p-8 shadow-xl" style={{ background: '#fff7ed', border: `3px dashed ${OR}` }}>
         <div className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>🎄 Cadeau de Noël · Toutes les formules</div>
-        <H3 color={ENCRE}>🌐 Créer le site web de votre livre</H3>
-        <P>Transformez chaque lecteur en abonné fidèle : une page élégante pour votre livre avec couverture, extrait, boutons Amazon Kindle et broché, et formulaire pour récupérer les e-mails de vos lecteurs. Vous possédez enfin votre audience. Exemple réel : ebookstudio.fr/livre/el-cuervo</P>
+        <H3 color={ENCRE}>🌐 Créer la page de présentation de votre livre</H3>
+        <P>Transformez chaque lecteur en abonné fidèle : une page de présentation élégante pour votre livre, avec un décor selon son genre (jeunesse, thriller, romance, policier, western…), couverture, extrait, boutons Amazon Kindle et broché, et formulaire pour récupérer les e-mails de vos lecteurs. Vous possédez enfin votre audience. Exemple réel : ebookstudio.fr/livre/el-cuervo</P>
         <div className="mt-4 text-lg font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>67 €</span> <span style={{ color: '#047857' }}>OFFERT pour vous</span></div>
-        <div className="mt-2 text-sm" style={{ color: '#475569' }}>Création automatique en 1 clic depuis « Mes livres » : bientôt disponible.</div>
+        <div className="mt-2 text-sm" style={{ color: '#475569' }}>Création automatique en 1 clic depuis « Mes livres » : il suffit d’ajouter les ASIN Amazon de votre livre (Kindle et broché) pour activer les boutons d’achat.</div>
       </div>
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {bonus.map(([t, f, d, v], i) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: i === 0 ? '#fff7ed' : BLANC, border: `2px solid ${i === 0 ? OR : '#e2e8f0'}` }}>

@@ -12,6 +12,9 @@ import { BOOK_SITE_THEMES, detectBookSiteTheme, firstExcerpt, slugifyTitle, type
 const db = supabase as unknown as { from: (t: string) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
 type Form = { id?: string; slug: string; title: string; subtitle: string; author_name: string; description: string; excerpt_title: string; excerpt: string; cover_url: string; theme: BookSiteTheme; amazon_kindle_url: string; amazon_paperback_url: string; published: boolean };
 
+const asinOf = (url: string) => (url.match(/\/dp\/([A-Z0-9]{10})/i)?.[1] || (url.startsWith('https://') ? '' : url)).toUpperCase();
+const asinUrl = (v: string) => { const a = v.trim().toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10); return a ? `https://www.amazon.fr/dp/${a}` : ''; };
+
 export default function V3BookSiteEditorPage() {
   const { projectId = '' } = useParams();
   const nav = useNavigate();
@@ -65,7 +68,7 @@ export default function V3BookSiteEditorPage() {
     setSaving(false);
     if (error) return toast.error(error.code === '23505' ? 'Cette adresse est déjà prise, choisissez-en une autre.' : error.message);
     set({ id: data.id, published: publish });
-    toast.success(publish ? 'Site publié ✓' : 'Brouillon enregistré ✓');
+    toast.success(publish ? 'Page publiée ✓' : 'Brouillon enregistré ✓');
   }
 
   if (!f) return <div className="flex justify-center p-16"><Loader2 className="animate-spin" /></div>;
@@ -73,11 +76,17 @@ export default function V3BookSiteEditorPage() {
   return (
     <div className="mx-auto grid max-w-7xl gap-6 p-4 lg:grid-cols-[380px_1fr]">
       <aside className="book-site-editor space-y-4 rounded-lg border border-border bg-card p-4 text-card-foreground lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-auto">
-        <h1 className="flex items-center gap-2 text-xl font-bold"><Globe className="h-5 w-5" /> Site web du livre</h1>
+        <h1 className="flex items-center gap-2 text-xl font-bold"><Globe className="h-5 w-5" /> Page de présentation du livre</h1>
         <div><p className="mb-2 text-sm font-semibold">Ambiance</p><div className="grid grid-cols-2 gap-2">
           {BOOK_SITE_THEMES.map((t) => <button key={t.id} onClick={() => set({ theme: t.id })} className={`v3-chip-toggle overflow-hidden rounded border p-0 text-left text-xs ${f.theme === t.id ? 'border-primary ring-2 ring-primary' : 'border-border'}`}><img src={BOOK_SITE_BACKGROUNDS[t.id]} alt="" className="h-12 w-full object-cover" loading="lazy" /><span className="block p-2"><b className="block">{t.emoji} {t.label}</b>{t.hint}</span></button>)}
         </div></div>
-        <p className="rounded border border-border bg-background p-3 text-sm text-foreground">✨ Tout est rempli automatiquement depuis votre livre : titre, auteur, présentation, extrait et couverture. Il ne reste qu’à cliquer sur « Publier le site ».</p>
+        <p className="rounded border border-border bg-background p-3 text-sm text-foreground">✨ Tout est rempli automatiquement depuis votre livre : titre, auteur, présentation, extrait et couverture. Il ne reste qu’à cliquer sur « Publier la page ».</p>
+        <div className="rounded border-2 border-primary p-3 text-sm">
+          <p className="mb-2 font-semibold">⚠️ N’oubliez pas vos ASIN Amazon</p>
+          <p className="mb-3 text-xs">Sans ASIN, les boutons « Acheter » n’apparaissent pas. Vous trouvez l’ASIN dans votre bibliothèque KDP ou sur la fiche Amazon du livre (10 caractères, ex. B0HLL8PZB6).</p>
+          <label className="mb-2 block text-xs font-medium">ASIN Kindle<input className={field} placeholder="B0XXXXXXXX" value={asinOf(f.amazon_kindle_url)} onChange={(e) => set({ amazon_kindle_url: asinUrl(e.target.value) })} /></label>
+          <label className="block text-xs font-medium">ASIN broché<input className={field} placeholder="B0XXXXXXXX" value={asinOf(f.amazon_paperback_url)} onChange={(e) => set({ amazon_paperback_url: asinUrl(e.target.value) })} /></label>
+        </div>
         <button type="button" onClick={() => setShowDetails((v) => !v)} className="v3-chip-toggle text-sm font-semibold underline">{showDetails ? 'Masquer les détails' : 'Modifier les détails (facultatif)'}</button>
         {showDetails && <div className="space-y-4">
         <label className="block text-sm font-medium">Adresse<div className="flex items-center gap-1 text-xs text-muted-foreground">ebookstudio.fr/livre/<input className={field} value={f.slug} onChange={(e) => set({ slug: e.target.value.toLowerCase() })} /></div></label>
@@ -94,7 +103,7 @@ export default function V3BookSiteEditorPage() {
         </div>}
         <div className="flex flex-wrap gap-2">
           <button disabled={saving} onClick={() => void save(false)} className="v3-btn v3-btn-outline text-xs">Enregistrer le brouillon</button>
-          <button disabled={saving || !f.title.trim()} onClick={() => void save(true)} className="v3-btn v3-btn-primary text-xs">{f.published ? 'Mettre à jour le site' : 'Publier le site'}</button>
+          <button disabled={saving || !f.title.trim()} onClick={() => void save(true)} className="v3-btn v3-btn-primary text-xs">{f.published ? 'Mettre à jour la page' : 'Publier la page'}</button>
           {f.published && <a href={`/livre/${f.slug}`} target="_blank" rel="noopener" className="v3-btn v3-btn-outline text-xs"><ExternalLink className="h-3.5 w-3.5" /> Voir en ligne</a>}
         </div>
       </aside>
