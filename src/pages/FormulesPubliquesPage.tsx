@@ -47,7 +47,7 @@ const bonus: [string, string, string, number][] = [
   ['📖 Atelier roman et fiction longue','Toutes les formules','Intrigues cohérentes jusqu’à 240 pages et plus : mémoire des personnages, aucune scène rejouée, aucune scorie.',97],
   ['🧸 Album illustré jeunesse 3–6 ans','Toutes les formules','La méthode pas à pas pour l’une des niches les plus vendues et les plus fidèles d’Amazon.',67],
 ];
-const bonusTotal = bonus.reduce((t, x) => t + x[3], 0);
+const bonusTotal = bonus.reduce((t, x) => t + x[3], 0) + 67;
 const profils = [
   ['Profil 1', 'Vous cherchez un complément de revenu', 'Décorrélez votre temps de votre argent. En publiant régulièrement sur des thématiques porteuses, vous créez de véritables « actifs numériques » qui travaillent pour vous sur Amazon, même pendant que vous dormez.'],
   ['Profil 2', 'Vous êtes coach, consultant, thérapeute ou pro', 'Le livre est la meilleure carte de visite au monde. Il assoit votre crédibilité, justifie vos tarifs et attire des clients qualifiés. EbookStudio transforme votre expertise en livre sans y passer vos week-ends.'],
@@ -255,6 +255,13 @@ export default function FormulesPubliquesPage() {
       <Kicker>Vos bonus</Kicker>
       <H2>Vos bonus exclusifs, offerts avec votre abonnement</H2>
       <Lead>La partie que tout le monde adore : des outils et un accompagnement qui font gagner des semaines de travail.</Lead>
+      <div className="mt-10 rounded-2xl p-8 shadow-xl" style={{ background: '#fff7ed', border: `3px dashed ${OR}` }}>
+        <div className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>🎄 Cadeau de Noël · Toutes les formules</div>
+        <H3 color={ENCRE}>🌐 Créer le site web de votre livre</H3>
+        <P>Transformez chaque lecteur en abonné fidèle : une page élégante pour votre livre avec couverture, extrait, boutons Amazon Kindle et broché, et formulaire pour récupérer les e-mails de vos lecteurs. Vous possédez enfin votre audience. Exemple réel : ebookstudio.fr/livre/el-cuervo</P>
+        <div className="mt-4 text-lg font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>67 €</span> <span style={{ color: '#047857' }}>OFFERT pour vous</span></div>
+        <div className="mt-2 text-sm" style={{ color: '#475569' }}>Création automatique en 1 clic depuis « Mes livres » : bientôt disponible.</div>
+      </div>
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {bonus.map(([t, f, d, v], i) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: i === 0 ? '#fff7ed' : BLANC, border: `2px solid ${i === 0 ? OR : '#e2e8f0'}` }}>
           <div className="mb-2 text-sm font-bold uppercase tracking-widest" style={{ color: '#008296' }}>Bonus {i + 1} · {f}</div>
