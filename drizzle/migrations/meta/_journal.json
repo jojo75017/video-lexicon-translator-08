@@ -162,6 +162,13 @@
       "when": 1794994369207,
       "tag": "0022_allow_mockup_studio_purchase",
       "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1795098763864,
+      "tag": "0023_book_reader_signups",
+      "breakpoints": true
     }
   ]
 }

@@ -30,6 +30,7 @@ export const MARKETING_EXCLUDED_PREFIXES = [
   '/lancement',
   // Essai gratuit : uniquement le parcours Kindle 12 chapitres + flipbook.
   '/essai',
+  '/livre',
 
 ];
 

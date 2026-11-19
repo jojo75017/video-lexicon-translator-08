@@ -714,6 +714,54 @@ export type Database = {
         }
         Relationships: []
       }
+      book_reader_rate_limits: {
+        Row: {
+          attempts: number
+          bucket_key: string
+          expires_at: string
+        }
+        Insert: {
+          attempts?: number
+          bucket_key: string
+          expires_at: string
+        }
+        Update: {
+          attempts?: number
+          bucket_key?: string
+          expires_at?: string
+        }
+        Relationships: []
+      }
+      book_reader_signups: {
+        Row: {
+          book_slug: string
+          consent_at: string
+          consent_version: string
+          created_at: string
+          email: string
+          first_name: string | null
+          id: string
+        }
+        Insert: {
+          book_slug: string
+          consent_at?: string
+          consent_version?: string
+          created_at?: string
+          email: string
+          first_name?: string | null
+          id?: string
+        }
+        Update: {
+          book_slug?: string
+          consent_at?: string
+          consent_version?: string
+          created_at?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
       book_testimonials: {
         Row: {
           approved: boolean
@@ -3505,6 +3553,7 @@ export type Database = {
         }[]
       }
       can_create_vip: { Args: never; Returns: boolean }
+      claim_book_reader_attempt: { Args: { p_key: string }; Returns: boolean }
       claim_installment_invoice: {
         Args: { invoice_id: string; order_uuid: string }
         Returns: boolean

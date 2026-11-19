@@ -33,5 +33,6 @@
 - [x] Accueil nouveaux abonnés : trois choix et rappel clés personnelles, mémorisés par compte sur cet appareil ; 4 tests réussis, ancien compte réel inchangé, nouvel abonnement simulé localement sur ordinateur/mobile et liens clés/écriture vérifiés. Première arrivée d’un véritable nouvel abonné reste à confirmer ; non publié.
 
 ## Évolutions
+- [x] Site El Cuervo : premières lignes reprises du manuscrit sauvegardé, inscription avec consentement et stockage privé, export CSV administrateur et liens légaux ; parcours réel testé, inscription de contrôle supprimée, affichage ordinateur/mobile et 3 tests validés. Non publié ; création automatique pour les abonnés réservée à une prochaine étape.
 - [x] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)
 - [x] Audiolivres et voix off offerts dans les formules Auteur 29 € et Édition 59 €
