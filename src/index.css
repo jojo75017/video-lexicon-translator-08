@@ -820,3 +820,8 @@ a:hover {
 
 /* Sales page light cards sit inside the dark site wrapper: keep their lists dark-on-light. */
 .v3-dark-page .fp-light-list li{color:#1e293b !important}
+
+@keyframes fp-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+.fp-marquee { animation: fp-marquee 45s linear infinite; }
+.fp-marquee:hover { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .fp-marquee { animation: none; } }

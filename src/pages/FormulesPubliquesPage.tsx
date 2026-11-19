@@ -1,6 +1,16 @@
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import { usePageMeta } from '@/hooks/usePageMeta';
 import mockup from '@/assets/vente-mockup-3d.jpg';
+import livre1 from '@/assets/vitrine/livre-1.avif.asset.json';
+import livre2 from '@/assets/vitrine/livre-2.avif.asset.json';
+import livre3 from '@/assets/vitrine/livre-3.avif.asset.json';
+import livre4 from '@/assets/vitrine/livre-4.avif.asset.json';
+import livre5 from '@/assets/vitrine/livre-5.avif.asset.json';
+import livre6 from '@/assets/vitrine/livre-6.avif.asset.json';
+import livre7 from '@/assets/vitrine/livre-7.avif.asset.json';
+import livre8 from '@/assets/vitrine/livre-8.avif.asset.json';
+import livre9 from '@/assets/vitrine/livre-9.avif.asset.json';
+import livre10 from '@/assets/vitrine/livre-10.avif.asset.json';
 import cuervo from '@/assets/vente-el-cuervo.jpg';
 
 /* Page de vente longue façon Book Machine : police droite, contrastes francs. */
@@ -47,6 +57,7 @@ const bonus: [string, string, string, number][] = [
   ['📖 Atelier roman et fiction longue','Toutes les formules','Intrigues cohérentes jusqu’à 240 pages et plus : mémoire des personnages, aucune scène rejouée, aucune scorie.',97],
   ['🧸 Album illustré jeunesse 3–6 ans','Toutes les formules','La méthode pas à pas pour l’une des niches les plus vendues et les plus fidèles d’Amazon.',67],
 ];
+const vitrine = [livre1,livre2,livre3,livre4,livre5,livre6,livre7,livre8,livre9,livre10].map((a) => a.url);
 const outilsInscription: [string, string][] = [
   ['🔑', 'Clés API · première étape'], ['🚀', 'Commence ici'], ['📚', 'Bibliothèque / Mes livres'], ['🎁', 'Mes cadeaux'],
   ['🎬', 'Tutoriels de A à Z'], ['🧰', 'Tous les outils V3'], ['📝', 'Révision éditoriale'], ['🌍', 'Traducteur d’Ebooks'],
@@ -227,6 +238,14 @@ export default function FormulesPubliquesPage() {
         {atouts.map(([t, d]) => <div key={t} className="rounded-2xl p-7" style={{ background: NUIT2, border: '1px solid #334155' }}><H3 color={OR}>✓ {t}</H3><P dark>{d}</P></div>)}
       </div>
     </Dark>
+
+    {/* VITRINE */}
+    <section className="overflow-hidden py-14" style={{ background: NUIT }}>
+      <h2 className="mb-8 px-4 text-center text-3xl font-extrabold md:text-4xl" style={{ color: BLANC, ...FONT }}>Des livres déjà publiés sur Amazon avec EbookStudio</h2>
+      <div className="fp-marquee flex w-max gap-6">
+        {[...vitrine, ...vitrine].map((src, i) => <img key={i} src={src} alt="Couverture d’un livre publié avec EbookStudio" className="h-72 w-auto rounded-lg shadow-2xl md:h-80" loading="lazy" />)}
+      </div>
+    </section>
 
     {/* PREUVE */}
     <Light>
