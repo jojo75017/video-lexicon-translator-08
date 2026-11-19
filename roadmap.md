@@ -36,3 +36,6 @@
 - [x] Site El Cuervo : premières lignes reprises du manuscrit sauvegardé, inscription avec consentement et stockage privé, export CSV administrateur et liens légaux ; parcours réel testé, inscription de contrôle supprimée, affichage ordinateur/mobile et 3 tests validés. Non publié ; création automatique pour les abonnés réservée à une prochaine étape.
 - [x] Studio Couvertures (Cover Studio Pro) inclus dans toutes les formules, présenté comme cadeau de bienvenue (décision du 17/11/2026)
 - [x] Audiolivres et voix off offerts dans les formules Auteur 29 € et Édition 59 €
+
+## Site web du livre en 1 clic (19/11/2026)
+- [x] Atelier complet publié : bouton « Créer le site du livre » dans Mes livres, éditeur prérempli (titre, auteur, extrait du chapitre 1), 4 ambiances, publication à /livre/slug. Parcours vérifié connecté (création, publication, page publique lue), site de test supprimé après contrôle, scan de sécurité sans alerte grave.
