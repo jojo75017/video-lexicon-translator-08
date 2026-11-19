@@ -6,6 +6,8 @@ import imgIllu from '@/assets/ebook-illustre-hero.jpg';
 import imgBd from '@/assets/bd-studio-hero.jpg';
 import imgKdp from '@/assets/kdp-hero.jpg';
 import imgTuto from '@/assets/tutoriels-hero-v2.jpg';
+import essaiResultat from '@/assets/essai-liseuse-resultat.jpg.asset.json';
+import { trackCaptureEvent } from '@/lib/captureTracking';
 
 const C = { bg: '#0b1120', card: '#131c2e', teal: '#2dd4bf', orange: '#ff9e2d', text: '#f5f5f5', muted: '#cbd5e1' };
 
@@ -132,74 +134,45 @@ export default function V3PremiumVentePage() {
   usePageMeta({ title: 'EbookStudio V3 Premium — créez et publiez vos livres avec l’IA', description: 'Écrivez, illustrez, traduisez et préparez vos livres pour Amazon KDP. Ressources incluses dans chaque formule. Dès 19 €/mois, sans engagement.' });
   return (
     <main className="dark v3-plans-dark min-h-screen" style={{ background: C.bg, color: C.text }}>
-      {/* Héro : les 8 vraies couvertures publiées de Georges */}
-      <section className="px-4 pt-16 pb-12 text-center" style={{ background: 'radial-gradient(circle at 50% 0%, #134e4a 0%, #0b1120 65%)' }}>
-        <p className="font-semibold tracking-widest uppercase mb-4" style={{ color: C.teal }}>EbookStudio V3 Premium</p>
-        <h1 className="mx-auto max-w-4xl text-4xl md:text-6xl font-extrabold leading-tight">Créez, illustrez et publiez vos livres sur Amazon KDP grâce à l'IA</h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg" style={{ color: C.muted }}>Vos idées et votre style, sans compétence graphique, en respectant les règles KDP. Un seul atelier pour écrire, illustrer, traduire et préparer votre publication.</p>
-        <div className="mt-8"><Btn>Découvrir les formules — dès 19 €/mois</Btn></div>
-        <p className="mt-4 text-sm" style={{ color: C.muted }}>Kindle et broché · Sans engagement · Assistance en français · Ressources incluses dans chaque formule</p>
-        <div className="mx-auto mt-10 max-w-5xl">
-          <div className="grid grid-cols-4 gap-3 md:gap-4">
-            {COVERS.map((src, i) => (
-              <a
-                key={src}
-                href={AUTHOR_AMAZON_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block overflow-hidden rounded-xl transition-transform hover:-translate-y-1"
-                style={{ border: '1px solid #1f2a44', boxShadow: '0 12px 28px -14px rgba(0,0,0,.8)' }}
-                title={`Livre ${i + 1} de Georges Boubet sur Amazon`}
-              >
-                <img
-                  src={src}
-                  alt={`Couverture du livre ${i + 1} de Georges Boubet, créée avec EbookStudio et publiée sur Amazon KDP`}
-                  loading="lazy"
-                  className="aspect-[2/3] w-full object-cover"
-                />
-              </a>
-            ))}
-          </div>
-          <p className="mt-4 text-sm" style={{ color: C.muted }}>
-            Des livres de Georges Boubet, écrits et mis en page avec les ateliers que vous avez sous la main —{' '}
-            <a href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="underline" style={{ color: C.teal }}>
-              voir la page auteur Amazon
+      {/* Premier écran : promesse claire + essai gratuit */}
+      <section className="px-4 pt-10 pb-12 text-center md:pt-16" style={{ background: 'radial-gradient(circle at 50% 0%, #1e293b 0%, #0b1120 65%)' }}>
+        <p className="font-semibold tracking-widest uppercase mb-3 text-sm" style={{ color: C.orange }}>EbookStudio V3 Premium</p>
+        <h1 className="mx-auto max-w-4xl text-3xl md:text-6xl font-extrabold leading-tight">Écrivez le premier chapitre de votre livre avec EbookStudio</h1>
+        <p className="mx-auto mt-5 max-w-2xl text-base md:text-lg" style={{ color: C.muted }}>Partez d’une idée ou d’un sommaire. Structurez votre livre et avancez chapitre par chapitre, en gardant la main sur votre texte.</p>
+        <div className="mt-7 flex flex-col items-center gap-3">
+          <a href="/essai" onClick={() => void trackCaptureEvent('v3', 'click')} className="inline-block w-full max-w-md rounded-xl px-6 py-4 text-lg font-bold" style={{ background: C.orange, color: '#111827' }}>Essayer mon premier chapitre gratuitement</a>
+          <p className="max-w-md text-sm" style={{ color: C.muted }}>Vous obtenez un titre, un sommaire et le début de votre premier chapitre. Gratuit, sans carte bancaire ; votre e-mail est demandé pour lire l’extrait complet.</p>
+          <a href="#formules" className="text-sm font-semibold underline" style={{ color: C.teal }}>Voir les formules</a>
+        </div>
+        <div className="mx-auto mt-10 max-w-5xl grid grid-cols-4 md:grid-cols-8 gap-2 md:gap-3">
+          {COVERS.map((src, i) => (
+            <a key={src} href={AUTHOR_AMAZON_URL} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg" style={{ border: '1px solid #1f2a44' }}>
+              <img src={src} alt={`Livre ${i + 1} de Georges Boubet publié sur Amazon`} loading="lazy" className="aspect-[2/3] w-full object-cover" />
             </a>
-          </p>
+          ))}
         </div>
       </section>
 
-      {/* Introduction éditoriale : d'une idée à un livre */}
-      <section className="px-4 py-14 mx-auto max-w-3xl">
-        <h2 className="text-3xl md:text-4xl font-bold text-center">D'une idée à un livre prêt pour Amazon</h2>
-        <div className="mt-6 space-y-4 text-lg leading-relaxed" style={{ color: C.muted }}>
-          <p>
-            Tout commence par une idée : un roman qui vous trotte dans la tête, un savoir-faire à transmettre,
-            une histoire à raconter aux enfants. Ensuite, la réalité reprend ses droits — la page blanche,
-            la mise en page, la couverture aux bonnes dimensions, les catégories Amazon à choisir.
-          </p>
-          <p>
-            EbookStudio V3 rassemble ces étapes dans un seul atelier : écrire avec l'aide de spécialistes IA,
-            créer la couverture Kindle ou broché, illustrer, traduire, puis préparer sereinement votre
-            publication KDP. L'IA vous aide à aller plus vite ; vous restez l'auteur, et c'est vous qui
-            relisez, validez et publiez chaque livre sur votre propre compte Amazon.
-          </p>
+      {/* EbookStudio en action */}
+      <section className="px-4 py-14 mx-auto max-w-6xl">
+        <h2 className="text-center text-3xl md:text-4xl font-bold">EbookStudio en action</h2>
+        <div className="mt-8 grid gap-4 md:grid-cols-3">
+          {[
+            ['1. Une idée de départ', '« Un roman policier dans un village breton où le boulanger disparaît la nuit de Noël. »'],
+            ['2. Un sommaire', 'La Nuit du boulanger : Le four est resté froid · Les rumeurs du port · La farine sur la lande…'],
+            ['3. Le premier chapitre', '« Le matin de Noël, pour la première fois depuis trente ans, l’odeur du pain ne monta pas sur Locmaria… »'],
+          ].map(([t, d]) => (
+            <div key={t} className="rounded-2xl p-6" style={{ background: C.card, border: '1px solid #1f2a44' }}>
+              <h3 className="font-bold text-lg" style={{ color: C.orange }}>{t}</h3>
+              <p className="mt-2" style={{ color: C.muted }}>{d}</p>
+            </div>
+          ))}
         </div>
-      </section>
-
-      {/* Constat */}
-      <section className="px-4 py-14 mx-auto max-w-6xl grid md:grid-cols-2 gap-6">
-        <div className="rounded-2xl p-8" style={{ background: '#2a1215', border: '1px solid #7f1d1d' }}>
-          <h2 className="text-2xl font-bold mb-4">❌ Écrire seul en 2026</h2>
-          <ul className="space-y-2" style={{ color: C.muted }}>
-            <li>Des semaines bloqué devant la page blanche</li><li>Des heures de marges sous Word</li><li>Des couvertures refusées par Amazon</li><li>Plusieurs abonnements à payer en parallèle</li>
-          </ul>
-        </div>
-        <div className="rounded-2xl p-8" style={{ background: '#0f2a2a', border: `1px solid ${C.teal}` }}>
-          <h2 className="text-2xl font-bold mb-4">✅ Avec EbookStudio V3</h2>
-          <ul className="space-y-2" style={{ color: C.muted }}>
-            <li>Des spécialistes IA qui vous guident du plan au manuscrit</li><li>Des exports au format KDP</li><li>Des couvertures Kindle et broché</li><li>Traduction, audio et outils Amazon au même endroit</li>
-          </ul>
+        <div className="mt-8 grid gap-6 md:grid-cols-2 md:items-center">
+          <img src={essaiResultat.url} alt="Capture de l’essai gratuit EbookStudio : sommaire et extrait du premier chapitre" loading="lazy" className="w-full rounded-2xl" style={{ border: '1px solid #1f2a44' }} />
+          <blockquote className="rounded-2xl p-6 text-lg leading-relaxed" style={{ background: C.card, borderLeft: `4px solid ${C.orange}`, color: C.text }}>
+            « Je suis Georges Boubet, auteur. J’ai créé EbookStudio pour vous aider à transformer une idée en manuscrit, tout en gardant la main sur votre texte. »
+          </blockquote>
         </div>
       </section>
 
