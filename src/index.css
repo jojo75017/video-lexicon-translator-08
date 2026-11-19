@@ -817,3 +817,6 @@ a:hover {
 /* Bulles de BD : toujours blanches à texte noir, comme un album imprimé */
 .comic-bubble { background: #ffffff; color: #111111; border-color: #111111; }
 .comic-bubble-tail { border-left: 7px solid transparent; border-right: 7px solid transparent; border-top: 10px solid #111111; }
+
+/* Sales page light cards sit inside the dark site wrapper: keep their lists dark-on-light. */
+.v3-dark-page .fp-light-list li{color:#1e293b !important}

@@ -47,6 +47,15 @@ const bonus: [string, string, string, number][] = [
   ['📖 Atelier roman et fiction longue','Toutes les formules','Intrigues cohérentes jusqu’à 240 pages et plus : mémoire des personnages, aucune scène rejouée, aucune scorie.',97],
   ['🧸 Album illustré jeunesse 3–6 ans','Toutes les formules','La méthode pas à pas pour l’une des niches les plus vendues et les plus fidèles d’Amazon.',67],
 ];
+const outilsInscription: [string, string[]][] = [
+  ['🚀 Démarrer', ['Clés API, première étape', 'Commence ici : 25 agents', 'Fonctionnalités (12 modules)', 'Workflow 15 agents pour écrire votre livre', 'Kit de démarrage (PDF)', 'Nouveautés']],
+  ['✍️ Écrire', ['Lancer mon livre (fiche + 15 agents)', 'Biographie : le récit de votre vie', 'Ebookstudio-Génie', 'Sommaire IA en dialogue', 'Table des matières', 'Roman et thriller en 15 agents', 'Studio Pro (Gemini + ChatGPT)', 'ContentStudio : du livre à la vidéo', 'Livres de jeux et énigmes', 'Coloriages Cherche et Trouve', 'BD et albums', 'Album illustré 3-6 ans', 'Histoires courtes et contes', 'Histoires du soir 3-7 ans', 'Corriger mon livre', 'HumanizeAI', 'Éditeur de texte', 'Traduction en 10 à 15 langues']],
+  ['📚 Livres spéciaux', ['VC Books : livres humoristiques', 'Guides illustrés de A à Z']],
+  ['🔎 Amazon KDP', ['Studio Recherche KDP', 'Recherche de mots-clés', 'Espion Amazon (ASIN)', 'Longue traîne', '7 mots-clés backend', 'Description KDP', '3 catégories KDP', 'Bio auteur', 'Contenu A+ Amazon', 'Audit KDP Pilot', 'Niches rentables', '600 niches']],
+  ['🎨 Habiller et publier', ['Studio de couverture', 'Mockups 3D', 'Livre audio (voix naturelles)', 'Calculateur de royalties', 'Outils offerts', 'Mes livres et livres corrigés', 'Page de présentation de votre livre']],
+  ['📣 Vendre', ['Plan 14 jours pour trouver des lecteurs', '30 jours de posts prêts', 'Obtenir des avis clients', 'Script vidéo HeyGen']],
+  ['🎓 Apprendre', ['Tutoriels de A à Z', 'Formation vidéo', 'Masterclass', 'Blog EbookStudio']],
+];
 const bonusTotal = bonus.reduce((t, x) => t + x[3], 0) + 67;
 const profils = [
   ['Profil 1', 'Vous cherchez un complément de revenu', 'Décorrélez votre temps de votre argent. En publiant régulièrement sur des thématiques porteuses, vous créez de véritables « actifs numériques » qui travaillent pour vous sur Amazon, même pendant que vous dormez.'],
@@ -250,6 +259,19 @@ export default function FormulesPubliquesPage() {
       </div>
     </Dark>
 
+    {/* OUTILS INCLUS */}
+    <Light>
+      <Kicker>Votre atelier</Kicker>
+      <H2>Voici ce que vous aurez en vous inscrivant</H2>
+      <Lead>Tous les outils de votre espace EbookStudio, rangés comme dans votre menu, de l’idée jusqu’à la vente.</Lead>
+      <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {outilsInscription.map(([cat, items]) => <div key={cat} className="rounded-2xl p-6 shadow-lg" style={{ background: BLANC, border: '2px solid #e2e8f0' }}>
+          <div className="mb-3 text-lg font-extrabold" style={{ color: ENCRE }}>{cat}</div>
+          <ul className="fp-light-list space-y-1.5">{items.map((it) => <li key={it} className="flex gap-2 text-base" style={{ color: '#1e293b', opacity: 1 }}><span style={{ color: '#047857' }}>✓</span>{it}</li>)}</ul>
+        </div>)}
+      </div>
+    </Light>
+
     {/* BONUS */}
     <Light>
       <Kicker>Vos bonus</Kicker>
@@ -257,11 +279,18 @@ export default function FormulesPubliquesPage() {
       <Lead>La partie que tout le monde adore : des outils et un accompagnement qui font gagner des semaines de travail.</Lead>
       <div className="mt-10 rounded-2xl p-8 shadow-xl" style={{ background: '#fff7ed', border: `3px dashed ${OR}` }}>
         <div className="text-sm font-bold uppercase tracking-widest" style={{ color: '#b91c1c' }}>🎄 Cadeau de Noël · Toutes les formules</div>
-        <H3 color={ENCRE}>🌐 Créer la page de présentation de votre livre</H3>
-        <P>Transformez chaque lecteur en abonné fidèle : une page de présentation élégante pour votre livre, avec un décor selon son genre (jeunesse, thriller, romance, policier, western…), couverture, extrait, boutons Amazon Kindle et broché, et formulaire pour récupérer les e-mails de vos lecteurs. Vous possédez enfin votre audience. Exemple réel : ebookstudio.fr/livre/el-cuervo</P>
+        <H3 color={ENCRE}>🌐 Créer la page de vente de votre livre</H3>
+        <P>Transformez chaque lecteur en abonné fidèle. Voici ce que vous allez recevoir :</P>
+        <ul className="fp-light-list mt-3 space-y-2 text-base" style={{ color: '#334155' }}>
+          <li style={{ color: '#1e293b', opacity: 1 }}>✓ <b style={{ color: '#0f172a' }}>La page de vente complète de votre livre, créée en 1 clic</b> depuis « Mes livres » : titre, présentation, extrait et couverture se remplissent tout seuls. Aucune connaissance technique, votre page est prête en quelques minutes.</li>
+          <li style={{ color: '#1e293b', opacity: 1 }}>✓ <b style={{ color: '#0f172a' }}>12 décors selon le genre</b> de votre livre : jeunesse, thriller, romance, policier, western, fantasy, science-fiction…</li>
+          <li style={{ color: '#1e293b', opacity: 1 }}>✓ <b style={{ color: '#0f172a' }}>Des boutons d’achat Amazon</b> Kindle et broché : il suffit d’ajouter les ASIN de votre livre.</li>
+          <li style={{ color: '#1e293b', opacity: 1 }}>✓ <b style={{ color: '#0f172a' }}>L’intelligence artificielle pour les textes</b>, les descriptions et les images de votre page.</li>
+          <li style={{ color: '#1e293b', opacity: 1 }}>✓ <b style={{ color: '#0f172a' }}>La capture d’e-mails</b> qui transforme vos lecteurs en communauté engagée, avec export de la liste.</li>
+        </ul>
+        <P>Vous possédez enfin votre audience, et vous pouvez la faire vivre à chaque nouveau livre, pas seulement une fois. Exemple réel : ebookstudio.fr/livre/el-cuervo</P>
         <div className="mt-4 text-lg font-extrabold" style={{ color: ENCRE }}>Valeur : <span style={{ textDecoration: 'line-through', color: '#b91c1c' }}>67 €</span> <span style={{ color: '#047857' }}>OFFERT pour vous</span></div>
-        <div className="mt-2 text-sm" style={{ color: '#475569' }}>Création automatique en 1 clic depuis « Mes livres » : il suffit d’ajouter les ASIN Amazon de votre livre (Kindle et broché) pour activer les boutons d’achat.</div>
-      </div>
+              </div>
       <div className="mt-10 grid gap-6 md:grid-cols-3">
         {bonus.map(([t, f, d, v], i) => <div key={t} className="rounded-2xl p-7 shadow-lg" style={{ background: i === 0 ? '#fff7ed' : BLANC, border: `2px solid ${i === 0 ? OR : '#e2e8f0'}` }}>
           <div className="mb-2 text-sm font-bold uppercase tracking-widest" style={{ color: '#008296' }}>Bonus {i + 1} · {f}</div>
@@ -271,6 +300,7 @@ export default function FormulesPubliquesPage() {
       <div className="mt-10 rounded-2xl p-8 text-center shadow-xl" style={{ background: NUIT, border: `3px solid ${OR}` }}>
         <div className="text-2xl md:text-3xl font-extrabold" style={{ color: BLANC }}>Valeur totale des bonus : <span style={{ textDecoration: 'line-through', color: OR }}>{bonusTotal} €</span> → <span style={{ color: OR }}>0 €</span> avec votre abonnement</div>
         <div className="mt-3 text-lg" style={{ color: '#e2e8f0' }}>En rejoignant EbookStudio aujourd’hui, vous recevez {bonusTotal} € d’outils, de ressources et d’accompagnement offerts.</div>
+        <div className="mt-5 text-xl font-extrabold" style={{ color: OR }}>🎓 Tous les tutoriels de A à Z : vous ne pouvez en aucun cas vous tromper.</div>
       </div>
     </Light>
 

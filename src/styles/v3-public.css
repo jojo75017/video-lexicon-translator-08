@@ -1075,3 +1075,6 @@ details.v3-genie-more > summary { color: #E6F4F1 !important; }
 .book-site .bs-book-title{font-family:var(--bs-display,inherit);font-size:2.1rem;line-height:1.05;font-weight:800}
 .book-site .bs-book-sub{margin-top:-30%;font-size:1rem;opacity:.9}
 .book-site .bs-book-author{font-size:1.05rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:hsl(var(--bs-accent)) !important}
+
+/* Sales page light cards sit inside the dark site wrapper: keep their lists dark-on-light. */
+.v3-dark-page .fp-light-list li{color:#1e293b !important}
