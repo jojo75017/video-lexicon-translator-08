@@ -229,6 +229,8 @@ const V3OutilsOffertsPage = lazy(() => import('./pages/v3public/V3OutilsOffertsP
 const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
 const FormulesPubliquesPage = lazy(() => import("./pages/FormulesPubliquesPage"));
 const ElCuervoBookSite = lazy(() => import("./pages/livre/ElCuervoBookSite"));
+const BookSitePage = lazy(() => import("./pages/livre/BookSitePage"));
+const V3BookSiteEditorPage = lazy(() => import("./pages/v3public/V3BookSiteEditorPage"));
 const V3PremiumVentePage = lazy(() => import("./pages/V3PremiumVentePage"));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 const V3PlansPage = lazy(() => import('./pages/v3public/V3PlansPage'));
@@ -612,6 +614,7 @@ const App = () => {
             <Route path="/paiement-mensuel" element={<AbonnementMensuelPaiementPage />} />
             <Route path="/formules" element={<FormulesPubliquesPage />} />
             <Route path="/livre/el-cuervo" element={<ElCuervoBookSite />} />
+            <Route path="/livre/:slug" element={<BookSitePage />} />
             <Route path="/v3-premium" element={<V3PremiumVentePage />} />
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
@@ -870,6 +873,7 @@ const App = () => {
               <Route path="gallery" element={<V3LockedGate><TrialGate label="Galerie publique"><V3GalleryPage /></TrialGate></V3LockedGate>} />
               <Route path="auteur" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3GuestAuthorPage /></TrialGate></V3LockedGate>} />
               <Route path="u/:slug" element={<V3LockedGate><TrialGate label="Profil auteur public"><V3AuthorProfilePage /></TrialGate></V3LockedGate>} />
+              <Route path="site-livre/:projectId" element={<V3LockedGate><V3BookSiteEditorPage /></V3LockedGate>} />
               <Route path="mes-livres" element={<V3LockedGate><PageHeroImage src={mesLivresHero} alt="Ma bibliothèque" /><V3BookManagerPage /></V3LockedGate>} />
               <Route path="livres-corriges" element={<V3LockedGate><PageHeroImage src={mesLivresHero} alt="Ma bibliothèque" /><V3BookManagerPage /></V3LockedGate>} />
               <Route path="donnees-kdp" element={<V3PaidModuleRoute><V3KdpDataPage /></V3PaidModuleRoute>} />

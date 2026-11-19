@@ -304,7 +304,7 @@ export default function V3BookManagerPage() {
                     <Globe className="w-3.5 h-3.5" /> Voir le site web
                   </button>
                 ) : (
-                  <button onClick={() => toast.info('Création automatique du site bientôt disponible pour ce livre.')} className="v3-btn v3-btn-outline text-xs">
+                  <button onClick={() => nav(`/v3/site-livre/${b.id}`)} className="v3-btn v3-btn-outline text-xs">
                     <Globe className="w-3.5 h-3.5" /> Créer le site du livre
                   </button>
                 )}
