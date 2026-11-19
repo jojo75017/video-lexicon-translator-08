@@ -228,6 +228,7 @@ const V3CompetitorSpyPage = lazy(() => import('./pages/v3public/V3CompetitorSpyP
 const V3OutilsOffertsPage = lazy(() => import('./pages/v3public/V3OutilsOffertsPage'));
 const V3CategoryFinderPage = lazy(() => import('./pages/v3public/V3CategoryFinderPage'));
 const FormulesPubliquesPage = lazy(() => import("./pages/FormulesPubliquesPage"));
+const ElCuervoBookSite = lazy(() => import("./pages/livre/ElCuervoBookSite"));
 const V3PremiumVentePage = lazy(() => import("./pages/V3PremiumVentePage"));
 const V3ForfaitsPage = lazy(() => import('./pages/v3public/V3ForfaitsPage'));
 const V3PlansPage = lazy(() => import('./pages/v3public/V3PlansPage'));
@@ -610,6 +611,7 @@ const App = () => {
             <Route path="/paiement-offre" element={<NouvelleOffrePaiementPage />} />
             <Route path="/paiement-mensuel" element={<AbonnementMensuelPaiementPage />} />
             <Route path="/formules" element={<FormulesPubliquesPage />} />
+            <Route path="/livre/el-cuervo" element={<ElCuervoBookSite />} />
             <Route path="/v3-premium" element={<V3PremiumVentePage />} />
             <Route path="/oto/edition-pro" element={<V3OtoEditionProPage />} />
             <Route path="/paiement-manuel" element={<PaiementManuelPage />} />
