@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2, BarChart3 } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2, BarChart3, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
@@ -299,6 +299,15 @@ export default function V3BookManagerPage() {
                 <button onClick={() => nav(`${draftMode(b.draft_state) === 'biography' ? '/v3/biographie' : '/v3/create'}?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Ouvrir le livre
                 </button>
+                {/cuervo/i.test(b.title || '') ? (
+                  <button onClick={() => window.open('/livre/el-cuervo', '_blank', 'noopener')} className="v3-btn v3-btn-primary text-xs">
+                    <Globe className="w-3.5 h-3.5" /> Voir le site web
+                  </button>
+                ) : (
+                  <button onClick={() => toast.info('Création automatique du site bientôt disponible pour ce livre.')} className="v3-btn v3-btn-outline text-xs">
+                    <Globe className="w-3.5 h-3.5" /> Créer le site du livre
+                  </button>
+                )}
                 <button onClick={() => nav(`/v3/outils/mockup-3d?titre=${encodeURIComponent(b.title || '')}`)} className="v3-btn v3-btn-outline text-xs">🖼️ Créer un mockup 3D</button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>
