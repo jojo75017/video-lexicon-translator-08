@@ -28,7 +28,14 @@ export function BookSiteView({ site, preview = false }: { site: Site; preview?: 
     <main className="book-site min-h-screen" data-theme={site.theme}>
       <section className="bs-hero px-5 py-16 md:py-24" style={{ backgroundImage: `url(${BOOK_SITE_BACKGROUNDS[site.theme as BookSiteTheme] || BOOK_SITE_BACKGROUNDS.clair})` }}><div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
         {site.cover_url ? <img src={site.cover_url} alt={`Couverture du livre ${site.title}`} className="bs-cover mx-auto w-full max-w-sm rounded-md" />
-          : <div className="bs-cover bs-muted mx-auto flex aspect-[2/3] w-full max-w-sm items-center justify-center rounded-md p-6 text-center text-3xl font-bold">{site.title}</div>}
+          : <div className="bs-book mx-auto w-full max-w-sm" role="img" aria-label={`Livre ${site.title}`}>
+            <div className="bs-book-front" style={{ backgroundImage: `url(${BOOK_SITE_BACKGROUNDS[site.theme as BookSiteTheme] || BOOK_SITE_BACKGROUNDS.clair})` }}>
+              <div className="bs-book-shade" />
+              <p className="bs-book-title">{site.title}</p>
+              {site.subtitle && <p className="bs-book-sub">{site.subtitle}</p>}
+              {site.author_name && <p className="bs-book-author">{site.author_name}</p>}
+            </div>
+          </div>}
         <div className="bs-hero-panel">
           <h1 className="mb-3 text-4xl font-extrabold leading-tight md:text-5xl">{site.title}</h1>
           {site.subtitle && <p className="bs-sub mb-3 text-xl">{site.subtitle}</p>}

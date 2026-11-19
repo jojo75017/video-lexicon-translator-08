@@ -1064,3 +1064,14 @@ details.v3-genie-more > summary { color: #E6F4F1 !important; }
 .book-site .bs-cover:hover{transform:perspective(1200px) rotateY(0)}
 .book-site .bs-btn{box-shadow:0 10px 25px -8px hsl(var(--bs-accent)/.7);transition:transform .2s}
 .book-site .bs-btn:hover{transform:translateY(-2px)}
+
+/* Generated 3D book when no cover image exists yet: built from the genre scene, title and author. */
+.book-site .bs-book{perspective:1400px}
+.book-site .bs-book-front{position:relative;aspect-ratio:2/3;background-size:cover;background-position:center;border-radius:3px 8px 8px 3px;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;padding:2.2rem 1.6rem;text-align:center;transform:rotateY(-18deg);transform-style:preserve-3d;box-shadow:-14px 0 0 -2px hsl(0 0% 0%/.55),0 35px 60px -15px hsl(0 0% 0%/.8);transition:transform .5s}
+.book-site .bs-book-front:hover{transform:rotateY(-6deg)}
+.book-site .bs-book-front::after{content:"";position:absolute;inset:0 auto 0 0;width:14px;background:linear-gradient(90deg,hsl(0 0% 0%/.45),hsl(0 0% 100%/.15),transparent)}
+.book-site .bs-book-shade{position:absolute;inset:0;background:linear-gradient(180deg,hsl(0 0% 0%/.6) 0%,hsl(0 0% 0%/.1) 45%,hsl(0 0% 0%/.75) 100%)}
+.book-site .bs-book-title,.book-site .bs-book-sub,.book-site .bs-book-author{position:relative;color:hsl(0 0% 100%) !important;text-shadow:0 2px 12px hsl(0 0% 0%/.8)}
+.book-site .bs-book-title{font-family:var(--bs-display,inherit);font-size:2.1rem;line-height:1.05;font-weight:800}
+.book-site .bs-book-sub{margin-top:-30%;font-size:1rem;opacity:.9}
+.book-site .bs-book-author{font-size:1.05rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:hsl(var(--bs-accent)) !important}
