@@ -1,6 +1,5 @@
 import V3PricingOverview from '@/components/v3public/V3PricingOverview';
 import { usePageMeta } from '@/hooks/usePageMeta';
-import mockup from '@/assets/vente-mockup-3d.jpg';
 import livre1 from '@/assets/vitrine/livre-1.avif.asset.json';
 import livre2 from '@/assets/vitrine/livre-2.avif.asset.json';
 import livre3 from '@/assets/vitrine/livre-3.avif.asset.json';
@@ -129,7 +128,11 @@ export default function FormulesPubliquesPage() {
             <div>✅ Paiement sécurisé Stripe</div><div>✅ Sans engagement, dès 19 €/mois</div><div>✅ Séance d’accueil de 30 min avec Georges</div>
           </div>
         </div>
-        <img src={mockup} alt="Livre EbookStudio présenté en mockup 3D" className="w-full rounded-3xl shadow-2xl" width={1080} height={1080} />
+        <div className="overflow-hidden rounded-3xl py-6" style={{ background: 'rgba(255,255,255,0.04)' }}>
+          <div className="fp-marquee flex w-max gap-5">
+            {[...vitrine, ...vitrine].map((src, i) => <img key={i} src={src} alt="Couverture d’un livre publié avec EbookStudio" className="h-80 w-auto rounded-lg shadow-2xl md:h-96" />)}
+          </div>
+        </div>
       </div>
     </section>
 
@@ -285,6 +288,9 @@ export default function FormulesPubliquesPage() {
         {outilsInscription.map(([ic, cat]) => <div key={cat} className="flex items-center gap-3 rounded-2xl p-5 shadow-lg" style={{ background: BLANC, border: '2px solid #e2e8f0' }}>
           <span className="text-3xl">{ic}</span><span className="text-xl font-extrabold" style={{ color: ENCRE }}>{cat}</span>
         </div>)}
+        <div className="flex items-center gap-3 rounded-2xl p-5 shadow-lg sm:col-span-2 lg:col-span-2" style={{ background: '#fff7ed', border: `2px solid ${OR}` }}>
+          <span className="text-3xl">✨</span><span className="text-xl font-extrabold" style={{ color: ENCRE }}>Vous en découvrirez d’autres encore, je ne peux pas tout mettre ! À votre succès d’auteur !</span>
+        </div>
       </div>
     </Light>
 
