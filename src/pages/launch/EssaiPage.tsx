@@ -138,6 +138,7 @@ export default function EssaiPage() {
   const [chapterLoading, setChapterLoading] = useState(false);
 
   const [email, setEmail] = useState('');
+  const emailRef = useRef<HTMLInputElement>(null);
   const [claiming, setClaiming] = useState(false);
   const [claimed, setClaimed] = useState(false);
   const [fullChapter, setFullChapter] = useState<string | null>(null);
@@ -187,6 +188,11 @@ export default function EssaiPage() {
       toast.error('Décrivez votre idée en une phrase au minimum.');
       return;
     }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      toast.error('Entrez votre e-mail pour lancer l’essai gratuit.');
+      emailRef.current?.focus();
+      return;
+    }
     setGenerating(true);
     void track('generate_click', params);
     try {
@@ -208,6 +214,7 @@ export default function EssaiPage() {
       try {
         const ch = (await invoke({ action: 'chapter', trialId: data.trialId })) as ChapterResult;
         setChapter(ch);
+        void claim(data.trialId, data);
         if (!wallSeen.current) {
           wallSeen.current = true;
           void track('wall_shown', params);
@@ -224,8 +231,9 @@ export default function EssaiPage() {
     }
   };
 
-  const claim = async () => {
-    if (!outlineResult) return;
+  const claim = async (tid?: string, o?: OutlineResult) => {
+    const res = o ?? outlineResult;
+    if (!res) return;
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       toast.error('Merci de saisir un email valide.');
       return;
@@ -234,7 +242,7 @@ export default function EssaiPage() {
     try {
       const data = (await invoke({
         action: 'claim',
-        trialId: outlineResult.trialId,
+        trialId: tid ?? res.trialId,
         email: email.trim(),
       })) as { chapter?: string; chapterTitle?: string; wordCount?: number };
       try {
@@ -247,14 +255,14 @@ export default function EssaiPage() {
       setClaimed(true);
       try {
         const blob = buildTrialPdf({
-          title: outlineResult.title,
-          subtitle: outlineResult.subtitle,
-          outline: outlineResult.outline,
+          title: res.title,
+          subtitle: res.subtitle,
+          outline: res.outline,
           chapterTitle: data.chapterTitle || chapter?.chapterTitle || 'Chapitre 1',
           chapterText: data.chapter ?? '',
         });
         setPdfBlob(blob);
-        downloadBlob(blob, `${slugify(outlineResult.title)}.pdf`);
+        downloadBlob(blob, `${slugify(res.title)}.pdf`);
         void track('pdf_downloaded', params);
       } catch (err) {
         console.error('PDF', err);
@@ -362,9 +370,21 @@ export default function EssaiPage() {
                     className="mt-2 w-full rounded-lg border-0 bg-white px-3 py-3 text-base font-normal leading-relaxed text-[#1E2533] focus:outline-none focus:ring-2"
                   />
                 </label>
+                <label className="block text-sm font-semibold text-white/90">
+                  Votre e-mail (obligatoire pour recevoir votre début de livre)
+                  <input
+                    ref={emailRef}
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="vous@exemple.fr"
+                    className="mt-2 w-full rounded-lg border-0 bg-white px-3 py-3 text-base font-normal text-[#1E2533] focus:outline-none focus:ring-2"
+                  />
+                </label>
                 {ctaButton(() => void generate())}
                 <p className="text-center text-sm text-white/80" aria-live="polite">
-                  {generating ? `Étape ${genStep + 1}/3 · environ 20 secondes, restez sur la page.` : 'Aperçu gratuit, sans e-mail ni carte bancaire.'}
+                  {generating ? `Étape ${genStep + 1}/3 · environ 20 secondes, restez sur la page.` : 'Essai gratuit, sans carte bancaire. Votre chapitre et votre PDF vous sont envoyés par e-mail.'}
                 </p>
                 <button type="button" onClick={() => setShowAdvanced((v) => !v)} className="flex w-full items-center justify-center gap-1 text-xs font-semibold" style={{ color: GOLD }}>
                   <ChevronDown className={`h-3.5 w-3.5 transition ${showAdvanced ? 'rotate-180' : ''}`} /> Affiner (public, ton, langue) facultatif
@@ -636,7 +656,7 @@ export default function EssaiPage() {
                         />
                         <button
                           type="button"
-                          onClick={claim}
+                          onClick={() => void claim()}
                           disabled={claiming}
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#0F2E1F] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#14532D] disabled:opacity-60"
                         >
