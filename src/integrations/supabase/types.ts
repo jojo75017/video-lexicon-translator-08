@@ -762,6 +762,66 @@ export type Database = {
         }
         Relationships: []
       }
+      book_sites: {
+        Row: {
+          amazon_kindle_url: string | null
+          amazon_paperback_url: string | null
+          author_name: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          excerpt: string | null
+          excerpt_title: string | null
+          id: string
+          project_id: string | null
+          published: boolean
+          slug: string
+          subtitle: string | null
+          theme: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amazon_kindle_url?: string | null
+          amazon_paperback_url?: string | null
+          author_name?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          excerpt?: string | null
+          excerpt_title?: string | null
+          id?: string
+          project_id?: string | null
+          published?: boolean
+          slug: string
+          subtitle?: string | null
+          theme?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amazon_kindle_url?: string | null
+          amazon_paperback_url?: string | null
+          author_name?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          excerpt?: string | null
+          excerpt_title?: string | null
+          id?: string
+          project_id?: string | null
+          published?: boolean
+          slug?: string
+          subtitle?: string | null
+          theme?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       book_testimonials: {
         Row: {
           approved: boolean
