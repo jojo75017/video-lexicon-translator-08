@@ -48,8 +48,11 @@ const bonus: [string, string, string, number][] = [
   ['🧸 Album illustré jeunesse 3–6 ans','Toutes les formules','La méthode pas à pas pour l’une des niches les plus vendues et les plus fidèles d’Amazon.',67],
 ];
 const outilsInscription: [string, string][] = [
-  ['🚀', 'Démarrer'], ['✍️', 'Créer un livre'], ['📚', 'Livres spéciaux'], ['🔎', 'Recherche KDP'],
-  ['🎨', 'Habiller & exporter'], ['📖', 'Mes livres'], ['📣', 'Vendre'], ['🎓', 'Apprendre'], ['🛟', 'Support'],
+  ['🔑', 'Clés API · première étape'], ['🚀', 'Commence ici'], ['📚', 'Bibliothèque / Mes livres'], ['🎁', 'Mes cadeaux'],
+  ['🎬', 'Tutoriels de A à Z'], ['🧰', 'Tous les outils V3'], ['📝', 'Révision éditoriale'], ['🌍', 'Traducteur d’Ebooks'],
+  ['🖼️', 'Création d’eBook illustré'], ['🎧', 'Livres audio'], ['💡', 'Créer'], ['✍️', 'Écrire'], ['🎨', 'Habiller'],
+  ['🔎', 'Ebookstudio KDP'], ['📤', 'Publier'], ['📣', 'Vendre'], ['📖', 'Livres spéciaux'], ['💎', 'Nos offres'],
+  ['🛟', 'Mon abonnement & aide'],
 ];
 const bonusTotal = bonus.reduce((t, x) => t + x[3], 0) + 67;
 const profils = [
