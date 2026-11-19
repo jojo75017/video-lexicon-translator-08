@@ -1,17 +1,33 @@
-export type BookSiteTheme = 'clair' | 'litteraire' | 'doux' | 'sombre';
+export type BookSiteTheme = 'clair' | 'litteraire' | 'doux' | 'sombre' | 'jeunesse' | 'policier' | 'western' | 'fantasy' | 'sf' | 'horreur' | 'aventure' | 'bienetre';
 
-export const BOOK_SITE_THEMES: { id: BookSiteTheme; label: string; hint: string }[] = [
-  { id: 'clair', label: 'Clair & moderne', hint: 'Guides, business, pratique' },
-  { id: 'litteraire', label: 'Littéraire & papier', hint: 'Romans, sagas, histoire' },
-  { id: 'doux', label: 'Doux & chaleureux', hint: 'Jeunesse, bien-être, romance' },
-  { id: 'sombre', label: 'Cinéma & mystère', hint: 'Thriller, polar, fantasy' },
+export const BOOK_SITE_THEMES: { id: BookSiteTheme; label: string; hint: string; emoji: string }[] = [
+  { id: 'jeunesse', label: 'Jeunesse', hint: 'Contes, albums, enfants', emoji: '🧸' },
+  { id: 'sombre', label: 'Thriller', hint: 'Suspense, nuit, néons', emoji: '🔪' },
+  { id: 'doux', label: 'Romance', hint: 'Amour, émotion', emoji: '🌹' },
+  { id: 'policier', label: 'Policier', hint: 'Enquête, film noir', emoji: '🕵️' },
+  { id: 'western', label: 'Western', hint: 'Désert, cow-boys, justiciers', emoji: '🤠' },
+  { id: 'fantasy', label: 'Fantasy', hint: 'Magie, royaumes', emoji: '🐉' },
+  { id: 'sf', label: 'Science-fiction', hint: 'Espace, futur', emoji: '🚀' },
+  { id: 'horreur', label: 'Horreur', hint: 'Frissons, fantômes', emoji: '👻' },
+  { id: 'aventure', label: 'Aventure', hint: 'Jungle, trésors', emoji: '🗺️' },
+  { id: 'litteraire', label: 'Historique', hint: 'Sagas, romans d’époque', emoji: '📜' },
+  { id: 'bienetre', label: 'Bien-être', hint: 'Développement personnel', emoji: '🌿' },
+  { id: 'clair', label: 'Guide pratique', hint: 'Business, méthode', emoji: '💼' },
 ];
 
 const RULES: [BookSiteTheme, RegExp][] = [
-  ['sombre', /thriller|polar|policier|crime|meurtre|enqu[eê]te|myst[eè]re|horreur|fantasy|fantastique|vampire|sombre|suspense|noir|masqu/i],
-  ['doux', /enfant|jeunesse|conte|album|b[ée]b[ée]|bien[- ]?[êe]tre|d[ée]veloppement personnel|romance|amour|m[ée]ditation|famille|cuisine|recette/i],
-  ['clair', /guide|m[ée]thode|business|argent|marketing|entreprise|pratique|apprendre|comment|manuel|formation|productivit/i],
-  ['litteraire', /roman|saga|historique|biographie|m[ée]moires|po[ée]sie|litt[ée]rat/i],
+  ['jeunesse', /enfant|jeunesse|conte|album|b[ée]b[ée]|3[- ]?6 ans|histoires? du soir|doudou/i],
+  ['western', /western|cow-?boy|far[- ]?west|shérif|sh[ée]rif|zorro|cuervo|justicier|ranch|apache|mexique/i],
+  ['horreur', /horreur|zombie|fant[ôo]me|hant[ée]|d[ée]mon|vampire|terreur/i],
+  ['sf', /science[- ]?fiction|espace|galax|plan[èe]te|robot|futur|cyber|vaisseau|androïde/i],
+  ['fantasy', /fantasy|dragon|magie|sorci|elfe|royaume|fantastique|mage/i],
+  ['policier', /policier|enqu[eê]te|d[ée]tective|inspecteur|commissaire|meurtre|crime|polar/i],
+  ['sombre', /thriller|suspense|myst[eè]re|secr[eè]te?|complot|noir|traque|amn[ée]sie/i],
+  ['doux', /romance|amour|passion|c[œo]ur|mariage|coup de foudre/i],
+  ['aventure', /aventure|tr[ée]sor|jungle|exp[ée]dition|pirate|voyage|[îi]le/i],
+  ['bienetre', /bien[- ]?[êe]tre|d[ée]veloppement personnel|m[ée]ditation|confiance|bonheur|sant[ée]|yoga/i],
+  ['clair', /guide|m[ée]thode|business|argent|marketing|entreprise|pratique|apprendre|comment|manuel|formation|productivit|cuisine|recette/i],
+  ['litteraire', /roman|saga|historique|biographie|m[ée]moires|po[ée]sie|litt[ée]rat|si[eè]cle|guerre/i],
 ];
 
 /** Picks a theme from the book's own words; never black by default. */

@@ -1,0 +1,2 @@
+DO $$ DECLARE c text; BEGIN SELECT conname INTO c FROM pg_constraint WHERE conrelid='public.book_sites'::regclass AND pg_get_constraintdef(oid) LIKE '%theme%'; IF c IS NOT NULL THEN EXECUTE format('ALTER TABLE public.book_sites DROP CONSTRAINT %I', c); END IF; END $$;
+ALTER TABLE public.book_sites ADD CONSTRAINT book_sites_theme_check CHECK (theme = ANY (ARRAY['clair','litteraire','doux','sombre','jeunesse','policier','western','fantasy','sf','horreur','aventure','bienetre']));

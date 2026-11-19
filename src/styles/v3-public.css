@@ -1041,5 +1041,26 @@ details.v3-genie-more > summary { color: #E6F4F1 !important; }
 .v3-dark-page .book-site .bs-muted{background:hsl(var(--bs-muted)) !important}
 .v3-dark-page .book-site .bs-btn{color:hsl(var(--bs-accent-fg)) !important}
 .v3-dark-page .book-site input{background:hsl(var(--bs-bg)) !important;color:hsl(var(--bs-fg)) !important;border-color:hsl(var(--bs-line)) !important}
-.v3-dark-page .book-site-editor :is(label,p,h1,b){color:#F9FAFB !important}
+.v3-dark-page .book-site-editor :is(label,p,h1,b,span){color:#F9FAFB !important}
 .v3-dark-page .book-site-editor :is(input,textarea){background:#0F172A !important;color:#F9FAFB !important;border-color:#475569 !important}
+
+/* Genre ambiances: dark scenic palettes and light ones, each with its own display font. */
+.book-site[data-theme="jeunesse"]{--bs-bg:200 80% 97%;--bs-fg:230 40% 22%;--bs-muted:45 90% 92%;--bs-sub:230 20% 40%;--bs-accent:330 75% 55%;--bs-accent-fg:0 0% 100%;--bs-line:200 50% 85%;--bs-display:'Fredoka','Comic Sans MS',system-ui,sans-serif}
+.book-site[data-theme="sombre"]{--bs-accent:355 85% 55%;--bs-accent-fg:0 0% 100%;--bs-display:'Bebas Neue',Impact,sans-serif}
+.book-site[data-theme="doux"]{--bs-bg:345 60% 97%;--bs-fg:340 35% 20%;--bs-muted:345 60% 92%;--bs-accent:345 70% 50%;--bs-accent-fg:0 0% 100%;--bs-display:'Playfair Display',Georgia,serif}
+.book-site[data-theme="policier"]{--bs-bg:35 15% 9%;--bs-fg:40 30% 90%;--bs-muted:35 12% 14%;--bs-sub:40 12% 68%;--bs-accent:42 70% 55%;--bs-accent-fg:35 15% 9%;--bs-line:35 10% 24%;--bs-display:'Special Elite','Courier New',monospace}
+.book-site[data-theme="western"]{--bs-bg:30 40% 92%;--bs-fg:20 50% 16%;--bs-muted:32 45% 84%;--bs-sub:20 25% 34%;--bs-accent:18 80% 42%;--bs-accent-fg:0 0% 100%;--bs-line:25 35% 72%;--bs-display:'Rye',Georgia,serif}
+.book-site[data-theme="fantasy"]{--bs-bg:265 35% 10%;--bs-fg:270 30% 94%;--bs-muted:265 30% 15%;--bs-sub:270 15% 72%;--bs-accent:160 70% 55%;--bs-accent-fg:265 35% 10%;--bs-line:265 20% 26%;--bs-display:'Cinzel',Georgia,serif}
+.book-site[data-theme="sf"]{--bs-bg:230 50% 7%;--bs-fg:195 60% 94%;--bs-muted:230 40% 12%;--bs-sub:200 20% 72%;--bs-accent:190 95% 55%;--bs-accent-fg:230 50% 7%;--bs-line:230 30% 22%;--bs-display:'Orbitron',system-ui,sans-serif}
+.book-site[data-theme="horreur"]{--bs-bg:140 20% 5%;--bs-fg:120 15% 88%;--bs-muted:140 18% 9%;--bs-sub:120 10% 65%;--bs-accent:110 70% 50%;--bs-accent-fg:140 20% 5%;--bs-line:140 12% 18%;--bs-display:'Creepster',Impact,sans-serif}
+.book-site[data-theme="aventure"]{--bs-bg:45 50% 95%;--bs-fg:160 45% 14%;--bs-muted:170 40% 88%;--bs-sub:160 20% 32%;--bs-accent:175 80% 32%;--bs-accent-fg:0 0% 100%;--bs-line:170 25% 75%;--bs-display:'Cinzel',Georgia,serif}
+.book-site[data-theme="litteraire"]{--bs-display:'Playfair Display',Georgia,serif}
+.book-site[data-theme="bienetre"]{--bs-bg:90 25% 96%;--bs-fg:140 25% 18%;--bs-muted:100 25% 90%;--bs-sub:140 12% 38%;--bs-accent:145 35% 38%;--bs-accent-fg:0 0% 100%;--bs-line:100 18% 80%;--bs-display:'Playfair Display',Georgia,serif}
+.book-site h1,.book-site h2{font-family:var(--bs-display,inherit)}
+.book-site .bs-hero{position:relative;background-size:cover;background-position:center;isolation:isolate}
+.book-site .bs-hero::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,hsl(var(--bs-bg)/.15) 0%,hsl(var(--bs-bg)/.75) 45%,hsl(var(--bs-bg)/.92) 100%)}
+.book-site .bs-hero-panel{background:hsl(var(--bs-bg)/.82);backdrop-filter:blur(6px);border:1px solid hsl(var(--bs-line));border-radius:1rem;padding:2rem;box-shadow:0 20px 60px -20px hsl(0 0% 0%/.5)}
+.book-site .bs-cover{box-shadow:0 30px 60px -15px hsl(0 0% 0%/.7),0 0 0 1px hsl(var(--bs-line));transform:perspective(1200px) rotateY(-8deg);transition:transform .4s}
+.book-site .bs-cover:hover{transform:perspective(1200px) rotateY(0)}
+.book-site .bs-btn{box-shadow:0 10px 25px -8px hsl(var(--bs-accent)/.7);transition:transform .2s}
+.book-site .bs-btn:hover{transform:translateY(-2px)}

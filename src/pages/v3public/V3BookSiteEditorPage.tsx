@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { BookSiteView } from '@/pages/livre/BookSitePage';
 import { loadStudioCovers, indexCoversByTitle, normalizeTitle, LONG_SIGNED_TTL } from '@/lib/studioCovers';
 import { getSignedCoverUrl } from '@/lib/coverProjects';
+import { BOOK_SITE_BACKGROUNDS } from '@/lib/bookSite/backgrounds';
 import { BOOK_SITE_THEMES, detectBookSiteTheme, firstExcerpt, slugifyTitle, type BookSiteTheme } from '@/lib/bookSite/themes';
 
 const db = supabase as unknown as { from: (t: string) => any }; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -74,7 +75,7 @@ export default function V3BookSiteEditorPage() {
       <aside className="book-site-editor space-y-4 rounded-lg border border-border bg-card p-4 text-card-foreground lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-auto">
         <h1 className="flex items-center gap-2 text-xl font-bold"><Globe className="h-5 w-5" /> Site web du livre</h1>
         <div><p className="mb-2 text-sm font-semibold">Ambiance</p><div className="grid grid-cols-2 gap-2">
-          {BOOK_SITE_THEMES.map((t) => <button key={t.id} onClick={() => set({ theme: t.id })} className={`v3-chip-toggle rounded border p-2 text-left text-xs ${f.theme === t.id ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-background text-foreground'}`}><b className="block">{t.label}</b>{t.hint}</button>)}
+          {BOOK_SITE_THEMES.map((t) => <button key={t.id} onClick={() => set({ theme: t.id })} className={`v3-chip-toggle overflow-hidden rounded border p-0 text-left text-xs ${f.theme === t.id ? 'border-primary ring-2 ring-primary' : 'border-border'}`}><img src={BOOK_SITE_BACKGROUNDS[t.id]} alt="" className="h-12 w-full object-cover" loading="lazy" /><span className="block p-2"><b className="block">{t.emoji} {t.label}</b>{t.hint}</span></button>)}
         </div></div>
         <p className="rounded border border-border bg-background p-3 text-sm text-foreground">✨ Tout est rempli automatiquement depuis votre livre : titre, auteur, présentation, extrait et couverture. Il ne reste qu’à cliquer sur « Publier le site ».</p>
         <button type="button" onClick={() => setShowDetails((v) => !v)} className="v3-chip-toggle text-sm font-semibold underline">{showDetails ? 'Masquer les détails' : 'Modifier les détails (facultatif)'}</button>

@@ -4,6 +4,8 @@ import { Helmet } from 'react-helmet';
 import { BookOpen, CheckCircle2, Download, Loader2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import '@/styles/v3-public.css';
+import { BOOK_SITE_BACKGROUNDS } from '@/lib/bookSite/backgrounds';
+import type { BookSiteTheme } from '@/lib/bookSite/themes';
 
 type Site = { slug: string; title: string; subtitle: string | null; author_name: string | null; description: string | null; excerpt_title: string | null; excerpt: string | null; cover_url: string | null; theme: string; amazon_kindle_url: string | null; amazon_paperback_url: string | null; user_id: string; published: boolean };
 type Reader = { email: string; first_name: string | null; consent_at: string };
@@ -24,21 +26,21 @@ export function BookSiteView({ site, preview = false }: { site: Site; preview?: 
   }
   return (
     <main className="book-site min-h-screen" data-theme={site.theme}>
-      <section className="mx-auto grid max-w-5xl items-center gap-10 px-5 py-12 md:grid-cols-2">
-        {site.cover_url ? <img src={site.cover_url} alt={`Couverture du livre ${site.title}`} className="mx-auto w-full max-w-sm rounded-md shadow-xl" />
-          : <div className="bs-muted mx-auto flex aspect-[2/3] w-full max-w-sm items-center justify-center rounded-md p-6 text-center text-3xl font-bold">{site.title}</div>}
-        <div>
+      <section className="bs-hero px-5 py-16 md:py-24" style={{ backgroundImage: `url(${BOOK_SITE_BACKGROUNDS[site.theme as BookSiteTheme] || BOOK_SITE_BACKGROUNDS.clair})` }}><div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-2">
+        {site.cover_url ? <img src={site.cover_url} alt={`Couverture du livre ${site.title}`} className="bs-cover mx-auto w-full max-w-sm rounded-md" />
+          : <div className="bs-cover bs-muted mx-auto flex aspect-[2/3] w-full max-w-sm items-center justify-center rounded-md p-6 text-center text-3xl font-bold">{site.title}</div>}
+        <div className="bs-hero-panel">
           <h1 className="mb-3 text-4xl font-extrabold leading-tight md:text-5xl">{site.title}</h1>
           {site.subtitle && <p className="bs-sub mb-3 text-xl">{site.subtitle}</p>}
           {site.author_name && <p className="bs-accent mb-5 text-lg font-semibold">{site.author_name}</p>}
-          {site.description && <p className="bs-sub mb-8 whitespace-pre-line text-lg leading-relaxed">{site.description}</p>}
+          {site.description && <p className="bs-sub mb-8 line-clamp-6 whitespace-pre-line text-lg leading-relaxed">{site.description}</p>}
           <div className="flex flex-wrap gap-3">
             {site.amazon_kindle_url && <a className="bs-btn" href={site.amazon_kindle_url} target="_blank" rel="noopener noreferrer">Acheter le Kindle</a>}
             {site.amazon_paperback_url && <a className="bs-btn-out" href={site.amazon_paperback_url} target="_blank" rel="noopener noreferrer">Acheter le broché</a>}
           </div>
           {site.excerpt && <a href="#lecture" className="bs-accent mt-5 inline-flex items-center gap-2 font-semibold underline"><BookOpen className="h-4 w-4" /> Lire les premières pages</a>}
         </div>
-      </section>
+      </div></section>
       {site.excerpt && <section id="lecture" className="bs-muted bs-line border-y px-5 py-12"><div className="mx-auto max-w-3xl">
         <p className="bs-accent mb-3 text-sm font-semibold uppercase tracking-widest">Extrait</p>
         {site.excerpt_title && <h2 className="mb-6 text-3xl font-bold">{site.excerpt_title}</h2>}
