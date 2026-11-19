@@ -1021,3 +1021,14 @@ details.v3-genie-more > summary { color: #E6F4F1 !important; }
 .v3-lancer-dark select option { background: #0F172A; color: #F8FAFC; }
 .v3-lancer-dark select option:checked { background: #008296; color: #fff; }
 .v3-lancer-dark [style*="background: rgb(243, 251, 247)"], .v3-lancer-dark [style*="background: rgb(255, 253, 248)"] { background: #151D2C !important; color: #F8FAFC; }
+
+/* Book site templates: scoped palettes so a book never inherits a black page by default. */
+.book-site{--bs-bg:0 0% 100%;--bs-fg:215 35% 15%;--bs-muted:210 25% 96%;--bs-sub:215 15% 40%;--bs-accent:162 63% 32%;--bs-accent-fg:0 0% 100%;--bs-line:214 20% 88%;background:hsl(var(--bs-bg));color:hsl(var(--bs-fg));font-family:ui-sans-serif,system-ui,sans-serif}
+.book-site[data-theme="litteraire"]{--bs-bg:40 45% 95%;--bs-fg:25 30% 16%;--bs-muted:38 35% 89%;--bs-sub:25 15% 38%;--bs-accent:350 55% 32%;--bs-line:35 25% 80%;font-family:Georgia,'Times New Roman',serif}
+.book-site[data-theme="doux"]{--bs-bg:30 50% 96%;--bs-fg:15 25% 22%;--bs-muted:20 55% 91%;--bs-sub:15 15% 40%;--bs-accent:14 62% 48%;--bs-line:20 35% 84%}
+.book-site[data-theme="sombre"]{--bs-bg:220 20% 8%;--bs-fg:40 30% 92%;--bs-muted:220 16% 13%;--bs-sub:40 10% 70%;--bs-accent:38 85% 55%;--bs-accent-fg:220 20% 8%;--bs-line:220 12% 22%}
+.book-site .bs-muted{background:hsl(var(--bs-muted))}.book-site .bs-sub{color:hsl(var(--bs-sub))}.book-site .bs-accent{color:hsl(var(--bs-accent))}
+.book-site .bs-line{border-color:hsl(var(--bs-line))}
+.book-site .bs-btn{display:inline-flex;align-items:center;gap:.5rem;border-radius:.4rem;padding:.75rem 1.25rem;font-weight:700;background:hsl(var(--bs-accent));color:hsl(var(--bs-accent-fg))}
+.book-site .bs-btn-out{display:inline-flex;align-items:center;gap:.5rem;border-radius:.4rem;padding:.7rem 1.2rem;font-weight:700;border:2px solid hsl(var(--bs-accent));color:hsl(var(--bs-accent))}
+.book-site input{background:hsl(var(--bs-bg));color:hsl(var(--bs-fg));border:1px solid hsl(var(--bs-line))}

@@ -8,7 +8,7 @@ describe('inscriptions des lecteurs El Cuervo', () => {
     expect(readerSignupSchema.safeParse(valid).success).toBe(true);
   });
   it('ne permet pas de collecter des lecteurs pour un autre livre', () => {
-    expect(readerSignupSchema.safeParse({ ...valid, book_slug: 'autre-livre' }).success).toBe(false);
+    expect(readerSignupSchema.safeParse({ ...valid, book_slug: '../admin' }).success).toBe(false);
   });
   it('normalise les emails pour éviter les doublons', () => {
     expect(readerSignupSchema.parse({ ...valid, email: ' Lecteur@Example.org ' }).email).toBe('lecteur@example.org');

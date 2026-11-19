@@ -25,6 +25,10 @@ Deno.serve(async (req) => {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || req.headers.get('cf-connecting-ip') || 'unknown';
     const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${key}:${ip}`));
     const bucket = Array.from(new Uint8Array(digest), (b) => b.toString(16).padStart(2, '0')).join('');
+    if (parsed.data.book_slug !== 'el-cuervo') {
+      const { data: site } = await db.from('book_sites').select('id').eq('slug', parsed.data.book_slug).eq('published', true).maybeSingle();
+      if (!site) return reply(404, { error: 'Ce site de livre est introuvable.' });
+    }
     const { data: allowed, error: limitError } = await db.rpc('claim_book_reader_attempt', { p_key: bucket });
     if (limitError) return reply(503, { error: 'Inscription temporairement indisponible.' });
     if (!allowed) return reply(429, { error: 'Trop de tentatives. Réessayez dans une heure.' });
