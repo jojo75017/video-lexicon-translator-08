@@ -312,7 +312,7 @@ export default function V3BookManagerPage() {
                   );
                   const url = `https://ebookstudio.fr/livre/${slug}`;
                   return (<>
-                    <button onClick={() => window.open(`/livre/${slug}`, '_blank', 'noopener')} className="v3-btn text-xs" style={{ background: '#15803d', color: '#fff' }}>
+                    <button onClick={() => window.open(`/livre/${slug}`, '_blank', 'noopener')} className="v3-btn v3-btn-live text-xs">
                       <Globe className="w-3.5 h-3.5" /> Page en ligne
                     </button>
                     <button onClick={() => void navigator.clipboard.writeText(url).then(() => toast.success('Lien copié ! Collez-le dans votre bio ou vos publications.'))} className="v3-btn v3-btn-outline text-xs">

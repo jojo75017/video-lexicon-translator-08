@@ -514,6 +514,12 @@
   color: #ffffff !important;
 }
 
+/* Bouton vert « Page en ligne » des pages de présentation. */
+.v3pub button.v3-btn-live:not(:disabled),
+.v3pub button.v3-btn-live:not(:disabled):hover,
+.v3pub .v3-btn.v3-btn-live { background: #15803d !important; color: #ffffff !important; border-color: #15803d !important; }
+.v3pub button.v3-btn-live:not(:disabled):hover { background: #166534 !important; }
+
 /* Exception : le bouton « Nouveau livre (remettre à zéro) » suit le bleu robot. */
 .v3pub button.v3-btn-reset-green:not(:disabled),
 .v3pub button.v3-btn-reset-green:not(:disabled):hover,
