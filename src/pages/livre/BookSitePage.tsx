@@ -53,6 +53,19 @@ export function BookSiteView({ site, preview = false }: { site: Site; preview?: 
         {site.excerpt_title && <h2 className="mb-6 text-3xl font-bold">{site.excerpt_title}</h2>}
         <div className="space-y-5 text-lg leading-loose">{site.excerpt.split(/\n\s*\n/).map((p, i) => <p key={i}>{p}</p>)}</div>
       </div></section>}
+      <section className="bs-line border-b px-5 py-10 text-center"><div className="mx-auto max-w-3xl">
+        <h2 className="mb-2 text-2xl font-bold">📢 Vous aimez ce livre ? Partagez-le avec vos amis !</h2>
+        {(() => {
+          const url = `https://ebookstudio.fr/livre/${site.slug}`;
+          const msg = `Regarde ce livre que je viens de découvrir : « ${site.title} ». Tu peux lire le début gratuitement ici : ${url}`;
+          return <div className="mt-4 flex flex-wrap justify-center gap-3">
+            <a className="bs-btn" href={`https://wa.me/?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            <a className="bs-btn-out" href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`} target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a className="bs-btn-out" href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(msg)}`} target="_blank" rel="noopener noreferrer">X</a>
+            <button type="button" className="bs-btn-out" onClick={() => void navigator.clipboard.writeText(url)}>Copier le lien</button>
+          </div>;
+        })()}
+      </div></section>
       <section className="mx-auto max-w-3xl px-5 py-14">
         <Mail className="bs-accent mb-4 h-7 w-7" aria-hidden="true" />
         <h2 className="mb-4 text-3xl font-bold">Gardons le contact</h2>

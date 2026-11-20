@@ -90,6 +90,24 @@ export default function V3BookSiteEditorPage() {
               <li><b>Facebook et réseaux :</b> ajoutez le lien dans vos publications pour faire lire le résumé et l’extrait.</li>
               <li><b>Emails :</b> envoyez le lien à vos contacts pour qu’ils achètent sur Amazon en un clic.</li>
             </ul>
+            <details className="mt-3 rounded border border-border bg-background p-2">
+              <summary className="cursor-pointer text-xs font-semibold">📢 Vos publications prêtes à copier</summary>
+              {(() => {
+                const url = `https://ebookstudio.fr/livre/${f.slug}`;
+                const resume = (f.description || '').split(/(?<=[.!?])\s+/).slice(0, 2).join(' ');
+                const posts = [
+                  { label: 'Post Facebook & Instagram', text: `📖 Et si votre prochaine lecture commençait aujourd’hui ?\n\n« ${f.title} »${f.author_name ? ` de ${f.author_name}` : ''}\n${resume}\n\n👉 Lisez les premières pages gratuitement : ${url}\n\n#lecture #livre #nouveauté #auteurindépendant` },
+                  { label: 'Script TikTok & Reels', text: `[Écran, 3 s] Si vous aimez les histoires qui ne vous lâchent plus, arrêtez de scroller.\n[Voix, 15 s] Je vous présente « ${f.title} ». ${resume}\n[Fin] Le lien pour lire le début gratuitement est dans ma bio !\n\nLien bio : ${url}` },
+                  { label: 'Message WhatsApp / proches', text: `Coucou ! Mon livre « ${f.title} » est enfin sorti 🎉 Tu peux lire le début gratuitement ici : ${url}\nSi tu l’aimes, partage-le autour de toi, ça m’aiderait beaucoup. Merci !` },
+                ];
+                return <div className="mt-2 space-y-3">{posts.map((p) => (
+                  <div key={p.label}>
+                    <p className="mb-1 text-xs font-semibold">{p.label}</p>
+                    <p className="whitespace-pre-line rounded border border-border p-2 text-xs">{p.text}</p>
+                    <button type="button" onClick={() => void navigator.clipboard.writeText(p.text).then(() => toast.success('Publication copiée !'))} className="v3-btn v3-btn-outline mt-1 text-xs"><Copy className="h-3.5 w-3.5" /> Copier</button>
+                  </div>))}</div>;
+              })()}
+            </details>
           </div>
         ) : (
           <p className="rounded border border-border bg-background p-3 text-xs">🔗 Après avoir cliqué sur « Publier la page », votre lien à partager (bio TikTok, Instagram, Facebook, emails) apparaîtra ici avec un bouton « Copier le lien ».</p>
