@@ -194,6 +194,17 @@ export default function V3BookManagerPage() {
         <button onClick={() => nav(correctedOnly ? '/v3/corriger' : '/v3/create')} className="v3-btn v3-btn-primary"><Plus className="w-4 h-4" /> {correctedOnly ? 'Corriger un livre' : 'Ajouter'}</button>
       </div>
 
+      {!correctedOnly && (
+        <div className="v3-card mt-6 border-2" style={{ borderColor: '#15803d' }}>
+          <div className="text-base font-semibold">🔗 Comment partager la page de présentation de votre livre</div>
+          <ol className="mt-2 list-decimal space-y-1 pl-5 text-sm">
+            <li>Sur la carte du livre, cliquez sur « Créer la page de présentation », ajoutez vos ASIN Amazon puis « Publier la page ».</li>
+            <li>Le bouton vert « Page en ligne » apparaît : cliquez sur « Copier le lien » juste à côté.</li>
+            <li>Collez ce lien dans le champ « Site web » de votre bio TikTok ou Instagram, dans vos publications Facebook et dans vos emails.</li>
+          </ol>
+        </div>
+      )}
+
       {!loading && duplicateCount > 0 && (
         <div className="v3-card mt-6 flex flex-wrap items-center justify-between gap-3 border border-[var(--v3-orange)]/40">
           <div>
