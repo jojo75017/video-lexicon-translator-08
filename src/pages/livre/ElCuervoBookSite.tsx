@@ -99,6 +99,15 @@ export default function ElCuervoBookSite() {
           <Button asChild variant="outline" className="h-auto min-h-11 whitespace-normal py-3"><a href="https://www.amazon.fr/dp/B0HLL8PZB6" target="_blank" rel="noopener noreferrer"><BookOpen /> Voir la présentation et l’aperçu Amazon</a></Button>
         </div>
       </section>
+      <section className="border-b border-border px-5 py-10 text-center"><div className="mx-auto max-w-3xl">
+        <h2 className="mb-4 text-2xl font-bold">📢 Vous aimez ce livre ? Partagez-le avec vos amis !</h2>
+        <div className="flex flex-wrap justify-center gap-3">
+          <Button asChild><a href={`https://wa.me/?text=${encodeURIComponent('Regarde ce livre : « Le Fils d’El Cuervo ». Le début est gratuit ici : https://ebookstudio.fr/livre/el-cuervo')}`} target="_blank" rel="noopener noreferrer">WhatsApp</a></Button>
+          <Button asChild variant="outline"><a href="https://www.facebook.com/sharer/sharer.php?u=https://ebookstudio.fr/livre/el-cuervo" target="_blank" rel="noopener noreferrer">Facebook</a></Button>
+          <Button asChild variant="outline"><a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Je découvre « Le Fils d’El Cuervo » : https://ebookstudio.fr/livre/el-cuervo')}`} target="_blank" rel="noopener noreferrer">X</a></Button>
+          <Button variant="outline" onClick={() => void navigator.clipboard.writeText('https://ebookstudio.fr/livre/el-cuervo')}>Copier le lien</Button>
+        </div>
+      </div></section>
       <section className="mx-auto max-w-3xl px-5 py-14" aria-labelledby="reader-title">
         <Mail className="mb-4 h-7 w-7 text-primary" aria-hidden="true" />
         <h2 id="reader-title" className="mb-4 text-3xl font-bold">Gardons le contact</h2>

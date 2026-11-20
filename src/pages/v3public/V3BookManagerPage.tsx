@@ -330,6 +330,19 @@ export default function V3BookManagerPage() {
                       <Copy className="w-3.5 h-3.5" /> Copier le lien
                     </button>
                     {site && <button onClick={() => nav(`/v3/site-livre/${b.id}`)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /> Modifier la page</button>}
+                    <details className="basis-full rounded-lg border-2 border-orange-300 bg-orange-50 p-3">
+                      <summary className="cursor-pointer text-sm font-bold">📢 Vos publications prêtes à copier (avec votre lien)</summary>
+                      <div className="mt-3 grid gap-3 md:grid-cols-3">{[
+                        { label: 'Facebook & Instagram', text: `📖 Et si votre prochaine lecture commençait aujourd’hui ?\n\n« ${b.title} »\nUne histoire qui ne vous lâchera plus.\n\n👉 Lisez les premières pages gratuitement : ${url}\n\n#lecture #livre #nouveauté #auteurindépendant` },
+                        { label: 'TikTok & Reels', text: `[Écran, 3 s] Si vous aimez les histoires intenses, arrêtez de scroller.\n[Voix] Je vous présente « ${b.title} ».\n[Fin] Le lien pour lire le début gratuitement est dans ma bio !\n\nLien bio : ${url}` },
+                        { label: 'WhatsApp / proches', text: `Coucou ! Mon livre « ${b.title} » est sorti 🎉 Tu peux lire le début gratuitement ici : ${url}\nS’il te plaît, partage-le autour de toi. Merci !` },
+                      ].map((p) => (
+                        <div key={p.label} className="rounded border border-border bg-white p-2">
+                          <p className="mb-1 text-xs font-bold">{p.label}</p>
+                          <p className="whitespace-pre-line text-xs">{p.text}</p>
+                          <button onClick={() => void navigator.clipboard.writeText(p.text).then(() => toast.success('Publication copiée !'))} className="v3-btn v3-btn-outline mt-2 text-xs"><Copy className="w-3.5 h-3.5" /> Copier</button>
+                        </div>))}</div>
+                    </details>
                   </>);
                 })()}
                 <button onClick={() => nav(`/v3/outils/mockup-3d?titre=${encodeURIComponent(b.title || '')}`)} className="v3-btn v3-btn-outline text-xs">🖼️ Créer un mockup 3D</button>
