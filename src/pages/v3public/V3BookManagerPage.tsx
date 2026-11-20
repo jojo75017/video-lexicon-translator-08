@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2, BarChart3, Globe } from 'lucide-react';
+import { Plus, Pencil, Trash2, BookOpen, FileDown, X, Wand2, BarChart3, Globe, Copy } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { BackButton } from "@/components/v3/BackButton";
@@ -69,6 +69,7 @@ export default function V3BookManagerPage() {
   const [flipBook, setFlipBook] = useState<Book | null>(null);
   const [reading, setReading] = useState<Book | null>(null);
   const [covers, setCovers] = useState<Record<string, StudioCover>>({});
+  const [sites, setSites] = useState<Record<string, { slug: string; published: boolean }>>({});
   useEffect(() => { void loadStudioCovers().then((c) => setCovers(indexCoversByTitle(c))); }, []);
 
 
@@ -83,6 +84,8 @@ export default function V3BookManagerPage() {
     if (error) toast.error(`Chargement impossible : ${error.message}`);
     const list = (data as (Book & { project_type?: string | null })[]) || [];
     setAllBooks(list);
+    const { data: siteRows } = await (supabase as unknown as { from: (t: string) => any }).from('book_sites').select('project_id,slug,published').eq('user_id', auth.user.id); // eslint-disable-line @typescript-eslint/no-explicit-any
+    setSites(Object.fromEntries(((siteRows as { project_id: string; slug: string; published: boolean }[]) || []).map((r) => [r.project_id, { slug: r.slug, published: r.published }])));
     setRows(correctedOnly ? list.filter((b) => b.project_type === 'corrected') : list);
     setLoading(false);
   };
@@ -299,15 +302,25 @@ export default function V3BookManagerPage() {
                 <button onClick={() => nav(`${draftMode(b.draft_state) === 'biography' ? '/v3/biographie' : '/v3/create'}?projectId=${b.id}`)} className="v3-btn v3-btn-primary text-xs">
                   <BookOpen className="w-3.5 h-3.5" /> Ouvrir le livre
                 </button>
-                {/cuervo/i.test(b.title || '') ? (
-                  <button onClick={() => window.open('/livre/el-cuervo', '_blank', 'noopener')} className="v3-btn v3-btn-primary text-xs">
-                    <Globe className="w-3.5 h-3.5" /> Voir la page de présentation
-                  </button>
-                ) : (
-                  <button onClick={() => nav(`/v3/site-livre/${b.id}`)} className="v3-btn v3-btn-outline text-xs">
-                    <Globe className="w-3.5 h-3.5" /> Créer la page de présentation
-                  </button>
-                )}
+                {(() => {
+                  const site = sites[b.id];
+                  const slug = site?.published ? site.slug : /cuervo/i.test(b.title || '') ? 'el-cuervo' : '';
+                  if (!slug) return (
+                    <button onClick={() => nav(`/v3/site-livre/${b.id}`)} className="v3-btn v3-btn-outline text-xs">
+                      <Globe className="w-3.5 h-3.5" /> Créer la page de présentation
+                    </button>
+                  );
+                  const url = `https://ebookstudio.fr/livre/${slug}`;
+                  return (<>
+                    <button onClick={() => window.open(`/livre/${slug}`, '_blank', 'noopener')} className="v3-btn text-xs" style={{ background: '#15803d', color: '#fff' }}>
+                      <Globe className="w-3.5 h-3.5" /> Page en ligne
+                    </button>
+                    <button onClick={() => void navigator.clipboard.writeText(url).then(() => toast.success('Lien copié ! Collez-le dans votre bio ou vos publications.'))} className="v3-btn v3-btn-outline text-xs">
+                      <Copy className="w-3.5 h-3.5" /> Copier le lien
+                    </button>
+                    {site && <button onClick={() => nav(`/v3/site-livre/${b.id}`)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /> Modifier la page</button>}
+                  </>);
+                })()}
                 <button onClick={() => nav(`/v3/outils/mockup-3d?titre=${encodeURIComponent(b.title || '')}`)} className="v3-btn v3-btn-outline text-xs">🖼️ Créer un mockup 3D</button>
                 <button onClick={() => setEditing(b)} className="v3-btn v3-btn-outline text-xs"><Pencil className="w-3.5 h-3.5" /></button>
                 <button onClick={() => remove(b.id)} className="v3-btn v3-btn-ghost text-xs text-red-600"><Trash2 className="w-3.5 h-3.5" /></button>

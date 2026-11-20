@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ExternalLink, Globe, Loader2, Upload } from 'lucide-react';
+import { Copy, ExternalLink, Globe, Loader2, Upload } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { BookSiteView } from '@/pages/livre/BookSitePage';
 import { loadStudioCovers, indexCoversByTitle, normalizeTitle, LONG_SIGNED_TTL } from '@/lib/studioCovers';
@@ -77,6 +77,23 @@ export default function V3BookSiteEditorPage() {
     <div className="mx-auto grid max-w-7xl gap-6 p-4 lg:grid-cols-[380px_1fr]">
       <aside className="book-site-editor space-y-4 rounded-lg border border-border bg-card p-4 text-card-foreground lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-auto">
         <h1 className="flex items-center gap-2 text-xl font-bold"><Globe className="h-5 w-5" /> Page de présentation du livre</h1>
+        {f.published && f.id ? (
+          <div className="rounded-lg border-2 p-3 text-sm" style={{ borderColor: '#15803d' }}>
+            <p className="mb-2 font-semibold">🔗 Votre lien à partager</p>
+            <p className="mb-2 break-all rounded border border-border bg-background p-2 text-xs font-mono">https://ebookstudio.fr/livre/{f.slug}</p>
+            <div className="mb-3 flex flex-wrap gap-2">
+              <button type="button" onClick={() => void navigator.clipboard.writeText(`https://ebookstudio.fr/livre/${f.slug}`).then(() => toast.success('Lien copié !'))} className="v3-btn v3-btn-primary text-xs"><Copy className="h-3.5 w-3.5" /> Copier le lien</button>
+              <a href={`/livre/${f.slug}`} target="_blank" rel="noopener" className="v3-btn v3-btn-outline text-xs"><ExternalLink className="h-3.5 w-3.5" /> Ouvrir la page</a>
+            </div>
+            <ul className="list-disc space-y-1 pl-4 text-xs">
+              <li><b>Bio TikTok et Instagram :</b> collez le lien dans le champ « Site web » de votre profil.</li>
+              <li><b>Facebook et réseaux :</b> ajoutez le lien dans vos publications pour faire lire le résumé et l’extrait.</li>
+              <li><b>Emails :</b> envoyez le lien à vos contacts pour qu’ils achètent sur Amazon en un clic.</li>
+            </ul>
+          </div>
+        ) : (
+          <p className="rounded border border-border bg-background p-3 text-xs">🔗 Après avoir cliqué sur « Publier la page », votre lien à partager (bio TikTok, Instagram, Facebook, emails) apparaîtra ici avec un bouton « Copier le lien ».</p>
+        )}
         <div><p className="mb-2 text-sm font-semibold">Ambiance</p><div className="grid grid-cols-2 gap-2">
           {BOOK_SITE_THEMES.map((t) => <button key={t.id} onClick={() => set({ theme: t.id })} className={`v3-chip-toggle overflow-hidden rounded border p-0 text-left text-xs ${f.theme === t.id ? 'border-primary ring-2 ring-primary' : 'border-border'}`}><img src={BOOK_SITE_BACKGROUNDS[t.id]} alt="" className="h-12 w-full object-cover" loading="lazy" /><span className="block p-2"><b className="block">{t.emoji} {t.label}</b>{t.hint}</span></button>)}
         </div></div>
