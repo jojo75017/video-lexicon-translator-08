@@ -29,6 +29,8 @@ import {
   type ExportMargin,
   COLOR_PRESETS,
   TYPO_PRESETS,
+  FONT_CHOICES,
+  fontCss,
   loadTypography,
   saveTypography,
   getOpenRouterImageKey,
@@ -256,14 +258,11 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
           </div>
 
           {/* Aperçu live */}
-          <div className="rounded-lg border bg-white p-4 space-y-2">
+          <div className="book-preview-paper rounded-lg border p-4 space-y-2">
             <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Aperçu en temps réel</div>
             <div
               style={{
-                fontFamily: typo.fontFamily === 'Calibri' ? 'Calibri, system-ui, sans-serif'
-                          : typo.fontFamily === 'Helvetica' ? 'Helvetica, Arial, sans-serif'
-                          : typo.fontFamily === 'Georgia' ? 'Georgia, serif'
-                          : 'Garamond, "EB Garamond", serif',
+                fontFamily: fontCss(typo.headingFontFamily || typo.fontFamily),
                 fontSize: `${typo.headingSize + 2}px`,
                 color: typo.headingColor,
                 fontWeight: 700,
@@ -274,10 +273,7 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
             </div>
             <div
               style={{
-                fontFamily: typo.fontFamily === 'Calibri' ? 'Calibri, system-ui, sans-serif'
-                          : typo.fontFamily === 'Helvetica' ? 'Helvetica, Arial, sans-serif'
-                          : typo.fontFamily === 'Georgia' ? 'Georgia, serif'
-                          : 'Garamond, "EB Garamond", serif',
+                fontFamily: fontCss(typo.fontFamily),
                 fontSize: `${typo.bodySize + 2}px`,
                 color: typo.bodyColor,
                 lineHeight: typo.lineHeight,
@@ -293,19 +289,32 @@ export const EbookSettingsPanel: React.FC<Props> = ({ onTypographyChange }) => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3">
             <div className="space-y-2">
-              <Label>Police</Label>
+              <Label>Police des titres</Label>
+              <Select
+                value={typo.headingFontFamily || typo.fontFamily}
+                onValueChange={(v: ExportFontFamily) => updateTypo({ headingFontFamily: v })}
+              >
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent className="max-h-80">
+                  {FONT_CHOICES.map(f => (
+                    <SelectItem key={f.value} value={f.value}><span style={{ fontFamily: f.css }}>{f.label}</span></SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Police du corps</Label>
               <Select
                 value={typo.fontFamily}
                 onValueChange={(v: ExportFontFamily) => updateTypo({ fontFamily: v })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Calibri">Calibri (sans serif)</SelectItem>
-                  <SelectItem value="Helvetica">Helvetica (sans serif)</SelectItem>
-                  <SelectItem value="Georgia">Georgia (serif)</SelectItem>
-                  <SelectItem value="Garamond">Garamond (serif classique)</SelectItem>
+                <SelectContent className="max-h-80">
+                  {FONT_CHOICES.filter(f => !f.heading).map(f => (
+                    <SelectItem key={f.value} value={f.value}><span style={{ fontFamily: f.css }}>{f.label}</span></SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>

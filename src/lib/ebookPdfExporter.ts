@@ -56,6 +56,7 @@ export const exportEbookToPdf = async (opts: {
 }) => {
   const typo: EbookExportTypography = { ...loadTypography(), ...(opts.typography || {}) };
   const pdfFont = pdfFontFor(typo.fontFamily);
+  const pdfHeadingFont = pdfFontFor(typo.headingFontFamily || typo.fontFamily);
   const headingSize = typo.headingSize;
   const bodySize = typo.bodySize;
   const justifyBody = typo.justify;
@@ -272,7 +273,7 @@ export const exportEbookToPdf = async (opts: {
       y = margin;
     }
     // Chapter title — small dark heading (H6 equivalent), no big colored "chapitre IA"
-    writeText(s.title, headingSize, { bold: true, color: headingRgb, spacingAfter: 8 });
+    writeText(s.title, headingSize, { bold: true, color: headingRgb, spacingAfter: 8, fontOverride: pdfHeadingFont });
     if (s.subtitle) writeText(s.subtitle, bodySize - 1, { color: [120, 120, 120], spacingAfter: 8, italic: true });
 
     if (s.imageUrl) {

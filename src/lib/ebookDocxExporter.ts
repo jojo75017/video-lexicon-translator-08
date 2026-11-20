@@ -232,6 +232,7 @@ export const exportEbookToDocx = async (opts: {
 }) => {
   const typo: EbookExportTypography = { ...loadTypography(), ...(opts.typography || {}) };
   const fontFamily = typo.fontFamily;
+  const headingFont = typo.headingFontFamily || typo.fontFamily;
   // docx-js sizes are in HALF-POINTS
   const bodyHalfPt = typo.bodySize * 2;
   const headingHalfPt = typo.headingSize * 2;
@@ -251,7 +252,7 @@ export const exportEbookToDocx = async (opts: {
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: { before: 2400, after: 240 },
-      children: [new TextRun({ text: opts.documentTitle, bold: true, size: 48, font: fontFamily })],
+      children: [new TextRun({ text: opts.documentTitle, bold: true, size: 48, font: headingFont })],
     })
   );
   if (opts.documentSubtitle) {
@@ -272,7 +273,7 @@ export const exportEbookToDocx = async (opts: {
       new Paragraph({
         heading: HeadingLevel.HEADING_6,
         spacing: { before: 200, after: 160 },
-        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: fontFamily, color: headingColor })],
+        children: [new TextRun({ text: s.title, bold: true, size: headingHalfPt, font: headingFont, color: headingColor })],
       })
     );
     if (s.subtitle) {
@@ -328,7 +329,7 @@ export const exportEbookToDocx = async (opts: {
             new Paragraph({
               heading: HeadingLevel.HEADING_2,
               spacing: { before: 200, after: 120 },
-              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: fontFamily, color: headingColor })],
+              children: [new TextRun({ text: pb.heading, bold: true, size: subHeadingHalfPt, font: headingFont, color: headingColor })],
             })
           );
         }

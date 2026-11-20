@@ -1,13 +1,53 @@
 // Options de mise en page partagées entre les exports DOCX et PDF
 // pour les Livres Pédagogiques (et autres exports rich-block).
 
-export type ExportFontFamily = 'Calibri' | 'Georgia' | 'Garamond' | 'Helvetica';
+export type ExportFontFamily =
+  | 'Calibri' | 'Georgia' | 'Garamond' | 'Helvetica'
+  | 'Baskerville' | 'Book Antiqua' | 'Palatino Linotype' | 'Cambria' | 'Times New Roman'
+  | 'Lora' | 'Merriweather' | 'EB Garamond' | 'Crimson Text' | 'Libre Baskerville'
+  | 'Playfair Display' | 'Cinzel' | 'Cormorant Garamond' | 'Bebas Neue' | 'Oswald'
+  | 'Montserrat' | 'Raleway' | 'Open Sans' | 'Arial' | 'Verdana' | 'Fredoka' | 'Rye';
+
+/** Polices proposées pour les titres et le corps du livre. */
+export const FONT_CHOICES: { value: ExportFontFamily; label: string; serif: boolean; css: string; heading?: boolean }[] = [
+  { value: 'Garamond', label: 'Garamond (édition classique)', serif: true, css: 'Garamond, "EB Garamond", serif' },
+  { value: 'EB Garamond', label: 'EB Garamond', serif: true, css: '"EB Garamond", Garamond, serif' },
+  { value: 'Georgia', label: 'Georgia', serif: true, css: 'Georgia, serif' },
+  { value: 'Baskerville', label: 'Baskerville', serif: true, css: 'Baskerville, "Libre Baskerville", serif' },
+  { value: 'Libre Baskerville', label: 'Libre Baskerville', serif: true, css: '"Libre Baskerville", Baskerville, serif' },
+  { value: 'Book Antiqua', label: 'Book Antiqua', serif: true, css: '"Book Antiqua", Palatino, serif' },
+  { value: 'Palatino Linotype', label: 'Palatino', serif: true, css: '"Palatino Linotype", Palatino, serif' },
+  { value: 'Times New Roman', label: 'Times New Roman', serif: true, css: '"Times New Roman", Times, serif' },
+  { value: 'Cambria', label: 'Cambria', serif: true, css: 'Cambria, Georgia, serif' },
+  { value: 'Lora', label: 'Lora (roman moderne)', serif: true, css: 'Lora, Georgia, serif' },
+  { value: 'Merriweather', label: 'Merriweather', serif: true, css: 'Merriweather, Georgia, serif' },
+  { value: 'Crimson Text', label: 'Crimson Text', serif: true, css: '"Crimson Text", Georgia, serif' },
+  { value: 'Playfair Display', label: 'Playfair Display (prestige)', serif: true, css: '"Playfair Display", Georgia, serif', heading: true },
+  { value: 'Cinzel', label: 'Cinzel (historique, épique)', serif: true, css: 'Cinzel, Georgia, serif', heading: true },
+  { value: 'Cormorant Garamond', label: 'Cormorant Garamond (romance)', serif: true, css: '"Cormorant Garamond", Garamond, serif', heading: true },
+  { value: 'Rye', label: 'Rye (western)', serif: true, css: 'Rye, Georgia, serif', heading: true },
+  { value: 'Bebas Neue', label: 'Bebas Neue (thriller, action)', serif: false, css: '"Bebas Neue", Oswald, sans-serif', heading: true },
+  { value: 'Oswald', label: 'Oswald (policier)', serif: false, css: 'Oswald, Arial, sans-serif', heading: true },
+  { value: 'Fredoka', label: 'Fredoka (jeunesse)', serif: false, css: 'Fredoka, Arial, sans-serif', heading: true },
+  { value: 'Montserrat', label: 'Montserrat (moderne)', serif: false, css: 'Montserrat, Arial, sans-serif' },
+  { value: 'Raleway', label: 'Raleway', serif: false, css: 'Raleway, Arial, sans-serif' },
+  { value: 'Open Sans', label: 'Open Sans', serif: false, css: '"Open Sans", Arial, sans-serif' },
+  { value: 'Calibri', label: 'Calibri', serif: false, css: 'Calibri, system-ui, sans-serif' },
+  { value: 'Helvetica', label: 'Helvetica', serif: false, css: 'Helvetica, Arial, sans-serif' },
+  { value: 'Arial', label: 'Arial', serif: false, css: 'Arial, sans-serif' },
+  { value: 'Verdana', label: 'Verdana (grande lisibilité)', serif: false, css: 'Verdana, sans-serif' },
+];
+export const fontCss = (f?: ExportFontFamily) => FONT_CHOICES.find(c => c.value === f)?.css ?? 'Calibri, system-ui, sans-serif';
+/** Police des titres effective (retombe sur la police du corps si aucune n'est choisie). */
+export const headingFontOf = (t: Pick<EbookExportTypography, 'fontFamily' | 'headingFontFamily'>) => t.headingFontFamily || t.fontFamily;
 export type ExportLineHeight = 1.15 | 1.5 | 2.0;
 export type ExportMargin = 'tight' | 'standard' | 'wide';
 
 export interface EbookExportTypography {
-  /** Police principale (titres + corps) */
+  /** Police du corps de texte (et des titres si headingFontFamily est vide) */
   fontFamily: ExportFontFamily;
+  /** Police des titres (facultative) */
+  headingFontFamily?: ExportFontFamily;
   /** Taille des titres de chapitre (en pt) — 14 ou 16 */
   headingSize: 14 | 16 | 18 | 20;
   /** Taille du corps de texte (en pt) — 11, 12 ou 14 */
@@ -72,6 +112,12 @@ export const TYPO_PRESETS: { id: string; label: string; description: string; val
     description: 'Moins de pages — utile pour les guides courts',
     values: { fontFamily: 'Calibri', headingSize: 14, bodySize: 11, justify: true, headingColor: '#1F2937', bodyColor: '#111111', italicQuotes: true, lineHeight: 1.15, margin: 'tight' },
   },
+  { id: 'duo-roman', label: '🖋️ Roman littéraire', description: 'Titres Cinzel · corps Garamond', values: { headingFontFamily: 'Cinzel', fontFamily: 'Garamond' } },
+  { id: 'duo-thriller', label: '🔪 Thriller & polar', description: 'Titres Oswald · corps Georgia', values: { headingFontFamily: 'Oswald', fontFamily: 'Georgia' } },
+  { id: 'duo-moderne', label: '✨ Moderne & épuré', description: 'Titres Montserrat · corps Calibri', values: { headingFontFamily: 'Montserrat', fontFamily: 'Calibri' } },
+  { id: 'duo-prestige', label: '🏛️ Historique & prestige', description: 'Titres Playfair · corps Baskerville', values: { headingFontFamily: 'Playfair Display', fontFamily: 'Baskerville' } },
+  { id: 'duo-western', label: '🐎 Western & aventure', description: 'Titres Rye · corps Book Antiqua', values: { headingFontFamily: 'Rye', fontFamily: 'Book Antiqua' } },
+  { id: 'duo-jeunesse', label: '🧸 Jeunesse', description: 'Titres Fredoka · corps Verdana', values: { headingFontFamily: 'Fredoka', fontFamily: 'Verdana' } },
 ];
 
 const TYPO_LS = 'ebook_export_typography_v1';
@@ -122,15 +168,7 @@ export const setIdeogramKey = (k: string) => {
 /** Famille jsPDF acceptée (helvetica / times / courier).
  *  jsPDF ne supporte pas Calibri/Garamond → fallback raisonnable. */
 export const pdfFontFor = (f: ExportFontFamily): 'helvetica' | 'times' | 'courier' => {
-  switch (f) {
-    case 'Georgia':
-    case 'Garamond':
-      return 'times';
-    case 'Calibri':
-    case 'Helvetica':
-    default:
-      return 'helvetica';
-  }
+  return FONT_CHOICES.find(c => c.value === f)?.serif ? 'times' : 'helvetica';
 };
 
 /** Marges PDF en points (1 inch = 72pt) */

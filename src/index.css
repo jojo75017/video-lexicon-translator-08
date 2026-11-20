@@ -825,3 +825,7 @@ a:hover {
 .fp-marquee { animation: fp-marquee 45s linear infinite; }
 .fp-marquee:hover { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { .fp-marquee { animation: none; } }
+
+/* Aperçu typographique : toujours sur papier blanc, même sur les pages sombres */
+.book-preview-paper, .v3-dark-page .book-preview-paper { background: #FFFFFF !important; }
+.book-preview-paper > div:first-child { color: #6B7280 !important; }
