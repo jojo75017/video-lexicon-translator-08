@@ -61,6 +61,10 @@ export interface DocxExportOptions {
   characters?: DocxCharacter[];
   fontFamily?: string;
   fontSize?: number; // in pt (e.g. 12)
+  /** Police des titres (sinon fontFamily). */
+  headingFontFamily?: string;
+  /** Taille des titres de chapitre en pt. */
+  headingSize?: number;
   includeTableOfContents?: boolean;
   /** Sommaire stylé « motif discret » (crème + filets dorés). Activé par défaut. */
   styledToc?: boolean;
@@ -743,6 +747,8 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     expectedChapterCount,
     backCoverText = '',
     readerLink = '',
+    headingFontFamily,
+    headingSize,
   } = options;
 
 
@@ -766,7 +772,8 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   const font = fontFamily;
   const baseSize = fontSize * 2; // half-points
   const titleSize = 72; // 36pt toujours
-  const chapterTitleSize = Math.round(fontSize * 2.5);
+  const hFont = headingFontFamily || fontFamily;
+  const chapterTitleSize = headingSize ? headingSize * 2 : Math.round(fontSize * 2.5);
   const subTitleSize = Math.round(fontSize * 1.75);
 
   // Dimensions de page
@@ -866,7 +873,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
         text: styled ? 'T A B L E   D E S   M A T I È R E S' : 'TABLE DES MATIÈRES',
         bold: true,
         size: chapterTitleSize,
-        font,
+        font: hFont,
         ...(styled ? { color: TOC_GOLD } : {}),
       })],
       heading: HeadingLevel.HEADING_1,
@@ -936,7 +943,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   // ═══ PRÉFACE ═══
   if (preface) {
     children.push(new Paragraph({
-      children: [new TextRun({ text: 'PRÉFACE', bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({ text: 'PRÉFACE', bold: true, size: chapterTitleSize, font: hFont })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 600, after: 400 },
@@ -950,8 +957,8 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     // Un seul vrai Heading 1 contient numéro + titre : le sommaire Word reste cohérent.
     children.push(new Paragraph({
       children: [
-        new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font, color: '888888' }),
-        new TextRun({ text: displayTitle.toUpperCase(), bold: true, size: chapterTitleSize, font, break: 1 }),
+        new TextRun({ text: `CHAPITRE ${num}`, bold: true, size: subTitleSize, font: hFont, color: '888888' }),
+        new TextRun({ text: displayTitle.toUpperCase(), bold: true, size: chapterTitleSize, font: hFont, break: 1 }),
       ],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
@@ -986,7 +993,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
           text: subLabel,
           bold: true,
           size: subTitleSize,
-          font,
+          font: hFont,
         })],
         heading: HeadingLevel.HEADING_2,
         spacing: { before: 480, after: 240 },
@@ -1006,7 +1013,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   if (conclusion) {
     children.push(new Paragraph({ children: [new PageBreak()] }));
     children.push(new Paragraph({
-      children: [new TextRun({ text: 'CONCLUSION', bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({ text: 'CONCLUSION', bold: true, size: chapterTitleSize, font: hFont })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 600, after: 400 },
@@ -1018,7 +1025,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   if (epilogue) {
     children.push(new Paragraph({ children: [new PageBreak()] }));
     children.push(new Paragraph({
-      children: [new TextRun({ text: 'ÉPILOGUE', bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({ text: 'ÉPILOGUE', bold: true, size: chapterTitleSize, font: hFont })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 600, after: 400 },
@@ -1030,7 +1037,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   if (characters.length > 0) {
     children.push(new Paragraph({ children: [new PageBreak()] }));
     children.push(new Paragraph({
-      children: [new TextRun({ text: 'PERSONNAGES', bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({ text: 'PERSONNAGES', bold: true, size: chapterTitleSize, font: hFont })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 600, after: 400 },
@@ -1039,7 +1046,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     for (const character of characters) {
       children.push(new Paragraph({
         children: [
-          new TextRun({ text: character.name || 'Personnage', bold: true, size: subTitleSize, font }),
+          new TextRun({ text: character.name || 'Personnage', bold: true, size: subTitleSize, font: hFont }),
           ...(character.role ? [new TextRun({ text: `  (${character.role})`, italics: true, size: baseSize, font, color: '666666' })] : []),
         ],
         spacing: { before: 240, after: 80 },
@@ -1062,7 +1069,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   const backPage = (heading: string, paragraphs: string[]) => {
     children.push(new Paragraph({ children: [new PageBreak()] }));
     children.push(new Paragraph({
-      children: [new TextRun({ text: heading, bold: true, size: chapterTitleSize, font })],
+      children: [new TextRun({ text: heading, bold: true, size: chapterTitleSize, font: hFont })],
       heading: HeadingLevel.HEADING_1,
       alignment: AlignmentType.CENTER,
       spacing: { before: 600, after: 400 },
@@ -1159,7 +1166,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
           name: 'Heading 1',
           basedOn: 'Normal',
           next: 'Normal',
-          run: { size: chapterTitleSize, bold: true, font },
+          run: { size: chapterTitleSize, bold: true, font: hFont },
           paragraph: { spacing: { before: 600, after: 300 } },
         },
         {
@@ -1167,7 +1174,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
           name: 'Heading 2',
           basedOn: 'Normal',
           next: 'Normal',
-          run: { size: subTitleSize, bold: true, font },
+          run: { size: subTitleSize, bold: true, font: hFont },
           paragraph: { spacing: { before: 400, after: 200 } },
         },
       ],

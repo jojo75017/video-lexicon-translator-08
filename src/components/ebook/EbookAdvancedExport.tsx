@@ -15,6 +15,7 @@ import { cleanGeneratedText } from '@/utils/textCleaner';
 import { exportProfessionalDocx, validateDocxChapters, type DocxExportOptions } from '@/utils/docxExportEngine';
 import { DocxPreviewDialog } from './DocxPreviewDialog';
 import jsPDF from 'jspdf';
+import { loadTypography, saveTypography, FONT_CHOICES, TYPO_PRESETS, headingFontOf, fontCss, type EbookExportTypography } from '@/lib/ebookExportOptions';
 import JSZip from 'jszip';
 
 interface EbookAdvancedExportProps {
@@ -105,6 +106,10 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
   const [includeCopyright, setIncludeCopyright] = useState(true);
   const [includePreface, setIncludePreface] = useState(true);
   const [includeConclusion, setIncludeConclusion] = useState(true);
+  const [typo, setTypoState] = useState<EbookExportTypography>(() => loadTypography());
+  const updateTypo = (patch: Partial<EbookExportTypography>) => setTypoState(prev => { const next = { ...prev, ...patch }; saveTypography(next); return next; });
+  const bodyCss = fontCss(typo.fontFamily);
+  const headCss = fontCss(headingFontOf(typo));
   const [readerLink, setReaderLinkState] = useState<string>(() => localStorage.getItem('ebook-reader-link') || '');
   const setReaderLink = (v: string) => { setReaderLinkState(v); localStorage.setItem('ebook-reader-link', v.trim()); };
   const validLink = /^https?:\/\//i.test(readerLink.trim()) ? readerLink.trim() : '';
@@ -136,9 +141,9 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
 
   const epubStyles = `
     @page { margin: 1em; }
-    body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.8; color: #1a1a1a; margin: 0; padding: 1.5em; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
-    h1 { font-size: 1.6em; font-weight: 700; text-align: center; margin: 2em 0 1.5em; letter-spacing: 0.02em; line-height: 1.3; page-break-before: always; }
-    h2 { font-size: 1.25em; font-weight: 600; margin: 1.8em 0 0.8em; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 0.3em; }
+    body { font-family: ${bodyCss}; font-size: ${typo.bodySize}pt; line-height: ${typo.lineHeight}; text-align: ${typo.justify ? 'justify' : 'left'}; color: #1a1a1a; margin: 0; padding: 1.5em; text-align: justify; hyphens: auto; -webkit-hyphens: auto; }
+    h1 { font-family: ${headCss}; font-size: ${typo.headingSize}pt; font-weight: 700; text-align: center; margin: 2em 0 1.5em; letter-spacing: 0.02em; line-height: 1.3; page-break-before: always; }
+    h2 { font-family: ${headCss}; font-size: 1.25em; font-weight: 600; margin: 1.8em 0 0.8em; color: #333; border-bottom: 1px solid #e0e0e0; padding-bottom: 0.3em; }
     p { margin: 0 0 0.8em; text-indent: 1.5em; orphans: 2; widows: 2; }
     p:first-of-type, h1 + p, h2 + p { text-indent: 0; }
     p:first-of-type::first-letter { font-size: 2.5em; float: left; line-height: 1; margin-right: 0.1em; font-weight: 700; }
@@ -296,7 +301,7 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       doc.setFont('times', style);
       const ml = getMarginLeft();
       const lines = doc.splitTextToSize(text, contentWidth);
-      const lineHeight = fontSize / 72 * 1.6;
+      const lineHeight = fontSize / 72 * (typo.lineHeight + 0.15);
       for (const line of lines) {
         if (y > maxY) newPage();
         if (align === 'center') doc.text(line, pageW / 2, y, { align: 'center' });
@@ -355,7 +360,7 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       y = marginOuter + 1;
       addText('PRÉFACE', 16, true, false, 'center');
       y += 0.4;
-      addText(cleanGeneratedText(preface), 11);
+      addText(cleanGeneratedText(preface), typo.bodySize);
     }
 
     // ─── Chapters ───
@@ -369,18 +374,18 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       doc.setTextColor(30);
       y += 0.5;
       const cleanTitle = stripChapterPrefix(ch.title || '', i);
-      if (cleanTitle) addText(cleanTitle, 22, true, false, 'center');
+      if (cleanTitle) addText(cleanTitle, typo.headingSize + 4, true, false, 'center');
       // Decorative separator
       doc.setDrawColor(200);
       doc.line(pageW * 0.35, y + 0.1, pageW * 0.65, y + 0.1);
       y += 0.5;
-      addText(cleanGeneratedText(ch.content || ''), 11);
+      addText(cleanGeneratedText(ch.content || ''), typo.bodySize);
       ch.subChapters?.forEach(sc => {
         if (sc.content) {
           y += 0.3;
           addText(sc.title, 13, true, true);
           y += 0.15;
-          addText(cleanGeneratedText(sc.content), 11);
+          addText(cleanGeneratedText(sc.content), typo.bodySize);
         }
       });
     });
@@ -391,7 +396,7 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       y = marginOuter + 1;
       addText('CONCLUSION', 16, true, false, 'center');
       y += 0.4;
-      addText(cleanGeneratedText(conclusion), 11);
+      addText(cleanGeneratedText(conclusion), typo.bodySize);
     }
 
     // ─── Pages de fin ───
@@ -401,7 +406,7 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       y = marginOuter + 1;
       addText(heading, 16, true, false, 'center');
       y += 0.4;
-      paras.forEach((p) => { addText(p, 11); y += 0.12; });
+      paras.forEach((p) => { addText(p, typo.bodySize); y += 0.12; });
     };
     endPage('REMERCIEMENTS', [
       `Merci à vous, cher lecteur, d'avoir accordé votre temps et votre confiance à « ${ebookTitle} ».`,
@@ -439,11 +444,12 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
     let html = `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapeXml(ebookTitle)}</title>
 <style>
 *{box-sizing:border-box}
-body{max-width:720px;margin:0 auto;font-family:Georgia,'Times New Roman',serif;line-height:1.9;color:#1a1a1a;padding:2em 1.5em;text-align:justify;hyphens:auto;-webkit-hyphens:auto}
+body{max-width:720px;margin:0 auto;font-family:${bodyCss};font-size:${typo.bodySize}pt;line-height:${typo.lineHeight};color:#1a1a1a;padding:2em 1.5em;text-align:${typo.justify ? 'justify' : 'left'};hyphens:auto;-webkit-hyphens:auto}
+h1,h2,h3{font-family:${headCss}}
 h1.book-title{text-align:center;font-size:2.8em;margin:3em 0 0.3em;font-weight:700;letter-spacing:-0.02em;line-height:1.2}
 .author{text-align:center;font-size:1.1em;color:#888;margin-bottom:1em;font-style:italic;letter-spacing:0.05em}
 .title-divider{width:100px;height:1px;background:#ccc;margin:0 auto 4em}
-h2{font-size:1.5em;margin:3em 0 0.5em;font-weight:700;letter-spacing:0.01em;page-break-before:always}
+h2{font-size:${typo.headingSize}pt;margin:3em 0 0.5em;font-weight:700;letter-spacing:0.01em;page-break-before:always}
 h2 .chapter-num{display:block;font-size:0.55em;text-transform:uppercase;letter-spacing:0.15em;color:#999;font-weight:400;margin-bottom:0.3em}
 h3{font-size:1.15em;margin:2em 0 0.8em;font-weight:600;color:#444}
 p{margin:0 0 0.9em;text-indent:1.5em}
@@ -498,7 +504,11 @@ h2+p,h3+p{text-indent:0}
     includePageNumbers,
     includeCopyrightPage: includeCopyright,
     readerLink: validLink,
-  }), [validLink, ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion, includeToc, includePageNumbers, includeCopyright]);
+    fontFamily: typo.fontFamily,
+    fontSize: typo.bodySize,
+    headingFontFamily: headingFontOf(typo),
+    headingSize: typo.headingSize,
+  }), [typo, validLink, ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion, includeToc, includePageNumbers, includeCopyright]);
 
   const docxAudit = useMemo(() => validateDocxChapters(chapters), [chapters]);
 
@@ -606,6 +616,50 @@ h2+p,h3+p{text-indent:0}
                 <Label htmlFor={opt.id} className="text-sm">{opt.label}</Label>
               </div>
             ))}
+
+            <div className="space-y-2 pt-2 border-t">
+              <Label className="text-sm font-semibold">🖋️ Polices et tailles du livre</Label>
+              <Select onValueChange={(id) => { const p = TYPO_PRESETS.find(x => x.id === id); if (p) updateTypo(p.values); }}>
+                <SelectTrigger><SelectValue placeholder="Duo de styles en 1 clic" /></SelectTrigger>
+                <SelectContent>{TYPO_PRESETS.map(p => <SelectItem key={p.id} value={p.id}>{p.label}</SelectItem>)}</SelectContent>
+              </Select>
+              <Label className="text-xs">Police des titres</Label>
+              <Select value={headingFontOf(typo)} onValueChange={(v) => updateTypo({ headingFontFamily: v as any })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{FONT_CHOICES.map(f => <SelectItem key={f.value} value={f.value}><span style={{ fontFamily: f.css }}>{f.label}</span></SelectItem>)}</SelectContent>
+              </Select>
+              <Label className="text-xs">Police du texte</Label>
+              <Select value={typo.fontFamily} onValueChange={(v) => updateTypo({ fontFamily: v as any })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>{FONT_CHOICES.map(f => <SelectItem key={f.value} value={f.value}><span style={{ fontFamily: f.css }}>{f.label}</span></SelectItem>)}</SelectContent>
+              </Select>
+              <div className="grid grid-cols-2 gap-2">
+                <div><Label className="text-xs">Taille titres</Label>
+                  <Select value={String(typo.headingSize)} onValueChange={(v) => updateTypo({ headingSize: Number(v) as any })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{[14, 16, 18, 20].map(n => <SelectItem key={n} value={String(n)}>{n} pt</SelectItem>)}</SelectContent>
+                  </Select></div>
+                <div><Label className="text-xs">Taille texte</Label>
+                  <Select value={String(typo.bodySize)} onValueChange={(v) => updateTypo({ bodySize: Number(v) as any })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{[11, 12, 14, 16].map(n => <SelectItem key={n} value={String(n)}>{n} pt</SelectItem>)}</SelectContent>
+                  </Select></div>
+                <div><Label className="text-xs">Interligne</Label>
+                  <Select value={String(typo.lineHeight)} onValueChange={(v) => updateTypo({ lineHeight: Number(v) as any })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{[1.15, 1.5, 2].map(n => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}</SelectContent>
+                  </Select></div>
+                <div><Label className="text-xs">Alignement</Label>
+                  <Select value={typo.justify ? 'j' : 'l'} onValueChange={(v) => updateTypo({ justify: v === 'j' })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent><SelectItem value="j">Justifié</SelectItem><SelectItem value="l">À gauche</SelectItem></SelectContent>
+                  </Select></div>
+              </div>
+              <div className="rounded border bg-white p-3 text-black">
+                <div style={{ fontFamily: headCss, fontSize: `${typo.headingSize}pt`, fontWeight: 700 }}>Chapitre 1</div>
+                <p style={{ fontFamily: bodyCss, fontSize: `${typo.bodySize}pt`, lineHeight: typo.lineHeight, textAlign: typo.justify ? 'justify' : 'left' }}>Le vent soufflait sur la plaine quand il aperçut enfin la silhouette du cavalier.</p>
+              </div>
+            </div>
 
             <div className="space-y-1 pt-2 border-t">
               <Label htmlFor="reader-link" className="text-sm font-semibold">Lien vers vos livres (QR code en fin de livre)</Label>
