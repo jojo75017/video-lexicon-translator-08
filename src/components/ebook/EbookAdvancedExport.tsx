@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
 import { Download, FileText, BookOpen, Loader2, CheckCircle2, Settings, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import { Chapter } from '@/hooks/useSubscriptionGeneration';
@@ -104,6 +105,9 @@ export const EbookAdvancedExport: React.FC<EbookAdvancedExportProps> = ({
   const [includeCopyright, setIncludeCopyright] = useState(true);
   const [includePreface, setIncludePreface] = useState(true);
   const [includeConclusion, setIncludeConclusion] = useState(true);
+  const [readerLink, setReaderLinkState] = useState<string>(() => localStorage.getItem('ebook-reader-link') || '');
+  const setReaderLink = (v: string) => { setReaderLinkState(v); localStorage.setItem('ebook-reader-link', v.trim()); };
+  const validLink = /^https?:\/\//i.test(readerLink.trim()) ? readerLink.trim() : '';
 
   const stats = useMemo(() => {
     let totalWords = 0;
@@ -259,7 +263,7 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
     downloadBlob(blob, `${ebookTitle}.epub`);
   };
 
-  const exportPdfPrint = () => {
+  const exportPdfPrint = (qrDataUrl?: string) => {
     const isDigital = selectedFormat === 'pdf-digital';
     const pageW = isDigital ? 8.27 : (trimSize?.w ?? 6);
     const pageH = isDigital ? 11.69 : (trimSize?.h ?? 9);
@@ -390,6 +394,39 @@ ${chapterFiles.map(cf => `<li><a href="${cf.filename}">${escapeXml(cf.title)}</a
       addText(cleanGeneratedText(conclusion), 11);
     }
 
+    // ─── Pages de fin ───
+    const who = authorName?.trim() || "l'auteur";
+    const endPage = (heading: string, paras: string[]) => {
+      newPage();
+      y = marginOuter + 1;
+      addText(heading, 16, true, false, 'center');
+      y += 0.4;
+      paras.forEach((p) => { addText(p, 11); y += 0.12; });
+    };
+    endPage('REMERCIEMENTS', [
+      `Merci à vous, cher lecteur, d'avoir accordé votre temps et votre confiance à « ${ebookTitle} ».`,
+      `Ce livre n'aurait pu voir le jour sans le soutien de celles et ceux qui ont accompagné ${who} tout au long de ce projet.`,
+      'Du fond du cœur, merci.',
+    ]);
+    endPage("MOT DE L'AUTEUR", [
+      "J'ai écrit ce livre avec l'envie sincère de vous transmettre quelque chose, et j'espère qu'il aura trouvé un écho en vous.",
+      'Au plaisir de vous retrouver dans un prochain ouvrage.',
+      authorName?.trim() ? authorName.trim() : "L'auteur",
+    ]);
+    endPage('NOTE POUR LES LECTEURS', [
+      'Si vous avez aimé ce livre, accepteriez-vous de partager votre avis sur Amazon ? Quelques mots suffisent et aident énormément.',
+      'Merci infiniment pour votre lecture.',
+    ]);
+    if (qrDataUrl && validLink) {
+      y += 0.2;
+      addText(`Découvrez tous les livres de ${who} : scannez ce QR code.`, 11, false, false, 'center');
+      const size = Math.min(2, contentWidth);
+      if (y + size > maxY) newPage();
+      doc.addImage(qrDataUrl, 'PNG', (pageW - size) / 2, y, size, size);
+      y += size + 0.25;
+      addText(validLink, 9, false, false, 'center');
+    }
+
     doc.save(`${ebookTitle} - ${isDigital ? 'Digital' : 'KDP Print'}.pdf`);
   };
 
@@ -460,9 +497,16 @@ h2+p,h3+p{text-indent:0}
     includeTableOfContents: includeToc,
     includePageNumbers,
     includeCopyrightPage: includeCopyright,
-  }), [ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion, includeToc, includePageNumbers, includeCopyright]);
+    readerLink: validLink,
+  }), [validLink, ebookTitle, authorName, chapters, includePreface, preface, includeConclusion, conclusion, includeToc, includePageNumbers, includeCopyright]);
 
   const docxAudit = useMemo(() => validateDocxChapters(chapters), [chapters]);
+
+  const makeQr = async () => {
+    if (!validLink) return undefined;
+    const { default: QRCode } = await import('qrcode');
+    return QRCode.toDataURL(validLink, { width: 600, margin: 1 });
+  };
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -476,10 +520,10 @@ h2+p,h3+p{text-indent:0}
           await exportEpub();
           break;
         case 'pdf-print':
-          exportPdfPrint();
+          exportPdfPrint(await makeQr());
           break;
         case 'pdf-digital':
-          exportPdfPrint(); // Uses A4 format with digital optimizations
+          exportPdfPrint(await makeQr()); // Uses A4 format with digital optimizations
           break;
         case 'txt':
           exportTxt();
@@ -562,6 +606,12 @@ h2+p,h3+p{text-indent:0}
                 <Label htmlFor={opt.id} className="text-sm">{opt.label}</Label>
               </div>
             ))}
+
+            <div className="space-y-1 pt-2 border-t">
+              <Label htmlFor="reader-link" className="text-sm font-semibold">Lien vers vos livres (QR code en fin de livre)</Label>
+              <Input id="reader-link" value={readerLink} onChange={(e) => setReaderLink(e.target.value)} placeholder="https://amzn.to/... (votre page auteur Amazon)" />
+              <p className="text-xs text-muted-foreground">Ajouté à la page « Note pour les lecteurs », après « Remerciements » et « Mot de l'auteur ». Laissez vide pour ne pas mettre de QR code.</p>
+            </div>
 
             {selectedFormat === 'docx-kdp' && (
               <Button

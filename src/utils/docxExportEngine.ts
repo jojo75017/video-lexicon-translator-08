@@ -23,6 +23,7 @@ import {
   convertInchesToTwip,
   UnderlineType,
   TabStopType,
+  ImageRun,
   Tab,
   LevelFormat,
   SectionType,
@@ -71,6 +72,8 @@ export interface DocxExportOptions {
   expectedChapterCount?: number;
   /** Texte de la 4ᵉ de couverture choisi par l'auteur : ajouté en dernière page. */
   backCoverText?: string;
+  /** Lien vers les livres de l'auteur (page auteur Amazon) : QR code imprimé dans la note aux lecteurs. */
+  readerLink?: string;
 
 
 }
@@ -739,6 +742,7 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
     pageFormat = '6x9',
     expectedChapterCount,
     backCoverText = '',
+    readerLink = '',
   } = options;
 
 
@@ -1088,12 +1092,34 @@ export async function generateProfessionalDocx(options: DocxExportOptions, previ
   ]);
 
   // 3/ Demande d'avis (courtoise)
-  backPage('UN DERNIER MOT', [
+  backPage('NOTE POUR LES LECTEURS', [
     `Si vous avez aimé ce livre, accepteriez-vous de prendre un instant pour partager votre avis ?`,
     `Un simple commentaire, déposé en toute liberté et sans aucune obligation, aide énormément les lecteurs à découvrir cet ouvrage et encourage ${authorForText} à poursuivre ce travail.`,
     `Quelques mots suffisent, et chaque retour est reçu avec une profonde gratitude.`,
     `Merci infiniment pour votre lecture et votre bienveillance.`,
   ]);
+
+  // 3 bis/ QR code vers les autres livres de l'auteur
+  const link = String(readerLink || '').trim();
+  if (/^https?:\/\//i.test(link)) {
+    const { default: QRCode } = await import('qrcode');
+    const dataUrl = await QRCode.toDataURL(link, { width: 600, margin: 1 });
+    const bytes = Uint8Array.from(atob(dataUrl.split(',')[1]), (c) => c.charCodeAt(0));
+    children.push(new Paragraph({
+      children: [new TextRun({ text: `Découvrez tous les livres de ${authorForText} : scannez ce QR code avec votre téléphone.`, size: baseSize, font })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 400, after: 200 },
+    }));
+    children.push(new Paragraph({
+      alignment: AlignmentType.CENTER,
+      children: [new ImageRun({ type: 'png', data: bytes, transformation: { width: 180, height: 180 }, altText: { title: 'QR code', description: link, name: 'qr' } })],
+    }));
+    children.push(new Paragraph({
+      children: [new TextRun({ text: link, size: Math.round(baseSize * 0.85), font, color: '555555' })],
+      alignment: AlignmentType.CENTER,
+      spacing: { before: 120 },
+    }));
+  }
 
   // 4/ Quatrième de couverture choisie par l'auteur (dernière page du fichier).
   // La couverture imprimée KDP complète (avec dos) reste un fichier séparé.
