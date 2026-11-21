@@ -10,6 +10,7 @@ const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com/v1beta/models
  *  "-latest" pointent toujours vers une version servie par Google, ce qui
  *  évite les 404 quand une version datée est retirée. */
 const MODEL_FALLBACKS = [
+  'gemini-4-hydrogen',
   'gemini-flash-latest',
   'gemini-2.5-flash',
   'gemini-2.0-flash',

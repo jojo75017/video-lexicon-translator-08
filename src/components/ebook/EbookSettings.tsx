@@ -203,6 +203,7 @@ export const EbookSettings: React.FC<EbookSettingsProps> = ({
                 <SelectValue placeholder="Sélectionner un modèle" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="gemini-4-hydrogen">🆕 Gemini 4 Hydrogen (Nouveau · gratuit)</SelectItem>
                 <SelectItem value="gemini-2.5-flash">Gemini 2.5 Flash (Recommandé)</SelectItem>
                 <SelectItem value="gemini-2.5-pro">Gemini 2.5 Pro (Premium)</SelectItem>
                 <SelectItem value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Économique)</SelectItem>

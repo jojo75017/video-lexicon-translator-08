@@ -45,6 +45,15 @@ export const V3_TIER_COLOR: Record<V3NouveauteTier, string> = {
 
 /** Liste des nouveautés, ordre libre : l'affichage trie par date décroissante. */
 export const V3_NOUVEAUTES: V3Nouveaute[] = [
+  {
+    id: 'gemini-4-hydrogen',
+    title: 'Nouveau modèle Gemini 4 Hydrogen',
+    desc: "Le dernier modèle de Google, gratuit avec votre clé Gemini : plus rapide, moins d'incohérences et une mémoire capable de suivre tout un roman.",
+    to: '/v3/fonctionnalites/cles#mes-reglages',
+    date: '2026-11-21',
+    tier: 'offert',
+    status: 'live',
+  },
   // --- Septembre 2026 ---
   {
     id: 'mes-couvertures',

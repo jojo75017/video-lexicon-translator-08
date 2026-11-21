@@ -450,6 +450,7 @@ const V3Workflow30: React.FC<{ onOpenModule: (m: V3Module) => void }> = ({ onOpe
   };
   const MODELS: Record<string, { value: string; label: string }[]> = {
     gemini: [
+      { value: 'gemini-4-hydrogen', label: '🆕 Gemini 4 Hydrogen (nouveau)' },
       { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (rapide)' },
       { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (qualité)' },
       { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (économique)' },
